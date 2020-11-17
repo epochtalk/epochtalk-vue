@@ -12,12 +12,9 @@ export default {
   name: 'Boards',
   props: {},
   setup() {
-    const $api = inject('$api');
-    const $swrvCache = inject('$swrvCache');
+    const $api = inject('$api')
 
-    const { data: boards, error: error } = useSWRV(`/api/boards`, path => $api(`${path}`), {
-      cache: $swrvCache
-    })
+    const { data: boards, error: error } = useSWRV(`/api/boards`, path => $api(`${path}`))
 
     return {
       boards,
@@ -25,18 +22,4 @@ export default {
     }
   }
 }
-// export default {
-//   data() {
-//     return {
-//       boards: null,
-//       error: null
-//     };
-//   },
-//   created() {
-//     // Simple GET request using axios
-//     const { data: boards, error } = useSWRV(`/boards`, path => root.$api(`${path}`), {
-//       cache: root.$swrvCache
-//     })
-//   }
-// }
 </script>

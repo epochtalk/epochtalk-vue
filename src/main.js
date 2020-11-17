@@ -1,13 +1,13 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
-import LocalStorageCache from './localStorageCache'
-import { provide } from 'vue'
+// import LocalStorageCache from './localStorageCache'
 
 // Vue.prototype.$api = path => fetch(`http://localhost:8000${path}`).then(res => res.json())
 // Vue.prototype.$swrvCache = new LocalStorageCache()
 
-createApp(App).use(router).mount('#app')
+const app = createApp(App).use(router)
 
-provide('$api', path => fetch(`http://localhost:8000${path}`).then(res => res.json()));
-provide('$swrvCache', new LocalStorageCache());
+app.provide('$api', path => fetch(`http://localhost:8080${path}`).then(res => res.json()));
+// app.provide('$swrvCache', new LocalStorageCache());
+app.mount('#app')
