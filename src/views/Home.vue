@@ -13,8 +13,11 @@ export default {
   props: {},
   setup() {
     const $api = inject('$api')
+    const $swrvCache = inject('$swrvCache')
 
-    const { data: boards, error: error } = useSWRV(`/api/boards`, path => $api(`${path}`))
+    const { data: boards, error: error } = useSWRV(`/api/boards`, path => $api(`${path}`), {
+      cache: $swrvCache
+    })
 
     return {
       boards,
