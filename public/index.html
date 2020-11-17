@@ -15,3 +15,68 @@
     <!-- built files will be auto injected -->
   </body>
 </html>
+
+  <!--
+  <div class="category" ng-repeat="cat in BoardsCtrl.categorizedBoards">
+
+    <div id="{{BoardsCtrl.generateCatId(cat.name, cat.view_order)}}" class="title">
+      <div ng-click="BoardsCtrl.toggleCategory(cat)" class="collapse-section">
+        <a ng-class="{ 'fa-chevron-down' : cat.show, 'fa-chevron-right': !cat.show }"
+        class="fa collapse-btn no-select"></a>
+        <h4 ng-bind-html="::cat.name"></h4>
+      </div>
+      <div class="thin-underline"></div>
+    </div>
+
+    <div slide-toggle="cat.show" initial-state="{{cat.initial}}">
+      <div class="slide-wrapper">
+        <div class="board" ng-repeat="board in cat.boards track by board.id">
+
+          <div class="info">
+            <h5>
+              <a ui-sref="threads.data({ boardSlug: board.slug })" class="board-name" ng-bind-html="board.name"></a>
+            </h5>
+            <div ng-if="board.moderators.length > 0">
+              <strong>Moderators: </strong>
+              <a ui-sref="profile.posts({ username: mod.username })" ng-repeat="mod in board.moderators" ng-bind="::mod.username + ($last ? '' : ', ')"></a>
+            </div>
+            <div class="description" ng-bind-html="::board.description"></div>
+
+            <div class="childboards" ng-if="board.children.length > 0">
+              <strong>Child Boards:</strong>
+              <span ng-repeat="child in board.children">
+                <a ui-sref="threads.data({ boardSlug: child.slug })" class="board-name" ng-bind-html="::child.name"></a>{{$last ? '' : ', '}}
+              </span>
+            </div>
+          </div>
+
+          <div class="view-count">
+            <div>
+              <strong ng-bind="::board.total_post_count | number:0"></strong> posts
+            </div>
+            <div>
+              <strong ng-bind="::board.total_thread_count | number:0"></strong> threads
+            </div>
+          </div>
+
+          <div class="last-post">
+            <div ng-if="board.last_post_username">
+              Last post by
+              <span ng-if="board.user_deleted || board.post_deleted">deleted</span>
+              <img ng-if="!board.user_deleted && !board.post_deleted" class="avatar-small" ng-src="{{::board.last_post_avatar || $webConfigs.default_avatar}}" />
+              <a ng-if="!board.user_deleted && !board.post_deleted" ui-sref="profile.posts({ username: board.last_post_username })" ng-bind="::board.last_post_username"></a>
+            </div>
+            <div ng-if="board.last_thread_title">
+              in
+              <a ui-sref="posts.data({ slug: board.last_thread_slug, start: board.last_post_position })" ng-bind-html="::board.last_thread_title | decode | truncate:25" title="{{board.last_thread_title | decode}}"></a>
+            </div>
+            <div ng-if="board.last_post_created_at">
+              <i ng-bind="::board.last_post_created_at | humanDate"></i>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  -->

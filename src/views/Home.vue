@@ -1,7 +1,22 @@
 <template>
-  <h1>Home Page</h1>
-  <p>{{boards}}</p>
-  <p><strong>{{error}}</strong></p>
+  <h1>Home</h1>
+  <p v-if="error"><strong>{{error}}</strong></p>
+  <hr />
+  <div v-if="data">
+    <div class="category" v-for="cat in data.boards" :key="cat.id">
+      <h3>&bull; {{cat.name}}</h3>
+      <ul v-for="board in cat.boards" :key="board.id">
+        <a href="#">{{board.name}}</a>
+        <div class="description">{{board.description}}</div>
+        <div class="childboards" v-if="board.children.length > 0">
+          <strong>Child Boards:</strong>
+          <span v-for="child in board.children" :key="child.id">
+            <a href="#">{{child.name}}</a>,
+          </span>
+        </div>
+      </ul>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -15,12 +30,12 @@ export default {
     const $api = inject('$api')
     const $swrvCache = inject('$swrvCache')
 
-    const { data: boards, error: error } = useSWRV(`/api/boards`, path => $api(`${path}`), {
-      cache: $swrvCache
-    })
+    const { data: data, error: error } = useSWRV(`/api/boards`, path => $api(`${path}`), {
+      cache: $swrvCache });
+
 
     return {
-      boards,
+      data,
       error
     }
   }

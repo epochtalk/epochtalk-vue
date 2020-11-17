@@ -15,8 +15,10 @@ function fromBinary(binary) {
 }
 
 class LocalStorageCache {
-  constructor () {
+  constructor (ttl) {
     this.STORAGE_KEY = 'swrv'
+    if (ttl === void 0) { ttl = 0 }
+    this.ttl = ttl
   }
 
   encode (storage) { return btoa(toBinary(JSON.stringify(storage))) }
@@ -29,17 +31,26 @@ class LocalStorageCache {
     }
   }
 
-  set (k, v) {
-    let payload = {}
-    const storage = localStorage.getItem(this.STORAGE_KEY)
-    if (storage) {
-      payload = this.decode(storage)
-      payload[k] = { data: v, ttl: Date.now() }
-    } else {
-      payload = { [k]: { data: v, ttl: Date.now() } }
+  set (k, v, ttl) {
+    let timeToLive = ttl || this.ttl
+    let now = Date.now()
+    let payload = {
+      [k]: {
+        data: v,
+        createdAt: now,
+        expiresAt: timeToLive ? now + timeToLive : Infinity
+      }
     }
-
+    timeToLive && setTimeout(function() {
+      let current = Date.now()
+      let hasExpired = current >= payload[k].expiresAt;
+      if (hasExpired) { this.delete(k) }
+    }, timeToLive)
     localStorage.setItem(this.STORAGE_KEY, this.encode(payload))
+  }
+
+  delete (k) {
+    localStorage.removeItem(k);
   }
 }
 
