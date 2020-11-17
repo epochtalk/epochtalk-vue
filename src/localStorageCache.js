@@ -25,7 +25,7 @@ class LocalStorageCache {
   get (k) {
     const item = localStorage.getItem(this.STORAGE_KEY)
     if (item) {
-      return JSON.parse(atob(item))[k]
+      return JSON.parse(fromBinary(atob(item)))[k]
     }
   }
 
