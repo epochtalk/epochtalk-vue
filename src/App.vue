@@ -1,32 +1,48 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+    <nav id="navigation">
+      <h1 class="title">Epochtalk</h1>
+      <div class="right" id="nav">
+        <router-link to="/">Boards</router-link> |
+        <router-link to="/about">About</router-link>
+      </div>
+    </nav>
+    <div id="content">
+      <router-view />
     </div>
-    <router-view />
   </div>
 </template>
 
 <script>
-// import HelloWorld from './components/HelloWorld.vue'
 
 export default {
-  name: 'App',
+  name: 'Epochtalk',
   components: {
-    // HelloWorld
   }
 }
 </script>
 
 <style>
+body { margin: 0; }
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
-  margin-top: 60px;
-  margin-left: 4rem;
-  margin-right: 4rem;
+}
+#navigation {
+  background-color: #555;
+  color: #fff;
+  display: flex;
+  align-items: center;
+}
+#navigation a { color: #fff; }
+#navigation .right { margin: 1rem 10rem 1rem auto; }
+#navigation .title {
+  display: inline-block;
+  margin: 1rem 0 1rem 10rem;
+}
+#content {
+  margin: 1rem 10rem;
 }
 </style>
