@@ -8,12 +8,14 @@
         <div class="description">{{board.description}}</div>
         <div class="moderators" v-if="board.moderators && board.moderators.length">
           <strong>Moderators: </strong>
-          <a href="#" v-for="mod in board.moderators" :key="mod.username">{{mod.username}}</a>,
+          <span v-for="(mod, i) in board.moderators" :key="mod.username">
+            <a href="#">{{mod.username}}</a><span v-if="(i + 1) !== board.moderators.length">, </span>
+          </span>
         </div>
         <div class="childboards" v-if="board.children.length">
           <strong>Child Boards:</strong>
-          <span v-for="child in board.children" :key="child.id">
-            <a href="#">{{child.name}}</a>,
+          <span v-for="(child, i) in board.children" :key="child.id">
+            <a href="#">{{child.name}}</a><span v-if="(i + 1) !== board.children.length">, </span>
           </span>
         </div>
       </ul>
