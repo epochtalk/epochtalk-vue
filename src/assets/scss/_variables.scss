@@ -1,0 +1,137 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto:300,400,700,900&display=swap');
+
+// grid layout
+$view-maxWidth: 1300px;
+$sidebarWidth: 240px;
+
+// Posts layout variables
+$postUserWidth: 80px;
+
+$dark-text-default: rgb(34, 34, 34);
+$light-text-default: rgb(255,255,255);
+$text-gray-med: #777;
+$text-gray-dark:  #555;
+$color-alert: rgb(202, 0, 0);
+$color-valid: rgb(24, 177, 1);
+$color-warning: rgb(255, 100, 0);
+
+// Font sizes calculated
+$font-size-base:  1rem;
+$font-size-3xl:   2.75rem;
+$font-size-2xl:   2.3125rem;
+$font-size-xl:    1.5rem;
+$font-size-lg:    1.3125rem;
+$font-size-med:   1.25rem;
+$font-size-sm:    0.875rem;
+$font-size-xs:    0.75rem;
+$font-size-tiny:  0.6375rem;
+
+
+@function brightness($color) {
+  @if type-of($color) == color {
+    @return (red($color) * 0.299 + green($color) * 0.587 + blue($color) * 0.114) / 255 * 100%;
+  }
+  @else { @return unquote("brightness(#{$color})"); }
+}
+
+@function color-contrast($color, $dark: $dark-text-default, $light: $light-text-default) {
+  @if $color == null { @return null; }
+  @else {
+    $color-brightness: brightness($color);
+    $light-text-brightness: brightness($light);
+    $dark-text-brightness: brightness($dark);
+    @return if(abs($color-brightness - $light-text-brightness) > abs($color-brightness - $dark-text-brightness), $light, $dark);
+  }
+}
+
+@import 'default-variables';
+// @import '../../../../content/sass/_custom-variables';
+@import 'preview-variables';
+
+// Placeholder text color
+$placeholder-text-color: lighten($header-bg-color, 20%);
+@if (lightness($header-bg-color) > 50) { $placeholder-text-color: darken($header-bg-color, 20%); }
+
+
+// Calculated shadow color
+$card-shadow-color: rgba(0, 0, 0, 0.1);
+@if (lightness($sub-header-color) < 50) {
+  $card-shadow-color: rgba(0, 0, 0, 0.2);
+}
+
+
+// Spacing Calculated
+$base-grid-padding: 2rem;
+
+// Primary Layout Colors Calculated
+$color-primary-alt: darken($color-primary, 15%);
+@if (lightness($color-primary) > 50) { $color-primary-alt: darken($color-primary, 15%); }
+// transparent version
+$color-primary-transparent: rgba($color-primary, 0.4);
+
+// Fonts Calculated
+$button-text-color: color-contrast($color-primary);
+$secondary-font-color-dark: lighten($secondary-font-color, 15%);
+$secondary-font-color-light: darken($secondary-font-color, 20%);
+@if (lightness($base-background-color) > 50) {
+  $secondary-font-color-dark: darken($secondary-font-color, 15%);
+  $secondary-font-color-light: lighten($secondary-font-color, 20%);
+}
+
+// Components Calculated
+$color-highlighted: HSL(200, 20%, 12%);
+$border-color-alt: darken($border-color, 10%);
+$code-block-bg-color: lighten($base-background-color, 10%);
+@if (lightness($base-background-color) > 50) {
+  $border-color-alt: lighten($border-color, 10%);
+  $code-block-bg-color: darken($base-background-color, 10%);
+  $color-highlighted: HSL(60, 100%, 95%);
+}
+$code-block-text-color: color-contrast($code-block-bg-color);
+
+//Header Colors Calculated
+$header-height: 3.125rem;
+$header-offset: 6rem;
+$header-bottom-margin: 1.5rem;
+$header-logo-font-size: 1.3rem;
+$header-logo-font-color: $header-font-color;
+$header-login-font-size: 0.815rem;
+$header-login-font-color: $header-logo-font-color;
+$header-dropdown-bg-color: darken(rgba($header-bg-color, 0.98), 8%);
+$header-dropdown-shadow-color: rgba(0, 0, 0, 0.3);
+
+//Sub header color
+$sub-header-font-color: color-contrast($sub-header-color);
+$sub-header-secondary-font-color: darken($sub-header-font-color, 10%);
+
+// Breadcrumbs Calculated
+$breadcrumbs-height: 2.8125rem;
+$breadcrumbs-font-size: $header-login-font-size;
+$breadcrumbs-bg-color: $sub-header-color;
+$breadcrumbs-link-color: color-contrast($breadcrumbs-bg-color);
+$breadcrumbs-dead-link-color: $secondary-font-color;
+$breadcrumbs-border-color: darken($breadcrumbs-bg-color, 8%);
+$breadcrumbs-shadow-color: rgba(0, 0, 0, 0.1);
+$breadcrumbs-bottom-margin: 1rem;
+
+// Footer Calculated
+$footer-font-color: $secondary-font-color;
+$footer-bg-color: $sub-header-color;
+$footer-link-color: $footer-font-color;
+$footer-link-hover-color: $color-primary;
+
+
+// Borders (post color calculations)
+$border: 1px solid $border-color;
+$border-trans: 1px solid rgba($border-color, 0.35);
+$border-alt: 1px solid $border-color-alt;
+$border-quote: 2px solid rgba($border-color, 0.5);
+
+
+// Mobile Breakpoints
+$tablet:  767px;
+$medium: 1024px;
+$large:   1280px;
+
+@import 'mixins';
+@import 'overrides';

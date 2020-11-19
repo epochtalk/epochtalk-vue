@@ -7,29 +7,61 @@
         <router-link to="/about">About</router-link>
       </div>
     </nav>
-    <div id="content">
-      <router-view />
-    </div>
+    <main>
+      <div id="public-content">
+        <div class="main">
+          <router-view />
+        </div>
+      </div>
+  </main>
   </div>
 </template>
 
 <script>
-
 export default {
-  name: 'Epochtalk',
-  components: {
-  }
+  name: 'Epochtalk'
 }
 </script>
 
 <style lang="scss">
-body { margin: 0; }
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
+main {
+  @include clearfix();
+  @include pad(0 $base-grid-padding);
+  min-height: 100%;
+  // padding-bottom: 58px;
+  #public-content {
+    @include base-layout-width;
+    @include grid-base-layout;
+    @include grid-columns-base;
+    // margin-top: $header-bottom-margin;
+    grid-template-areas:
+      "header header"
+      "main main"
+      "sidebar sidebar";
+    grid-gap: 2rem;
+    row-gap: 1rem;
+    margin-bottom: 2rem;
+
+    @include break-mobile-sm {
+      column-gap: 0;
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .main { grid-area: main; }
+
+  @include break-mobile-sm {
+    padding: 0 1rem;
+
+    #public-content,
+    .posts #public-content {
+      column-gap: 0;
+      grid-template-columns: 1fr;
+      justify-items: center;
+    }
+  }
 }
+
 #navigation {
   background-color: #555;
   color: #fff;
@@ -41,8 +73,5 @@ body { margin: 0; }
     display: inline-block;
     margin: 1rem 0 1rem 10rem;
   }
-}
-#content {
-  margin: 1rem 10rem;
 }
 </style>

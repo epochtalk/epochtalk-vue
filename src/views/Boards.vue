@@ -1,8 +1,9 @@
 <template>
   <p v-if="error"><strong>{{error}}</strong></p>
+  <recent-threads :threads="data.threads"></recent-threads>
   <div v-if="data">
     <div class="category" v-for="cat in data.boards" :key="cat.id">
-      <h3>&bull; {{cat.name}}</h3>
+      <h2>{{cat.name}}</h2>
       <div class="board" v-for="board in cat.boards" :key="board.id">
 
         <div class="info">
@@ -59,10 +60,13 @@
 <script>
 import useSWRV from 'swrv'
 import { inject } from 'vue'
+import RecentThreads from "@/components/threads/RecentThreads.vue";
 
 export default {
   name: 'Boards',
-  props: {},
+  components: {
+    RecentThreads
+  },
   setup() {
     const $api = inject('$api')
     const $swrvCache = inject('$swrvCache')
@@ -97,14 +101,14 @@ img.avatar-small {
   .title {
     h1 {
       display: inline-block;
-      font-size: .75rem;
+      font-size: $font-size-sm;
       line-height: 1.5;
       // margin-top: 0.5rem;
       padding-left: 0;
     }
     a {
       display: inline-block;
-      color: #444;
+      color: $secondary-font-color;
       width: 1rem;
       // font-size: 0.65rem;
       position: relative;
@@ -116,6 +120,7 @@ img.avatar-small {
     }
 
     .collapse-section {
+       @include no-select;
        display: flex;
        align-items: center;
        margin-left: -1rem;
@@ -141,7 +146,7 @@ img.avatar-small {
 
          polyline {
            fill: none;
-           stroke: #444;
+           stroke: $secondary-font-color;
            stroke-linecap: round;
            stroke-miterlimit: 10;
            stroke-width: 7px;
@@ -162,8 +167,8 @@ img.avatar-small {
       .description,
       .childboards,
       .moderators {
-        color: #444;
-        font-size: .75rem;
+        color: $secondary-font-color;
+        font-size: $font-size-sm;
         line-height: 1;
         margin-bottom: 0.5rem;
       }
@@ -175,20 +180,20 @@ img.avatar-small {
       }
 
       .description {
-        color: #222;
+        color: $base-font-color;
       }
     }
 
     h2 {
-      font-size: 1.25rem;
+      font-size: $font-size-med;
       font-weight: 600;
       text-transform: none;
 
       a {
-        color: #222;
+        color: $base-font-color;
 
         &:hover {
-          color: #555;
+          color: $color-primary;
         }
       }
     }
@@ -200,6 +205,7 @@ img.avatar-small {
     }
 
     .view-count {
+      @include info-text;
       flex: 0 0 50%;
 
       &-posts,
@@ -221,6 +227,7 @@ img.avatar-small {
     }
 
     .last-post {
+      @include info-text;
       flex: 2;
     }
 
@@ -251,5 +258,8 @@ img.avatar-small {
       }
   }
 
+  @include break-mobile-sm {
+    margin: 0 1rem 0 1.75rem;
+  }
 }
 </style>
