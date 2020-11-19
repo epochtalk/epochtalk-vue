@@ -22,7 +22,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 body { margin: 0; }
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
@@ -35,12 +35,12 @@ body { margin: 0; }
   color: #fff;
   display: flex;
   align-items: center;
-}
-#navigation a { color: #fff; }
-#navigation .right { margin: 1rem 10rem 1rem auto; }
-#navigation .title {
-  display: inline-block;
-  margin: 1rem 0 1rem 10rem;
+  a { color: #fff; }
+  .right { margin: 1rem 10rem 1rem auto; }
+  .title {
+    display: inline-block;
+    margin: 1rem 0 1rem 10rem;
+  }
 }
 #content {
   margin: 1rem 10rem;
