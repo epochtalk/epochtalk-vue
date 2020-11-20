@@ -46,7 +46,7 @@
             <a v-if="!thread.deleted" href="#" onclick="event.stopPropagation()">{{thread.user.username}}</a>
           </div>
           <div class="last-reply">
-            <div>{{thread.post.created_at}}</div>
+            <div>{{humanDate(thread.post.created_at)}}</div>
           </div>
         </div>
       </div>
@@ -55,8 +55,13 @@
 </template>
 
 <script>
+import humanDate from '@/filters/humanDate'
+
 export default {
-  props: ['threads']
+  props: ['threads'],
+  methods: {
+    humanDate: humanDate
+  }
 }
 </script>
 

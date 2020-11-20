@@ -46,7 +46,7 @@
                 <a href="#">{{board.last_thread_title }}</a> on
               </span>
               <span vi-if="board.last_post_created_at">
-                <span>{{board.last_post_created_at}}</span>
+                <span>{{humanDate(board.last_post_created_at)}}</span>
               </span>
             </div>
           </div>
@@ -61,6 +61,7 @@
 import useSWRV from 'swrv'
 import { inject } from 'vue'
 import RecentThreads from "@/components/threads/RecentThreads.vue";
+import humanDate from '@/filters/humanDate'
 
 export default {
   name: 'Boards',
@@ -79,6 +80,9 @@ export default {
       data,
       error
     }
+  },
+  methods: {
+    humanDate: humanDate
   }
 }
 </script>
