@@ -94,6 +94,7 @@ export default {
     grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
     grid-gap: 2rem;
     padding-bottom: 2rem;
+    @include break-mobile-sm { padding-bottom: 1rem; }
   }
 
   .threads-data {
@@ -160,7 +161,9 @@ export default {
   }
 
   @include break-mobile-sm {
-    padding: 0 1rem;
+    padding: 1rem;
+    width: 100%;
+    margin-bottom: 0;
   }
 }
 </style>

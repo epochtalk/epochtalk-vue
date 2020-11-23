@@ -31,7 +31,12 @@ export default {
 
 <style lang="scss">
 /*-- View Layout Wrappers --*/
-#public-content { margin-top: $header-bottom-margin; }
+#public-content {
+  margin-top: $header-bottom-margin;
+  @include break-mobile-sm {
+    margin-top: 0;
+  }
+}
 
 /*-------------- Index File -------------- */
 #wrapper {
@@ -67,7 +72,7 @@ export default {
     &:hover { color: black; }
     &:last-child { margin-right: 0; }
   }
-  @media screen and (max-width: 767px) { a span { display: none; } }
+  @include break-mobile-sm { a span { display: none; } }
 }
 main {
   @include clearfix();
