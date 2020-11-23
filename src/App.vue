@@ -1,29 +1,74 @@
 <template>
-  <div id="app">
-    <nav id="navigation">
-      <h1 class="title">Epochtalk</h1>
-      <div class="right" id="nav">
-        <router-link to="/">Boards</router-link> |
-        <router-link to="/about">About</router-link>
-      </div>
-    </nav>
-    <main>
-      <div id="public-content">
-        <div class="main">
-          <router-view />
+  <div id="wrapper">
+      <!-- <nav id="navigation">
+        <h1 class="title">Epochtalk</h1>
+        <div class="right" id="nav">
+          <router-link to="/">Boards</router-link> |
+          <router-link to="/about">About</router-link>
         </div>
-      </div>
-  </main>
+      </nav> -->
+      <Header></Header>
+      <main>
+        <div id="public-content">
+          <div class="main">
+            <router-view />
+          </div>
+        </div>
+    </main>
   </div>
 </template>
 
 <script>
+import Header from "@/components/layout/Header.vue";
+
 export default {
-  name: 'Epochtalk'
+  name: 'Epochtalk',
+  components: {
+    Header
+  }
 }
 </script>
 
 <style lang="scss">
+/*-- View Layout Wrappers --*/
+#public-content { margin-top: $header-bottom-margin; }
+
+/*-------------- Index File -------------- */
+#wrapper {
+  min-height: calc(100vh - #{$header-offset});
+  position:relative;
+  margin-top: #{$header-offset};
+
+  .motd-visible & {
+    margin-top: calc(#{$header-offset} + 4rem);
+
+    @include break-mobile-sm {
+      margin-top: calc(#{$header-offset} + 3rem);
+    }
+  }
+
+  @include break-mobile-sm {
+    overflow-x: hidden;
+    margin-top: calc(#{$header-offset} - 0.5rem);
+  }
+}
+
+#wrapper #preview-banner {
+  @include pad(0 $base-grid-padding);
+  background-color: orange;
+  height: 2rem;
+  line-height: 2rem;
+  color: $dark-text-default;
+  border-bottom: 1px solid darken(orange, 10%);
+  a {
+    @include border-radius(2px);
+    padding: 0 0.5rem;
+    color: $dark-text-default;
+    &:hover { color: black; }
+    &:last-child { margin-right: 0; }
+  }
+  @media screen and (max-width: 767px) { a span { display: none; } }
+}
 main {
   @include clearfix();
   @include pad(0 $base-grid-padding);
