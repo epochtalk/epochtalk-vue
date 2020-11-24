@@ -3,54 +3,70 @@
   <recent-threads :threads="data.threads"></recent-threads>
   <div v-if="data">
     <div class="category" v-for="cat in data.boards" :key="cat.id">
-      <h2>{{cat.name}}</h2>
-      <div class="board" v-for="board in cat.boards" :key="board.id">
-
-        <div class="info">
-          <a href="#">{{board.name}}</a>
-          <div class="description">{{board.description}}</div>
-          <div class="moderators" v-if="board.moderators && board.moderators.length">
-            <strong>Moderators: </strong>
-            <span v-for="(mod, i) in board.moderators" :key="mod.username">
-              <a href="#">{{mod.username}}</a><span v-if="(i + 1) !== board.moderators.length">, </span>
-            </span>
-          </div>
-          <div class="childboards" v-if="board.children.length">
-            <strong>Child Boards:</strong>
-            <span v-for="(child, i) in board.children" :key="child.id">
-              <a href="#">{{child.name}}</a><span v-if="(i + 1) !== board.children.length">, </span>
-            </span>
-          </div>
+      <!-- Category Title -->
+      <div :id="generateCatId(cat.name, cat.view_order)" class="title">
+        <div v-on:click="toggleCategory(cat)" class="collapse-section">
+          <a :class="{ 'is-open' : cat.show || cat.show === undefined, 'is-closed': !cat.show }" class="test">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 39.84 22.63" class="icon__caretDown">
+              <title></title>
+              <g id="Layer_2" data-name="Layer 2">
+                <polyline class="icon" points="37.92 1.92 19.92 19.92 1.92 1.92" />
+              </g>
+            </svg>
+          </a>
+          <h1>{{cat.name}}</h1>
         </div>
+      </div>
+      <div v-for="board in cat.boards" :key="board.id">
+        <transition>
+          <div class="board" v-if="cat.show || cat.show === undefined">
+            <div class="info">
+              <a href="#">{{board.name}}</a>
+              <div class="description">{{board.description}}</div>
+              <div class="moderators" v-if="board.moderators && board.moderators.length">
+                <strong>Moderators: </strong>
+                <span v-for="(mod, i) in board.moderators" :key="mod.username">
+                  <a href="#">{{mod.username}}</a><span v-if="(i + 1) !== board.moderators.length">, </span>
+                </span>
+              </div>
+              <div class="childboards" v-if="board.children.length">
+                <strong>Child Boards:</strong>
+                <span v-for="(child, i) in board.children" :key="child.id">
+                  <a href="#">{{child.name}}</a><span v-if="(i + 1) !== board.children.length">, </span>
+                </span>
+              </div>
+            </div>
 
-        <div class="board-secondary">
-          <!-- Board Posts and Threads -->
-          <div class="view-count">
-            <p class="view-count-posts">
-              <span class="view-count-number">{{board.post_count}}</span>
-               <span class="label"> posts,</span>
-            </p>
-            <p class="view-count-threads">
-              <span class="view-count-number">{{board.thread_count}}</span>
-               <span class="label"> threads</span>
-            </p>
-          </div>
+            <div class="board-secondary">
+              <!-- Board Posts and Threads -->
+              <div class="view-count">
+                <p class="view-count-posts">
+                  <span class="view-count-number">{{board.post_count}}</span>
+                   <span class="label"> posts,</span>
+                </p>
+                <p class="view-count-threads">
+                  <span class="view-count-number">{{board.thread_count}}</span>
+                   <span class="label"> threads</span>
+                </p>
+              </div>
 
-          <!-- Board Last Post By -->
-          <div class="last-post">
-            <div v-if="board.last_post_username">
-              <span v-if="board.user_deleted || board.post_deleted">deleted</span>
-              <img v-if="!board.user_deleted && !board.post_deleted" class="avatar-small round" v-bind:src="board.last_post_avatar" />
-              <a v-if="!board.user_deleted && !board.post_deleted" href="#">{{board.last_post_username}}</a> posted in
-              <span v-if="board.last_thread_title">
-                <a href="#">{{board.last_thread_title }}</a> on
-              </span>
-              <span vi-if="board.last_post_created_at">
-                <span>{{humanDate(board.last_post_created_at)}}</span>
-              </span>
+              <!-- Board Last Post By -->
+              <div class="last-post">
+                <div v-if="board.last_post_username">
+                  <span v-if="board.user_deleted || board.post_deleted">deleted</span>
+                  <img v-if="!board.user_deleted && !board.post_deleted" class="avatar-small round" v-bind:src="board.last_post_avatar" />
+                  <a v-if="!board.user_deleted && !board.post_deleted" href="#">{{board.last_post_username}}</a> posted in
+                  <span v-if="board.last_thread_title">
+                    <a href="#">{{board.last_thread_title }}</a> on
+                  </span>
+                  <span vi-if="board.last_post_created_at">
+                    <span>{{humanDate(board.last_post_created_at)}}</span>
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        </transition>
 
       </div>
     </div>
@@ -73,7 +89,31 @@ export default {
     const $swrvCache = inject('$swrvCache')
 
     const { data: data, error: error } = useSWRV(`/api/boards`, path => $api(`${path}`), {
-      cache: $swrvCache });
+      cache: $swrvCache })
+
+    let collapsedCats = [];
+    // let ignoredBoards = [];
+
+    data.value.boards.map(function(category) {
+      // set category visibility
+      if (collapsedCats.indexOf(category.id) > -1) {
+        category.show = false;
+      }
+      else {
+        category.show = true;
+      }
+
+      // set total_thread_count and total_post_count for all boards
+      //category.boards = filterIgnoredBoards(category.boards)
+
+      // category.boards.map(function(board) {
+      //   var children = countTotals([board]);
+      //   var lastPost = getLastPost([board]);
+      //   board.total_thread_count = children.thread_count;
+      //   board.total_post_count = children.post_count;
+      //   return Object.assign(board, lastPost);
+      // });
+    })
 
 
     return {
@@ -82,7 +122,30 @@ export default {
     }
   },
   methods: {
-    humanDate: humanDate
+    humanDate: humanDate,
+    generateCatId(name, viewOrder) {
+      var anchorId = (name + '-' + viewOrder).replace(/\s+/g, '-').toLowerCase();
+      return anchorId;
+    },
+    toggleCategory(cat) {
+      if (cat.show === undefined) { cat.show = false; }
+      else { cat.show = !cat.show; }
+      // if (!Session.isAuthenticated()) { return; }
+
+      // // if showing, remove from collapsed_categories in place
+      // if (cat.show) { remove(collapsedCats, cat.id); }
+      // // else add to collapsed_categories
+      // else if (collapsedCats.indexOf(cat.id) < 0) { collapsedCats.push(cat.id); }
+
+      // // save changes to local preferences
+      // var newPrefs = PreferencesSvc.preferences;
+      // newPrefs.collapsed_categories = collapsedCats;
+      // PreferencesSvc.setPreferences(newPrefs);
+
+      // // save changes to server preferences
+      // newPrefs.username = Session.user.username;
+      // User.update({ id: Session.user.id }, newPrefs);
+    }
   }
 }
 </script>
