@@ -67,10 +67,10 @@
           <!-- Login Section -->
           <ul class="signed-out" v-if="!loggedIn()">
             <li>
-              <a v-on:click="showRegister = true">REGISTER</a>
+              <a href="" @click.prevent="showRegister = true">REGISTER</a>
             </li>
             <li>
-              <a id="login-link" v-on:click="showLogin = true">LOGIN</a>
+              <a href="" id="login-link" @click.prevent="showLogin = true">LOGIN</a>
             </li>
           </ul>
 
@@ -177,6 +177,8 @@
       <motd></motd>
       <alert></alert>
       -->
+      <login-modal :show="showLogin" @close="showLogin = false"></login-modal>
+      <register-modal :show="showRegister" @close="showRegister = false"></register-modal>
     </div>
   </header>
 </template>
@@ -184,8 +186,11 @@
 <script>
 import decode from '@/filters/decode'
 import truncate from '@/filters/truncate'
+import LoginModal from "@/components/modals/auth/Login.vue";
+import RegisterModal from "@/components/modals/auth/Register.vue";
 
 export default {
+  components: { LoginModal, RegisterModal },
   data() {
 
     return {
@@ -194,7 +199,8 @@ export default {
       searchExpanded: false,
       searchTerms: '',
       showInvite: false,
-      showLogin: true,
+      showRegister: false,
+      showLogin: false,
       logo: '',
       currentUser: {},
       breadcrumbs: [{label:'Home', state: '#', opts: {}}],

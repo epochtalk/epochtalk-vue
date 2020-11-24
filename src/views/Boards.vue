@@ -3,8 +3,8 @@
   <recent-threads :threads="data.threads"></recent-threads>
 
   <div v-if="!loggedIn()" class="dashboard-actions">
-    <a href="" class="e-control e-btn e-lib e-info">Create an Account</a>
-    <a href="" class="button">Log In</a>
+    <a href="" class="button" @click.prevent="showRegister = true">Create an Account</a>
+    <a href="" class="button" @click.prevent="showLogin = true">Log In</a>
   </div>
   <div v-if="loggedIn()" class="dashboard-actions">
     <a class="button" href="#">Watchlist</a>
@@ -40,7 +40,7 @@
                 </span>
               </div>
               <div class="childboards" v-if="board.children.length">
-                <strong>Child Boards:</strong>
+                <strong>Child Boards: </strong>
                 <span v-for="(child, i) in board.children" :key="child.id">
                   <a href="#">{{child.name}}</a><span v-if="(i + 1) !== board.children.length">, </span>
                 </span>
@@ -81,6 +81,8 @@
       </div>
     </div>
   </div>
+  <login-modal :show="showLogin" @close="showLogin = false"></login-modal>
+  <register-modal :show="showRegister" @close="showRegister = false"></register-modal>
 </template>
 
 <script>
@@ -88,11 +90,21 @@ import useSWRV from 'swrv'
 import { inject } from 'vue'
 import RecentThreads from "@/components/threads/RecentThreads.vue";
 import humanDate from '@/filters/humanDate'
+import LoginModal from "@/components/modals/auth/Login.vue";
+import RegisterModal from "@/components/modals/auth/Register.vue";
 
 export default {
   name: 'Boards',
   components: {
-    RecentThreads
+    RecentThreads,
+    LoginModal,
+    RegisterModal
+  },
+  data() {
+    return {
+      showLogin: false,
+      showRegister: false
+    }
   },
   setup() {
     const $api = inject('$api')

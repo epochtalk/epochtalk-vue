@@ -1,0 +1,28 @@
+.button, button, button:focus, .button:focus {
+  border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  -webkit-transition: color 0.15s ease,background-color 0.15s ease,box-shadow 150ms ease,-webkit-transform 150ms ease;
+  -moz-transition: color 0.15s ease,background-color 0.15s ease,box-shadow 150ms ease,-moz-transform 150ms ease;
+  transition: color 0.15s ease,background-color 0.15s ease,box-shadow 150ms ease,transform 150ms ease;
+  border: 0;
+  background-color: $color-primary;
+  border-color: $color-primary;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  outline: none;
+  padding: 0.625rem 1.375rem;
+  font-weight: normal;
+  line-height: normal;
+  cursor: pointer;
+  margin: 0 0 1.25rem;
+  position: relative;
+  color: #fff;
+  text-decoration: none;
+  text-align: center;
+  -webkit-appearance: none;
+}
+
