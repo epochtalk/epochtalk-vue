@@ -1,6 +1,16 @@
 <template>
   <p v-if="error"><strong>{{error}}</strong></p>
   <recent-threads :threads="data.threads"></recent-threads>
+
+  <div v-if="!loggedIn()" class="dashboard-actions">
+    <a href="" class="e-control e-btn e-lib e-info">Create an Account</a>
+    <a href="" class="button">Log In</a>
+  </div>
+  <div v-if="loggedIn()" class="dashboard-actions">
+    <a class="button" href="#">Watchlist</a>
+    <a class="button" href="#">Threads Posted In</a>
+  </div>
+
   <div v-if="data">
     <div class="category" v-for="cat in data.boards" :key="cat.id">
       <!-- Category Title -->
@@ -104,7 +114,7 @@ export default {
       }
 
       // set total_thread_count and total_post_count for all boards
-      //category.boards = filterIgnoredBoards(category.boards)
+      // category.boards = filterIgnoredBoards(category.boards)
 
       // category.boards.map(function(board) {
       //   var children = countTotals([board]);
@@ -123,6 +133,9 @@ export default {
   },
   methods: {
     humanDate: humanDate,
+    loggedIn() {
+      return false
+    },
     generateCatId(name, viewOrder) {
       var anchorId = (name + '-' + viewOrder).replace(/\s+/g, '-').toLowerCase();
       return anchorId;
@@ -278,7 +291,8 @@ img.avatar-small {
       &-posts,
       &-threads {
         display: flex;
-
+        margin: 0;
+        padding: 0;
         .label {
           flex: 0 0 50px;
           text-align: left;
@@ -327,6 +341,62 @@ img.avatar-small {
 
   @include break-mobile-sm {
     margin: 0 1rem 0 1.75rem;
+  }
+}
+.dashboard-actions {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+
+  .button {
+    margin: 0 1rem;
+    min-width: 160px;
+  }
+
+  @include break-mobile-sm {
+    .button {
+      font-size: $font-size-sm;
+    }
+  }
+}
+
+.sidebar {
+  grid-area: sidebar;
+  padding-top: 1rem;
+
+  h1 {
+    font-size: $font-size-sm;
+    line-height: inherit;
+    margin-bottom: 0.5rem;
+  }
+
+  .threads-recent {
+    color: $secondary-font-color;
+    font-size: $font-size-sm;
+    margin-bottom: 1rem;
+
+    .title {
+      font-size: $font-size-base;;
+    }
+
+    .user {
+      font-size: $font-size-sm;
+    }
+
+    .thread-status {
+      font-size: $font-size-sm;
+
+      svg {
+        height: 0.875rem;
+      }
+    }
+  }
+
+  @media screen and (min-width: 1280px) {
+    border-top: none;
+    // border-left: $border;
+    padding-left: 1rem;
+    padding-top: 0;
   }
 }
 </style>
