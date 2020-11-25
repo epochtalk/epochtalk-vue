@@ -18,11 +18,16 @@
   font-weight: normal;
   line-height: normal;
   cursor: pointer;
-  margin: 0 0 1.25rem;
+  margin: 0;
   position: relative;
   color: #fff;
   text-decoration: none;
   text-align: center;
   -webkit-appearance: none;
+
+  &.fill {
+    display: block;
+    width: 100%;
+  }
 }
 

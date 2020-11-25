@@ -1,13 +1,6 @@
 <template>
-  <!-- use the modal component, pass in the prop -->
   <modal :name="$options.name" :show="show" @close="this.$emit('close')">
-    <!--
-      you can use custom content here to overwrite
-      default content
-    -->
-    <template v-slot:header>
-      <h3>Login</h3>
-    </template>
+    <template v-slot:header>Login</template>
 
     <template v-slot:body>
       <label>
@@ -22,10 +15,9 @@
     </template>
 
     <template v-slot:footer>
-      <button>Login</button>
-      <button @click="this.$emit('close')">Cancel</button>
+      <button class="fill">Login</button>
+      <button class="fill" @click="this.$emit('close')">Cancel</button>
     </template>
-
   </modal>
 </template>
 
