@@ -1,4 +1,4 @@
-export const AuthModule = {
+export default {
   state: {
     token: ''
   },
