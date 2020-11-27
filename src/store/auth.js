@@ -10,7 +10,7 @@ export const AuthModule = {
     setToken(state, token) {
       state.token = token;
     }
-  }
+  },
   // asynchronously commit mutations
   actions: {
     async fetchToken ({ commit }, { username, password }) {
@@ -18,6 +18,6 @@ export const AuthModule = {
       const res = await fetch(`http://localhost:8080/auth/`);
       // mutate token
       commit('setToken', await res.text());
-    },
+    }
   }
 }
