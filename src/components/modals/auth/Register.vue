@@ -12,9 +12,7 @@
         Password
         <input type="password" />
       </label>
-    </template>
 
-    <template v-slot:footer>
       <button class="fill">Sign Up</button>
       &nbsp;
       <button class="fill" @click="this.$emit('close')">Cancel</button>

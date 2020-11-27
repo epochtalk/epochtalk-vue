@@ -19,11 +19,7 @@
             <div class="modal-body">
               <slot name="body">
                 Modal body goes here
-              </slot>
-            </div>
-
-            <div class="modal-footer">
-              <slot name="footer">
+                <br><br>
                 <button class="fill" @click="this.$emit('close')">
                   Close
                 </button>
@@ -143,24 +139,16 @@ export default {
   .modal-body {
     padding: 2rem;
 
-    @include break-mobile-sm {
-      padding: 1rem 0 2rem;
-    }
-  }
-
-  .modal-footer {
-    padding: 0 2rem 2rem;
-
     .secondary-actions {
       border-top: $border;
       margin: 0 -3rem -3rem;
-      margin-top: 1rem;
+      margin-top: 2rem;
       padding: 1rem;
       text-align: center;
     }
 
     @include break-mobile-sm {
-      padding: 0rem;
+      padding: 1rem 0 2rem;
     }
   }
 
