@@ -16,7 +16,7 @@ export default {
     // log user in and set auth token in store
     login ({ commit }, { username, password, rememberMe }) {
       // attempt login
-      fetch(`http://localhost:8080/api/login/`, {
+      fetch(`http://localhost:8080/api/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
