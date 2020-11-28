@@ -15,10 +15,30 @@ export default {
   actions: {
     // log user in and set auth token in store
     login ({ commit }, { username, password, rememberMe }) {
-      // get auth token from api
-      const res = await fetch(`http://localhost:8080/auth/`);
-      // mutate token
-      commit('setAuthToken', await res.text());
+      // attempt login
+      fetch(`http://localhost:8080/api/login/`, {
+        method: 'POST',
+        body: JSON.stringify({
+          username: username,
+          password: password,
+          rememberMe: rememberMe
+        })
+      })
+      .then(function(result) {
+        console.log(result);
+        // login successful
+        if (result.good) {
+          // mutate token
+        }
+        // handle bad login
+        else {
+          console.log('login failed, bad credentials');
+        }
+      })
+      .catch(function(error) {
+        // something bad happened
+        console.log('omg an error loggin in', error);
+      });
     }
   }
 }
