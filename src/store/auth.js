@@ -32,7 +32,7 @@ export default {
           rememberMe: rememberMe
         })
       })
-      .then(result => result.json())
+      .then(result => result.ok ? result.json() : null)
       .then(function(user) {
         // login successful
         if (user) {
