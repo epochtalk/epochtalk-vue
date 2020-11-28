@@ -55,6 +55,11 @@
     methods: {
       login() {
         console.log('Login!')
+        this.$store.dispatch('login', {
+          username: this.user.username,
+          password: this.user.password,
+          rememberMe: this.user.rememberMe
+        });
         this.$emit('close')
       },
       signInWithGoogle() {
