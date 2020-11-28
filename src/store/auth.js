@@ -11,6 +11,9 @@ export default {
   mutations: {
     setUser(state, user) {
       state.user = user;
+    },
+    deleteUser(state) {
+      state.user = {};
     }
   },
   // asynchronously commit mutations
@@ -45,6 +48,9 @@ export default {
         // something bad happened
         console.log('error logging in', error);
       });
+    },
+    logout ({ commit }) {
+      commit('deleteUser');
     }
   }
 }
