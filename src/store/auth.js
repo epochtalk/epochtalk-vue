@@ -15,7 +15,7 @@ export default {
   },
   // asynchronously commit mutations
   actions: {
-    // log user in and set auth token in store
+    // log user in and set in store
     login ({ commit }, { username, password, rememberMe }) {
       // attempt login
       return fetch(`http://localhost:8080/api/login`, {
@@ -33,7 +33,7 @@ export default {
       .then(function(user) {
         // login successful
         if (user) {
-          // mutate token
+          // mutate user
           commit('setUser', user);
         }
         // handle bad login
