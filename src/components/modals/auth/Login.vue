@@ -62,9 +62,6 @@
         });
         this.$emit('close')
       },
-      logout() {
-        return this.$store.dispatch('logout')
-      },
       signInWithGoogle() {
         console.log('Sign in with Google!')
         this.$emit('close')
