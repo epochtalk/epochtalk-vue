@@ -210,8 +210,7 @@ export default {
   },
   methods: {
     loggedIn() {
-      let loggedIn = false
-      return loggedIn
+      return this.$store.getters.loggedIn
     },
     logout() {
       console.log('logout')
