@@ -1,14 +1,14 @@
 export default {
   state: {
-    token: ''
+    user: {}
   },
   getters: {
     authToken: state => state.token
   },
   // bind state changes to anything using getters
   mutations: {
-    setAuthToken(state, token) {
-      state.token = token;
+    setUser(state, user) {
+      state.user = user;
     }
   },
   // asynchronously commit mutations
