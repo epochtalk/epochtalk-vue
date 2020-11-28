@@ -3,7 +3,9 @@ export default {
     user: {}
   },
   getters: {
-    authToken: state => state.token
+    user: state => state.user,
+    authToken: (state, getters) => getters.user ? getters.token : null,
+    loggedIn: (state, getters) => getters.authToken ? true : false
   },
   // bind state changes to anything using getters
   mutations: {
