@@ -29,11 +29,12 @@ export default {
           rememberMe: rememberMe
         })
       })
-      .then(function(result) {
-        console.log(result);
+      .then(result => result.json())
+      .then(function(user) {
         // login successful
-        if (result.good) {
+        if (user) {
           // mutate token
+          commit('setUser', user);
         }
         // handle bad login
         else {
