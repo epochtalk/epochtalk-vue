@@ -4,7 +4,7 @@ export default {
   },
   getters: {
     user: state => state.user,
-    authToken: (state, getters) => getters.user ? getters.token : null,
+    authToken: (state, getters) => getters.user ? getters.user.token : null,
     loggedIn: (state, getters) => getters.authToken ? true : false
   },
   // bind state changes to anything using getters
