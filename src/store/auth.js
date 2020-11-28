@@ -13,7 +13,8 @@ export default {
   },
   // asynchronously commit mutations
   actions: {
-    async fetchAuthToken ({ commit }, { username, password }) {
+    // log user in and set auth token in store
+    login ({ commit }, { username, password, rememberMe }) {
       // get auth token from api
       const res = await fetch(`http://localhost:8080/auth/`);
       // mutate token
