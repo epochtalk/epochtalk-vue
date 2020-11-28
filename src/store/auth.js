@@ -36,14 +36,14 @@ export default {
           // mutate user
           commit('setUser', user);
         }
-        // handle bad login
+        // handle invalid credentials
         else {
-          console.log('login failed, bad credentials');
+          console.log('login failed, invalid credentials');
         }
       })
       .catch(function(error) {
         // something bad happened
-        console.log('omg an error loggin in', error);
+        console.log('error logging in', error);
       });
     }
   }
