@@ -219,6 +219,10 @@ export default {
       let count = null
       return count
     },
+    notificationMentions() {
+      let mentions = []
+      return mentions
+    },
     searchForum() {
       // DO Something
       console.log('SEARCH!')
