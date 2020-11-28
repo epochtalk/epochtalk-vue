@@ -213,7 +213,7 @@ export default {
       return this.$store.getters.loggedIn
     },
     logout() {
-      console.log('logout')
+      this.$store.dispatch('logout')
     },
     notificationMessages() {
       let count = null
