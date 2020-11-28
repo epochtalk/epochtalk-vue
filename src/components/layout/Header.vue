@@ -202,7 +202,7 @@ export default {
       showRegister: false,
       showLogin: false,
       logo: '',
-      currentUser: {},
+      currentUser: this.$store.getters.user,
       breadcrumbs: [{label:'Home', state: '#', opts: {}}],
       scrollDownPos: 95,
       lastScrollTop: 0
