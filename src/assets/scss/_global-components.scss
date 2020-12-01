@@ -1,3 +1,17 @@
+a, a:hover, a:active, a:visited, a:focus {
+  text-decoration: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  line-height: 1.5rem;
+  font-style: normal;
+  font-weight: normal;
+  color: $secondary-font-color;
+  text-rendering: optimizedLegibility;
+  text-transform: uppercase;
+}
+
 .button, button, button:focus, .button:focus {
   border-radius: 3px;
   -webkit-border-radius: 3px;
