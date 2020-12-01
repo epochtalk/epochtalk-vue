@@ -18,8 +18,8 @@
           </div>
         </label>
 
-        <input type="email" class="icon-padding" id="email" name="email" maxlength="255" v-model="form.email.val" placeholder="your-email@email.com" required />
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" ng-if="form.email.val && form.email.val.length > -1 && (form.email.valid && form.email.unique)" class="input-icon valid">
+        <input type="email" class="icon-padding" id="email" name="email" maxlength="255" v-model="form.email.val" placeholder="your-email@email.com" @keydown="form.valid=false" required />
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" v-if="form.email.val && form.email.val.length > -1 && (form.email.valid && form.email.unique)" class="input-icon valid">
           <title></title>
           <polygon class="cls-1" points="19.69 37.19 7.23 24.73 10.77 21.2 19.69 30.12 37.23 12.58 40.77 16.11 19.69 37.19"/>
         </svg>
@@ -46,7 +46,7 @@
           </div>
         </label>
 
-        <input type="text" class="input-text icon-padding" id="username" name="username" maxlength="50" v-model="form.username.val" placeholder="your-username" required />
+        <input type="text" class="input-text icon-padding" id="username" name="username" maxlength="50" v-model="form.username.val" placeholder="your-username" @keydown="form.valid=false" required />
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" v-if="form.username.val && form.username.val.length > -1 && (form.username.valid && form.username.unique)" class="input-icon valid">
           <title></title>
           <polygon class="cls-1" points="19.69 37.19 7.23 24.73 10.77 21.2 19.69 30.12 37.23 12.58 40.77 16.11 19.69 37.19"/>
@@ -63,18 +63,15 @@
       <div class="input-section">
         <label for="password">
           Password
-          <div v-if="form.password.val && form.password.val.length < 1 && !form.password.valid" class="invalid input-validation-message">
-            Password is required
-          </div>
-          <div v-if="form.password.val && form.password.val.length > 0 && !form.password.valid" class="invalid input-validation-message">
+          <div v-if="form.password.val && form.password.val.length > 0 && form.password.val.length < 8 && !form.password.valid" class="invalid input-validation-message">
             Password must be at least 8 characters
           </div>
-          <div v-if="form.password.val && form.password.val.length > -1 && form.confirmation.val && form.confirmation.val.length > -1 && form.password.val !== form.confirmation.val && form.password.valid && form.confirmation.valid" class="invalid input-validation-message">
+          <div v-if="form.password.val && form.password.val.length >= 8 && form.confirmation.val && form.confirmation.val.length >= 8 && (!form.password.valid || !form.confirmation.valid)" class="invalid input-validation-message">
             Password and confirmation do not match
           </div>
         </label>
 
-        <input type="password" :class="{'invalid-mismatch': form.password.val !== form.confirmation.val || !form.password.valid }" class="icon-padding" id="password" name="password" v-model="form.password.val" placeholder="Enter a password" required />
+        <input type="password" :class="{'invalid-mismatch': form.password.val && (form.password.val !== form.confirmation.val || !form.password.valid) }" class="icon-padding" id="password" name="password" v-model="form.password.val" placeholder="Enter a password" required />
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" v-if="(form.password.val && form.password.val.length > -1 && !(form.confirmation.val && form.confirmation.val.length > -1) && form.password.valid) || (form.password.val && form.password.val.length > -1 && form.confirmation.val && form.confirmation.val.length > -1 && form.password.val === form.confirmation.val && form.password.valid)" class="input-icon valid">
           <title></title>
           <polygon class="cls-1" points="19.69 37.19 7.23 24.73 10.77 21.2 19.69 30.12 37.23 12.58 40.77 16.11 19.69 37.19"/>
@@ -87,18 +84,15 @@
       <div class="input-section">
         <label for="confirmation">
           Confirm Password
-          <div v-if="form.confirmation.val && form.confirmation.val.length < 1 && !form.confirmation.valid" class="invalid input-validation-message">
-            Confirmation is required
-          </div>
-          <div v-if="form.confirmation.val && form.confirmation.val.length > 0 && !form.confirmation.valid" class="invalid input-validation-message">
+          <div v-if="form.confirmation.val && form.confirmation.val.length > 0 && form.confirmation.val.length < 8 && !form.confirmation.valid" class="invalid input-validation-message">
             Confirmation must be at least 8 characters
           </div>
-          <div v-if="form.password.val && form.password.val.length > -1 && form.password.val !== '' && form.confirmation.val && form.confirmation.val.length > -1 && form.password.val !== form.confirmation.val && form.confirmation.valid" class="invalid input-validation-message">
+          <div v-if="form.password.val && form.password.val.length >= 8 && form.confirmation.val && form.confirmation.val.length >= 8 && (!form.password.valid || !form.confirmation.valid)" class="invalid input-validation-message">
             Password and confirmation do not match
           </div>
         </label>
 
-        <input type="password" :class="{'invalid-mismatch': form.password.val !== form.confirmation.val || !form.confirmation.valid}" class="icon-padding" name="confirmation" id="confirmation" v-model="form.confirmation.val" placeholder="Enter your password again" required />
+        <input type="password" :class="{'invalid-mismatch': form.confirmation.val && (form.password.val !== form.confirmation.val || !form.confirmation.valid) }" class="icon-padding" name="confirmation" id="confirmation" v-model="form.confirmation.val" placeholder="Enter your password again" required />
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" v-if="(form.confirmation.val && form.confirmation.val.length > -1 && !(form.password.val && form.password.val.length > -1) && form.confirmation.valid) || (form.password.val && form.password.val.length > -1 && form.confirmation.val && form.confirmation.val.length > -1 && form.password.val === form.confirmation.val && form.confirmation.valid)" class="input-icon valid">
           <title></title>
           <polygon class="cls-1" points="19.69 37.19 7.23 24.73 10.77 21.2 19.69 30.12 37.23 12.58 40.77 16.11 19.69 37.19"/>
@@ -127,6 +121,7 @@
 
 <script>
   import Modal from "@/components/layout/Modal.vue";
+  import { debounce } from 'lodash'
 
   export default {
     name: 'register-modal',
@@ -138,18 +133,59 @@
         hasGoogleCredentials: true,
         form: {
           valid: false,
-          email: { val: undefined, valid: false },
-          username: { val: undefined, valid: false },
+          email: { val: undefined, valid: false, unique: undefined },
+          username: { val: undefined, valid: false, unique: undefined },
           password: { val: undefined, valid: false },
           confirmation:{ val: undefined, valid: false }
         }
       }
     },
+    watch: {
+      'form.email.val': debounce(async function(val) {
+        this.form.email.valid = val.length >= 3 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)
+        // check email unique
+        const response = await fetch('http://localhost:8080/api/register/email/' + val)
+        const data = await response.json();
+        this.form.email.unique = !data.found
+        this.form.valid = this.checkFormValid()
+       }, 500),
+      'form.username.val':  debounce(async function(val) {
+        this.form.username.valid = val.length >= 3 && val.length <= 20 && /^[a-zA-Z\d-_.]+$/.test(val)
+        // check email unique
+        const response = await fetch('http://localhost:8080/api/register/username/' + val)
+        const data = await response.json();
+        this.form.username.unique = !data.found
+        this.form.valid = this.checkFormValid()
+       }, 500),
+      'form.password.val': function(val) {
+        this.form.password.valid = val.length >= 8 && val.length <= 72
+        if (this.form.password.valid && this.form.password.val && this.form.confirmation.val && this.form.password.val !== this.form.confirmation.val) {
+          this.form.password.valid = false;
+          this.form.confirmation.valid = false;
+        }
+        else if (this.form.password.valid  && this.form.password.val && this.form.confirmation.val && this.form.password.val === this.form.confirmation.val) {
+          this.form.password.valid = true;
+          this.form.confirmation.valid = true;
+        }
+        this.form.valid = this.checkFormValid()
+       },
+      'form.confirmation.val': function(val) {
+        this.form.confirmation.valid = val.length >= 8 && val.length <= 72
+        if (this.form.confirmation.valid && this.form.password.val && this.form.confirmation.val && this.form.password.val !== this.form.confirmation.val) {
+          this.form.password.valid = false;
+          this.form.confirmation.valid = false;
+        }
+        else if (this.form.confirmation.valid  && this.form.password.val && this.form.confirmation.val && this.form.password.val === this.form.confirmation.val) {
+          this.form.password.valid = true;
+          this.form.confirmation.valid = true;
+        }
+        this.form.valid = this.checkFormValid()
+      },
+    },
     methods: {
-      register() { console.log('Register!') },
+      register() { console.log('Register!', this.form) },
       signInWithGoogle() { console.log('Sign in with Google!') },
-      validateEmail() { return true },
-      validateEmailUnique() { return true }
+      checkFormValid() { return this.form.email.valid && this.form.email.unique && this.form.username.valid && this.form.username.unique && this.form.password.valid && this.form.confirmation.valid }
     }
   }
 </script>
