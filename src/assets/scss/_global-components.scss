@@ -1,6 +1,8 @@
 a, a:hover, a:active, a:visited, a:focus {
   text-decoration: none;
+  color: $color-primary;
 }
+a:hover { color: $color-primary-alt; }
 
 h1, h2, h3, h4, h5, h6 {
   margin: 0;
@@ -12,7 +14,7 @@ h1, h2, h3, h4, h5, h6 {
   text-transform: uppercase;
 }
 
-.button, button, button:focus, .button:focus {
+a.button, .button, button, button:focus, .button:focus {
   border-radius: 3px;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
@@ -35,10 +37,12 @@ h1, h2, h3, h4, h5, h6 {
   cursor: pointer;
   margin: 0;
   position: relative;
-  color: #fff;
+  color: $base-background-color;
   text-decoration: none;
   text-align: center;
   -webkit-appearance: none;
+
+  &:hover { background-color: $color-primary-alt; }
 
   &.fill {
     display: block;
