@@ -31,7 +31,7 @@
         <transition>
           <div class="board" v-if="cat.show || cat.show === undefined">
             <div class="info">
-              <a href="#">{{board.name}}</a>
+              <h2><a href="#">{{board.name}}</a></h2>
               <div class="description">{{board.description}}</div>
               <div class="moderators" v-if="board.moderators && board.moderators.length">
                 <strong>Moderators: </strong>
@@ -51,11 +51,11 @@
               <!-- Board Posts and Threads -->
               <div class="view-count">
                 <p class="view-count-posts">
-                  <span class="view-count-number">{{board.post_count}}</span>
+                  <span class="view-count-number">{{board.total_post_count}}</span>
                    <span class="label"> posts,</span>
                 </p>
                 <p class="view-count-threads">
-                  <span class="view-count-number">{{board.thread_count}}</span>
+                  <span class="view-count-number">{{board.total_thread_count}}</span>
                    <span class="label"> threads</span>
                 </p>
               </div>
@@ -110,33 +110,81 @@ export default {
     const $api = inject('$api')
     const $swrvCache = inject('$swrvCache')
 
-    const { data: data, error: error } = useSWRV(`/api/boards`, path => $api(`${path}`), {
-      cache: $swrvCache })
+    const { data: data, error: error } = useSWRV(`/api/boards`,
+      function(path) {
+        return $api(`${path}`)
+        .then(function(data) {
+          let collapsedCats = []
+          // let ignoredBoards = [];
+          data.boards.map(function(category) {
+            // set category visibility
+            if (collapsedCats.indexOf(category.id) > -1) { category.show = false }
+            else { category.show = true }
 
-    let collapsedCats = [];
-    // let ignoredBoards = [];
+            // set total_thread_count and total_post_count for all boards
+            // category.boards = filterIgnoredBoards(category.boards)
 
-    data.value.boards.map(function(category) {
-      // set category visibility
-      if (collapsedCats.indexOf(category.id) > -1) {
-        category.show = false;
+            category.boards.map(function(board) {
+              let children = countTotals([board])
+              let lastPost = getLastPost([board])
+              board.total_thread_count = children.thread_count
+              board.total_post_count = children.post_count
+              return Object.assign(board, lastPost)
+            })
+          })
+          return data
+        })
+      },
+      { cache: $swrvCache })
+
+    const countTotals = function(countBoards) {
+      let thread_count = 0
+      let post_count = 0
+      if (countBoards.length > 0) {
+        countBoards.forEach(function(board) {
+          let children = countTotals(board.children)
+          thread_count += children.thread_count + board.thread_count
+          post_count += children.post_count + board.post_count
+          board.total_thread_count = thread_count
+          board.total_post_count = post_count
+        })
       }
-      else {
-        category.show = true;
+      return { thread_count: thread_count, post_count: post_count }
+    }
+
+    const buildLastPostData = function(data) {
+      return {
+        last_post_created_at: data.last_post_created_at,
+        last_post_position: data.last_post_position,
+        last_post_username: data.last_post_username,
+        last_post_avatar: data.last_post_avatar,
+        last_thread_id: data.last_thread_id,
+        last_thread_slug: data.last_thread_slug,
+        last_thread_title: data.last_thread_title
       }
+    }
 
-      // set total_thread_count and total_post_count for all boards
-      // category.boards = filterIgnoredBoards(category.boards)
+    const greater = function(a, b) {
+      let minDate = new Date('0001-01-01T00:00:00Z')
+      let aCreatedAt = a.last_post_created_at || minDate
+      let bCreatedAt = b.last_post_created_at || minDate
+      if (new Date(aCreatedAt) > new Date(bCreatedAt)) { return a }
+      else { return b }
+    }
 
-      // category.boards.map(function(board) {
-      //   var children = countTotals([board]);
-      //   var lastPost = getLastPost([board]);
-      //   board.total_thread_count = children.thread_count;
-      //   board.total_post_count = children.post_count;
-      //   return Object.assign(board, lastPost);
-      // });
-    })
-
+    const getLastPost = function(boards) {
+      let latestPost = {}
+      if (boards.length > 0) {
+        boards.forEach(function(board) {
+          let curLatest = getLastPost(board.children)
+          // Compare curLatest to board
+          curLatest = buildLastPostData(greater(curLatest, board))
+          // Compare curLatest to actual latest
+          latestPost = buildLastPostData(greater(curLatest, latestPost))
+        })
+      }
+      return latestPost
+    }
 
     return {
       data,
@@ -149,12 +197,12 @@ export default {
       return false
     },
     generateCatId(name, viewOrder) {
-      var anchorId = (name + '-' + viewOrder).replace(/\s+/g, '-').toLowerCase();
-      return anchorId;
+      var anchorId = (name + '-' + viewOrder).replace(/\s+/g, '-').toLowerCase()
+      return anchorId
     },
     toggleCategory(cat) {
-      if (cat.show === undefined) { cat.show = false; }
-      else { cat.show = !cat.show; }
+      if (cat.show === undefined) { cat.show = false }
+      else { cat.show = !cat.show }
       // if (!Session.isAuthenticated()) { return; }
 
       // // if showing, remove from collapsed_categories in place

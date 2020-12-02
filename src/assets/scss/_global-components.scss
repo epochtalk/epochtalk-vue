@@ -1,4 +1,20 @@
-.button, button, button:focus, .button:focus {
+a, a:hover, a:active, a:visited, a:focus {
+  text-decoration: none;
+  color: $color-primary;
+}
+a:hover { color: $color-primary-alt; }
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  line-height: 1.5rem;
+  font-style: normal;
+  font-weight: normal;
+  color: $secondary-font-color;
+  text-rendering: optimizedLegibility;
+  text-transform: uppercase;
+}
+
+a.button, .button, button, button:focus, .button:focus {
   border-radius: 3px;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
@@ -21,10 +37,12 @@
   cursor: pointer;
   margin: 0;
   position: relative;
-  color: #fff;
+  color: $base-background-color;
   text-decoration: none;
   text-align: center;
   -webkit-appearance: none;
+
+  &:hover { background-color: $color-primary-alt; }
 
   &.fill {
     display: block;
@@ -232,8 +250,6 @@ input[type="checkbox"] + label, input[type="radio"] + label {
 
   label {
     font-size: $font-size-tiny;
-    color: $secondary-font-color;
-    margin: 0.5rem -0.5rem 0 0.5rem;
     position: absolute;
     width: 100%;
     cursor: pointer;
@@ -241,6 +257,16 @@ input[type="checkbox"] + label, input[type="radio"] + label {
     font-weight: normal;
     line-height: 1.5;
     margin-bottom: 0;
+    box-sizing: border-box;
+    color: $secondary-font-color;
+    height: 31px;
+    padding-bottom: 8px;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-top: 8px;
+    text-align: left;
+    text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
   }
 
   input {
