@@ -39,6 +39,7 @@
 </template>
 
 <script>
+  import store from "../../../store/vuex.js"
   import Modal from "@/components/layout/Modal.vue";
   import { reactive, ref, toRefs } from "vue"
 
@@ -50,10 +51,10 @@
     setup(props, { emit }) {
       function login() {
         console.log('Login!', user.username, user.password, user.rememberMe)
-        this.$store.dispatch('login', {
-          username: this.user.username,
-          password: this.user.password,
-          rememberMe: this.user.rememberMe
+        store.dispatch('login', {
+          username: user.username,
+          password: user.password,
+          rememberMe: user.rememberMe
         });
         emit('close')
       }
