@@ -40,7 +40,8 @@
 
 <script>
   import Modal from "@/components/layout/Modal.vue";
-  import {reactive, ref, toRefs } from "vue"
+  import { reactive, ref, toRefs } from "vue"
+
   export default {
     name: 'login-modal',
     props: ['show'],
@@ -58,7 +59,7 @@
       }
 
       const user = reactive({ username: '', password: '', rememberMe: false })
-      let hasGoogleCredentials = ref(true)
+      const hasGoogleCredentials = ref(true)
       return { ...toRefs(user), hasGoogleCredentials, login, signInWithGoogle }
     }
   }
