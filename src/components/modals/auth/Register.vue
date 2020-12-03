@@ -200,7 +200,7 @@
         form.valid = checkFormValid()
       })
 
-      return { hasGoogleCredentials, ...toRefs(form), register, signInWithGoogle }
+      return { ...toRefs(form), hasGoogleCredentials, register, signInWithGoogle }
     }
   }
 </script>

@@ -34,30 +34,33 @@
 </template>
 
 <script>
-export default {
-  props: ['name', 'show'],
-  emits: ['close'],
-  data() {
-    return { open: false  }
-  },
-  watch: {
-    show() { this.toggle() }
-  },
-  methods: {
-    toggle() {
-      // Show for first time
-      if (this.show && !this.open) { this.open = true  }
-      // Hide for first time, emit event to parent
-      else if (this.show && this.open) { this.$emit('close') }
-      // Watch will retrigger because of emit close and set open to false
-      else if (!this.show && this.open) { this.open = false }
-    },
-    closeFromWrapper(e) {
-      // Allows us to close via the wrapper, without closing when clicking on modal body
-      if (e.target.classList.contains('modal-wrapper')) { this.$emit('close') }
+  import { ref, watch } from "vue"
+
+  export default {
+    props: ['name', 'show'],
+    emits: ['close'],
+    setup(props, { emit }) {
+      function closeFromWrapper(e) {
+        // Allows us to close via the wrapper, without closing when clicking on modal body
+        if (e.target.classList.contains('modal-wrapper')) { emit('close') }
+      }
+
+      function toggle() {
+        // Show for first time
+        if (props.show && !open.value) { open.value = true  }
+        // Hide for first time, emit event to parent
+        else if (props.show && open.value) { emit('close') }
+        // Watch will retrigger because of emit close and set open to false
+        else if (!props.show && open.value) { open.value = false }
+      }
+
+      const open = ref(false)
+
+      watch(() => props.show, () => toggle())
+
+      return { open, closeFromWrapper, toggle }
     }
   }
-}
 </script>
 
 <style lang="scss">
