@@ -59,9 +59,7 @@ import humanDate from '@/filters/humanDate'
 
 export default {
   props: ['threads'],
-  methods: {
-    humanDate: humanDate
-  }
+  setup() { return { humanDate }}
 }
 </script>
 
