@@ -1,18 +1,18 @@
 <template>
-  <p v-if="error"><strong>{{error}}</strong></p>
-  <recent-threads :threads="data.threads"></recent-threads>
+  <p v-if="boardData.error"><strong>{{boardData.error}}</strong></p>
+  <recent-threads :threads="boardData.data.threads"></recent-threads>
 
-  <div v-if="!loggedIn()" class="dashboard-actions">
+  <div v-if="!loggedIn" class="dashboard-actions">
     <a href="" class="button" @click.prevent="showRegister = true">Create an Account</a>
     <a href="" class="button" @click.prevent="showLogin = true">Log In</a>
   </div>
-  <div v-if="loggedIn()" class="dashboard-actions">
+  <div v-if="loggedIn" class="dashboard-actions">
     <a class="button" href="#">Watchlist</a>
     <a class="button" href="#">Threads Posted In</a>
   </div>
 
-  <div v-if="data">
-    <div class="category" v-for="cat in data.boards" :key="cat.id">
+  <div v-if="boardData.data">
+    <div class="category" v-for="cat in boardData.data.boards" :key="cat.id">
       <!-- Category Title -->
       <div :id="generateCatId(cat.name, cat.view_order)" class="title">
         <div v-on:click="toggleCategory(cat)" class="collapse-section">
@@ -92,6 +92,7 @@ import RecentThreads from "@/components/threads/RecentThreads.vue";
 import humanDate from '@/filters/humanDate'
 import LoginModal from "@/components/modals/auth/Login.vue";
 import RegisterModal from "@/components/modals/auth/Register.vue";
+import { reactive, toRefs } from 'vue'
 
 export default {
   name: 'Boards',
@@ -100,44 +101,9 @@ export default {
     LoginModal,
     RegisterModal
   },
-  data() {
-    return {
-      showLogin: false,
-      showRegister: false
-    }
-  },
   setup() {
-    const $api = inject('$api')
-    const $swrvCache = inject('$swrvCache')
-
-    const { data: data, error: error } = useSWRV(`/api/boards`,
-      function(path) {
-        return $api(`${path}`)
-        .then(function(data) {
-          let collapsedCats = []
-          // let ignoredBoards = [];
-          data.boards.map(function(category) {
-            // set category visibility
-            if (collapsedCats.indexOf(category.id) > -1) { category.show = false }
-            else { category.show = true }
-
-            // set total_thread_count and total_post_count for all boards
-            // category.boards = filterIgnoredBoards(category.boards)
-
-            category.boards.map(function(board) {
-              let children = countTotals([board])
-              let lastPost = getLastPost([board])
-              board.total_thread_count = children.thread_count
-              board.total_post_count = children.post_count
-              return Object.assign(board, lastPost)
-            })
-          })
-          return data
-        })
-      },
-      { cache: $swrvCache })
-
-    const countTotals = function(countBoards) {
+    /* Internal View Methods */
+    const countTotals = countBoards => {
       let thread_count = 0
       let post_count = 0
       if (countBoards.length > 0) {
@@ -152,7 +118,7 @@ export default {
       return { thread_count: thread_count, post_count: post_count }
     }
 
-    const buildLastPostData = function(data) {
+    const buildLastPostData = data => {
       return {
         last_post_created_at: data.last_post_created_at,
         last_post_position: data.last_post_position,
@@ -164,7 +130,7 @@ export default {
       }
     }
 
-    const greater = function(a, b) {
+    const greater = (a, b) => {
       let minDate = new Date('0001-01-01T00:00:00Z')
       let aCreatedAt = a.last_post_created_at || minDate
       let bCreatedAt = b.last_post_created_at || minDate
@@ -172,7 +138,7 @@ export default {
       else { return b }
     }
 
-    const getLastPost = function(boards) {
+    const getLastPost = boards => {
       let latestPost = {}
       if (boards.length > 0) {
         boards.forEach(function(board) {
@@ -186,39 +152,54 @@ export default {
       return latestPost
     }
 
-    return {
-      data,
-      error
+    const processBoards = path => {
+      return $api(`${path}`)
+      .then(data => {
+        let collapsedCats = []
+        // let ignoredBoards = [];
+        data.boards.map(function(category) {
+          // set category visibility
+          if (collapsedCats.indexOf(category.id) > -1) { category.show = false }
+          else { category.show = true }
+
+          // set total_thread_count and total_post_count for all boards
+          // category.boards = filterIgnoredBoards(category.boards)
+
+          category.boards.map(function(board) {
+            let children = countTotals([board])
+            let lastPost = getLastPost([board])
+            board.total_thread_count = children.thread_count
+            board.total_post_count = children.post_count
+            return Object.assign(board, lastPost)
+          })
+        })
+        return data
+      })
     }
-  },
-  methods: {
-    humanDate: humanDate,
-    loggedIn() {
-      return false
-    },
-    generateCatId(name, viewOrder) {
+
+    /* View Methods */
+    const generateCatId = (name, viewOrder) => {
       var anchorId = (name + '-' + viewOrder).replace(/\s+/g, '-').toLowerCase()
       return anchorId
-    },
-    toggleCategory(cat) {
+    }
+
+    const toggleCategory = cat => {
       if (cat.show === undefined) { cat.show = false }
       else { cat.show = !cat.show }
-      // if (!Session.isAuthenticated()) { return; }
-
-      // // if showing, remove from collapsed_categories in place
-      // if (cat.show) { remove(collapsedCats, cat.id); }
-      // // else add to collapsed_categories
-      // else if (collapsedCats.indexOf(cat.id) < 0) { collapsedCats.push(cat.id); }
-
-      // // save changes to local preferences
-      // var newPrefs = PreferencesSvc.preferences;
-      // newPrefs.collapsed_categories = collapsedCats;
-      // PreferencesSvc.setPreferences(newPrefs);
-
-      // // save changes to server preferences
-      // newPrefs.username = Session.user.username;
-      // User.update({ id: Session.user.id }, newPrefs);
     }
+
+    /* View Data */
+    const $api = inject('$api')
+    const $swrvCache = inject('$swrvCache')
+
+    const v = reactive({
+      loggedIn: false,
+      showLogin: false,
+      showRegister: false,
+      boardData: useSWRV(`/api/boards`, processBoards, { cache: $swrvCache })
+    })
+
+    return { ...toRefs(v), generateCatId, toggleCategory, humanDate }
   }
 }
 </script>
