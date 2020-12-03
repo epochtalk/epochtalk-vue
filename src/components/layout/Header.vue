@@ -36,7 +36,7 @@
         <!--<mentions-menu></mentions-menu>-->
         <li v-on:click="showMobileMenu = false" >
           <a href="#" v-on:click="dismissNotifications({ type: 'message' })"><i class="fa fa-envelope" aria-hidden="true"></i>Messages</a>
-          <div class="count" v-if="notificationMessages()">{{notificationMessages()}}</div>
+          <div class="count" v-if="notificationMessages">{{notificationMessages}}</div>
         </li>
         <li v-on:click="showMobileMenu = false" >
           <a href="#"><i class="fa fa-eye" aria-hidden="true"></i>Watchlist</a>
@@ -65,7 +65,7 @@
           </h1>
 
           <!-- Login Section -->
-          <ul class="signed-out" v-if="!loggedIn()">
+          <ul class="signed-out" v-if="!loggedIn">
             <li>
               <a href="" @click.prevent="showRegister = true">REGISTER</a>
             </li>
@@ -75,8 +75,8 @@
           </ul>
 
           <!-- User Dropdown Mobile -->
-          <ul v-if="loggedIn()" class="burger-icon">
-            <div class="burger-notification show-mobile" v-if="notificationMessages() || notificationMentions()"></div>
+          <ul v-if="loggedIn" class="burger-icon">
+            <div class="burger-notification show-mobile" v-if="notificationMessages || notificationMentions"></div>
             <!-- <i v-on:click="showMobileMenu = true" class="fa fa-bars fa-lg burger" aria-hidden="true"></i> -->
             <span class="burger-menu-icon" v-on:click="showMobileMenu = true" aria-hidden="true">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -88,7 +88,7 @@
           </ul>
 
           <!-- User Dropdown -->
-          <ul v-if="loggedIn()">
+          <ul v-if="loggedIn">
             <li class="search"> <!--v-if="hasPermission('posts.search.allow')"-->
               <form action="." class="search-btn" autocomplete="off" v-on:submit.prevent="searchForum">
                 <div class="balloon" data-balloon="Search" data-balloon-pos="down">
@@ -106,7 +106,7 @@
 
               <div class="tray-icon" href="#" v-on:click="dismissNotifications({ type: 'message' })" data-balloon="Messages" data-balloon-pos="down">
                 <i class="fa fa-envelope"></i>
-                <div class="count" v-if="notificationMessages()">{{notificationMessages()}}</div>
+                <div class="count" v-if="notificationMessages">{{notificationMessages}}</div>
               </div>
 
               <!-- <div class="tray-icon">
@@ -184,16 +184,31 @@
 </template>
 
 <script>
+import { debounce } from 'lodash'
 import decode from '@/filters/decode'
 import truncate from '@/filters/truncate'
-import LoginModal from "@/components/modals/auth/Login.vue";
-import RegisterModal from "@/components/modals/auth/Register.vue";
+import LoginModal from '@/components/modals/auth/Login.vue'
+import RegisterModal from '@/components/modals/auth/Register.vue'
+import { reactive, toRefs, onMounted, onUnmounted } from 'vue'
 
 export default {
   components: { LoginModal, RegisterModal },
-  data() {
+  setup() {
+    /* view methods */
+    const logout = () => { console.log('logout') }
 
-    return {
+    const searchForum = () => { console.log('SEARCH!') }
+
+    const dismissNotifications = params => { console.log('DISMISS NOTIFICATIONS!', params) }
+
+    const toggleFocusSearch = () => {
+      v.focusSearch = !v.focusSearch
+      v.searchExpanded = v.focusSearch
+      if (v.searchExpanded) { v.search.focus() }
+    }
+
+    /* view data */
+    const v = reactive({
       showMobileMenu: false,
       focusSearch: false,
       searchExpanded: false,
@@ -201,80 +216,43 @@ export default {
       showInvite: false,
       showRegister: false,
       showLogin: false,
+      loggedIn: false,
       logo: '',
-      currentUser: {},
-      breadcrumbs: [{label:'Home', state: '#', opts: {}}],
       scrollDownPos: 95,
-      lastScrollTop: 0
-    }
-  },
-  methods: {
-    loggedIn() {
-      let loggedIn = false
-      return loggedIn
-    },
-    logout() {
-      console.log('logout')
-    },
-    notificationMessages() {
-      let count = null
-      return count
-    },
-    notificationMentions() {
-      let mentions = []
-      return mentions
-    },
-    searchForum() {
-      // DO Something
-      console.log('SEARCH!')
-    },
-    toggleFocusSearch() {
-      this.focusSearch = !this.focusSearch
-      this.searchExpanded = this.focusSearch
-      if (this.searchExpanded) {
-        this.$refs.search.focus()
-      }
-    },
-    dismissNotifications(params) {
-      console.log(params)
-    },
-    debounce(func, wait = 10, immediate = true) {
-      let timeout;
-      return function () {
-        let context = this, args = arguments;
-        let later = function () {
-          timeout = null;
-          if (!immediate) func.apply(context, args);
-        };
-        let callNow = immediate && !timeout;
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-        if (callNow) func.apply(context, args);
-      };
-    },
-    checkPosition() {
+      lastScrollTop: 0,
+      currentUser: {},
+      search: null,
+      notificationMessages: null,
+      notificationMentions: null,
+      breadcrumbs: [{label:'Home', state: '#', opts: {}}]
+    })
+
+    /* Scroll away header */
+    function checkPosition() {
       let header = document.querySelector('header');
       let windowY = window.scrollY;
-      if (windowY >= this.scrollDownPos) {
+      if (windowY >= v.scrollDownPos) {
         // Scrolling DOWN
         header.classList.add('is-hidden');
         header.classList.remove('is-visible');
       }
-      if (windowY === 0 || windowY < this.lastScrollTop) {
+      if (windowY === 0 || windowY < v.lastScrollTop) {
         // Scrolling UP
         header.classList.add('is-visible');
         header.classList.remove('is-hidden');
       }
-      this.lastScrollTop = windowY;
-    },
-    decode: decode,
-    truncate: truncate
-  },
-  mounted() {
-    window.addEventListener('scroll', this.debounce(this.checkPosition))
-  },
-  unmounted() {
-    window.removeEventListener('scroll', this.debounce(this.checkPosition))
+      v.lastScrollTop = windowY;
+    }
+
+    onMounted(() => {
+      window.addEventListener('scroll', debounce(checkPosition, 10))
+    })
+
+    onUnmounted(() => {
+      window.removeEventListener('scroll', debounce(checkPosition, 10))
+    })
+
+    return { ...toRefs(v), logout, searchForum, dismissNotifications, toggleFocusSearch, decode, truncate }
   }
 }
 </script>
