@@ -19,13 +19,11 @@
 </template>
 
 <script>
-import Header from "@/components/layout/Header.vue";
+import Header from '@/components/layout/Header.vue'
 
 export default {
   name: 'Epochtalk',
-  components: {
-    Header
-  }
+  components: { Header }
 }
 </script>
 

@@ -34,66 +34,70 @@
 </template>
 
 <script>
-  import { ref, watch } from "vue"
+import { ref, watch } from 'vue'
 
-  export default {
-    props: ['name', 'show'],
-    emits: ['close'],
-    setup(props, { emit }) {
-      function closeFromWrapper(e) {
-        // Allows us to close via the wrapper, without closing when clicking on modal body
-        if (e.target.classList.contains('modal-wrapper')) { emit('close') }
-      }
-
-      function toggle() {
-        // Show for first time
-        if (props.show && !open.value) { open.value = true  }
-        // Hide for first time, emit event to parent
-        else if (props.show && open.value) { emit('close') }
-        // Watch will retrigger because of emit close and set open to false
-        else if (!props.show && open.value) { open.value = false }
-      }
-
-      const open = ref(false)
-
-      watch(() => props.show, () => toggle())
-
-      return { open, closeFromWrapper, toggle }
+export default {
+  props: ['name', 'show'],
+  emits: ['close'],
+  setup(props, { emit }) {
+    /* Internal Methods */
+    const toggle = () => {
+      // Show for first time
+      if (props.show && !open.value) { open.value = true  }
+      // Hide for first time, emit event to parent
+      else if (props.show && open.value) { emit('close') }
+      // Watch will retrigger because of emit close and set open to false
+      else if (!props.show && open.value) { open.value = false }
     }
+
+    /* Template Methods */
+    const closeFromWrapper = e => {
+      // Allows us to close via the wrapper, without closing when clicking on modal body
+      if (e.target.classList.contains('modal-wrapper')) { emit('close') }
+    }
+
+    /* Template Data */
+    const open = ref(false)
+
+    /* Watch Data */
+    watch(() => props.show, toggle)
+
+    return { open, closeFromWrapper }
   }
+}
 </script>
 
 <style lang="scss">
-  .modal-mask {
-    position: fixed;
-    z-index: 9998;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: table;
-  }
+.modal-mask {
+  position: fixed;
+  z-index: 9998;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: table;
+}
 
-  .modal-wrapper {
-    display: table-cell;
-    vertical-align: middle;
-  }
+.modal-wrapper {
+  display: table-cell;
+  vertical-align: middle;
+}
 
-  .modal-enter-from, .modal-leave-to {
-    opacity: 0;
-  }
+.modal-enter-from, .modal-leave-to {
+  opacity: 0;
+}
 
-  .modal-leave-active, .modal-enter-active  {
-    transition: opacity .2s ease;
-  }
+.modal-leave-active, .modal-enter-active  {
+  transition: opacity .2s ease;
+}
 
-  .modal-enter-from .modal-container,
-  .modal-leave-active .modal-container {
-    -webkit-transform: scale(1.1);
-    transform: scale(1.1);
-    transition: transform .2s ease;
-  }
+.modal-enter-from .modal-container,
+.modal-leave-active .modal-container {
+  -webkit-transform: scale(1.1);
+  transform: scale(1.1);
+  transition: transform .2s ease;
+}
 
 .modal-container {
   border-radius: 8px;

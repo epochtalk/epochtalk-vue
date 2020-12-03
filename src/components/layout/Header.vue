@@ -194,7 +194,24 @@ import { reactive, toRefs, onMounted, onUnmounted } from 'vue'
 export default {
   components: { LoginModal, RegisterModal },
   setup() {
-    /* view methods */
+    /* Internal Methods */
+    const scrollHeader = () => {
+      let header = document.querySelector('header');
+      let windowY = window.scrollY;
+      if (windowY >= v.scrollDownPos) {
+        // Scrolling DOWN
+        header.classList.add('is-hidden');
+        header.classList.remove('is-visible');
+      }
+      if (windowY === 0 || windowY < v.lastScrollTop) {
+        // Scrolling UP
+        header.classList.add('is-visible');
+        header.classList.remove('is-hidden');
+      }
+      v.lastScrollTop = windowY;
+    }
+
+    /* Template Methods */
     const logout = () => { console.log('logout') }
 
     const searchForum = () => { console.log('SEARCH!') }
@@ -207,7 +224,7 @@ export default {
       if (v.searchExpanded) { v.search.focus() }
     }
 
-    /* view data */
+    /* Template Data */
     const v = reactive({
       showMobileMenu: false,
       focusSearch: false,
@@ -227,29 +244,13 @@ export default {
       breadcrumbs: [{label:'Home', state: '#', opts: {}}]
     })
 
-    /* Scroll away header */
-    function checkPosition() {
-      let header = document.querySelector('header');
-      let windowY = window.scrollY;
-      if (windowY >= v.scrollDownPos) {
-        // Scrolling DOWN
-        header.classList.add('is-hidden');
-        header.classList.remove('is-visible');
-      }
-      if (windowY === 0 || windowY < v.lastScrollTop) {
-        // Scrolling UP
-        header.classList.add('is-visible');
-        header.classList.remove('is-hidden');
-      }
-      v.lastScrollTop = windowY;
-    }
-
+    /* Lifecycle Events */
     onMounted(() => {
-      window.addEventListener('scroll', debounce(checkPosition, 10))
+      window.addEventListener('scroll', debounce(scrollHeader, 10))
     })
 
     onUnmounted(() => {
-      window.removeEventListener('scroll', debounce(checkPosition, 10))
+      window.removeEventListener('scroll', debounce(scrollHeader, 10))
     })
 
     return { ...toRefs(v), logout, searchForum, dismissNotifications, toggleFocusSearch, decode, truncate }

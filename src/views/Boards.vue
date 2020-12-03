@@ -88,10 +88,10 @@
 <script>
 import useSWRV from 'swrv'
 import { inject } from 'vue'
-import RecentThreads from "@/components/threads/RecentThreads.vue";
+import RecentThreads from '@/components/threads/RecentThreads.vue'
 import humanDate from '@/filters/humanDate'
-import LoginModal from "@/components/modals/auth/Login.vue";
-import RegisterModal from "@/components/modals/auth/Register.vue";
+import LoginModal from '@/components/modals/auth/Login.vue'
+import RegisterModal from '@/components/modals/auth/Register.vue'
 import { reactive, toRefs } from 'vue'
 
 export default {
@@ -107,7 +107,7 @@ export default {
       let thread_count = 0
       let post_count = 0
       if (countBoards.length > 0) {
-        countBoards.forEach(function(board) {
+        countBoards.forEach(board => {
           let children = countTotals(board.children)
           thread_count += children.thread_count + board.thread_count
           post_count += children.post_count + board.post_count
@@ -141,7 +141,7 @@ export default {
     const getLastPost = boards => {
       let latestPost = {}
       if (boards.length > 0) {
-        boards.forEach(function(board) {
+        boards.forEach((board) => {
           let curLatest = getLastPost(board.children)
           // Compare curLatest to board
           curLatest = buildLastPostData(greater(curLatest, board))
@@ -152,12 +152,11 @@ export default {
       return latestPost
     }
 
-    const processBoards = path => {
-      return $api(`${path}`)
+    const processBoards = path => $api(`${path}`)
       .then(data => {
         let collapsedCats = []
-        // let ignoredBoards = [];
-        data.boards.map(function(category) {
+        // let ignoredBoards = []
+        data.boards.map(category => {
           // set category visibility
           if (collapsedCats.indexOf(category.id) > -1) { category.show = false }
           else { category.show = true }
@@ -165,7 +164,7 @@ export default {
           // set total_thread_count and total_post_count for all boards
           // category.boards = filterIgnoredBoards(category.boards)
 
-          category.boards.map(function(board) {
+          category.boards.map(board => {
             let children = countTotals([board])
             let lastPost = getLastPost([board])
             board.total_thread_count = children.thread_count
@@ -175,11 +174,10 @@ export default {
         })
         return data
       })
-    }
 
     /* View Methods */
     const generateCatId = (name, viewOrder) => {
-      var anchorId = (name + '-' + viewOrder).replace(/\s+/g, '-').toLowerCase()
+      let anchorId = (name + '-' + viewOrder).replace(/\s+/g, '-').toLowerCase()
       return anchorId
     }
 

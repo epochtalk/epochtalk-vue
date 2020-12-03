@@ -6,20 +6,20 @@
       <form action="." class="css-form" @submit="console.log('submit');">
         <div class="input-section">
           <label for="login-user">Username</label>
-          <input id="login-user" type="text" class="input-text" placeholder="Enter your username" v-model="username" :class="{'invalid': username.length < 3 && username.length }" required />
+          <input id="login-user" type="text" class="input-text" placeholder="Enter your username" v-model="user.username" :class="{'invalid': user.username.length < 3 && user.username.length }" required />
         </div>
         <div class="input-section">
           <label for="login-pass">Password</label>
-          <input id="login-pass" type="password" placeholder="Enter your password" v-model="password" :class="{'invalid': password.length < 8 && password.length }" required />
+          <input id="login-pass" type="password" placeholder="Enter your password" v-model="user.password" :class="{'invalid': user.password.length < 8 && user.password.length }" required />
           <div class="input-info">Minimum 8 characters</div>
         </div>
 
         <label class="checkbox-container">
-          <input type="checkbox" id="remember-me" v-model="rememberMe" />
+          <input type="checkbox" id="remember-me" v-model="user.rememberMe" />
           Remember Me
         </label>
         <br><br>
-        <button id="login-btn" class="fill" @click.prevent="login()" type="submit" :disabled="username.length < 3 || password.length < 8">
+        <button id="login-btn" class="fill" @click.prevent="login()" type="submit" :disabled="user.username.length < 3 || user.password.length < 8">
           Login
         </button>
         <div v-if="hasGoogleCredentials" class="modal-actions-sso-google">
@@ -39,28 +39,33 @@
 </template>
 
 <script>
-  import Modal from "@/components/layout/Modal.vue";
-  import { reactive, ref, toRefs } from "vue"
+import Modal from '@/components/layout/Modal.vue'
+import { reactive, toRefs } from 'vue'
 
-  export default {
-    name: 'login-modal',
-    props: ['show'],
-    emits: ['close'],
-    components: { Modal },
-    setup(props, { emit }) {
-      function login() {
-        console.log('Login!', user.username, user.password, user.rememberMe)
-        emit('close')
-      }
-
-       function signInWithGoogle() {
-        console.log('Sign in with Google!')
-        emit('close')
-      }
-
-      const user = reactive({ username: '', password: '', rememberMe: false })
-      const hasGoogleCredentials = ref(true)
-      return { ...toRefs(user), hasGoogleCredentials, login, signInWithGoogle }
+export default {
+  name: 'login-modal',
+  props: ['show'],
+  emits: ['close'],
+  components: { Modal },
+  setup(props, { emit }) {
+    /* Template Methods */
+    const login = () => {
+      console.log('Login!', v.user.username, v.user.password, v.user.rememberMe)
+      emit('close')
     }
+
+    const signInWithGoogle = () => {
+      console.log('Sign in with Google!')
+      emit('close')
+    }
+
+    /* Template Data */
+    const v = reactive({
+      user: { username: '', password: '', rememberMe: false },
+      hasGoogleCredentials: true
+    })
+
+    return { ...toRefs(v), login, signInWithGoogle }
   }
+}
 </script>
