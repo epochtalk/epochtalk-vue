@@ -87,12 +87,11 @@
 
 <script>
 import useSWRV from 'swrv'
-import { inject } from 'vue'
+import humanDate from '@/composables/filters/humanDate'
 import RecentThreads from '@/components/threads/RecentThreads.vue'
-import humanDate from '@/filters/humanDate'
 import LoginModal from '@/components/modals/auth/Login.vue'
 import RegisterModal from '@/components/modals/auth/Register.vue'
-import { reactive, toRefs } from 'vue'
+import { inject, reactive, toRefs } from 'vue'
 
 export default {
   name: 'Boards',

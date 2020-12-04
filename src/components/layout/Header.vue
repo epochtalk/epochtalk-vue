@@ -185,8 +185,8 @@
 
 <script>
 import { debounce } from 'lodash'
-import decode from '@/filters/decode'
-import truncate from '@/filters/truncate'
+import decode from '@/composables/filters/decode'
+import truncate from '@/composables/filters/truncate'
 import LoginModal from '@/components/modals/auth/Login.vue'
 import RegisterModal from '@/components/modals/auth/Register.vue'
 import { reactive, toRefs, onMounted, onUnmounted } from 'vue'

@@ -55,7 +55,7 @@
 </template>
 
 <script>
-import humanDate from '@/filters/humanDate'
+import humanDate from '@/composables/filters/humanDate'
 
 export default {
   props: ['threads'],
