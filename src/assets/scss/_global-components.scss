@@ -111,7 +111,7 @@ a.button, .button, button, button:focus, .button:focus {
     padding: 0.5rem 1rem;
   }
 
-  @media screen and (max-width: 769px) {
+  @include break-mobile-sm {
     margin-bottom: 0.5rem;
   }
 }

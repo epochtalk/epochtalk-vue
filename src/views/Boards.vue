@@ -34,15 +34,15 @@
               <h2><a href="#">{{board.name}}</a></h2>
               <div class="description">{{board.description}}</div>
               <div class="moderators" v-if="board.moderators && board.moderators.length">
-                <strong>Moderators: </strong>
+                <span>Moderators: </span>
                 <span v-for="(mod, i) in board.moderators" :key="mod.username">
                   <a href="#">{{mod.username}}</a><span v-if="(i + 1) !== board.moderators.length">, </span>
                 </span>
               </div>
               <div class="childboards" v-if="board.children.length">
-                <strong>Child Boards: </strong>
+                <span>Child Boards: </span>
                 <span v-for="(child, i) in board.children" :key="child.id">
-                  <a href="#">{{child.name}}</a><span v-if="(i + 1) !== board.children.length">, </span>
+                  <a class="board-name" href="#">{{child.name}}</a><span v-if="(i + 1) !== board.children.length">, </span>
                 </span>
               </div>
             </div>
@@ -351,7 +351,7 @@ img.avatar-small {
       flex: 2;
     }
 
-    @media screen and (max-width: 960px) {
+    @include break-max-desktop {
       .view-count {
         flex: 0 0 auto;
       }
@@ -365,7 +365,7 @@ img.avatar-small {
       }
     }
 
-    @media screen and  (min-width: 960px) {
+    @include break-min-desktop {
       .info {
         flex: 2;
       }
@@ -431,7 +431,7 @@ img.avatar-small {
     }
   }
 
-  @media screen and (min-width: 1280px) {
+  @include break-min-large {
     border-top: none;
     // border-left: $border;
     padding-left: 1rem;

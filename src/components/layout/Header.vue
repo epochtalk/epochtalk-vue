@@ -400,7 +400,7 @@ header {
 
       li {
         float: none;
-        @media screen and (max-width: 767px) {
+        @include break-mobile-sm {
           height: 2rem;
         }
         @media screen and (max-width: ($tablet - 1)) and (orientation: portrait) {
@@ -455,7 +455,7 @@ header {
       &.mobile-expanded { min-height: 2 * $header-height; }
     }
 
-    @media screen and (max-width: 767px) {
+    @include break-mobile-sm {
       padding: 0 1rem;
     }
 
@@ -487,7 +487,7 @@ header {
       // span { padding-left: 0.8rem; }
       .burger-icon {
         display: none;
-        @media screen and (max-width: 767px) {
+        @include break-mobile-sm {
           display: inline-block;
         }
 
@@ -894,7 +894,7 @@ header {
     @include clearfix();
     @include pad(0 $base-grid-padding);
 
-    @media screen and (max-width: 767px) {
+    @include break-mobile-sm {
       padding: 0 1rem;
     }
 

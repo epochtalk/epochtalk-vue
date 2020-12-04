@@ -1,3 +1,6 @@
+// Misc Mixins
+@charset "UTF-8";
+
 // Page Break Mixins
 @mixin break-mobile-sm {
   @media screen and (max-width: #{$tablet}) {
@@ -29,6 +32,18 @@
   }
 }
 
+@mixin break-min-desktop {
+  @media screen and (min-width: #{$desktop}) {
+    @content;
+  }
+}
+
+@mixin break-max-desktop {
+  @media screen and (max-width: #{$desktop}) {
+    @content;
+  }
+}
+
 // Grid Layout Mixins
 $grid-2-column: 1fr $sidebarWidth;
 
@@ -46,9 +61,35 @@ $grid-2-column: 1fr $sidebarWidth;
   grid-template-columns: $grid-2-column;
 }
 
-
-// Misc Mixins
-@charset "UTF-8";
+@mixin label($type, $font-size: 0.6875rem, $border-radius: 2px, $padding: 0.25rem 0.5rem 0.25rem) {
+  @include border-radius($border-radius);
+  font-weight: normal;
+  text-align: center;
+  display: inline-block;
+  position: relative;
+  padding: $padding;
+  font-size: $font-size;
+  @if $type == error {
+    background-color: #f04124;
+    color: #FFFFFF;
+  }
+  @else if $type == warning {
+    background-color: #f08a24;
+    color: #FFFFFF;
+  }
+  @else if $type == success {
+    background-color: #43AC6A;
+    color: #FFFFFF;
+  }
+  @else if $type == info {
+    background-color: #a0d3e8;
+    color: #333333;
+  }
+  @else {
+    background-color: #e7e7e7;
+    color: #333333;
+  }
+}
 
 @mixin clearfix {
   &::after {
