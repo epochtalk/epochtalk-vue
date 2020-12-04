@@ -13,18 +13,18 @@ export default (dateStr, hideTime) => {
   if (hideTime) {
     if (isToday) { result = 'Today' }
     else if (isMaxDate) { result = 'Permanent' } // bans
-    else { result = dayjs(dateStr).format('MMMM d, YYYY') }
+    else { result = dayjs(dateStr).format('MMMM D, YYYY') }
   }
   else {
     if (timezone) {
-      if (isToday) { result = 'Today at ' +  dayjs(dateStr).format('h:mm a').tz(timezone) }
-      else if (isThisYear) { result = dayjs(dateStr).format('MMMM d [at] h:mm a').tz(timezone) }
-      else { result = dayjs(dateStr).format('MMM d, YYYY [at] h:mm a').tz(timezone) }
+      if (isToday) { result = 'Today at ' +  dayjs(dateStr).format('h:mm A').tz(timezone) }
+      else if (isThisYear) { result = dayjs(dateStr).format('MMMM D [at] h:mm A').tz(timezone) }
+      else { result = dayjs(dateStr).format('MMM D, YYYY [at] h:mm A').tz(timezone) }
     }
     else {
-      if (isToday) { result = 'Today at ' +  dayjs(dateStr).format('h:mm a') }
-      else if (isThisYear) { result = dayjs(dateStr).format('MMMM d [at] h:mm a') }
-      else { result = dayjs(dateStr).format('MMM d, YYYY [at] h:mm a') }
+      if (isToday) { result = 'Today at ' +  dayjs(dateStr).format('h:mm A') }
+      else if (isThisYear) { result = dayjs(dateStr).format('MMMM D [at] h:mm A') }
+      else { result = dayjs(dateStr).format('MMM D, YYYY [at] h:mm A') }
     }
   }
   return result
