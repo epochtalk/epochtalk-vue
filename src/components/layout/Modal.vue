@@ -34,16 +34,19 @@
 </template>
 
 <script>
-import { ref, watch } from 'vue'
+import { ref, watch, nextTick } from 'vue'
 
 export default {
-  props: ['name', 'show'],
+  props: ['name', 'show', 'focusInput'],
   emits: ['close'],
   setup(props, { emit }) {
     /* Internal Methods */
     const toggle = () => {
       // Show for first time
-      if (props.show && !open.value) { open.value = true  }
+      if (props.show && !open.value) {
+        open.value = true
+        nextTick(() => { if (props.focusInput) props.focusInput.focus() })
+      }
       // Hide for first time, emit event to parent
       else if (props.show && open.value) { emit('close') }
       // Watch will retrigger because of emit close and set open to false

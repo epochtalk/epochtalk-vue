@@ -1,5 +1,5 @@
 <template>
-  <modal :name="$options.name" :show="show" @close="this.$emit('close')">
+  <modal :name="$options.name" :show="show" @close="close()" :focusInput="focusInput">
     <template v-slot:header>Register a new account</template>
 
     <template v-slot:body>
@@ -18,7 +18,7 @@
           </div>
         </label>
 
-        <input type="email" class="icon-padding" id="email" name="email" maxlength="255" v-model="form.email.val" placeholder="your-email@email.com" @keydown="form.valid=false" required />
+        <input type="email" class="icon-padding" id="email" name="email" maxlength="255" v-model="form.email.val" placeholder="your-email@email.com" @keydown="form.valid=false" ref="focusInput" required />
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" v-if="form.email.val && form.email.val.length > -1 && (form.email.valid && form.email.unique)" class="input-icon valid">
           <title></title>
           <polygon class="cls-1" points="19.69 37.19 7.23 24.73 10.77 21.2 19.69 30.12 37.23 12.58 40.77 16.11 19.69 37.19"/>
@@ -121,7 +121,7 @@
 
 <script>
 import Modal from '@/components/layout/Modal.vue'
-import { debounce } from 'lodash'
+import { debounce, cloneDeep } from 'lodash'
 import { reactive, toRefs, watch } from 'vue'
 
 export default {
@@ -138,29 +138,37 @@ export default {
     /* Template Methods */
     const register = () => {
       console.log('Register!', v.form.email.val, v.form.username.val, v.form.password.val)
-      emit('close')
+      close()
     }
 
     const signInWithGoogle = () => {
       console.log('Sign in with Google!')
+      close()
+    }
+
+    const close = () => {
+      v.form = cloneDeep(initForm)
       emit('close')
     }
 
     /* Template Data */
+    const initForm = {
+      valid: false,
+      email: { val: undefined, valid: false, unique: undefined },
+      username: { val: undefined, valid: false, unique: undefined },
+      password: { val: undefined, valid: false },
+      confirmation:{ val: undefined, valid: false }
+    }
+
     const v = reactive({
-      form: {
-        valid: false,
-        email: { val: undefined, valid: false, unique: undefined },
-        username: { val: undefined, valid: false, unique: undefined },
-        password: { val: undefined, valid: false },
-        confirmation:{ val: undefined, valid: false }
-      },
+      form: cloneDeep(initForm),
+      focusInput: null,
       hasGoogleCredentials: true
     })
 
     /* Watch Data */
     watch(() => v.form.email.val, debounce(async (val) => {
-      v.form.email.valid = val.length >= 3 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)
+      v.form.email.valid = val && val.length >= 3 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)
       // check email unique
       const response = await fetch('http://localhost:8080/api/register/email/' + val)
       const data = await response.json()
@@ -169,7 +177,7 @@ export default {
     }, 500))
 
     watch(() => v.form.username.val, debounce(async (val) => {
-      v.form.username.valid = val.length >= 3 && val.length <= 20 && /^[a-zA-Z\d-_.]+$/.test(val)
+      v.form.username.valid = val && val.length >= 3 && val.length <= 20 && /^[a-zA-Z\d-_.]+$/.test(val)
       // check email unique
       const response = await fetch('http://localhost:8080/api/register/username/' + val)
       const data = await response.json()
@@ -178,7 +186,7 @@ export default {
     }, 500))
 
     watch(() => v.form.password.val, (val) => {
-      v.form.password.valid = val.length >= 8 && val.length <= 72
+      v.form.password.valid = val && val.length >= 8 && val.length <= 72
       if (v.form.password.valid && v.form.password.val && v.form.confirmation.val && v.form.password.val !== v.form.confirmation.val) {
         v.form.password.valid = false
         v.form.confirmation.valid = false
@@ -191,7 +199,7 @@ export default {
     })
 
     watch(() => v.form.confirmation.val, (val) => {
-      v.form.confirmation.valid = val.length >= 8 && val.length <= 72
+      v.form.confirmation.valid = val && val.length >= 8 && val.length <= 72
       if (v.form.confirmation.valid && v.form.password.val && v.form.confirmation.val && v.form.password.val !== v.form.confirmation.val) {
         v.form.password.valid = false
         v.form.confirmation.valid = false
@@ -203,7 +211,7 @@ export default {
       checkFormValid()
     })
 
-    return { ...toRefs(v), register, signInWithGoogle }
+    return { ...toRefs(v), register, signInWithGoogle, close }
   }
 }
 </script>

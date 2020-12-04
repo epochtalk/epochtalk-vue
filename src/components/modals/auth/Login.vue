@@ -1,12 +1,12 @@
 <template>
-  <modal :name="$options.name" :show="show" @close="this.$emit('close')">
+  <modal :name="$options.name" :show="show" @close="close()" :focusInput="focusInput">
     <template v-slot:header>Login</template>
 
     <template v-slot:body>
       <form action="." class="css-form" @submit="console.log('submit');">
         <div class="input-section">
           <label for="login-user">Username</label>
-          <input id="login-user" type="text" class="input-text" placeholder="Enter your username" v-model="user.username" :class="{'invalid': user.username.length < 3 && user.username.length }" required />
+          <input id="login-user" type="text" class="input-text" placeholder="Enter your username" v-model="user.username" :class="{'invalid': user.username.length < 3 && user.username.length }" ref="focusInput" required />
         </div>
         <div class="input-section">
           <label for="login-pass">Password</label>
@@ -40,6 +40,7 @@
 
 <script>
 import Modal from '@/components/layout/Modal.vue'
+import { cloneDeep } from 'lodash'
 import { reactive, toRefs } from 'vue'
 
 export default {
@@ -51,21 +52,29 @@ export default {
     /* Template Methods */
     const login = () => {
       console.log('Login!', v.user.username, v.user.password, v.user.rememberMe)
-      emit('close')
+      close()
     }
 
     const signInWithGoogle = () => {
       console.log('Sign in with Google!')
+      close()
+    }
+
+    const close = () => {
+      v.user = cloneDeep(initUser)
       emit('close')
     }
 
     /* Template Data */
+    const initUser = { username: '', password: '', rememberMe: false }
+
     const v = reactive({
-      user: { username: '', password: '', rememberMe: false },
-      hasGoogleCredentials: true
+      user: cloneDeep(initUser),
+      hasGoogleCredentials: true,
+      focusInput: null
     })
 
-    return { ...toRefs(v), login, signInWithGoogle }
+    return { ...toRefs(v), login, signInWithGoogle, close }
   }
 }
 </script>
