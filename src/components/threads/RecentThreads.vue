@@ -158,10 +158,6 @@ export default {
     }
   }
 
-  @include break-mobile-sm {
-    padding: 1rem;
-    width: 100%;
-    margin-bottom: 0;
-  }
+  @include break-mobile-sm { padding: 1rem; }
 }
 </style>

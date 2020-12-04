@@ -32,7 +32,7 @@ export default {
 #public-content {
   margin-top: $header-bottom-margin;
   @include break-mobile-sm {
-    margin-top: 0;
+    margin-top: -.5rem;
   }
 }
 
