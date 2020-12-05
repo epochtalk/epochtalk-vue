@@ -189,7 +189,8 @@ import decode from '@/composables/filters/decode'
 import truncate from '@/composables/filters/truncate'
 import LoginModal from '@/components/modals/auth/Login.vue'
 import RegisterModal from '@/components/modals/auth/Register.vue'
-import { reactive, toRefs, onMounted, onUnmounted } from 'vue'
+import { reactive, watch, toRefs, onMounted, onUnmounted } from 'vue'
+import { stateAuthContext } from '@/composables/states/auth'
 
 export default {
   components: { LoginModal, RegisterModal },
@@ -212,7 +213,7 @@ export default {
     }
 
     /* Template Methods */
-    const logout = () => { console.log('logout') }
+    const logout = () => { auth.logout() }
 
     const searchForum = () => { console.log('SEARCH!') }
 
@@ -224,6 +225,9 @@ export default {
       if (v.searchExpanded) { v.search.focus() }
     }
 
+    /* Internal Data */
+    const auth = stateAuthContext()
+
     /* Template Data */
     const v = reactive({
       showMobileMenu: false,
@@ -233,7 +237,7 @@ export default {
       showInvite: false,
       showRegister: false,
       showLogin: false,
-      loggedIn: false,
+      loggedIn: auth.loggedIn,
       logo: '',
       scrollDownPos: 95,
       lastScrollTop: 0,
@@ -243,6 +247,8 @@ export default {
       notificationMentions: null,
       breadcrumbs: [{label:'Home', state: '#', opts: {}}]
     })
+
+    watch(() => auth.user, (val) => { console.log('logggggg in', val)}, {deep: true})
 
     /* Lifecycle Events */
     onMounted(() => {

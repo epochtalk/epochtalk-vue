@@ -15,8 +15,8 @@ const fromBinary = binary => {
 }
 
 class LocalStorageCache {
-  constructor (ttl) {
-    this.STORAGE_KEY = 'swrv'
+  constructor (ttl, storageKey) {
+    this.STORAGE_KEY = storageKey || 'app'
     if (ttl === void 0) { ttl = 0 }
     this.ttl = ttl
   }
@@ -25,14 +25,21 @@ class LocalStorageCache {
   decode (storage) { return JSON.parse(fromBinary(atob(storage))) }
 
   get (k) {
-    const item = localStorage.getItem(this.STORAGE_KEY)
-    if (item) { return JSON.parse(fromBinary(atob(item)))[k] }
+    const encodedStore = localStorage.getItem(this.STORAGE_KEY)
+    if (encodedStore) {
+      let store = JSON.parse(fromBinary(atob(encodedStore)))
+      if (k) return store[k]
+      else return store
+    }
   }
+
 
   set (k, v, ttl) {
     let timeToLive = ttl || this.ttl
     let now = Date.now()
-    let payload = {
+    let store = this.get()
+    let updatedStore = {
+      ...store,
       [k]: {
         data: v,
         createdAt: now,
@@ -41,15 +48,18 @@ class LocalStorageCache {
     }
     timeToLive && setTimeout(() => {
       let current = Date.now()
-      let hasExpired = current >= payload[k].expiresAt
+      let hasExpired = current >= updatedStore[k].expiresAt
       if (hasExpired) { this.delete(k) }
     }, timeToLive)
-    localStorage.setItem(this.STORAGE_KEY, this.encode(payload))
+    localStorage.setItem(this.STORAGE_KEY, this.encode(updatedStore))
   }
 
   delete (k) {
-    localStorage.removeItem(k)
+    let store = this.get()
+    delete store[k]
+    console.log(store)
+    localStorage.setItem(this.STORAGE_KEY, this.encode(store))
   }
 }
 
-export default new LocalStorageCache()
+export default (ttl, storageKey) => new LocalStorageCache(ttl, storageKey)

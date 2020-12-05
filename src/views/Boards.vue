@@ -92,6 +92,7 @@ import RecentThreads from '@/components/threads/RecentThreads.vue'
 import LoginModal from '@/components/modals/auth/Login.vue'
 import RegisterModal from '@/components/modals/auth/Register.vue'
 import { inject, reactive, toRefs } from 'vue'
+import { stateAuthContext } from '@/composables/states/auth'
 
 export default {
   name: 'Boards',
@@ -185,12 +186,14 @@ export default {
       else { cat.show = !cat.show }
     }
 
-    /* View Data */
+    /* Internal Data */
     const $api = inject('$api')
     const $swrvCache = inject('$swrvCache')
+    const auth = stateAuthContext()
 
+    /* View Data */
     const v = reactive({
-      loggedIn: false,
+      loggedIn: auth.loggedIn,
       showLogin: false,
       showRegister: false,
       boardData: useSWRV(`/api/boards`, processBoards, { cache: $swrvCache })
