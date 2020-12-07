@@ -117,7 +117,7 @@
             <li id="user-dropdown-wrap" class="hide-mobile">
               <div>
                 <a href="#">
-                  <div>
+                  <div class="avatar-wrap">
                     <img :src="currentUser.avatar" class="avatar circle">
                   </div>
                   <span>{{currentUser.username}}</span>
@@ -432,6 +432,7 @@ header {
     }
   }
 
+  .avatar-wrap { display: inline; }
   .avatar {
     &.circle { @include border-radius(100px); }
     &.rect, &.circle {

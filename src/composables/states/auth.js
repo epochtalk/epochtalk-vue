@@ -42,7 +42,9 @@ export const provideAuth = () => {
 
   const logout = () => {
     $appCache.delete(USER_KEY)
-    Object.assign(user, cloneDeep(emtpyUser))
+    user.token = '' // clear token to invalidate session immediately
+    // delay clearing reactive user to give css transitions time to complete
+    setTimeout(() => { Object.assign(user, cloneDeep(emtpyUser)) }, 500)
   }
 
   provide(AUTH_CONTEXT, {
