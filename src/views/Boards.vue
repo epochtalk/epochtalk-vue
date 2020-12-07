@@ -92,7 +92,7 @@ import RecentThreads from '@/components/threads/RecentThreads.vue'
 import LoginModal from '@/components/modals/auth/Login.vue'
 import RegisterModal from '@/components/modals/auth/Register.vue'
 import { inject, reactive, toRefs } from 'vue'
-import { stateAuthContext } from '@/composables/states/auth'
+import { useAuth } from '@/composables/states/auth'
 
 export default {
   name: 'Boards',
@@ -189,7 +189,7 @@ export default {
     /* Internal Data */
     const $api = inject('$api')
     const $swrvCache = inject('$swrvCache')
-    const auth = stateAuthContext()
+    const auth = useAuth()
 
     /* View Data */
     const v = reactive({

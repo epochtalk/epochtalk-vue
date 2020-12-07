@@ -20,14 +20,12 @@
 
 <script>
 import Header from '@/components/layout/Header.vue'
-import { stateAuthProvider } from '@/composables/states/auth'
+import { provideAuth } from '@/composables/states/auth'
 
 export default {
   name: 'Epochtalk',
   components: { Header },
-  setup() {
-    stateAuthProvider()
-  }
+  setup() { provideAuth() }
 }
 </script>
 

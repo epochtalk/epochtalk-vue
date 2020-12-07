@@ -42,7 +42,7 @@
 import Modal from '@/components/layout/Modal.vue'
 import { cloneDeep } from 'lodash'
 import { reactive, toRefs } from 'vue'
-import { stateAuthContext } from '@/composables/states/auth'
+import { useAuth } from '@/composables/states/auth'
 
 export default {
   name: 'login-modal',
@@ -50,12 +50,11 @@ export default {
   emits: ['close'],
   components: { Modal },
   setup(props, { emit }) {
-    const auth = stateAuthContext()
+    const auth = useAuth()
 
     /* Template Methods */
     const login = () => {
       auth.login(v.user.username, v.user.password, v.user.rememberMe)
-      console.log('IN LOGIN MODAL', auth.user)
       close()
     }
 

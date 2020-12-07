@@ -4,7 +4,7 @@
     <div class="burger-close-overlay" :class="{ 'open': showMobileMenu }" v-on:click="showMobileMenu = false" ></div>
     <div class="burger-menu show-mobile" :class="{ 'open' : showMobileMenu }">
       <a v-on:click="showMobileMenu = false" class="profile" href="#">
-        <img src="{{ currentUser.avatar }}" class="avatar round">
+        <img :src="currentUser.avatar" class="avatar circle">
         <span class="username">{{currentUser.username}}</span>
       </a>
       <div class="close-menu" v-on:click="showMobileMenu = false">
@@ -117,7 +117,7 @@
             <li id="user-dropdown-wrap" class="hide-mobile">
               <div>
                 <a href="#">
-                  <img src="{{ currentUser.avatar }}" class="avatar round">
+                  <img :src="currentUser.avatar" class="avatar circle">
                   <span>{{currentUser.username}}</span>
                 </a>
               </div>
@@ -189,8 +189,8 @@ import decode from '@/composables/filters/decode'
 import truncate from '@/composables/filters/truncate'
 import LoginModal from '@/components/modals/auth/Login.vue'
 import RegisterModal from '@/components/modals/auth/Register.vue'
-import { reactive, watch, toRefs, onMounted, onUnmounted } from 'vue'
-import { stateAuthContext } from '@/composables/states/auth'
+import { reactive, toRefs, onMounted, onUnmounted } from 'vue'
+import { useAuth } from '@/composables/states/auth'
 
 export default {
   components: { LoginModal, RegisterModal },
@@ -226,7 +226,7 @@ export default {
     }
 
     /* Internal Data */
-    const auth = stateAuthContext()
+    const auth = useAuth()
 
     /* Template Data */
     const v = reactive({
@@ -241,14 +241,12 @@ export default {
       logo: '',
       scrollDownPos: 95,
       lastScrollTop: 0,
-      currentUser: {},
+      currentUser: auth.user,
       search: null,
       notificationMessages: null,
       notificationMentions: null,
       breadcrumbs: [{label:'Home', state: '#', opts: {}}]
     })
-
-    watch(() => auth.user, (val) => { console.log('logggggg in', val)}, {deep: true})
 
     /* Lifecycle Events */
     onMounted(() => {
@@ -386,7 +384,7 @@ header {
         overflow-x: hidden;
         text-overflow: ellipsis;
       }
-      .avatar, .avatar.loaded {
+      .avatar, .avatar {
         position: relative;
         top: -0.15rem;
       }
@@ -432,9 +430,6 @@ header {
     }
   }
 
-  .imageContainer { background: url('/static/img/loading.gif') no-repeat center; display: inline;}
-  .imageContainer.loaded { background: none; }
-  .avatar.loaded { opacity: 1; }
   .avatar {
     &.circle { @include border-radius(100px); }
     &.rect, &.circle {

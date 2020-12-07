@@ -1,9 +1,10 @@
-import { provide, inject, reactive } from 'vue'
+import { provide, computed, inject, reactive, readonly } from 'vue'
+import { cloneDeep } from 'lodash'
 
-const AUTH_CONTEXT = Symbol()
+const AUTH_CONTEXT = Symbol('state')
 const USER_KEY = 'user'
 
-export const stateAuthProvider = () => {
+export const provideAuth = () => {
   const $api = inject('$api')
   const $appCache = inject('$appCache')
 
@@ -17,7 +18,7 @@ export const stateAuthProvider = () => {
     token: null,
     username: ''
   }
-  const user = reactive(cachedUser ? cachedUser.data : emtpyUser)
+  const user = reactive(cachedUser ? cachedUser.data : cloneDeep(emtpyUser))
 
   const login = (username, password, rememberMe) => {
     const authOpts = {
@@ -41,15 +42,19 @@ export const stateAuthProvider = () => {
 
   const logout = () => {
     $appCache.delete(USER_KEY)
-    Object.assign(user, emtpyUser)
-    console.log($appCache.get(USER_KEY))
+    Object.assign(user, cloneDeep(emtpyUser))
   }
 
-  provide(AUTH_CONTEXT, { user, login, logout })
+  provide(AUTH_CONTEXT, {
+    user: readonly(user),
+    loggedIn: computed(() => !!user.token),
+    login,
+    logout
+  })
 }
 
-export const stateAuthContext = () => {
+export const useAuth = () => {
   const context = inject(AUTH_CONTEXT)
   if (context) return context
-  else throw new Error('stateAuthContext must be used with stateAuthProvider')
+  else throw new Error('useAuth must be used with provideAuth')
 }
