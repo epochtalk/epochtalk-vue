@@ -117,7 +117,9 @@
             <li id="user-dropdown-wrap" class="hide-mobile">
               <div>
                 <a href="#">
-                  <img :src="currentUser.avatar" class="avatar circle">
+                  <div>
+                    <img :src="currentUser.avatar" class="avatar circle">
+                  </div>
                   <span>{{currentUser.username}}</span>
                 </a>
               </div>
