@@ -7,16 +7,21 @@ const routes = [
   {
     path: '/',
     name: 'Boards',
-    component: Boards
+    component: Boards,
+    meta: {
+      requiresAuth: false
+    }
   },
   {
     path: '/about',
     name: 'About',
-    component: About
+    component: About,
+    meta: {}
   },
   {
     path: '/:catchAll(.*)',
-    component: NotFound
+    component: NotFound,
+    meta: {}
   }
 ]
 

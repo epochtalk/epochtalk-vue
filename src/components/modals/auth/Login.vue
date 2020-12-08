@@ -3,7 +3,7 @@
     <template v-slot:header>Login</template>
 
     <template v-slot:body>
-      <form action="." class="css-form" @submit="console.log('submit');">
+      <form action="." class="css-form">
         <div class="input-section">
           <label for="login-user">Username</label>
           <input id="login-user" type="text" class="input-text" placeholder="Enter your username" v-model="user.username" :class="{'invalid': user.username.length < 3 && user.username.length }" ref="focusInput" required />
