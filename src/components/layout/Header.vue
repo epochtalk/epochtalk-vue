@@ -1,53 +1,53 @@
 <template>
   <header>
     <!-- Mobile Menu -->
-    <div class="burger-close-overlay" :class="{ 'open': showMobileMenu }" v-on:click="showMobileMenu = false" ></div>
+    <div class="burger-close-overlay" :class="{ 'open': showMobileMenu }" @click="showMobileMenu = false" ></div>
     <div class="burger-menu show-mobile" :class="{ 'open' : showMobileMenu }">
-      <a v-on:click="showMobileMenu = false" class="profile" href="#">
+      <a @click="showMobileMenu = false" class="profile" href="#">
         <img :src="currentUser.avatar" @error="$event.target.src='/static/img/avatar.png'" class="avatar circle">
         <span class="username">{{currentUser.username}}</span>
       </a>
-      <div class="close-menu" v-on:click="showMobileMenu = false">
+      <div class="close-menu" @click="showMobileMenu = false">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
           <title></title>
           <path d="M24,38.83,4.59,19.41a2,2,0,0,1,2.82-2.82L24,33.17,40.59,16.59a2,2,0,0,1,2.82,2.82Z"/>
         </svg>
       </div>
       <ul>
-        <li v-on:click="showMobileMenu = false">
+        <li @click="showMobileMenu = false">
         <!--v-if="hasPermission('adminAccess')"> -->
           <a href="#"><i class="fa fa-cogs" aria-hidden="true"></i>Admin Panel</a>
         </li>
-        <li v-on:click="showMobileMenu = false"> <!--v-if="hasPermission('modAccess') && !hasPermission('adminAccess')"> -->
+        <li @click="showMobileMenu = false"> <!--v-if="hasPermission('modAccess') && !hasPermission('adminAccess')"> -->
           <a href="#"><i class="fa fa-cogs" aria-hidden="true"></i>Mod Panel</a>
         </li>
-        <li v-on:click="showMobileMenu = false"> <!-- v-if="isPatroller()">-->
+        <li @click="showMobileMenu = false"> <!-- v-if="isPatroller()">-->
           <a href="#"><i class="fa fa-binoculars" aria-hidden="true"></i>Patrol</a>
         </li>
-        <li v-on:click="showMobileMenu = false" >
+        <li @click="showMobileMenu = false" >
           <a href="#"><i class="fa fa-user" aria-hidden="true"></i>Profile</a>
         </li>
-        <li v-on:click="showMobileMenu = false" >
+        <li @click="showMobileMenu = false" >
           <a href="#"><i class="fa fa-wrench" aria-hidden="true"></i>Settings</a>
         </li>
-        <li v-on:click="showMobileMenu = false" >
+        <li @click="showMobileMenu = false" >
           <a href="#"><i class="fa fa-users" aria-hidden="true"></i>Member Search</a>
         </li>
         <!--<mentions-menu></mentions-menu>-->
-        <li v-on:click="showMobileMenu = false" >
-          <a href="#" v-on:click="dismissNotifications({ type: 'message' })"><i class="fa fa-envelope" aria-hidden="true"></i>Messages</a>
+        <li @click="showMobileMenu = false" >
+          <a href="#" @click="dismissNotifications({ type: 'message' })"><i class="fa fa-envelope" aria-hidden="true"></i>Messages</a>
           <div class="count" v-if="notificationMessages">{{notificationMessages}}</div>
         </li>
-        <li v-on:click="showMobileMenu = false" >
+        <li @click="showMobileMenu = false" >
           <a href="#"><i class="fa fa-eye" aria-hidden="true"></i>Watchlist</a>
         </li>
-        <li v-on:click="showMobileMenu = false"> <!--v-if="canInvite()">-->
-          <a v-on:click="showInvite = true">
+        <li @click="showMobileMenu = false"> <!--v-if="canInvite()">-->
+          <a @click="showInvite = true">
             <i class="fa fa-user-plus" aria-hidden="true"></i>Invite Users
           </a>
         </li>
-        <li v-on:click="showMobileMenu = false" >
-          <a href="#" v-on:click="logout()"><i class="fa fa-sign-out" aria-hidden="true"></i>Logout</a>
+        <li @click="showMobileMenu = false" >
+          <a href="#" @click="logout()"><i class="fa fa-sign-out" aria-hidden="true"></i>Logout</a>
         </li>
       </ul>
     </div>
@@ -77,8 +77,8 @@
           <!-- User Dropdown Mobile -->
           <ul v-if="loggedIn" class="burger-icon">
             <div class="burger-notification show-mobile" v-if="notificationMessages || notificationMentions"></div>
-            <!-- <i v-on:click="showMobileMenu = true" class="fa fa-bars fa-lg burger" aria-hidden="true"></i> -->
-            <span class="burger-menu-icon" v-on:click="showMobileMenu = true" aria-hidden="true">
+            <!-- <i @click="showMobileMenu = true" class="fa fa-bars fa-lg burger" aria-hidden="true"></i> -->
+            <span class="burger-menu-icon" @click="showMobileMenu = true" aria-hidden="true">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <path d="M7,16H41a2,2,0,0,0,0-4H7a2,2,0,0,0,0,4Z"/>
                 <path d="M41,22H7a2,2,0,0,0,0,4H41a2,2,0,0,0,0-4Z"/>
@@ -90,9 +90,9 @@
           <!-- User Dropdown -->
           <ul v-if="loggedIn">
             <li class="search"> <!--v-if="hasPermission('posts.search.allow')"-->
-              <form action="." class="search-btn" autocomplete="off" v-on:submit.prevent="searchForum">
+              <form action="." class="search-btn" autocomplete="off" @submit.prevent="searchForum">
                 <div class="balloon" data-balloon="Search" data-balloon-pos="down">
-                  <label for="search" class="fa fa-search" :class="{ 'search-label-expanded' : searchExpanded || focusSearch }" v-on:click="toggleFocusSearch()"></label>
+                  <label for="search" class="fa fa-search" :class="{ 'search-label-expanded' : searchExpanded || focusSearch }" @click="toggleFocusSearch()"></label>
                   <input class="search-input" v-model="searchTerms" :class="{ 'search-input-expanded' : focusSearch, 'search-input-minimized' : !focusSearch }" type="search" name="search" placeholder="Search" autocomplete="off" ref="search" />
                 </div>
               </form>
@@ -104,7 +104,7 @@
 
               <!-- <mentions-tray></mentions-tray> -->
 
-              <div class="tray-icon" href="#" v-on:click="dismissNotifications({ type: 'message' })" data-balloon="Messages" data-balloon-pos="down">
+              <div class="tray-icon" href="#" @click="dismissNotifications({ type: 'message' })" data-balloon="Messages" data-balloon-pos="down">
                 <i class="fa fa-envelope"></i>
                 <div class="count" v-if="notificationMessages">{{notificationMessages}}</div>
               </div>
@@ -146,7 +146,7 @@
                   <a href="#">Watchlist</a>
                 </li>
                 <li> <!--v-if="canInvite()">-->
-                  <a v-on:click="showInvite = true">
+                  <a @click="showInvite = true">
                     Invite User
                   </a>
                 </li>
@@ -154,7 +154,7 @@
                   <a href="#">About</a>
                 </li>
                 <li>
-                  <a href="#" v-on:click="logout()">Logout</a>
+                  <a href="#" @click="logout()">Logout</a>
                 </li>
               </ul>
             </li>

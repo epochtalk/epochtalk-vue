@@ -57,7 +57,6 @@ class LocalStorageCache {
   delete (k) {
     let store = this.get()
     delete store[k]
-    console.log(store)
     localStorage.setItem(this.STORAGE_KEY, this.encode(store))
   }
 }
