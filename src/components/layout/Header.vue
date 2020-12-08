@@ -4,7 +4,7 @@
     <div class="burger-close-overlay" :class="{ 'open': showMobileMenu }" v-on:click="showMobileMenu = false" ></div>
     <div class="burger-menu show-mobile" :class="{ 'open' : showMobileMenu }">
       <a v-on:click="showMobileMenu = false" class="profile" href="#">
-        <img :src="currentUser.avatar" class="avatar circle">
+        <img :src="currentUser.avatar" @error="$event.target.src='/static/img/avatar.png'" class="avatar circle">
         <span class="username">{{currentUser.username}}</span>
       </a>
       <div class="close-menu" v-on:click="showMobileMenu = false">
@@ -118,7 +118,7 @@
               <div>
                 <a href="#">
                   <div class="avatar-wrap">
-                    <img :src="currentUser.avatar" class="avatar circle">
+                    <img :src="currentUser.avatar || require('@/assets/images/avatar.png')" @error="$event.target.src=require('@/assets/images/avatar.png')" class="avatar circle">
                   </div>
                   <span>{{currentUser.username}}</span>
                 </a>

@@ -21,7 +21,7 @@ export const provideAuth = () => {
   const user = reactive(cachedUser ? cachedUser.data : cloneDeep(emtpyUser))
 
   const login = (username, password, rememberMe) => {
-    const authOpts = {
+    const opts = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -33,7 +33,7 @@ export const provideAuth = () => {
       })
     }
 
-    $api('/api/login', authOpts)
+    $api('/api/login', opts)
     .then(dbUser => {
       Object.assign(user, dbUser)
       $appCache.set(USER_KEY, user)
@@ -47,11 +47,36 @@ export const provideAuth = () => {
     setTimeout(() => { Object.assign(user, cloneDeep(emtpyUser)) }, 500)
   }
 
+  const register = (email, username, password) => {
+    const opts = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        email: email,
+        username: username,
+        password: password
+      })
+    }
+
+    $api('/api/register', opts)
+    .then(dbUser => {
+      // Set user session if account is already confirmed (log the user in)
+      if (!dbUser.confirm_token) {
+        Object.assign(user, dbUser)
+        $appCache.set(USER_KEY, user)
+      }
+    })
+  }
+
+
   provide(AUTH_CONTEXT, {
     user: readonly(user),
     loggedIn: computed(() => !!user.token),
     login,
-    logout
+    logout,
+    register
   })
 }
 

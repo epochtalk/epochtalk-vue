@@ -64,7 +64,7 @@
               <div class="last-post">
                 <div v-if="board.last_post_username">
                   <span v-if="board.user_deleted || board.post_deleted">deleted</span>
-                  <img v-if="!board.user_deleted && !board.post_deleted" class="avatar-small round" v-bind:src="board.last_post_avatar" />
+                  <img v-if="!board.user_deleted && !board.post_deleted" class="avatar-small round" :src="board.last_post_avatar || require('@/assets/images/avatar.png')" @error="$event.target.src=require('@/assets/images/avatar.png')" />
                   <a v-if="!board.user_deleted && !board.post_deleted" href="#">{{board.last_post_username}}</a> posted in
                   <span v-if="board.last_thread_title">
                     <a href="#">{{board.last_thread_title }}</a> on

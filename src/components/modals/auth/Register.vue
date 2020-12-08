@@ -123,6 +123,7 @@
 import Modal from '@/components/layout/Modal.vue'
 import { debounce, cloneDeep } from 'lodash'
 import { reactive, toRefs, watch } from 'vue'
+import { useAuth } from '@/composables/states/auth'
 
 export default {
   name: 'register-modal',
@@ -137,6 +138,7 @@ export default {
 
     /* Template Methods */
     const register = () => {
+      auth.register(v.form.email.val, v.form.username.val, v.form.password.val)
       console.log('Register!', v.form.email.val, v.form.username.val, v.form.password.val)
       close()
     }
@@ -150,6 +152,9 @@ export default {
       v.form = cloneDeep(initForm)
       emit('close')
     }
+
+    /* Internal Data */
+    const auth = useAuth()
 
     /* Template Data */
     const initForm = {

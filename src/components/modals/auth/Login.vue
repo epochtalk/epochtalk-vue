@@ -50,8 +50,6 @@ export default {
   emits: ['close'],
   components: { Modal },
   setup(props, { emit }) {
-    const auth = useAuth()
-
     /* Template Methods */
     const login = () => {
       auth.login(v.user.username, v.user.password, v.user.rememberMe)
@@ -67,6 +65,9 @@ export default {
       v.user = cloneDeep(initUser)
       emit('close')
     }
+
+    /* Internal Data */
+    const auth = useAuth()
 
     /* Template Data */
     const initUser = { username: '', password: '', rememberMe: false }
