@@ -1,7 +1,7 @@
 import { provide, computed, inject, reactive, readonly } from 'vue'
 import { cloneDeep } from 'lodash'
 
-const AUTH_CONTEXT = Symbol('state')
+const AUTH_CONTEXT = Symbol('auth')
 const USER_KEY = 'user'
 
 export const provideAuth = () => {
@@ -78,6 +78,10 @@ export const provideAuth = () => {
     logout,
     register
   })
+}
+
+export const getUser = () => {
+
 }
 
 export const useAuth = () => {

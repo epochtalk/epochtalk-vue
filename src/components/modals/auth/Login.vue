@@ -42,7 +42,7 @@
 import Modal from '@/components/layout/Modal.vue'
 import { cloneDeep } from 'lodash'
 import { reactive, toRefs } from 'vue'
-import { useAuth } from '@/composables/states/auth'
+import { useAuth } from '@/composables/stores/auth'
 
 export default {
   name: 'login-modal',

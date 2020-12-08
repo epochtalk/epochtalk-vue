@@ -92,7 +92,7 @@ import RecentThreads from '@/components/threads/RecentThreads.vue'
 import LoginModal from '@/components/modals/auth/Login.vue'
 import RegisterModal from '@/components/modals/auth/Register.vue'
 import { inject, reactive, toRefs } from 'vue'
-import { useAuth } from '@/composables/states/auth'
+import { useAuth } from '@/composables/stores/auth'
 
 export default {
   name: 'Boards',

@@ -20,7 +20,7 @@
 
 <script>
 import Header from '@/components/layout/Header.vue'
-import { provideAuth } from '@/composables/states/auth'
+import { provideAuth } from '@/composables/stores/auth'
 
 export default {
   name: 'Epochtalk',

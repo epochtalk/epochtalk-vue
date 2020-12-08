@@ -16,12 +16,12 @@ const routes = [
     path: '/about',
     name: 'About',
     component: About,
-    meta: {}
+    meta: { requiresAuth: false }
   },
   {
     path: '/:catchAll(.*)',
     component: NotFound,
-    meta: {}
+    meta: { requiresAuth: false }
   }
 ]
 
