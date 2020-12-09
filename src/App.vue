@@ -1,31 +1,35 @@
 <template>
-  <div id="wrapper">
-      <!-- <nav id="navigation">
-        <h1 class="title">Epochtalk</h1>
-        <div class="right" id="nav">
-          <router-link to="/">Boards</router-link> |
-          <router-link to="/about">About</router-link>
-        </div>
-      </nav> -->
-      <Header></Header>
-      <main>
-        <div id="public-content">
-          <div class="main">
-            <router-view />
-          </div>
-        </div>
-    </main>
-  </div>
+  <ProvidePreferences>
+    <ProvideAuth>
+      <div id="wrapper">
+          <!-- <nav id="navigation">
+            <h1 class="title">Epochtalk</h1>
+            <div class="right" id="nav">
+              <router-link to="/">Boards</router-link> |
+              <router-link to="/about">About</router-link>
+            </div>
+          </nav> -->
+          <Header></Header>
+          <main>
+            <div id="public-content">
+              <div class="main">
+                <router-view />
+              </div>
+            </div>
+        </main>
+      </div>
+    </ProvideAuth>
+  </ProvidePreferences>
 </template>
 
 <script>
 import Header from '@/components/layout/Header.vue'
-import { provideAuth } from '@/composables/stores/auth'
+import ProvidePreferences from '@/composables/stores/prefs'
+import ProvideAuth from '@/composables/stores/auth'
 
 export default {
   name: 'Epochtalk',
-  components: { Header },
-  setup() { provideAuth() }
+  components: { Header, ProvidePreferences, ProvideAuth }
 }
 </script>
 

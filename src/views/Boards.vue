@@ -16,7 +16,7 @@
       <!-- Category Title -->
       <div :id="generateCatId(cat.name, cat.view_order)" class="title">
         <div v-on:click="toggleCategory(cat)" class="collapse-section">
-          <a :class="{ 'is-open' : cat.show || cat.show === undefined, 'is-closed': !cat.show }" class="test">
+          <a :class="{ 'is-open' : cat.show || cat.show === undefined, 'is-closed': !cat.show }">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 39.84 22.63" class="icon__caretDown">
               <title></title>
               <g id="Layer_2" data-name="Layer 2">
@@ -91,8 +91,9 @@ import humanDate from '@/composables/filters/humanDate'
 import RecentThreads from '@/components/threads/RecentThreads.vue'
 import LoginModal from '@/components/modals/auth/Login.vue'
 import RegisterModal from '@/components/modals/auth/Register.vue'
-import { inject, reactive, toRefs } from 'vue'
-import { useAuth } from '@/composables/stores/auth'
+import { inject, reactive, toRefs, watch, nextTick } from 'vue'
+import { AuthStore } from '@/composables/stores/auth'
+import { PreferencesStore } from '@/composables/stores/prefs'
 
 export default {
   name: 'Boards',
@@ -154,10 +155,10 @@ export default {
 
     const processBoards = path => $api(`${path}`)
       .then(data => {
-        let collapsedCats = []
         // let ignoredBoards = []
         data.boards.map(category => {
           // set category visibility
+          // console.log('COLLAPSED', collapsedCats)
           if (collapsedCats.indexOf(category.id) > -1) { category.show = false }
           else { category.show = true }
 
@@ -184,19 +185,43 @@ export default {
     const toggleCategory = cat => {
       if (cat.show === undefined) { cat.show = false }
       else { cat.show = !cat.show }
+
+      if (auth.loggedIn) {
+        if (cat.show) { remove(collapsedCats, cat.id) }
+        else if (collapsedCats.indexOf(cat.id) < 0) { collapsedCats.push(cat.id); }
+
+        preferences.update('collapsed_categories', collapsedCats)
+      }
+    }
+
+    function remove(array, item) {
+      var found = array.indexOf(item);
+      while (found !== -1) {
+        array.splice(found, 1);
+        found = array.indexOf(item);
+      }
     }
 
     /* Internal Data */
     const $api = inject('$api')
     const $swrvCache = inject('$swrvCache')
-    const auth = useAuth()
+    const auth = inject(AuthStore)
+    const preferences = inject(PreferencesStore)
+    const collapsedCats = [...preferences.collapsed_categories]
 
     /* View Data */
     const v = reactive({
+      collapsedCats: preferences.collapsed_categories,
       loggedIn: auth.loggedIn,
       showLogin: false,
       showRegister: false,
       boardData: useSWRV(`/api/boards`, processBoards, { cache: $swrvCache })
+    })
+
+    watch(() => v.loggedIn, (val) => {
+      console.log('loggedIn', val)
+      console.log('mutated')
+      nextTick(v.boardData.mutate(processBoards, { forceRevalidate: true }))
     })
 
     return { ...toRefs(v), generateCatId, toggleCategory, humanDate }

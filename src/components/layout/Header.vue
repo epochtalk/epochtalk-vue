@@ -191,8 +191,8 @@ import decode from '@/composables/filters/decode'
 import truncate from '@/composables/filters/truncate'
 import LoginModal from '@/components/modals/auth/Login.vue'
 import RegisterModal from '@/components/modals/auth/Register.vue'
-import { reactive, toRefs, onMounted, onUnmounted } from 'vue'
-import { useAuth } from '@/composables/stores/auth'
+import { reactive, toRefs, onMounted, onUnmounted, inject } from 'vue'
+import { AuthStore } from '@/composables/stores/auth'
 
 export default {
   components: { LoginModal, RegisterModal },
@@ -228,7 +228,7 @@ export default {
     }
 
     /* Internal Data */
-    const auth = useAuth()
+    const auth = inject(AuthStore)
 
     /* Template Data */
     const v = reactive({

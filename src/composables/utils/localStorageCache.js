@@ -31,6 +31,7 @@ class LocalStorageCache {
       if (k) return store[k]
       else return store
     }
+    else return undefined
   }
 
 

@@ -41,8 +41,8 @@
 <script>
 import Modal from '@/components/layout/Modal.vue'
 import { cloneDeep } from 'lodash'
-import { reactive, toRefs } from 'vue'
-import { useAuth } from '@/composables/stores/auth'
+import { reactive, toRefs, inject } from 'vue'
+import { AuthStore } from '@/composables/stores/auth'
 
 export default {
   name: 'login-modal',
@@ -67,7 +67,7 @@ export default {
     }
 
     /* Internal Data */
-    const auth = useAuth()
+    const auth = inject(AuthStore)
 
     /* Template Data */
     const initUser = { username: '', password: '', rememberMe: false }

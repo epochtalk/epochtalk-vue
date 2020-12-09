@@ -124,8 +124,8 @@
 <script>
 import Modal from '@/components/layout/Modal.vue'
 import { debounce, cloneDeep } from 'lodash'
-import { reactive, toRefs, watch } from 'vue'
-import { useAuth } from '@/composables/stores/auth'
+import { reactive, toRefs, watch, inject } from 'vue'
+import { AuthStore } from '@/composables/stores/auth'
 
 export default {
   name: 'register-modal',
@@ -156,7 +156,7 @@ export default {
     }
 
     /* Internal Data */
-    const auth = useAuth()
+    const auth = inject(AuthStore)
 
     /* Template Data */
     const initForm = {
