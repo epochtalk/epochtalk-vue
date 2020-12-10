@@ -27,7 +27,10 @@ app.provide('$api', (path, opts) => {
   delete opts.data
 
   let req
+  console.log('METHOD', method)
   if (method === 'post' || method === 'put' || method === 'patch') {
+    opts = {...opts, crossDomain: true}
+    console.log(path, data, opts)
     req = $axios[method](path, data, opts)
   }
   else { req = $axios[method](path, opts) }

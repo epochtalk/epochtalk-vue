@@ -74,7 +74,7 @@ export default {
       })
     }
 
-    provide(AuthStore, {
+    return provide(AuthStore, {
       user: readonly(user),
       loggedIn: computed(() => !!user.token),
       login,

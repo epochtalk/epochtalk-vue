@@ -2,6 +2,7 @@ import { provide, inject, reactive, readonly } from 'vue'
 import { cloneDeep } from 'lodash'
 
 const PREFS_KEY = 'preferences'
+const AUTH_KEY = 'auth'
 
 export const PreferencesStore = Symbol(PREFS_KEY)
 
@@ -34,19 +35,38 @@ export default {
       Object.assign(prefs, cloneDeep(emtpyPrefs))
     }
 
+
     const update = (prop, val) => {
-      prefs[prop] = val
-      $appCache.set(PREFS_KEY, {
-        posts_per_page: prefs.posts_per_page,
-        threads_per_page: prefs.threads_per_page,
-        timezone_offset: prefs.timezone_offset,
-        patroller_view: prefs.patroller_view,
-        collapsed_categories: prefs.collapsed_categories,
-        ignored_boards: prefs.ignored_boards
-      })
+      const auth = $appCache.get(AUTH_KEY)
+      const user = auth ? auth.data : undefined
+      console.log(user)
+      if (user) {
+        let updatedPrefs = {
+          posts_per_page: prefs.posts_per_page,
+          threads_per_page: prefs.threads_per_page,
+          timezone_offset: prefs.timezone_offset,
+          patroller_view: prefs.patroller_view,
+          collapsed_categories: prefs.collapsed_categories,
+          ignored_boards: prefs.ignored_boards,
+          [prop]: val
+        }
+        const opts = {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          data: JSON.stringify({
+            username: user.username,
+            ...updatedPrefs
+          })
+        }
+        $api(`/api/user/${user.id}`, opts)
+        .then(() => {
+          prefs[prop] = val
+          $appCache.set(PREFS_KEY, updatedPrefs)
+        })
+      }
     }
 
-    provide(PreferencesStore, {
+    return provide(PreferencesStore, {
       ...readonly(prefs),
       fetch,
       clear,
