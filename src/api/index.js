@@ -3,7 +3,10 @@ const AUTH_KEY = 'auth'
 
 export default {
   login: opts => { return api('/api/login', opts) },
-  register: opts => { return api('/api/register', opts)}
+  register: opts => { return api('/api/register', opts) },
+  users: {
+    preferences: () => { return api('/api/users/preferences') }
+  }
 }
 
 const api = (path, opts) => {

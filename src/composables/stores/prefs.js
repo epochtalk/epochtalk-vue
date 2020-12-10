@@ -22,7 +22,7 @@ export default {
     const prefs = reactive(cachedPrefs ? cachedPrefs.data : cloneDeep(emtpyPrefs))
 
     const fetch = () => {
-      $api('/api/users/preferences')
+      $api.users.preferences()
       .then(dbPrefs => {
         $appCache.set(PREFS_KEY, dbPrefs)
         Object.assign(prefs, dbPrefs)
