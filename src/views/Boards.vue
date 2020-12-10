@@ -91,7 +91,7 @@ import humanDate from '@/composables/filters/humanDate'
 import RecentThreads from '@/components/threads/RecentThreads.vue'
 import LoginModal from '@/components/modals/auth/Login.vue'
 import RegisterModal from '@/components/modals/auth/Register.vue'
-import { inject, reactive, toRefs, watch, nextTick } from 'vue'
+import { inject, reactive, toRefs, watch } from 'vue'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
 
@@ -218,11 +218,7 @@ export default {
       boardData: useSWRV(`/api/boards`, processBoards, { cache: $swrvCache })
     })
 
-    watch(() => v.loggedIn, (val) => {
-      console.log('loggedIn', val)
-      console.log('mutated')
-      nextTick(v.boardData.mutate(processBoards, { forceRevalidate: true }))
-    })
+    watch(() => v.loggedIn, () => v.boardData.mutate(processBoards))
 
     return { ...toRefs(v), generateCatId, toggleCategory, humanDate }
   }

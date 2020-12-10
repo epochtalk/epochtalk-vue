@@ -215,7 +215,7 @@ export default {
     }
 
     /* Template Methods */
-    const logout = () => { auth.logout() }
+    const logout = () => auth.logout()
 
     const searchForum = () => { console.log('SEARCH!') }
 

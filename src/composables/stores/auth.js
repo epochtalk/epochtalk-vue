@@ -10,6 +10,7 @@ export default {
   setup() {
     const $api = inject('$api')
     const $appCache = inject('$appCache')
+    const $axios = inject('$axios')
     const preferences = inject(PreferencesStore)
 
     const cachedUser = $appCache.get(AUTH_KEY)
@@ -27,18 +28,16 @@ export default {
     const login = (username, password, rememberMe) => {
       const opts = {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
+        data: {
           username: username,
           password: password,
           rememberMe: rememberMe
-        })
+        }
       }
 
       $api('/api/login', opts)
       .then(dbUser => {
+        $axios.defaults.headers.common['Authorization'] = `BEARER ${dbUser.token}`
         $appCache.set(AUTH_KEY, dbUser)
         Object.assign(user, dbUser)
         preferences.fetch()
@@ -46,6 +45,7 @@ export default {
     }
 
     const logout = () => {
+      $axios.defaults.headers.common['Authorization'] = undefined
       $appCache.delete(AUTH_KEY)
       user.token = '' // clear token to invalidate session immediately
       preferences.clear()
@@ -56,14 +56,11 @@ export default {
     const register = (email, username, password) => {
       const opts = {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
+        data: {
           email: email,
           username: username,
           password: password
-        })
+        }
       }
 
       $api('/api/register', opts)
