@@ -37,7 +37,7 @@ export default {
         })
       }
 
-      $api('/api/login', opts)
+      $api.login(opts)
       .then(dbUser => {
         $appCache.set(AUTH_KEY, dbUser)
         Object.assign(user, dbUser)
@@ -66,7 +66,7 @@ export default {
         })
       }
 
-      $api('/api/register', opts)
+      $api.register(opts)
       .then(dbUser => {
         // Set user session if account is already confirmed (log the user in)
         if (!dbUser.confirm_token) {
