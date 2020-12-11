@@ -84,6 +84,8 @@ export default {
   .title {
     color: $secondary-font-color;
     font-size: $font-size-sm;
+    margin: 0;
+    padding: 0;
   }
 
   .threads-container {
