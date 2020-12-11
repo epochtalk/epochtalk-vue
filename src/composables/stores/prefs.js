@@ -1,4 +1,4 @@
-import { provide, inject, reactive } from 'vue'
+import { provide, inject, reactive, toRefs } from 'vue'
 import { cloneDeep } from 'lodash'
 
 const PREFS_KEY = 'preferences'
@@ -8,6 +8,7 @@ export const PreferencesStore = Symbol(PREFS_KEY)
 
 export default {
   setup() {
+    /* Internal Data */
     const $api = inject('$api')
     const $appCache = inject('$appCache')
 
@@ -20,8 +21,11 @@ export default {
       collapsed_categories: [],
       ignored_boards: []
     }
+
+    /* Provided Data */
     const prefs = reactive(cachedPrefs ? cachedPrefs.data : cloneDeep(emtpyPrefs))
 
+    /* Provided Methods */
     const fetch = () => {
       $api('/api/users/preferences')
       .then(dbPrefs => {
@@ -35,21 +39,18 @@ export default {
       Object.assign(prefs, cloneDeep(emtpyPrefs))
     }
 
-
-    const update = (prop, val) => {
-      console.log('in', val)
+    const update = () => {
       const auth = $appCache.get(AUTH_KEY)
       const user = auth ? auth.data : undefined
-      if (user) {
-        let updatedPrefs = {
-          posts_per_page: prefs.posts_per_page,
-          threads_per_page: prefs.threads_per_page,
-          timezone_offset: prefs.timezone_offset,
-          patroller_view: prefs.patroller_view,
-          collapsed_categories: prefs.collapsed_categories,
-          ignored_boards: prefs.ignored_boards,
-          [prop]: [...val]
-        }
+      const updatedPrefs = { // spread prefs to get rid of proxy object before storing in cache
+        posts_per_page: prefs.posts_per_page,
+        threads_per_page: prefs.threads_per_page,
+        timezone_offset: prefs.timezone_offset,
+        patroller_view: prefs.patroller_view,
+        collapsed_categories: [...prefs.collapsed_categories],
+        ignored_boards: [...prefs.ignored_boards]
+      }
+      if (user && user.token) { // user is logged in update cache and server
         const opts = {
           method: 'PUT',
           data: {
@@ -58,19 +59,18 @@ export default {
           }
         }
         $api(`/api/users/${user.id}`, opts)
-        .then((data) => {
-          prefs[prop] = data[prop]
-          $appCache.set(PREFS_KEY, updatedPrefs)
-        })
+        .then(() => $appCache.set(PREFS_KEY, updatedPrefs))
       }
+      else { $appCache.set(PREFS_KEY, updatedPrefs) } // user not logged in, only update cache
     }
 
+    /* Provide Store Data */
     return provide(PreferencesStore, {
-      ...prefs,
+      data: toRefs(prefs),
       fetch,
       clear,
       update
     })
   },
-  render() { return this.$slots.default() }
+  render() { return this.$slots.default() } // renderless component
 }

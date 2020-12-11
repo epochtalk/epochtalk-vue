@@ -11,13 +11,12 @@
     <a class="button" href="#">Threads Posted In</a>
   </div>
 
-  {{preferences.collapsed_categories}}
   <div v-if="boardData.data">
     <div class="category" v-for="cat in boardData.data.boards" :key="cat.id">
       <!-- Category Title -->
       <div :id="generateCatId(cat.name, cat.view_order)" class="title">
         <div v-on:click="toggleCategory(cat)" class="collapse-section">
-          <a :class="{ 'is-open' : cat.show || cat.show === undefined, 'is-closed': !cat.show }">
+          <a :class="{ 'is-open': collapsedCats.indexOf(cat.id) < 0, 'is-closed': collapsedCats.indexOf(cat.id) > -1 }">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 39.84 22.63" class="icon__caretDown">
               <title></title>
               <g id="Layer_2" data-name="Layer 2">
@@ -30,7 +29,7 @@
       </div>
       <div v-for="board in cat.boards" :key="board.id">
         <transition>
-          <div class="board" v-if="cat.show || cat.show === undefined">
+          <div class="board" v-if="collapsedCats.indexOf(cat.id) < 0">
             <div class="info">
               <h2><a href="#">{{board.name}}</a></h2>
               <div class="description">{{board.description}}</div>
@@ -105,6 +104,14 @@ export default {
   },
   setup() {
     /* Internal View Methods */
+    const remove = (array, item) => {
+      var found = array.indexOf(item);
+      while (found !== -1) {
+        array.splice(found, 1);
+        found = array.indexOf(item);
+      }
+    }
+
     const countTotals = countBoards => {
       let thread_count = 0
       let post_count = 0
@@ -158,11 +165,6 @@ export default {
       .then(data => {
         // let ignoredBoards = []
         data.boards.map(category => {
-          // set category visibility
-          // console.log('COLLAPSED', collapsedCats)
-          if (v.collapsedCats.indexOf(category.id) > -1) { category.show = false }
-          else { category.show = true }
-
           // set total_thread_count and total_post_count for all boards
           // category.boards = filterIgnoredBoards(category.boards)
 
@@ -184,23 +186,9 @@ export default {
     }
 
     const toggleCategory = cat => {
-      if (cat.show === undefined) { cat.show = false }
-      else { cat.show = !cat.show }
-
-      if (auth.loggedIn) {
-        if (cat.show) { remove(v.collapsedCats, cat.id) }
-        else if (v.collapsedCats.indexOf(cat.id) < 0) { v.collapsedCats.push(cat.id); }
-
-        preferences.update('collapsed_categories', [...v.collapsedCats])
-      }
-    }
-
-    function remove(array, item) {
-      var found = array.indexOf(item);
-      while (found !== -1) {
-        array.splice(found, 1);
-        found = array.indexOf(item);
-      }
+      if (v.collapsedCats.indexOf(cat.id) > -1) { remove(v.collapsedCats, cat.id) }
+      else if (v.collapsedCats.indexOf(cat.id) < 0) { v.collapsedCats.push(cat.id); }
+      preferences.update()
     }
 
     /* Internal Data */
@@ -211,16 +199,15 @@ export default {
 
     /* View Data */
     const v = reactive({
-      preferences: preferences,
-      collapsedCats: preferences.collapsed_categories,
+      collapsedCats: preferences.data.collapsed_categories,
       loggedIn: auth.loggedIn,
       showLogin: false,
       showRegister: false,
       boardData: useSWRV(`/api/boards`, processBoards, { cache: $swrvCache })
     })
 
-    watch(() => v.loggedIn, () => v.boardData.mutate(processBoards))
-    watch(() => v.collapsedCats, () => v.boardData.mutate(processBoards), { deep: true })
+    /* Watch Data */
+    watch(() => v.loggedIn, () => v.boardData.mutate(processBoards)) // Update boards on login
 
     return { ...toRefs(v), generateCatId, toggleCategory, humanDate }
   }

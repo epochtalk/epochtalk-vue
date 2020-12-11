@@ -157,6 +157,7 @@ export default {
 
     /* Internal Data */
     const auth = inject(AuthStore)
+    const $api = inject('$api')
 
     /* Template Data */
     const initForm = {
@@ -177,19 +178,25 @@ export default {
     watch(() => v.form.email.val, debounce(async (val) => {
       v.form.email.valid = val && val.length >= 3 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)
       // check email unique
-      const response = await fetch('http://localhost:8080/api/register/email/' + val)
-      const data = await response.json()
-      v.form.email.unique = !data.found
-      checkFormValid()
+      if (val) {
+        $api('/api/register/email/' + val)
+        .then(data => {
+          v.form.email.unique = !data.found
+          checkFormValid()
+        })
+      }
     }, 500))
 
     watch(() => v.form.username.val, debounce(async (val) => {
       v.form.username.valid = val && val.length >= 3 && val.length <= 20 && /^[a-zA-Z\d-_.]+$/.test(val)
       // check email unique
-      const response = await fetch('http://localhost:8080/api/register/username/' + val)
-      const data = await response.json()
-      v.form.username.unique = !data.found
-      checkFormValid()
+      if (val) {
+        $api('/api/register/username/' + val)
+        .then(data => {
+          v.form.username.unique = !data.found
+          checkFormValid()
+        })
+      }
     }, 500))
 
     watch(() => v.form.password.val, (val) => {
