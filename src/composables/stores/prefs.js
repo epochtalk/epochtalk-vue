@@ -58,7 +58,7 @@ export default {
             ...updatedPrefs
           })
         }
-        $api(`/api/user/${user.id}`, opts)
+        $api(`/api/users/${user.id}`, opts)
         .then(() => {
           prefs[prop] = val
           $appCache.set(PREFS_KEY, updatedPrefs)
