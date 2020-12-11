@@ -1,4 +1,4 @@
-import { provide, inject, reactive, readonly } from 'vue'
+import { provide, inject, reactive } from 'vue'
 import { cloneDeep } from 'lodash'
 
 const PREFS_KEY = 'preferences'
@@ -28,7 +28,7 @@ export default {
         $appCache.set(PREFS_KEY, dbPrefs)
         Object.assign(prefs, dbPrefs)
       })
-   }
+    }
 
     const clear = () => {
       $appCache.delete(PREFS_KEY)
@@ -37,9 +37,9 @@ export default {
 
 
     const update = (prop, val) => {
+      console.log('in', val)
       const auth = $appCache.get(AUTH_KEY)
       const user = auth ? auth.data : undefined
-      console.log(user)
       if (user) {
         let updatedPrefs = {
           posts_per_page: prefs.posts_per_page,
@@ -48,26 +48,25 @@ export default {
           patroller_view: prefs.patroller_view,
           collapsed_categories: prefs.collapsed_categories,
           ignored_boards: prefs.ignored_boards,
-          [prop]: val
+          [prop]: [...val]
         }
         const opts = {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          data: JSON.stringify({
+          data: {
             username: user.username,
             ...updatedPrefs
-          })
+          }
         }
-        $api(`/api/user/${user.id}`, opts)
-        .then(() => {
-          prefs[prop] = val
+        $api(`/api/users/${user.id}`, opts)
+        .then((data) => {
+          prefs[prop] = data[prop]
           $appCache.set(PREFS_KEY, updatedPrefs)
         })
       }
     }
 
     return provide(PreferencesStore, {
-      ...readonly(prefs),
+      ...prefs,
       fetch,
       clear,
       update

@@ -11,6 +11,7 @@
     <a class="button" href="#">Threads Posted In</a>
   </div>
 
+  {{preferences.collapsed_categories}}
   <div v-if="boardData.data">
     <div class="category" v-for="cat in boardData.data.boards" :key="cat.id">
       <!-- Category Title -->
@@ -159,7 +160,7 @@ export default {
         data.boards.map(category => {
           // set category visibility
           // console.log('COLLAPSED', collapsedCats)
-          if (collapsedCats.indexOf(category.id) > -1) { category.show = false }
+          if (v.collapsedCats.indexOf(category.id) > -1) { category.show = false }
           else { category.show = true }
 
           // set total_thread_count and total_post_count for all boards
@@ -187,10 +188,10 @@ export default {
       else { cat.show = !cat.show }
 
       if (auth.loggedIn) {
-        if (cat.show) { remove(collapsedCats, cat.id) }
-        else if (collapsedCats.indexOf(cat.id) < 0) { collapsedCats.push(cat.id); }
+        if (cat.show) { remove(v.collapsedCats, cat.id) }
+        else if (v.collapsedCats.indexOf(cat.id) < 0) { v.collapsedCats.push(cat.id); }
 
-        preferences.update('collapsed_categories', collapsedCats)
+        preferences.update('collapsed_categories', [...v.collapsedCats])
       }
     }
 
@@ -207,10 +208,10 @@ export default {
     const $swrvCache = inject('$swrvCache')
     const auth = inject(AuthStore)
     const preferences = inject(PreferencesStore)
-    const collapsedCats = [...preferences.collapsed_categories]
 
     /* View Data */
     const v = reactive({
+      preferences: preferences,
       collapsedCats: preferences.collapsed_categories,
       loggedIn: auth.loggedIn,
       showLogin: false,
@@ -219,6 +220,7 @@ export default {
     })
 
     watch(() => v.loggedIn, () => v.boardData.mutate(processBoards))
+    watch(() => v.collapsedCats, () => v.boardData.mutate(processBoards), { deep: true })
 
     return { ...toRefs(v), generateCatId, toggleCategory, humanDate }
   }

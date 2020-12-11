@@ -30,14 +30,15 @@ app.provide('$api', (path, opts) => {
   const data = opts.data
   delete opts.data
 
-  let req
-  console.log('METHOD', method)
-  if (method === 'post' || method === 'put' || method === 'patch') {
-    opts = {...opts, crossDomain: true}
-    console.log(path, data, opts)
-    req = $axios[method](path, data, opts)
-  }
-  else { req = $axios[method](path, opts) }
+  let req = (m => {
+    switch(m) {
+      case 'post':
+      case 'put':
+      case 'patch':
+        return $axios[method](path, data, opts)
+      default: return $axios[method](path, opts)
+    }
+  })(method)
 
   return req.then(res => res.status === 200 ? res.data : res)
 })
