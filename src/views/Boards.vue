@@ -15,7 +15,7 @@
     <div class="category" v-for="cat in boardData.data.boards" :key="cat.id">
       <!-- Category Title -->
       <div :id="generateCatId(cat.name, cat.view_order)" class="title">
-        <div v-on:click="toggleCategory(cat)" class="collapse-section">
+        <div @click="toggleCategory(cat)" class="collapse-section">
           <a :class="{ 'is-open': collapsedCats.indexOf(cat.id) < 0, 'is-closed': collapsedCats.indexOf(cat.id) > -1 }">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 39.84 22.63" class="icon__caretDown">
               <title></title>
@@ -29,7 +29,7 @@
       </div>
       <div v-for="board in cat.boards" :key="board.id">
         <transition>
-          <div class="board" v-if="collapsedCats.indexOf(cat.id) < 0">
+          <div class="board" v-if="collapsedCats.indexOf(cat.id) < 0 && ignoredBoards.indexOf(board.id) < 0">
             <div class="info">
               <h2><a href="#">{{board.name}}</a></h2>
               <div class="description">{{board.description}}</div>
@@ -165,9 +165,9 @@ export default {
       .then(data => {
         // let ignoredBoards = []
         data.boards.map(category => {
-          // set total_thread_count and total_post_count for all boards
           // category.boards = filterIgnoredBoards(category.boards)
 
+          // set total_thread_count and total_post_count for all boards
           category.boards.map(board => {
             let children = countTotals([board])
             let lastPost = getLastPost([board])
@@ -200,6 +200,7 @@ export default {
     /* View Data */
     const v = reactive({
       collapsedCats: preferences.data.collapsed_categories,
+      ignoredBoards: preferences.data.ignored_boards,
       loggedIn: auth.loggedIn,
       showLogin: false,
       showRegister: false,
