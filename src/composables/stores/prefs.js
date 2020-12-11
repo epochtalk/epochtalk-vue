@@ -52,11 +52,10 @@ export default {
         }
         const opts = {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          data: JSON.stringify({
+          data: {
             username: user.username,
             ...updatedPrefs
-          })
+          }
         }
         $api(`/api/users/${user.id}`, opts)
         .then(() => {
