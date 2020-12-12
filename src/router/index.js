@@ -12,9 +12,10 @@ const routes = [
     meta: { requiresAuth: false }
   },
   {
-    path: '/boards/:slug',
+    path: '/boards/:boardSlug',
     name: 'Threads',
     component: Threads,
+    props: true,
     meta: { requiresAuth: false }
   },
   {
