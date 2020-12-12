@@ -31,7 +31,7 @@
         <transition>
           <div class="board" v-if="collapsedCats.indexOf(cat.id) < 0 && ignoredBoards.indexOf(board.id) < 0">
             <div class="info">
-              <h2><a href="#">{{board.name}}</a></h2>
+              <h2><router-link :to="'/boards/' + board.slug">{{board.name}}</router-link></h2>
               <div class="description">{{board.description}}</div>
               <div class="moderators" v-if="board.moderators && board.moderators.length">
                 <span>Moderators: </span>

@@ -1,5 +1,6 @@
 import { createWebHistory, createRouter } from 'vue-router'
 import Boards from '@/views/Boards.vue'
+import Threads from '@/views/Threads.vue'
 import About from '@/views/About.vue'
 import NotFound from '@/views/NotFound.vue'
 
@@ -8,9 +9,13 @@ const routes = [
     path: '/',
     name: 'Boards',
     component: Boards,
-    meta: {
-      requiresAuth: false
-    }
+    meta: { requiresAuth: false }
+  },
+  {
+    path: '/boards/:slug',
+    name: 'Threads',
+    component: Threads,
+    meta: { requiresAuth: false }
   },
   {
     path: '/about',
