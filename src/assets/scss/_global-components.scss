@@ -16,7 +16,6 @@ img {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  margin: 0;
   line-height: 1.5rem;
   font-style: normal;
   font-weight: normal;
@@ -30,6 +29,11 @@ h3 { font-size: 1.5rem; } // modal titles
 h4 { font-size: 1.3125rem; } //Category Name, Board Name, Thread Name
 h5 { font-size: 1.125rem; } // Board Name (Front Page), Section Headers Board View
 h6 { font-size: 1rem; }
+
+div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, p, blockquote, th, td {
+  margin: 0;
+  padding: 0;
+}
 
 a.button, .button, button, button:focus, .button:focus {
   border-radius: 3px;
