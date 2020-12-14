@@ -15,6 +15,11 @@ img {
   -ms-interpolation-mode: bicubic;
 }
 
+table {
+  table-layout: auto;
+  border-collapse: collapse;
+}
+
 h1, h2, h3, h4, h5, h6 {
   line-height: 1.5rem;
   font-style: normal;

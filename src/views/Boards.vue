@@ -1,83 +1,85 @@
 <template>
-  <p v-if="boardData.error"><strong>{{boardData.error}}</strong></p>
-  <recent-threads :threads="boardData.data.threads"></recent-threads>
+  <div class="main">
+    <p v-if="boardData.error"><strong>{{boardData.error}}</strong></p>
+    <recent-threads :threads="boardData.data.threads"></recent-threads>
 
-  <div v-if="!loggedIn" class="dashboard-actions">
-    <a href="" class="button" @click.prevent="showRegister = true">Create an Account</a>
-    <a href="" class="button" @click.prevent="showLogin = true">Log In</a>
-  </div>
-  <div v-if="loggedIn" class="dashboard-actions">
-    <a class="button" href="#">Watchlist</a>
-    <a class="button" href="#">Threads Posted In</a>
-  </div>
+    <div v-if="!loggedIn" class="dashboard-actions">
+      <a href="" class="button" @click.prevent="showRegister = true">Create an Account</a>
+      <a href="" class="button" @click.prevent="showLogin = true">Log In</a>
+    </div>
+    <div v-if="loggedIn" class="dashboard-actions">
+      <a class="button" href="#">Watchlist</a>
+      <a class="button" href="#">Threads Posted In</a>
+    </div>
 
-  <div v-if="boardData.data">
-    <div class="category" v-for="cat in boardData.data.boards" :key="cat.id">
-      <!-- Category Title -->
-      <div :id="generateCatId(cat.name, cat.view_order)" class="title">
-        <div @click="toggleCategory(cat)" class="collapse-section">
-          <a :class="{ 'is-open': collapsedCats.indexOf(cat.id) < 0, 'is-closed': collapsedCats.indexOf(cat.id) > -1 }">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 39.84 22.63" class="icon__caretDown">
-              <title></title>
-              <g id="Layer_2" data-name="Layer 2">
-                <polyline class="icon" points="37.92 1.92 19.92 19.92 1.92 1.92" />
-              </g>
-            </svg>
-          </a>
-          <h1>{{cat.name}}</h1>
+    <div v-if="boardData.data">
+      <div class="category" v-for="cat in boardData.data.boards" :key="cat.id">
+        <!-- Category Title -->
+        <div :id="generateCatId(cat.name, cat.view_order)" class="title">
+          <div @click="toggleCategory(cat)" class="collapse-section">
+            <a :class="{ 'is-open': collapsedCats.indexOf(cat.id) < 0, 'is-closed': collapsedCats.indexOf(cat.id) > -1 }">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 39.84 22.63" class="icon__caretDown">
+                <title></title>
+                <g id="Layer_2" data-name="Layer 2">
+                  <polyline class="icon" points="37.92 1.92 19.92 19.92 1.92 1.92" />
+                </g>
+              </svg>
+            </a>
+            <h1>{{cat.name}}</h1>
+          </div>
         </div>
-      </div>
-      <div v-for="board in cat.boards" :key="board.id">
-        <transition>
-          <div class="board" v-if="collapsedCats.indexOf(cat.id) < 0 && ignoredBoards.indexOf(board.id) < 0">
-            <div class="info">
-              <h2><router-link :to="{ name: 'Threads', params: { boardSlug: board.slug, boardId: board.id } }">{{board.name}}</router-link></h2>
-              <div class="description">{{board.description}}</div>
-              <div class="moderators" v-if="board.moderators && board.moderators.length">
-                <span>Moderators: </span>
-                <span v-for="(mod, i) in board.moderators" :key="mod.username">
-                  <a href="#">{{mod.username}}</a><span v-if="(i + 1) !== board.moderators.length">, </span>
-                </span>
-              </div>
-              <div class="childboards" v-if="board.children.length">
-                <span>Child Boards: </span>
-                <span v-for="(child, i) in board.children" :key="child.id">
-                  <a class="board-name" href="#">{{child.name}}</a><span v-if="(i + 1) !== board.children.length">, </span>
-                </span>
-              </div>
-            </div>
-
-            <div class="board-secondary">
-              <!-- Board Posts and Threads -->
-              <div class="view-count">
-                <p class="view-count-posts">
-                  <span class="view-count-number">{{board.total_post_count}}</span>
-                   <span class="label"> posts,</span>
-                </p>
-                <p class="view-count-threads">
-                  <span class="view-count-number">{{board.total_thread_count}}</span>
-                   <span class="label"> threads</span>
-                </p>
-              </div>
-
-              <!-- Board Last Post By -->
-              <div class="last-post">
-                <div v-if="board.last_post_username">
-                  <span v-if="board.user_deleted || board.post_deleted">deleted</span>
-                  <img v-if="!board.user_deleted && !board.post_deleted" class="avatar-small round" :src="board.last_post_avatar || require('@/assets/images/avatar.png')" @error="$event.target.src=require('@/assets/images/avatar.png')" />
-                  <a v-if="!board.user_deleted && !board.post_deleted" href="#">{{board.last_post_username}}</a> posted in
-                  <span v-if="board.last_thread_title">
-                    <a href="#">{{board.last_thread_title }}</a> on
+        <div v-for="board in cat.boards" :key="board.id">
+          <transition>
+            <div class="board" v-if="collapsedCats.indexOf(cat.id) < 0 && ignoredBoards.indexOf(board.id) < 0">
+              <div class="info">
+                <h2><router-link :to="{ name: 'Threads', params: { boardSlug: board.slug, boardId: board.id } }">{{board.name}}</router-link></h2>
+                <div class="description">{{board.description}}</div>
+                <div class="moderators" v-if="board.moderators && board.moderators.length">
+                  <span>Moderators: </span>
+                  <span v-for="(mod, i) in board.moderators" :key="mod.username">
+                    <a href="#">{{mod.username}}</a><span v-if="(i + 1) !== board.moderators.length">, </span>
                   </span>
-                  <span vi-if="board.last_post_created_at">
-                    <span>{{humanDate(board.last_post_created_at)}}</span>
+                </div>
+                <div class="childboards" v-if="board.children.length">
+                  <span>Child Boards: </span>
+                  <span v-for="(child, i) in board.children" :key="child.id">
+                    <a class="board-name" href="#">{{child.name}}</a><span v-if="(i + 1) !== board.children.length">, </span>
                   </span>
                 </div>
               </div>
-            </div>
-          </div>
-        </transition>
 
+              <div class="board-secondary">
+                <!-- Board Posts and Threads -->
+                <div class="view-count">
+                  <p class="view-count-posts">
+                    <span class="view-count-number">{{board.total_post_count}}</span>
+                     <span class="label"> posts,</span>
+                  </p>
+                  <p class="view-count-threads">
+                    <span class="view-count-number">{{board.total_thread_count}}</span>
+                     <span class="label"> threads</span>
+                  </p>
+                </div>
+
+                <!-- Board Last Post By -->
+                <div class="last-post">
+                  <div v-if="board.last_post_username">
+                    <span v-if="board.user_deleted || board.post_deleted">deleted</span>
+                    <img v-if="!board.user_deleted && !board.post_deleted" class="avatar-small round" :src="board.last_post_avatar || require('@/assets/images/avatar.png')" @error="$event.target.src=require('@/assets/images/avatar.png')" />
+                    <a v-if="!board.user_deleted && !board.post_deleted" href="#">{{board.last_post_username}}</a> posted in
+                    <span v-if="board.last_thread_title">
+                      <a href="#">{{board.last_thread_title }}</a> on
+                    </span>
+                    <span vi-if="board.last_post_created_at">
+                      <span>{{humanDate(board.last_post_created_at)}}</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </transition>
+
+        </div>
       </div>
     </div>
   </div>

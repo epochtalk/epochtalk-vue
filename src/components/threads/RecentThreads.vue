@@ -67,7 +67,7 @@ export default {
 .dashboard-hero {
   background-color: $sub-header-color;
   grid-area: main;
-  margin: calc(-1rem - 1px) 0 2rem;
+  margin: calc(-2rem - 1px) 0 2rem;
   padding: 2rem 0;
   position: relative;
   width: 100vw;
