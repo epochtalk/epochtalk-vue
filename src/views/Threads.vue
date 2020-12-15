@@ -54,48 +54,51 @@
       </tbody>
     </table>
 
-   <!--
-    <div class="thread-sort">Sort <a href="" ng-click="ThreadsCtrl.setSortField()">{{ ThreadsCtrl.desc === true ? 'descending' : 'ascending' }}</a> by
-      <select ng-model="ThreadsCtrl.sortVal" name="select-thread-sort" class="select-clean" ng-options="s.label for s in ThreadsCtrl.sortItems" ng-change="ThreadsCtrl.setSortField()"></select>
+    <!-- Thread Sorting Controls -->
+    <div class="thread-sort">Sort <a href="" @click="setSortField()">{{ threadData.desc === true ? 'descending' : 'ascending' }}</a> by
+      <select v-model="sortVal" name="select-thread-sort" class="select-clean" @change="setSortField()">
+        <option v-for="item in sortItems" :key="item.value" :value="item.value">{{item.label}}</option>
+      </select>
     </div>
 
+    <!-- Thread Listing -->
     <table class="threads-list">
       <caption>Threads</caption>
       <thead>
         <tr>
           <th class="subject">Threads</th>
           <th class="views-replies">
-            <span class="pointer" ng-click="ThreadsCtrl.setSortField('post_count')">
+            <span class="pointer" @click="setSortField('post_count')">
               Replies
-              <span ng-class="ThreadsCtrl.getSortClass('post_count')" class="do-sort"></span>
+              <span :class="getSortClass('post_count')" class="do-sort"></span>
             </span>
-            <span class="pointer" ng-click="ThreadsCtrl.setSortField('views')">
+            <span class="pointer" @click="setSortField('views')">
               Views
-              <span ng-class="ThreadsCtrl.getSortClass('views')" class="do-sort"></span>
+              <span :class="getSortClass('views')" class="do-sort"></span>
             </span>
           </th>
           <th class="last-post">
-            <span class="pointer" ng-click="ThreadsCtrl.setSortField('updated_at')">
+            <span class="pointer" @click="setSortField('updated_at')">
               Last Post
-              <span ng-class="ThreadsCtrl.getSortClass('updated_at')" class="do-sort"></span>
+              <span :class="getSortClass('updated_at')" class="do-sort"></span>
             </span>
           </th>
         </tr>
       </thead>
       <tbody>
-
-        <tr class="threads-data sticky" ng-repeat="thread in ThreadsCtrl.stickyThreads track by thread.id">
+        <!-- Stick Threads -->
+        <tr class="threads-data sticky" v-for="thread in threadData.sticky" :key="thread.id">
           <td class="subject">
             <div class="title">
               <div class="thread-state">
-                <svg ng-if="thread.has_new_post" class="is-unread" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" data-balloon="Unread">
+                <svg v-if="thread.has_new_post" class="is-unread" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" data-balloon="Unread">
                   <title></title>
                   <g id="icons">
                     <circle cx="16" cy="16" r="16" />
                   </g>
                 </svg>
 
-                <svg ng-if="thread.sticky" class="is-sticky" viewBox="0 0 40.68 40.68" xmlns="http://www.w3.org/2000/svg" data-balloon="Sticky">
+                <svg v-if="thread.sticky" class="is-sticky" viewBox="0 0 40.68 40.68" xmlns="http://www.w3.org/2000/svg" data-balloon="Sticky">
                   <path d="m40 9.92-9.24-9.19a2.5 2.5 0 0 0 -3.54 3.54l9.2 9.19a2.5 2.5 0 0 0 3.58-3.54z" />
                   <path
                     d="m12 14.52a3 3 0 0 0 -4.24 4.24l5.66 5.66-11.3 11.31-2.12 4.95 5-2.12 11.26-11.31 5.66 5.66a3 3 0 0 0 4.24-4.25z" />
@@ -103,16 +106,15 @@
                 </svg>
 
               </div>
-              <a ng-class="{bold: thread.has_new_post}" class="thread-title" ui-sref="posts.data({ slug: thread.slug })"
-                ng-bind-html="thread.title"></a>
+              <a :class="{ 'bold': thread.has_new_post }" class="thread-title" href="#">{{thread.title}}</a>
               <div class="thread-state-secondary">
-                <span class="thread-state-locked" ng-if="thread.locked" data-balloon="Locked">
+                <span class="thread-state-locked" v-if="thread.locked" data-balloon="Locked">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                     <title></title>
                     <path d="M40,21H37.5V16.48a13.5,13.5,0,0,0-27,0V21H8a2,2,0,0,0-2,2V43a2,2,0,0,0,2,2H40a2,2,0,0,0,2-2V23A2,2,0,0,0,40,21ZM15.5,16.48a8.5,8.5,0,0,1,17,0V21h-17Z"/>
                   </svg>
                 </span>
-                <span class="thread-state-hasPoll" ng-if="thread.poll" data-balloon="Includes a Poll">
+                <span class="thread-state-hasPoll" v-if="thread.poll" data-balloon="Includes a Poll">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                     <path class="cls-1" d="M42,2H6A4,4,0,0,0,2,6V42a4,4,0,0,0,4,4H42a4,4,0,0,0,4-4V6A4,4,0,0,0,42,2ZM13.75,40h-6V32h6Zm9,0h-6V22h6Zm9,0h-6V27h6Zm9,0h-6V12h6Z"/>
                 </svg>
@@ -122,53 +124,48 @@
 
             <div class="started-by">
               Started by
-              <span ng-if="thread.user.deleted">deleted</span>
-              <a ng-if="!thread.user.deleted" ui-sref="profile.posts({ username: thread.user.username })"
-                ng-bind-html="thread.user.username"></a>
-              <span ng-bind="'on ' + (thread.created_at | humanDate)"></span>
+              <span v-if="thread.user.deleted">deleted</span>
+              <a v-if="!thread.user.deleted" href="#">{{thread.user.username}}</a>
+              <span> on {{humanDate(thread.created_at)}}</span>
             </div>
           </td>
 
           <td class="views-replies">
-            <span class="replies" ng-bind="(thread.post_count - 1 | number:0) || 0"></span>
-            <span class="views" ng-bind="(thread.view_count | number:0) || 0"></span>
+            <span class="replies">{{ thread.post_count - 1 || 0 }}</span>
+            <span class="views">{{ thread.view_count || 0 }}</span>
           </td>
 
           <td class="last-post">
-            <span ng-if="thread.last_deleted">deleted</span>
-            <img ng-if="!thread.last_deleted" class="avatar-small {{$webConfigs.default_avatar_shape}}"
-              ng-src="{{thread.last_post_avatar || $webConfigs.default_avatar}}" />
-            <a ng-if="!thread.last_deleted" ui-sref="profile.posts({ username: thread.last_post_username })"
-              ng-bind="thread.last_post_username"></a> posted on
-            <a ui-sref="posts.data({ slug: thread.slug, start: thread.last_post_position, '#': thread.last_post_id })"><span ng-bind="thread.last_post_created_at | humanDate"></span>.</a>
-            <span ng-if="thread.has_new_post">
-              <a
-                ui-sref="posts.data({ slug: thread.slug, start: thread.latest_unread_position, '#': thread.latest_unread_post_id })">(Last unread post)</a>
+            <span v-if="thread.last_deleted">deleted</span>
+            <img v-if="!thread.last_deleted" class="avatar-small round" :src="thread.last_post_avatar || require('@/assets/images/avatar.png')" @error="$event.target.src=require('@/assets/images/avatar.png')" />
+            <a v-if="!thread.last_deleted" href="#">{{thread.last_post_username}}</a> posted on
+            <a href="#">{{ humanDate(thread.last_post_created_at) }}.</a>
+            <span v-if="thread.has_new_post">
+              <a href="#">(Last unread post)</a>
             </span>
           </td>
         </tr>
 
-        <tr class="threads-data" ng-repeat="thread in ThreadsCtrl.threads track by thread.id">
+        <tr class="threads-data" v-for="thread in threadData.normal" :key="thread.id">
           <td class="subject">
             <div class="title">
               <div class="thread-state">
-                <svg class="is-unread" ng-if="thread.has_new_post" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" data-balloon="Unread">
+                <svg class="is-unread" v-if="thread.has_new_post" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" data-balloon="Unread">
                   <title></title>
                   <g id="icons">
                     <circle cx="16" cy="16" r="16" />
                   </g>
                 </svg>
               </div>
-              <a ng-class="{bold: thread.has_new_post}" class="thread-title" ui-sref="posts.data({ slug: thread.slug })"
-                ng-bind-html="thread.title"></a>
+              <a :class="{'bold': thread.has_new_post}" class="thread-title" href="#">{{thread.title}}</a>
                 <div class="thread-state-secondary">
-                <span class="thread-state-locked" ng-if="thread.locked" data-balloon="Locked">
+                <span class="thread-state-locked" v-if="thread.locked" data-balloon="Locked">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" data-balloon="Locked">
                     <title></title>
                     <path d="M40,21H37.5V16.48a13.5,13.5,0,0,0-27,0V21H8a2,2,0,0,0-2,2V43a2,2,0,0,0,2,2H40a2,2,0,0,0,2-2V23A2,2,0,0,0,40,21ZM15.5,16.48a8.5,8.5,0,0,1,17,0V21h-17Z"/>
                   </svg>
                 </span>
-                <span class="thread-state-hasPoll" ng-if="thread.poll" data-balloon="Includes a Poll">
+                <span class="thread-state-hasPoll" v-if="thread.poll" data-balloon="Includes a Poll">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                     <path class="cls-1" d="M42,2H6A4,4,0,0,0,2,6V42a4,4,0,0,0,4,4H42a4,4,0,0,0,4-4V6A4,4,0,0,0,42,2ZM13.75,40h-6V32h6Zm9,0h-6V22h6Zm9,0h-6V27h6Zm9,0h-6V12h6Z"/>
                 </svg>
@@ -178,33 +175,29 @@
 
             <div class="started-by">
               Started by
-              <span ng-if="thread.user.deleted">deleted</span>
-              <a ng-if="!thread.user.deleted" ui-sref="profile.posts({ username: thread.user.username })"
-                ng-bind-html="thread.user.username"></a>
-              <span ng-bind="'on ' + (thread.created_at | humanDate)"></span>
+              <span v-if="thread.user.deleted">deleted</span>
+              <a v-if="!thread.user.deleted" href="">{{thread.user.username}}</a>
+              <span> on {{ humanDate(thread.created_at)}}</span>
             </div>
           </td>
 
           <td class="views-replies">
-            <span class="replies" ng-bind="(thread.post_count - 1 | number:0) || 0"></span>
-            <span class="views" ng-bind="(thread.view_count | number:0) || 0"></span>
+            <span class="replies">{{ thread.post_count - 1 || 0 }}</span>
+            <span class="views">{{ thread.view_count || 0 }}</span>
           </td>
 
           <td class="last-post">
-            <span ng-if="thread.last_deleted">deleted</span>
-            <img ng-if="!thread.last_deleted" class="avatar-small {{$webConfigs.default_avatar_shape}}"
-              ng-src="{{thread.last_post_avatar || $webConfigs.default_avatar}}" />
-            <a ng-if="!thread.last_deleted" ui-sref="profile.posts({ username: thread.last_post_username })"
-              ng-bind="thread.last_post_username"></a> posted on
-            <a ui-sref="posts.data({ slug: thread.slug, start: thread.last_post_position, '#': thread.last_post_id })"><span ng-bind="thread.last_post_created_at | humanDate"></span>.</a>
-            <span ng-if="thread.has_new_post">
-              <a
-                ui-sref="posts.data({ slug: thread.slug, start: thread.latest_unread_position, '#': thread.latest_unread_post_id })">(Last unread post)</a>
+            <span v-if="thread.last_deleted">deleted</span>
+            <img v-if="!thread.last_deleted" class="avatar-small round" :src="thread.last_post_avatar || require('@/assets/images/avatar.png')" @error="$event.target.src=require('@/assets/images/avatar.png')" />
+            <a v-if="!thread.last_deleted" href="">{{thread.last_post_username}}</a> posted on
+            <a href="">{{ humanDate(thread.last_post_created_at) }}.</a>
+            <span v-if="thread.has_new_post">
+              <a href="">(Last unread post)</a>
             </span>
           </td>
         </tr>
       </tbody>
-    </table> -->
+    </table>
   </div>
 
   <div class="board-sidebar">
@@ -257,9 +250,28 @@ export default {
     }
 
     /* View Methods */
-    const loadEditor = () => { console.log('loadEditor()') }
+    const loadEditor = () => console.log('loadEditor()')
 
-    const watchBoard = () => { console.log('watchBoard()') }
+    const watchBoard = () => console.log('watchBoard()')
+
+    const setSortField = field => console.log(`setSortField(${field})`)
+
+    const getSortClass = field => {
+      let sortClass
+      const desc = v.threadData.desc
+      const curField = v.threadData.field
+      if (field === 'updated_at' && !curField && !desc) {
+        sortClass = 'fa fa-sort-desc'
+      }
+      else if (curField === field && desc) {
+        sortClass = 'fa fa-sort-desc'
+      }
+      else if (curField === field && !desc) {
+        sortClass = 'fa fa-sort-asc';
+      }
+      else { sortClass = 'fa fa-sort'; }
+      return sortClass
+    }
 
     /* Internal Data */
     const $api = inject('$api')
@@ -273,14 +285,33 @@ export default {
       threadData: useSWRV(`/api/threads`, fetchThreads, { cache: $swrvCache }).data,
       prefs: preferences.data,
       loggedIn: auth.loggedIn,
-      showSetModerators: true
+      showSetModerators: true,
+      sortVal: 'updated_at',
+      sortItems: [
+        {
+          value: 'updated_at',
+          label: 'Last Post'
+        },
+        {
+          value: 'created_at',
+          label: 'Created On'
+        },
+        {
+          value: 'views',
+          label: 'Views'
+        },
+        {
+          value: 'post_count',
+          label: 'Replies'
+        }
+      ]
     })
 
     /* Computed Data */
     const canCreate = computed(() => { return true })
     const canSetModerator = computed(() => { return true })
 
-    return { ...toRefs(v), canCreate, canSetModerator, loadEditor, watchBoard, humanDate, decode, truncate }
+    return { ...toRefs(v), canCreate, canSetModerator, loadEditor, watchBoard, setSortField, getSortClass, humanDate, decode, truncate }
 
   }
 }

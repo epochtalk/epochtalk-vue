@@ -18,6 +18,10 @@ img {
 table {
   table-layout: auto;
   border-collapse: collapse;
+  thead tr th,
+  thead tr td { padding: 0.5rem 0.625rem 0.625rem; font-size: 0.875rem; font-weight: bold; color: $base-font-color;}
+  tr th, tr td { padding: 0.5625rem 0.625rem; font-size: 0.875rem; color: $base-font-color; text-align: left; }
+  thead tr th, tbody tr th, tbody tr td, tr td { display: table-cell; line-height: 1.125rem; }
 }
 
 h1, h2, h3, h4, h5, h6 {
