@@ -15,7 +15,7 @@
     <div v-if="boardData.data">
       <div class="category" v-for="cat in boardData.data.boards" :key="cat.id">
         <!-- Category Title -->
-        <div :id="generateCatId(cat.name, cat.view_order)" class="title">
+        <div v-if="cat.boards.length" :id="generateCatId(cat.name, cat.view_order)" class="title">
           <div @click="toggleCategory(cat)" class="collapse-section">
             <a :class="{ 'is-open': collapsedCats.indexOf(cat.id) < 0, 'is-closed': collapsedCats.indexOf(cat.id) > -1 }">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 39.84 22.63" class="icon__caretDown">

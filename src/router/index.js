@@ -33,7 +33,10 @@ const routes = [
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
+  routes,
+  scrollBehavior() {
+    document.getElementsByTagName('html')[0].scrollIntoView();
+  }
 })
 
 router.beforeEach(to => {
