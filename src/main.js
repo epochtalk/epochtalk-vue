@@ -3,8 +3,6 @@ import App from './App.vue'
 import router from './router'
 import axios from 'axios'
 import localStorageCache from './composables/utils/localStorageCache'
-import 'normalize.css/normalize.css'
-import '@fortawesome/fontawesome-free/css/all.min.css'
 
 const app = createApp(App).use(router)
 
