@@ -23,7 +23,7 @@ const $axios = axios.create({
 if (user) { $axios.defaults.headers.common['Authorization'] = `BEARER ${user.token}` }
 
 app.provide('$axios', $axios)
-app.provide('$api', api(appCache))
+app.provide('$api', api)
 app.provide('$swrvCache', localStorageCache(0, 'swrv'))
 app.provide('$appCache', appCache)
 app.mount('#app')
