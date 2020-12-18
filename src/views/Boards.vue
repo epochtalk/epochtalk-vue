@@ -1,7 +1,7 @@
 <template>
   <div class="main">
     <p v-if="boardData.error"><strong>{{boardData.error}}</strong></p>
-    <recent-threads :threads="boardData.data.threads"></recent-threads>
+    <recent-threads v-if="boardData && boardData.data" :threads="boardData.data.threads"></recent-threads>
 
     <div v-if="!loggedIn" class="dashboard-actions">
       <a href="" class="button" @click.prevent="showRegister = true">Create an Account</a>
