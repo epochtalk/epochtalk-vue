@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import App from '@/App.vue'
 import router from '@/router'
 import axios from 'axios'
+import { get } from 'lodash'
 import localStorageCache from '@/composables/utils/localStorageCache'
 import alertStore from '@/composables/stores/alert'
 
@@ -29,7 +30,7 @@ app.provide('$axios', $axios)
 app.provide('$alertStore', alertStore)
 
 /* Provide API request util */
-app.provide('$api', (path, opts) => {
+app.provide('$api', (path, opts, handleErrors) => {
   opts = opts || {}
   const method = (opts.method || 'get').toLowerCase()
   delete opts.method
@@ -46,7 +47,16 @@ app.provide('$api', (path, opts) => {
     }
   })(method)
 
-  return req.then(res => res.status === 200 ? res.data : res)
+  const reqPromise = req.then(res => res.status === 200 ? res.data : res)
+
+  if (handleErrors) {
+    return reqPromise.catch(err => {
+      const msg = get(err, 'response.data.message')
+      if (msg) { alertStore.error(msg) }
+      return Promise.reject(err)
+    })
+  }
+  else { return reqPromise }
 })
 
 /* Mount App */

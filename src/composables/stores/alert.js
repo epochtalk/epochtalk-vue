@@ -10,13 +10,13 @@ const addAlert = (message, type) => {
 
 const success = message => addAlert(message, 'success')
 const info = message => addAlert(message, 'info')
-const warning = message => addAlert(message, 'warning')
+const warn = message => addAlert(message, 'warning')
 const error = message => addAlert(message, 'error')
 
 export default readonly({
   ...toRefs(store),
   success,
   info,
-  warning,
+  warn,
   error
 });

@@ -35,19 +35,21 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
-  scrollBehavior() {
-    document.getElementsByTagName('html')[0].scrollIntoView();
-  }
+  scrollBehavior() { document.getElementsByTagName('html')[0].scrollIntoView() }
 })
 
 router.beforeEach(to => {
+  // Start progress bar
+  if (!to.hash) { NProgress.start() }
+
+  // Apply route.meta.bodyClass as body class if present
   const bodyClass = to.meta.bodyClass
   if (bodyClass) { document.body.className = bodyClass }
   else { document.body.className = '' }
-  if (!to.hash) { NProgress.start() }
 })
 
 router.afterEach(to => {
+  // Stop progress bar
   if (!to.hash) { NProgress.done() }
 })
 

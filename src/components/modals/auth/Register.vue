@@ -141,7 +141,6 @@ export default {
     /* Template Methods */
     const register = () => {
       auth.register(v.form.email.val, v.form.username.val, v.form.password.val)
-      console.log('Register!', v.form.email.val, v.form.username.val, v.form.password.val)
       close()
     }
 
