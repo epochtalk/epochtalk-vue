@@ -230,11 +230,9 @@ export default {
   name: 'Threads',
   props: ['boardSlug', 'boardId'],
   setup(props) {
+    /* Internal Methods */
     const fetchThreads = () => {
-      return new Promise(resolve => {
-        if (props.boardId) { resolve(props.boardId) }
-        else { resolve($api(`/api/boards/${props.boardSlug}/id`).then(data => data.id)) }
-      })
+      return Promise.resolve(props.boardId)
       .then(boardId => {
         const opts = {
           params: {
