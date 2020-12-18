@@ -3,6 +3,7 @@ import Boards from '@/views/Boards.vue'
 import Threads from '@/views/Threads.vue'
 import About from '@/views/About.vue'
 import NotFound from '@/views/NotFound.vue'
+import NProgress from 'nprogress'
 
 const routes = [
   {
@@ -43,6 +44,11 @@ router.beforeEach(to => {
   const bodyClass = to.meta.bodyClass
   if (bodyClass) { document.body.className = bodyClass }
   else { document.body.className = '' }
+  if (!to.hash) { NProgress.start() }
+})
+
+router.afterEach(to => {
+  if (!to.hash) { NProgress.done() }
 })
 
 export default router
