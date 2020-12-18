@@ -1,5 +1,4 @@
 import { inject } from 'vue'
-const AUTH_KEY = 'auth'
 
 export default {
   login: opts => { return api('/api/login', opts) },
