@@ -12,9 +12,7 @@
           <Header></Header>
           <main>
             <div id="public-content">
-              <div class="main">
-                <router-view />
-              </div>
+              <router-view />
             </div>
         </main>
       </div>
@@ -44,9 +42,9 @@ export default {
 
 /*-------------- Index File -------------- */
 #wrapper {
-  min-height: calc(100vh - #{$header-offset});
+  min-height: calc(100vh - (#{$header-offset} + 1rem));
   position:relative;
-  margin-top: #{$header-offset};
+  margin-top: calc(#{$header-offset} + 1rem);
 
   .motd-visible & {
     margin-top: calc(#{$header-offset} + 4rem);
@@ -93,7 +91,7 @@ main {
       "main main"
       "sidebar sidebar";
     grid-gap: 2rem;
-    row-gap: 1rem;
+    row-gap: 0;
     margin-bottom: 2rem;
 
     @include break-mobile-sm {

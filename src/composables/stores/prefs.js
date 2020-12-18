@@ -1,12 +1,14 @@
-import { provide, inject, reactive, readonly } from 'vue'
+import { provide, inject, reactive, toRefs } from 'vue'
 import { cloneDeep } from 'lodash'
 
 const PREFS_KEY = 'preferences'
+const AUTH_KEY = 'auth'
 
 export const PreferencesStore = Symbol(PREFS_KEY)
 
 export default {
   setup() {
+    /* Internal Data */
     const $api = inject('$api')
     const $appCache = inject('$appCache')
 
@@ -19,39 +21,56 @@ export default {
       collapsed_categories: [],
       ignored_boards: []
     }
+
+    /* Provided Data */
     const prefs = reactive(cachedPrefs ? cachedPrefs.data : cloneDeep(emtpyPrefs))
 
+    /* Provided Methods */
     const fetch = () => {
       $api.users.preferences()
       .then(dbPrefs => {
         $appCache.set(PREFS_KEY, dbPrefs)
         Object.assign(prefs, dbPrefs)
       })
-   }
+    }
 
     const clear = () => {
       $appCache.delete(PREFS_KEY)
       Object.assign(prefs, cloneDeep(emtpyPrefs))
     }
 
-    const update = (prop, val) => {
-      prefs[prop] = val
-      $appCache.set(PREFS_KEY, {
+    const update = () => {
+      const auth = $appCache.get(AUTH_KEY)
+      const user = auth ? auth.data : undefined
+      const updatedPrefs = { // spread prefs to get rid of proxy object before storing in cache
         posts_per_page: prefs.posts_per_page,
         threads_per_page: prefs.threads_per_page,
         timezone_offset: prefs.timezone_offset,
         patroller_view: prefs.patroller_view,
-        collapsed_categories: prefs.collapsed_categories,
-        ignored_boards: prefs.ignored_boards
-      })
+        collapsed_categories: [...prefs.collapsed_categories],
+        ignored_boards: [...prefs.ignored_boards]
+      }
+      if (user && user.token) { // user is logged in update cache and server
+        const opts = {
+          method: 'PUT',
+          data: {
+            username: user.username,
+            ...updatedPrefs
+          }
+        }
+        $api(`/api/users/${user.id}`, opts)
+        .then(() => $appCache.set(PREFS_KEY, updatedPrefs))
+      }
+      else { $appCache.set(PREFS_KEY, updatedPrefs) } // user not logged in, only update cache
     }
 
-    provide(PreferencesStore, {
-      ...readonly(prefs),
+    /* Provide Store Data */
+    return provide(PreferencesStore, {
+      data: toRefs(prefs),
       fetch,
       clear,
       update
     })
   },
-  render() { return this.$slots.default() }
+  render() { return this.$slots.default() } // renderless component
 }

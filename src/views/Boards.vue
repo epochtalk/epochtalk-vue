@@ -1,83 +1,85 @@
 <template>
-  <p v-if="boardData.error"><strong>{{boardData.error}}</strong></p>
-  <recent-threads :threads="boardData.data.threads"></recent-threads>
+  <div class="main">
+    <p v-if="boardData.error"><strong>{{boardData.error}}</strong></p>
+    <recent-threads :threads="boardData.data.threads"></recent-threads>
 
-  <div v-if="!loggedIn" class="dashboard-actions">
-    <a href="" class="button" @click.prevent="showRegister = true">Create an Account</a>
-    <a href="" class="button" @click.prevent="showLogin = true">Log In</a>
-  </div>
-  <div v-if="loggedIn" class="dashboard-actions">
-    <a class="button" href="#">Watchlist</a>
-    <a class="button" href="#">Threads Posted In</a>
-  </div>
+    <div v-if="!loggedIn" class="dashboard-actions">
+      <a href="" class="button" @click.prevent="showRegister = true">Create an Account</a>
+      <a href="" class="button" @click.prevent="showLogin = true">Log In</a>
+    </div>
+    <div v-if="loggedIn" class="dashboard-actions">
+      <a class="button" href="#">Watchlist</a>
+      <a class="button" href="#">Threads Posted In</a>
+    </div>
 
-  <div v-if="boardData.data">
-    <div class="category" v-for="cat in boardData.data.boards" :key="cat.id">
-      <!-- Category Title -->
-      <div :id="generateCatId(cat.name, cat.view_order)" class="title">
-        <div v-on:click="toggleCategory(cat)" class="collapse-section">
-          <a :class="{ 'is-open' : cat.show || cat.show === undefined, 'is-closed': !cat.show }">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 39.84 22.63" class="icon__caretDown">
-              <title></title>
-              <g id="Layer_2" data-name="Layer 2">
-                <polyline class="icon" points="37.92 1.92 19.92 19.92 1.92 1.92" />
-              </g>
-            </svg>
-          </a>
-          <h1>{{cat.name}}</h1>
+    <div v-if="boardData.data">
+      <div class="category" v-for="cat in boardData.data.boards" :key="cat.id">
+        <!-- Category Title -->
+        <div :id="generateCatId(cat.name, cat.view_order)" class="title">
+          <div @click="toggleCategory(cat)" class="collapse-section">
+            <a :class="{ 'is-open': collapsedCats.indexOf(cat.id) < 0, 'is-closed': collapsedCats.indexOf(cat.id) > -1 }">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 39.84 22.63" class="icon__caretDown">
+                <title></title>
+                <g id="Layer_2" data-name="Layer 2">
+                  <polyline class="icon" points="37.92 1.92 19.92 19.92 1.92 1.92" />
+                </g>
+              </svg>
+            </a>
+            <h1>{{cat.name}}</h1>
+          </div>
         </div>
-      </div>
-      <div v-for="board in cat.boards" :key="board.id">
-        <transition>
-          <div class="board" v-if="cat.show || cat.show === undefined">
-            <div class="info">
-              <h2><a href="#">{{board.name}}</a></h2>
-              <div class="description">{{board.description}}</div>
-              <div class="moderators" v-if="board.moderators && board.moderators.length">
-                <span>Moderators: </span>
-                <span v-for="(mod, i) in board.moderators" :key="mod.username">
-                  <a href="#">{{mod.username}}</a><span v-if="(i + 1) !== board.moderators.length">, </span>
-                </span>
-              </div>
-              <div class="childboards" v-if="board.children.length">
-                <span>Child Boards: </span>
-                <span v-for="(child, i) in board.children" :key="child.id">
-                  <a class="board-name" href="#">{{child.name}}</a><span v-if="(i + 1) !== board.children.length">, </span>
-                </span>
-              </div>
-            </div>
-
-            <div class="board-secondary">
-              <!-- Board Posts and Threads -->
-              <div class="view-count">
-                <p class="view-count-posts">
-                  <span class="view-count-number">{{board.total_post_count}}</span>
-                   <span class="label"> posts,</span>
-                </p>
-                <p class="view-count-threads">
-                  <span class="view-count-number">{{board.total_thread_count}}</span>
-                   <span class="label"> threads</span>
-                </p>
-              </div>
-
-              <!-- Board Last Post By -->
-              <div class="last-post">
-                <div v-if="board.last_post_username">
-                  <span v-if="board.user_deleted || board.post_deleted">deleted</span>
-                  <img v-if="!board.user_deleted && !board.post_deleted" class="avatar-small round" :src="board.last_post_avatar || require('@/assets/images/avatar.png')" @error="$event.target.src=require('@/assets/images/avatar.png')" />
-                  <a v-if="!board.user_deleted && !board.post_deleted" href="#">{{board.last_post_username}}</a> posted in
-                  <span v-if="board.last_thread_title">
-                    <a href="#">{{board.last_thread_title }}</a> on
+        <div v-for="board in cat.boards" :key="board.id">
+          <transition>
+            <div class="board" v-if="collapsedCats.indexOf(cat.id) < 0 && ignoredBoards.indexOf(board.id) < 0">
+              <div class="info">
+                <h2><router-link :to="{ name: 'Threads', params: { boardSlug: board.slug, boardId: board.id } }">{{board.name}}</router-link></h2>
+                <div class="description">{{board.description}}</div>
+                <div class="moderators" v-if="board.moderators && board.moderators.length">
+                  <span>Moderators: </span>
+                  <span v-for="(mod, i) in board.moderators" :key="mod.username">
+                    <a href="#">{{mod.username}}</a><span v-if="(i + 1) !== board.moderators.length">, </span>
                   </span>
-                  <span vi-if="board.last_post_created_at">
-                    <span>{{humanDate(board.last_post_created_at)}}</span>
+                </div>
+                <div class="childboards" v-if="board.children.length">
+                  <span>Child Boards: </span>
+                  <span v-for="(child, i) in board.children" :key="child.id">
+                    <a class="board-name" href="#">{{child.name}}</a><span v-if="(i + 1) !== board.children.length">, </span>
                   </span>
                 </div>
               </div>
-            </div>
-          </div>
-        </transition>
 
+              <div class="board-secondary">
+                <!-- Board Posts and Threads -->
+                <div class="view-count">
+                  <p class="view-count-posts">
+                    <span class="view-count-number">{{board.total_post_count}}</span>
+                     <span class="label"> posts,</span>
+                  </p>
+                  <p class="view-count-threads">
+                    <span class="view-count-number">{{board.total_thread_count}}</span>
+                     <span class="label"> threads</span>
+                  </p>
+                </div>
+
+                <!-- Board Last Post By -->
+                <div class="last-post">
+                  <div v-if="board.last_post_username">
+                    <span v-if="board.user_deleted || board.post_deleted">deleted</span>
+                    <img v-if="!board.user_deleted && !board.post_deleted" class="avatar-small round" :src="board.last_post_avatar || require('@/assets/images/avatar.png')" @error="$event.target.src=require('@/assets/images/avatar.png')" />
+                    <a v-if="!board.user_deleted && !board.post_deleted" href="#">{{board.last_post_username}}</a> posted in
+                    <span v-if="board.last_thread_title">
+                      <a href="#">{{board.last_thread_title }}</a> on
+                    </span>
+                    <span vi-if="board.last_post_created_at">
+                      <span>{{humanDate(board.last_post_created_at)}}</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </transition>
+
+        </div>
       </div>
     </div>
   </div>
@@ -91,7 +93,7 @@ import humanDate from '@/composables/filters/humanDate'
 import RecentThreads from '@/components/threads/RecentThreads.vue'
 import LoginModal from '@/components/modals/auth/Login.vue'
 import RegisterModal from '@/components/modals/auth/Register.vue'
-import { inject, reactive, toRefs, watch, nextTick } from 'vue'
+import { inject, reactive, toRefs, watch } from 'vue'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
 
@@ -104,6 +106,14 @@ export default {
   },
   setup() {
     /* Internal View Methods */
+    const remove = (array, item) => {
+      var found = array.indexOf(item);
+      while (found !== -1) {
+        array.splice(found, 1);
+        found = array.indexOf(item);
+      }
+    }
+
     const countTotals = countBoards => {
       let thread_count = 0
       let post_count = 0
@@ -157,14 +167,9 @@ export default {
       .then(data => {
         // let ignoredBoards = []
         data.boards.map(category => {
-          // set category visibility
-          // console.log('COLLAPSED', collapsedCats)
-          if (collapsedCats.indexOf(category.id) > -1) { category.show = false }
-          else { category.show = true }
-
-          // set total_thread_count and total_post_count for all boards
           // category.boards = filterIgnoredBoards(category.boards)
 
+          // set total_thread_count and total_post_count for all boards
           category.boards.map(board => {
             let children = countTotals([board])
             let lastPost = getLastPost([board])
@@ -183,23 +188,9 @@ export default {
     }
 
     const toggleCategory = cat => {
-      if (cat.show === undefined) { cat.show = false }
-      else { cat.show = !cat.show }
-
-      if (auth.loggedIn) {
-        if (cat.show) { remove(collapsedCats, cat.id) }
-        else if (collapsedCats.indexOf(cat.id) < 0) { collapsedCats.push(cat.id); }
-
-        preferences.update('collapsed_categories', collapsedCats)
-      }
-    }
-
-    function remove(array, item) {
-      var found = array.indexOf(item);
-      while (found !== -1) {
-        array.splice(found, 1);
-        found = array.indexOf(item);
-      }
+      if (v.collapsedCats.indexOf(cat.id) > -1) { remove(v.collapsedCats, cat.id) }
+      else if (v.collapsedCats.indexOf(cat.id) < 0) { v.collapsedCats.push(cat.id); }
+      preferences.update()
     }
 
     /* Internal Data */
@@ -207,22 +198,19 @@ export default {
     const $swrvCache = inject('$swrvCache')
     const auth = inject(AuthStore)
     const preferences = inject(PreferencesStore)
-    const collapsedCats = [...preferences.collapsed_categories]
 
     /* View Data */
     const v = reactive({
-      collapsedCats: preferences.collapsed_categories,
+      collapsedCats: preferences.data.collapsed_categories,
+      ignoredBoards: preferences.data.ignored_boards,
       loggedIn: auth.loggedIn,
       showLogin: false,
       showRegister: false,
       boardData: useSWRV(`/api/boards`, processBoards, { cache: $swrvCache })
     })
 
-    watch(() => v.loggedIn, (val) => {
-      console.log('loggedIn', val)
-      console.log('mutated')
-      nextTick(v.boardData.mutate(processBoards, { forceRevalidate: true }))
-    })
+    /* Watch Data */
+    watch(() => v.loggedIn, () => v.boardData.mutate(processBoards)) // Update boards on login
 
     return { ...toRefs(v), generateCatId, toggleCategory, humanDate }
   }

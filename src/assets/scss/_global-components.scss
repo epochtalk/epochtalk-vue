@@ -15,8 +15,16 @@ img {
   -ms-interpolation-mode: bicubic;
 }
 
+table {
+  table-layout: auto;
+  border-collapse: collapse;
+  thead tr th,
+  thead tr td { padding: 0.5rem 0.625rem 0.625rem; font-size: 0.875rem; font-weight: bold; color: $base-font-color;}
+  tr th, tr td { padding: 0.5625rem 0.625rem; font-size: 0.875rem; color: $base-font-color; text-align: left; }
+  thead tr th, tbody tr th, tbody tr td, tr td { display: table-cell; line-height: 1.125rem; }
+}
+
 h1, h2, h3, h4, h5, h6 {
-  margin: 0;
   line-height: 1.5rem;
   font-style: normal;
   font-weight: normal;
@@ -30,6 +38,11 @@ h3 { font-size: 1.5rem; } // modal titles
 h4 { font-size: 1.3125rem; } //Category Name, Board Name, Thread Name
 h5 { font-size: 1.125rem; } // Board Name (Front Page), Section Headers Board View
 h6 { font-size: 1rem; }
+
+div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, p, blockquote, th, td {
+  margin: 0;
+  padding: 0;
+}
 
 a.button, .button, button, button:focus, .button:focus {
   border-radius: 3px;

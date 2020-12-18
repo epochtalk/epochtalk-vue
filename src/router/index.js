@@ -1,5 +1,6 @@
 import { createWebHistory, createRouter } from 'vue-router'
 import Boards from '@/views/Boards.vue'
+import Threads from '@/views/Threads.vue'
 import About from '@/views/About.vue'
 import NotFound from '@/views/NotFound.vue'
 
@@ -8,9 +9,14 @@ const routes = [
     path: '/',
     name: 'Boards',
     component: Boards,
-    meta: {
-      requiresAuth: false
-    }
+    meta: { requiresAuth: false, bodyClass: 'boards' }
+  },
+  {
+    path: '/boards/:boardSlug',
+    name: 'Threads',
+    component: Threads,
+    props: true,
+    meta: { requiresAuth: false, bodyClass: 'threads' }
   },
   {
     path: '/about',
@@ -28,6 +34,12 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes
+})
+
+router.beforeEach(to => {
+  const bodyClass = to.meta.bodyClass
+  if (bodyClass) { document.body.className = bodyClass }
+  else { document.body.className = '' }
 })
 
 export default router

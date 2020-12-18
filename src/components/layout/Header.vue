@@ -58,10 +58,10 @@
         <nav id="menu">
           <!-- Logo Section -->
           <h1>
-            <a href="#" v-if="logo"><img src="{{logo}}" id="logo" /></a>
-            <a href="#" id="logo-text" ng-bind="{{decode(title)}}">
-              Epochtalk
-            </a>
+            <router-link to="/" v-if="logo"><img :src="logo" id="logo" /></router-link>
+            <router-link id="logo-text" to="/"> <!-- ng-bind="{{decode(title)}}" -->
+              Epochtalk Forums
+            </router-link>
           </h1>
 
           <!-- Login Section -->
@@ -215,7 +215,7 @@ export default {
     }
 
     /* Template Methods */
-    const logout = () => { auth.logout() }
+    const logout = () => auth.logout()
 
     const searchForum = () => { console.log('SEARCH!') }
 

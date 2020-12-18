@@ -10,18 +10,23 @@ export default {
 }
 
 const api = (path, opts) => {
-  const $appCache = inject('$appCache')
+  const $axios = inject('$axios')
 
   opts = opts || {}
-  let auth = $appCache.get(AUTH_KEY)
-  let user = auth && auth.data ? auth.data : undefined
-  if (user && user.token) {
-    opts.headers = {
-      ...opts.headers,
-      Authorization: `BEARER ${user.token}`
+  const method = (opts.method || 'get').toLowerCase()
+  delete opts.method
+  const data = opts.data
+  delete opts.data
+
+  let req = (m => {
+    switch(m) {
+      case 'post':
+      case 'put':
+      case 'patch':
+        return $axios[method](path, data, opts)
+      default: return $axios[method](path, opts)
     }
-  }
-  console.log(path, opts.headers)
-  return fetch(`http://localhost:8080${path}`, opts)
-  .then(res => res.ok ? res.json() : res)
+  })(method)
+
+  return req.then(res => res.status === 200 ? res.data : res)
 }
