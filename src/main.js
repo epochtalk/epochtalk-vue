@@ -1,26 +1,34 @@
 import { createApp } from 'vue'
-import App from './App.vue'
-import router from './router'
+import App from '@/App.vue'
+import router from '@/router'
 import axios from 'axios'
-import localStorageCache from './composables/utils/localStorageCache'
+import localStorageCache from '@/composables/utils/localStorageCache'
+import alertStore from '@/composables/stores/alert'
 
 const app = createApp(App).use(router)
 
+/* Provide App Cache for caching Auth data */
 const appCache = localStorageCache(0, 'app')
+app.provide('$appCache', appCache)
 
-const auth = appCache.get('auth')
-const user = auth ? auth.data : undefined
+/* Provide SWR Cache for caching API data */
+app.provide('$swrvCache', localStorageCache(0, 'swrv'))
 
+/* Setup and Provide Axios */
 const $axios = axios.create({
   baseURL: 'http://localhost:8080',
   timeout: 3000,
   crossDomain: true
 })
-
+const auth = appCache.get('auth')
+const user = auth ? auth.data : undefined
 if (user) { $axios.defaults.headers.common['Authorization'] = `BEARER ${user.token}` }
-
 app.provide('$axios', $axios)
 
+/* Provide Alert Store */
+app.provide('$alertStore', alertStore)
+
+/* Provide API request util */
 app.provide('$api', (path, opts) => {
   opts = opts || {}
   const method = (opts.method || 'get').toLowerCase()
@@ -40,6 +48,6 @@ app.provide('$api', (path, opts) => {
 
   return req.then(res => res.status === 200 ? res.data : res)
 })
-app.provide('$swrvCache', localStorageCache(0, 'swrv'))
-app.provide('$appCache', appCache)
+
+/* Mount App */
 app.mount('#app')
