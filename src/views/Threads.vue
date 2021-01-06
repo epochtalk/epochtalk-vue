@@ -222,7 +222,7 @@ import { useRoute, useRouter } from 'vue-router'
 import humanDate from '@/composables/filters/humanDate'
 import decode from '@/composables/filters/decode'
 import truncate from '@/composables/filters/truncate'
-import { inject, reactive, computed, toRefs } from 'vue'
+import { inject, reactive, computed, watch, toRefs } from 'vue'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
 
@@ -238,9 +238,9 @@ export default {
           params: {
             board_id: boardId,
             limit: v.prefs.threads_per_page,
-            page: $route.params.page || 1,
-            field: $route.params.field,
-            desc: $route.params.desc
+            page: $route.query.page || 1,
+            field: $route.query.field,
+            desc: $route.query.desc
           }
         }
         return $api('/api/threads', opts)
@@ -255,8 +255,14 @@ export default {
     const setSortField = field => {
       if (!field) { field = v.sortVal }
       else { v.sortVal = field }
+      let desc = $route.query.desc === 'false' ? false : true
+      // Sort Field hasn't changed just toggle desc
+      let unchanged = field === ($route.query.field || 'updated_at') || (field === 'updated_at' && !$route.params.field)
+      console.log(unchanged, desc)
+      if (unchanged) { desc = !desc } // bool to str
+      console.log(unchanged, desc)
 
-      $router.replace({ name: $route.name, params: $route.params, query: { field: field }})
+      $router.replace({ name: $route.name, params: $route.params, query: { desc: desc, field: field }})
 
       // // Sort Field hasn't changed just toggle desc
       // let unchanged = sortField === ctrl.field || (sortField === 'updated_at' && !ctrl.field);
@@ -272,8 +278,7 @@ export default {
 
       // // Update queryParams (forces pagination to refresh)
       // ctrl.parent.queryParams = $location.search();
-      console.log(`setSortField(${field})`)
-      console.log(v.sortVal)
+
     }
 
     const getSortClass = field => {
@@ -329,6 +334,8 @@ export default {
       ]
     })
 
+    /* Watched Data */
+    watch(() => $route.query, () => v.threadData.mutate(fetchThreads)) // Update boards on login
 
     /* Computed Data */
     const canCreate = computed(() => { return true })
