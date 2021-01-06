@@ -55,7 +55,7 @@
     </table>
 
     <!-- Thread Sorting Controls -->
-    <div class="thread-sort">Sort <a href="" @click="setSortField()">{{ threadData.data.desc === true ? 'descending' : 'ascending' }}</a> by
+    <div class="thread-sort">Sort <a href="" @click.prevent="setSortField()">{{ threadData.data.desc === true ? 'descending' : 'ascending' }}</a> by
       <select v-model="sortVal" name="select-thread-sort" class="select-clean" @change="setSortField()">
         <option v-for="item in sortItems" :key="item.value" :value="item.value">{{item.label}}</option>
       </select>
@@ -68,17 +68,17 @@
         <tr>
           <th class="subject">Threads</th>
           <th class="views-replies">
-            <span class="pointer" @click="setSortField('post_count')">
+            <span class="pointer" @click.prevent="setSortField('post_count')">
               Replies
               <span :class="getSortClass('post_count')" class="do-sort"></span>
             </span>
-            <span class="pointer" @click="setSortField('views')">
+            <span class="pointer" @click.prevent="setSortField('views')">
               Views
               <span :class="getSortClass('views')" class="do-sort"></span>
             </span>
           </th>
           <th class="last-post">
-            <span class="pointer" @click="setSortField('updated_at')">
+            <span class="pointer" @click.prevent="setSortField('updated_at')">
               Last Post
               <span :class="getSortClass('updated_at')" class="do-sort"></span>
             </span>
@@ -218,7 +218,7 @@
 
 <script>
 import useSWRV from 'swrv'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import humanDate from '@/composables/filters/humanDate'
 import decode from '@/composables/filters/decode'
 import truncate from '@/composables/filters/truncate'
@@ -252,7 +252,29 @@ export default {
 
     const watchBoard = () => console.log('watchBoard()')
 
-    const setSortField = field => console.log(`setSortField(${field})`)
+    const setSortField = field => {
+      if (!field) { field = v.sortVal }
+      else { v.sortVal = field }
+
+      $router.replace({ name: $route.name, params: $route.params, query: { field: field }})
+
+      // // Sort Field hasn't changed just toggle desc
+      // let unchanged = sortField === ctrl.field || (sortField === 'updated_at' && !ctrl.field);
+      // if (unchanged) { ctrl.desc = ctrl.desc  ? 'false' : 'true'; } // bool to str
+      // // Sort Field changed default to ascending order
+      // else { ctrl.desc = 'true'; }
+      // ctrl.field = sortField;
+      // ctrl.page = 1;
+      // ctrl.parent.page = 1;
+      // $location.search('page', ctrl.page);
+      // $location.search('desc', ctrl.desc);
+      // $location.search('field', sortField);
+
+      // // Update queryParams (forces pagination to refresh)
+      // ctrl.parent.queryParams = $location.search();
+      console.log(`setSortField(${field})`)
+      console.log(v.sortVal)
+    }
 
     const getSortClass = field => {
       let sortClass
@@ -275,8 +297,10 @@ export default {
     const $api = inject('$api')
     const $swrvCache = inject('$swrvCache')
     const $route = useRoute()
+    const $router = useRouter()
     const preferences = inject(PreferencesStore)
     const auth = inject(AuthStore)
+    // const fieldToIndex = { 'updated_at': 0, 'created_at': 1, 'views': 2, 'post_count': 3 }
 
     /* View Data */
     const v = reactive({
@@ -284,7 +308,7 @@ export default {
       prefs: preferences.data,
       loggedIn: auth.loggedIn,
       showSetModerators: true,
-      sortVal: 'updated_at',
+      sortVal: $route.params.field ? $route.params.field : 'updated_at',
       sortItems: [
         {
           value: 'updated_at',
@@ -304,6 +328,7 @@ export default {
         }
       ]
     })
+
 
     /* Computed Data */
     const canCreate = computed(() => { return true })
