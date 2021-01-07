@@ -1,6 +1,5 @@
 <template>
   <div class="main">
-    <p v-if="boardData.error"><strong>{{boardData.error}}</strong></p>
     <recent-threads v-if="boardData && boardData.data" :threads="boardData.data.threads"></recent-threads>
 
     <div v-if="!loggedIn" class="dashboard-actions">
@@ -196,6 +195,7 @@ export default {
     /* Internal Data */
     const $api = inject('$api')
     const $swrvCache = inject('$swrvCache')
+    const $alertStore = inject('$alertStore')
     const auth = inject(AuthStore)
     const preferences = inject(PreferencesStore)
 
@@ -211,6 +211,7 @@ export default {
 
     /* Watch Data */
     watch(() => v.loggedIn, () => v.boardData.mutate(processBoards)) // Update boards on login
+    watch(() => v.boardData.error, () => $alertStore.error(v.boardData)) // Handle errors
 
     return { ...toRefs(v), generateCatId, toggleCategory, humanDate }
   }
