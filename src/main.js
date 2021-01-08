@@ -5,7 +5,6 @@ import axios from 'axios'
 import localStorageCache from './composables/utils/localStorageCache'
 import 'normalize.css/normalize.css'
 import '@fortawesome/fontawesome-free/css/all.min.css'
-import api from './api'
 
 const app = createApp(App).use(router)
 
@@ -23,7 +22,6 @@ const $axios = axios.create({
 if (user) { $axios.defaults.headers.common['Authorization'] = `BEARER ${user.token}` }
 
 app.provide('$axios', $axios)
-app.provide('$api', api)
 app.provide('$swrvCache', localStorageCache(0, 'swrv'))
 app.provide('$appCache', appCache)
 app.mount('#app')
