@@ -758,6 +758,7 @@ export default {
   .title {
     display: flex;
     flex: 0 auto;
+    position: relative;
   }
 
   .thread-state {
