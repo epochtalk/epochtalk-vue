@@ -252,33 +252,16 @@ export default {
 
     const watchBoard = () => console.log('watchBoard()')
 
-    const setSortField = field => {
-      if (!field) { field = v.sortVal }
-      else { v.sortVal = field }
+    const setSortField = newField => {
+      // Get/Set current sort field
+      if (!newField) { newField = v.sortVal }
+      else { v.sortVal = newField }
+      // Convert desc query param to boolean
       let desc = $route.query.desc === 'false' ? false : true
       // Sort Field hasn't changed just toggle desc
-      let unchanged = field === ($route.query.field || 'updated_at') || (field === 'updated_at' && !$route.params.field)
-      console.log(unchanged, desc)
-      if (unchanged) { desc = !desc } // bool to str
-      console.log(unchanged, desc)
-
-      $router.replace({ name: $route.name, params: $route.params, query: { desc: desc, field: field }})
-
-      // // Sort Field hasn't changed just toggle desc
-      // let unchanged = sortField === ctrl.field || (sortField === 'updated_at' && !ctrl.field);
-      // if (unchanged) { ctrl.desc = ctrl.desc  ? 'false' : 'true'; } // bool to str
-      // // Sort Field changed default to ascending order
-      // else { ctrl.desc = 'true'; }
-      // ctrl.field = sortField;
-      // ctrl.page = 1;
-      // ctrl.parent.page = 1;
-      // $location.search('page', ctrl.page);
-      // $location.search('desc', ctrl.desc);
-      // $location.search('field', sortField);
-
-      // // Update queryParams (forces pagination to refresh)
-      // ctrl.parent.queryParams = $location.search();
-
+      if (newField === $route.query.field || (!$route.query.desc && desc)) { desc = !desc }
+      // Update router to have new query params, watch on query params will update data
+      $router.replace({ name: $route.name, params: $route.params, query: { desc: desc, field: newField }})
     }
 
     const getSortClass = field => {
@@ -286,13 +269,13 @@ export default {
       const desc = v.threadData.data.desc
       const curField = v.threadData.data.field
       if (field === 'updated_at' && !curField && !desc) {
-        sortClass = 'fa fa-sort-desc'
+        sortClass = 'fa fa-sort-down'
       }
       else if (curField === field && desc) {
-        sortClass = 'fa fa-sort-desc'
+        sortClass = 'fa fa-sort-down'
       }
       else if (curField === field && !desc) {
-        sortClass = 'fa fa-sort-asc';
+        sortClass = 'fa fa-sort-up';
       }
       else { sortClass = 'fa fa-sort'; }
       return sortClass
@@ -305,11 +288,15 @@ export default {
     const $router = useRouter()
     const preferences = inject(PreferencesStore)
     const auth = inject(AuthStore)
-    // const fieldToIndex = { 'updated_at': 0, 'created_at': 1, 'views': 2, 'post_count': 3 }
 
     /* View Data */
     const v = reactive({
-      threadData: useSWRV(() => `/boards/${props.boardSlug}`, fetchThreads, { cache: $swrvCache }),
+      threadData: useSWRV(() => {
+        let params = new URLSearchParams($route.query)
+        let queryStr = params.toString()
+        let urlPath = queryStr ? `${props.boardSlug}?${queryStr}` : `${props.boardSlug}`
+        return `/boards/${urlPath}`
+      }, fetchThreads, { cache: $swrvCache, dedupingInterval: 100 }),
       prefs: preferences.data,
       loggedIn: auth.loggedIn,
       showSetModerators: true,
