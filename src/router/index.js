@@ -39,7 +39,9 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
-  scrollBehavior() { document.getElementsByTagName('html')[0].scrollIntoView() }
+  scrollBehavior(to) {
+    if (!to.params.saveScrollPos) { document.getElementsByTagName('html')[0].scrollIntoView() }
+  }
 })
 
 router.beforeEach(to => {
