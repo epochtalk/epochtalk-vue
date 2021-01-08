@@ -1,3 +1,5 @@
+const DEBUG = false
+
 class LocalStorageCache {
   constructor (ttl, storageKey) {
     this.STORAGE_KEY = storageKey || 'app'
@@ -7,16 +9,22 @@ class LocalStorageCache {
 
   encode (storage) {
     const string = JSON.stringify(storage)
-    const bytes = new Uint16Array(string.length)
-    for (let i = 0; i < bytes.length; i++) { bytes[i] = string.charCodeAt(i) }
-    return btoa(new Uint8Array(bytes.buffer).reduce((d, b) => d + String.fromCharCode(b), ''))
+    if (DEBUG) { return string }
+    else {
+      const bytes = new Uint16Array(string.length)
+      for (let i = 0; i < bytes.length; i++) { bytes[i] = string.charCodeAt(i) }
+      return btoa(new Uint8Array(bytes.buffer).reduce((d, b) => d + String.fromCharCode(b), ''))
+    }
   }
 
   decode (storage) {
-    const binary = atob(storage)
-    const bytes = new Uint8Array(binary.length)
-    for (let i = 0; i < bytes.length; i++) { bytes[i] = binary.charCodeAt(i) }
-    return JSON.parse(new Uint16Array(bytes.buffer).reduce((d, b) => d + String.fromCharCode(b), ''))
+    if (DEBUG) { return JSON.parse(storage) }
+    else {
+      const binary = atob(storage)
+      const bytes = new Uint8Array(binary.length)
+      for (let i = 0; i < bytes.length; i++) { bytes[i] = binary.charCodeAt(i) }
+      return JSON.parse(new Uint16Array(bytes.buffer).reduce((d, b) => d + String.fromCharCode(b), ''))
+    }
   }
 
   get (k) {
