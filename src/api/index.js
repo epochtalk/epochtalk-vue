@@ -7,8 +7,7 @@ export const ApiStore = Symbol(API_KEY)
 export default {
   name: 'Api',
   setup() {
-    const $axios = inject('$axios')
-
+    /* internal methods */
     const api = (path, opts) => {
 
       opts = opts || {}
@@ -29,10 +28,15 @@ export default {
 
       return req.then(res => res.status === 200 ? res.data : res)
     }
+
+    /* provided methods */
     const boards = path => { return api(path) }
     const login = opts => { return api('/api/login', opts) }
     const register = opts => { return api('/api/register', opts) }
     const usersPreferences = () => { return api('/api/users/preferences') }
+
+    /* internal data */
+    const $axios = inject('$axios')
 
     return provide(ApiStore, {
       boards,
