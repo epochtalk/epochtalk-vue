@@ -56,7 +56,7 @@
 
     <!-- Thread Sorting Controls -->
     <div class="thread-sort">Sort <a href="" @click.prevent="setSortField()">{{ threadData.data.desc === true ? 'descending' : 'ascending' }}</a> by
-      <select v-model="sortVal" name="select-thread-sort" class="select-clean" @change="setSortField()">
+      <select v-model="sortField" name="select-thread-sort" class="select-clean" @change="setSortField()">
         <option v-for="item in sortItems" :key="item.value" :value="item.value">{{item.label}}</option>
       </select>
     </div>
@@ -253,31 +253,31 @@ export default {
     const watchBoard = () => console.log('watchBoard()')
 
     const setSortField = newField => {
-      // Get/Set current sort field
-      if (!newField) { newField = v.sortVal }
-      else { v.sortVal = newField }
+      // Get/Set new sort field
+      if (newField) v.sortField = newField
+      else newField = v.sortField
       // Convert desc query param to boolean
       let desc = $route.query.desc === 'false' ? false : true
       // Sort Field hasn't changed just toggle desc
-      if (newField === $route.query.field || (!$route.query.desc && desc)) { desc = !desc }
+      const defaultField = newField === 'updated_at' && !$route.query.field
+      if (defaultField || newField === $route.query.field) desc = !desc
+      else desc = true // Sort field changed, default to desc true
       // Update router to have new query params, watch on query params will update data
-      $router.replace({ name: $route.name, params: $route.params, query: { desc: desc, field: newField }})
+      let query = { field: newField }
+      if (!desc) query.desc = false  // only display desc in query string when false
+      if (newField === 'updated_at') delete query.field // do not display default field in qs
+      const params = { ...$route.params, saveScrollPos: true } // save scroll pos when sorting table
+      $router.replace({ name: $route.name, params: params, query: query })
     }
 
     const getSortClass = field => {
-      let sortClass
+      let sortClass = 'fa '
       const desc = v.threadData.data.desc
       const curField = v.threadData.data.field
-      if (field === 'updated_at' && !curField && !desc) {
-        sortClass = 'fa fa-sort-down'
-      }
-      else if (curField === field && desc) {
-        sortClass = 'fa fa-sort-down'
-      }
-      else if (curField === field && !desc) {
-        sortClass = 'fa fa-sort-up';
-      }
-      else { sortClass = 'fa fa-sort'; }
+      const defaultField = field === 'updated_at' && !curField
+      if ((defaultField || curField === field) && desc) sortClass += 'fa-sort-down'
+      else if ((defaultField || curField === field) && !desc) sortClass += 'fa-sort-up'
+      else sortClass += 'fa-sort'
       return sortClass
     }
 
@@ -300,7 +300,7 @@ export default {
       prefs: preferences.data,
       loggedIn: auth.loggedIn,
       showSetModerators: true,
-      sortVal: $route.params.field ? $route.params.field : 'updated_at',
+      sortField: $route.params.field ? $route.params.field : 'updated_at',
       sortItems: [
         {
           value: 'updated_at',
@@ -322,14 +322,13 @@ export default {
     })
 
     /* Watched Data */
-    watch(() => $route.query, () => v.threadData.mutate(fetchThreads)) // Update boards on login
+    watch(() => $route.query, () => v.threadData.mutate(processThreads)) // Update on query change
 
     /* Computed Data */
     const canCreate = computed(() => { return true })
     const canSetModerator = computed(() => { return true })
 
     return { ...toRefs(v), canCreate, canSetModerator, loadEditor, watchBoard, setSortField, getSortClass, humanDate, decode, truncate }
-
   }
 }
 </script>
