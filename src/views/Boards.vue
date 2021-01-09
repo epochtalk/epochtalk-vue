@@ -196,7 +196,6 @@ export default {
     }
 
     /* Internal Data */
-    const $api = inject('$api')
     const $swrvCache = inject('$swrvCache')
     const auth = inject(AuthStore)
     const preferences = inject(PreferencesStore)
