@@ -1,31 +1,44 @@
-import { inject } from 'vue'
+import { provide, inject } from 'vue'
+
+const API_KEY = 'api'
+
+export const ApiStore = Symbol(API_KEY)
 
 export default {
-  login: opts => { return api('/api/login', opts) },
-  register: opts => { return api('/api/register', opts) },
-  users: {
-    preferences: () => { return api('/api/users/preferences') }
-  }
-}
+  setup() {
+    const $axios = inject('$axios')
 
-const api = (path, opts) => {
-  const $axios = inject('$axios')
+    const api = (path, opts) => {
 
-  opts = opts || {}
-  const method = (opts.method || 'get').toLowerCase()
-  delete opts.method
-  const data = opts.data
-  delete opts.data
+      opts = opts || {}
+      const method = (opts.method || 'get').toLowerCase()
+      delete opts.method
+      const data = opts.data
+      delete opts.data
 
-  let req = (m => {
-    switch(m) {
-      case 'post':
-      case 'put':
-      case 'patch':
-        return $axios[method](path, data, opts)
-      default: return $axios[method](path, opts)
+      let req = (m => {
+        switch(m) {
+          case 'post':
+          case 'put':
+          case 'patch':
+            return $axios[method](path, data, opts)
+          default: return $axios[method](path, opts)
+        }
+      })(method)
+
+      return req.then(res => res.status === 200 ? res.data : res)
     }
-  })(method)
+    const boards = path => { return api(path) }
+    const login = opts => { return api('/api/login', opts) }
+    const register = opts => { return api('/api/register', opts) }
+    const usersPreferences = () => { return api('/api/users/preferences') }
 
-  return req.then(res => res.status === 200 ? res.data : res)
+    return provide(ApiStore, {
+      boards,
+      login,
+      register,
+      usersPreferences
+    })
+  },
+  render() { return this.$slots.default() } // renderless component
 }
