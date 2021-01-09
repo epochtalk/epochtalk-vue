@@ -5,6 +5,7 @@ const API_KEY = 'api'
 export const ApiStore = Symbol(API_KEY)
 
 export default {
+  name: 'Api',
   setup() {
     const $axios = inject('$axios')
 
