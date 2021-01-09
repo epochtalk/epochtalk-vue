@@ -42,7 +42,7 @@
                 <div class="childboards" v-if="board.children.length">
                   <span>Child Boards: </span>
                   <span v-for="(child, i) in board.children" :key="child.id">
-                    <a class="board-name" href="#">{{child.name}}</a><span v-if="(i + 1) !== board.children.length">, </span>
+                    <router-link class="board-name" :to="{ name: 'Threads', params: { boardSlug: child.slug, boardId: child.id } }">{{child.name}}</router-link><span v-if="(i + 1) !== board.children.length">, </span>
                   </span>
                 </div>
               </div>
@@ -95,6 +95,7 @@ import RegisterModal from '@/components/modals/auth/Register.vue'
 import { inject, reactive, toRefs, watch } from 'vue'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
+import { countTotals, getLastPost, filterIgnoredBoards } from '@/composables/utils/boardUtils'
 
 export default {
   name: 'Boards',
@@ -105,68 +106,11 @@ export default {
   },
   setup() {
     /* Internal View Methods */
-    const remove = (array, item) => {
-      var found = array.indexOf(item);
-      while (found !== -1) {
-        array.splice(found, 1);
-        found = array.indexOf(item);
-      }
-    }
-
-    const countTotals = countBoards => {
-      let thread_count = 0
-      let post_count = 0
-      if (countBoards.length > 0) {
-        countBoards.forEach(board => {
-          let children = countTotals(board.children)
-          thread_count += children.thread_count + board.thread_count
-          post_count += children.post_count + board.post_count
-          board.total_thread_count = thread_count
-          board.total_post_count = post_count
-        })
-      }
-      return { thread_count: thread_count, post_count: post_count }
-    }
-
-    const buildLastPostData = data => {
-      return {
-        last_post_created_at: data.last_post_created_at,
-        last_post_position: data.last_post_position,
-        last_post_username: data.last_post_username,
-        last_post_avatar: data.last_post_avatar,
-        last_thread_id: data.last_thread_id,
-        last_thread_slug: data.last_thread_slug,
-        last_thread_title: data.last_thread_title
-      }
-    }
-
-    const greater = (a, b) => {
-      let minDate = new Date('0001-01-01T00:00:00Z')
-      let aCreatedAt = a.last_post_created_at || minDate
-      let bCreatedAt = b.last_post_created_at || minDate
-      if (new Date(aCreatedAt) > new Date(bCreatedAt)) { return a }
-      else { return b }
-    }
-
-    const getLastPost = boards => {
-      let latestPost = {}
-      if (boards.length > 0) {
-        boards.forEach((board) => {
-          let curLatest = getLastPost(board.children)
-          // Compare curLatest to board
-          curLatest = buildLastPostData(greater(curLatest, board))
-          // Compare curLatest to actual latest
-          latestPost = buildLastPostData(greater(curLatest, latestPost))
-        })
-      }
-      return latestPost
-    }
-
     const processBoards = path => $api(`${path}`)
       .then(data => {
-        // let ignoredBoards = []
         data.boards.map(category => {
-          // category.boards = filterIgnoredBoards(category.boards)
+          // filter out ignored boards
+          category.boards = filterIgnoredBoards(category.boards, v.ignoredBoards)
 
           // set total_thread_count and total_post_count for all boards
           category.boards.map(board => {
@@ -187,8 +131,14 @@ export default {
     }
 
     const toggleCategory = cat => {
-      if (v.collapsedCats.indexOf(cat.id) > -1) { remove(v.collapsedCats, cat.id) }
-      else if (v.collapsedCats.indexOf(cat.id) < 0) { v.collapsedCats.push(cat.id); }
+      if (v.collapsedCats.indexOf(cat.id) > -1) {
+        let found = v.collapsedCats.indexOf(cat.id)
+        while (found !== -1) {
+          v.collapsedCats.splice(found, 1)
+          found = v.collapsedCats.indexOf(cat.id)
+        }
+      }
+      else if (v.collapsedCats.indexOf(cat.id) < 0) { v.collapsedCats.push(cat.id) }
       preferences.update()
     }
 
@@ -206,7 +156,7 @@ export default {
       loggedIn: auth.loggedIn,
       showLogin: false,
       showRegister: false,
-      boardData: useSWRV(`/api/boards`, processBoards, { cache: $swrvCache })
+      boardData: useSWRV(`/api/boards`, processBoards, { cache: $swrvCache, dedupingInterval: 750 })
     })
 
     /* Watch Data */

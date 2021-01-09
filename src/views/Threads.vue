@@ -18,20 +18,20 @@
       <tbody>
         <tr v-for="childBoard in threadData.data.board.children" :key="childBoard.id">
           <td class="board-name">
-            <a href="#" class="board-name">{{childBoard.name}}</a>
+            <router-link class="board-name" :to="{ name: 'Threads', params: { boardSlug: childBoard.slug, boardId: childBoard.id } }">{{childBoard.name}}</router-link>
             <div class="description">{{childBoard.description}}</div>
 
             <div class="children" v-if="childBoard.children.length > 0">
-              <span class="label">Child Boards:</span>
+              <span class="label">Child Boards: </span>
               <span v-for="(child, i) in childBoard.children" :key="child.id">
-                <a href="#">{{child.name}}</a><span v-if="(i + 1) !== childBoard.children.length">, </span>
+                <router-link class="board-name" :to="{ name: 'Threads', params: { boardSlug: child.slug, boardId: child.id } }">{{child.name}}</router-link><span v-if="(i + 1) !== childBoard.children.length">, </span>
               </span>
             </div>
           </td>
           <td class="views">
-              <span class="views-number">{{childBoard.post_count}}</span>
+              <span class="views-number">{{childBoard.total_post_count}}</span>
               <span class="label"> posts,</span>
-              <span class="views-number">{{childBoard.thread_count}}</span>
+              <span class="views-number">{{childBoard.total_thread_count}}</span>
               <span class="label"> threads</span>
           </td>
 
@@ -225,13 +225,14 @@ import truncate from '@/composables/filters/truncate'
 import { inject, reactive, computed, watch, toRefs } from 'vue'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
+import { countTotals, getLastPost, filterIgnoredBoards } from '@/composables/utils/boardUtils'
 
 export default {
   name: 'Threads',
   props: ['boardSlug', 'boardId'],
   setup(props) {
     /* Internal Methods */
-    const fetchThreads = () => {
+    const processThreads = () => {
       return Promise.resolve(props.boardId)
       .then(boardId => {
         const opts = {
@@ -244,6 +245,21 @@ export default {
           }
         }
         return $api('/api/threads', opts)
+        .then(data => {
+          // filter out ignored child boards
+          data.board.children = filterIgnoredBoards(data.board.children, v.prefs.ignored_boards)
+
+          // set total_thread_count and total_post_count for all child board
+          data.board.children.map(childBoard => {
+            let children = countTotals(childBoard.children)
+            let lastPost = getLastPost([childBoard])
+            childBoard.total_thread_count = children.thread_count + childBoard.thread_count
+            childBoard.total_post_count = children.post_count + childBoard.post_count
+            console.log(childBoard,  Object.assign(childBoard, lastPost))
+            return Object.assign(childBoard, lastPost)
+          })
+          return data
+        })
       })
     }
 
@@ -296,7 +312,7 @@ export default {
         let queryStr = params.toString()
         let urlPath = queryStr ? `${props.boardSlug}?${queryStr}` : `${props.boardSlug}`
         return `/boards/${urlPath}`
-      }, fetchThreads, { cache: $swrvCache, dedupingInterval: 100 }),
+      }, processThreads, { cache: $swrvCache, dedupingInterval: 100, ttl: 100000 }),
       prefs: preferences.data,
       loggedIn: auth.loggedIn,
       showSetModerators: true,
@@ -322,11 +338,12 @@ export default {
     })
 
     /* Watched Data */
+    watch(() => v.loggedIn, () => v.threadData.mutate(processThreads)) // Update threads on login
     watch(() => $route.query, () => v.threadData.mutate(processThreads)) // Update on query change
 
     /* Computed Data */
-    const canCreate = computed(() => { return true })
-    const canSetModerator = computed(() => { return true })
+    const canCreate = computed(() => true)
+    const canSetModerator = computed(() => true)
 
     return { ...toRefs(v), canCreate, canSetModerator, loadEditor, watchBoard, setSortField, getSortClass, humanDate, decode, truncate }
   }
