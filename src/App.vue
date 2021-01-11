@@ -1,21 +1,23 @@
 <template>
   <ProvidePreferences>
     <ProvideAuth>
-      <div id="wrapper">
-          <!-- <nav id="navigation">
-            <h1 class="title">Epochtalk</h1>
-            <div class="right" id="nav">
-              <router-link to="/">Boards</router-link> |
-              <router-link to="/about">About</router-link>
-            </div>
-          </nav> -->
-          <Header></Header>
-          <main>
-            <div id="public-content">
-              <router-view />
-            </div>
-        </main>
-      </div>
+      <ProvideApi>
+        <div id="wrapper">
+            <!-- <nav id="navigation">
+              <h1 class="title">Epochtalk</h1>
+              <div class="right" id="nav">
+                <router-link to="/">Boards</router-link> |
+                <router-link to="/about">About</router-link>
+              </div>
+            </nav> -->
+            <Header></Header>
+            <main>
+              <div id="public-content">
+                <router-view />
+              </div>
+          </main>
+        </div>
+      </ProvideApi>
     </ProvideAuth>
   </ProvidePreferences>
 </template>
@@ -24,10 +26,11 @@
 import Header from '@/components/layout/Header.vue'
 import ProvidePreferences from '@/composables/stores/prefs'
 import ProvideAuth from '@/composables/stores/auth'
+import ProvideApi from '@/api'
 
 export default {
   name: 'Epochtalk',
-  components: { Header, ProvidePreferences, ProvideAuth }
+  components: { Header, ProvidePreferences, ProvideAuth, ProvideApi }
 }
 </script>
 
