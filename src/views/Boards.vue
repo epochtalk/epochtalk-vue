@@ -94,7 +94,7 @@ import RecentThreads from '@/components/threads/RecentThreads.vue'
 import LoginModal from '@/components/modals/auth/Login.vue'
 import RegisterModal from '@/components/modals/auth/Register.vue'
 import { inject, reactive, toRefs, watch } from 'vue'
-import { ApiStore } from '@/api/index'
+import { Api } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
 
@@ -164,8 +164,7 @@ export default {
       return latestPost
     }
 
-    const api = inject(ApiStore)
-    const processBoards = path => api.boards(`${path}`)
+    const processBoards = path => $api.boards(`${path}`)
       .then(data => {
         // let ignoredBoards = []
         data.boards.map(category => {
@@ -196,6 +195,7 @@ export default {
     }
 
     /* Internal Data */
+    const $api = inject(Api)
     const $swrvCache = inject('$swrvCache')
     const auth = inject(AuthStore)
     const preferences = inject(PreferencesStore)
