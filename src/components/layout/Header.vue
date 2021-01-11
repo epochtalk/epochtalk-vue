@@ -151,7 +151,7 @@
                   </a>
                 </li>
                 <li>
-                  <a href="#">About</a>
+                  <router-link :to="{ name: 'About' }">About</router-link>
                 </li>
                 <li>
                   <a href="#" @click="logout()">Logout</a>
