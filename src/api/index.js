@@ -2,7 +2,7 @@ import { provide, inject } from 'vue'
 
 const API_KEY = 'api'
 
-export const ApiStore = Symbol(API_KEY)
+export const Api = Symbol(API_KEY)
 
 export default {
   name: 'Api',
@@ -38,7 +38,7 @@ export default {
     /* internal data */
     const $axios = inject('$axios')
 
-    return provide(ApiStore, {
+    return provide(Api, {
       boards,
       login,
       register,
