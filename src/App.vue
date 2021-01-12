@@ -3,13 +3,6 @@
     <ProvideAuth>
       <ProvideApi>
         <div id="wrapper">
-            <!-- <nav id="navigation">
-              <h1 class="title">Epochtalk</h1>
-              <div class="right" id="nav">
-                <router-link to="/">Boards</router-link> |
-                <router-link to="/about">About</router-link>
-              </div>
-            </nav> -->
             <Header></Header>
             <main>
               <div id="public-content">

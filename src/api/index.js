@@ -9,7 +9,7 @@ export default {
   name: 'Api',
   setup() {
     /* internal methods */
-    const api = (path, opts) => {
+    const api = (path, opts, handleErrors) => {
 
       opts = opts || {}
       const method = (opts.method || 'get').toLowerCase()
@@ -26,6 +26,17 @@ export default {
           default: return $axios[method](path, opts)
         }
       })(method)
+
+      const reqPromise = req.then(res => res.status === 200 ? res.data : res)
+
+      if (handleErrors) {
+        return reqPromise.catch(err => {
+          const msg = get(err, 'response.data.message')
+          if (msg) { alertStore.error(msg) }
+          return Promise.reject(err)
+        })
+      }
+      else { return reqPromise }
 
       return req.then(res => res.status === 200 ? res.data : res)
     }
@@ -49,6 +60,7 @@ export default {
     /* internal data */
     const $axios = inject('$axios')
 
+    /* Provide API request util */
     return provide(Api, {
       boards,
       login,

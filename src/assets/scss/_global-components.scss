@@ -6,6 +6,7 @@ a:hover { color: $color-primary-alt; }
 
 .show-mobile { display: none; @include break-mobile-sm { display: inline-block; } }
 .hide-mobile { @include break-mobile-sm { display: none !important; } }
+.pointer { cursor: pointer; }
 
 img {
   max-width: 100%;

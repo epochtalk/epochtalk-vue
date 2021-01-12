@@ -1,37 +1,37 @@
 <template>
-  <div class="board-controls" v-if="threadData">
+  <div class="board-controls" v-if="threadData && threadData.data && threadData.data.board">
     <div class="board-title">
-      <h1>{{threadData.board.name}}</h1>
-      <div class="moderators" v-if="threadData.board.moderators && threadData.board.moderators.length > 0">
+      <h1>{{threadData.data.board.name}}</h1>
+      <div class="moderators" v-if="threadData.data.board.moderators && threadData.data.board.moderators.length > 0">
         <span class="label">Moderators: </span>
-        <span v-for="(mod, i) in threadData.board.moderators" :key="mod.username">
-          <a href="#">{{mod.username}}</a><span v-if="(i + 1) !== threadData.board.moderators.length">, </span>
+        <span v-for="(mod, i) in threadData.data.board.moderators" :key="mod.username">
+          <a href="#">{{mod.username}}</a><span v-if="(i + 1) !== threadData.data.board.moderators.length">, </span>
         </span>
       </div>
     </div>
   </div>
 
-  <div class="board-data">
+  <div class="board-data" v-if="threadData && threadData.data && threadData.data.board">
     <!-- Child Boards -->
-    <table class="child-boards" v-if="threadData.board.children.length > 0 && threadData.page === 1">
+    <table class="child-boards" v-if="threadData.data.board.children.length > 0 && threadData.data.page === 1">
       <caption>Child Boards</caption>
       <tbody>
-        <tr v-for="childBoard in threadData.board.children" :key="childBoard.id">
+        <tr v-for="childBoard in threadData.data.board.children" :key="childBoard.id">
           <td class="board-name">
-            <a href="#" class="board-name">{{childBoard.name}}</a>
+            <router-link class="board-name" :to="{ name: 'Threads', params: { boardSlug: childBoard.slug, boardId: childBoard.id } }">{{childBoard.name}}</router-link>
             <div class="description">{{childBoard.description}}</div>
 
             <div class="children" v-if="childBoard.children.length > 0">
-              <span class="label">Child Boards:</span>
+              <span class="label">Child Boards: </span>
               <span v-for="(child, i) in childBoard.children" :key="child.id">
-                <a href="#">{{child.name}}</a><span v-if="(i + 1) !== childBoard.children.length">, </span>
+                <router-link class="board-name" :to="{ name: 'Threads', params: { boardSlug: child.slug, boardId: child.id } }">{{child.name}}</router-link><span v-if="(i + 1) !== childBoard.children.length">, </span>
               </span>
             </div>
           </td>
           <td class="views">
-              <span class="views-number">{{childBoard.post_count}}</span>
+              <span class="views-number">{{childBoard.total_post_count}}</span>
               <span class="label"> posts,</span>
-              <span class="views-number">{{childBoard.thread_count}}</span>
+              <span class="views-number">{{childBoard.total_thread_count}}</span>
               <span class="label"> threads</span>
           </td>
 
@@ -55,30 +55,30 @@
     </table>
 
     <!-- Thread Sorting Controls -->
-    <div class="thread-sort">Sort <a href="" @click="setSortField()">{{ threadData.desc === true ? 'descending' : 'ascending' }}</a> by
-      <select v-model="sortVal" name="select-thread-sort" class="select-clean" @change="setSortField()">
+    <div class="thread-sort">Sort <a href="" @click.prevent="setSortField()">{{ threadData.data.desc === true ? 'descending' : 'ascending' }}</a> by
+      <select v-model="sortField" name="select-thread-sort" class="select-clean" @change="setSortField()">
         <option v-for="item in sortItems" :key="item.value" :value="item.value">{{item.label}}</option>
       </select>
     </div>
 
     <!-- Thread Listing -->
-    <table class="threads-list">
+    <table class="threads-list" v-if="threadData && threadData.data">
       <caption>Threads</caption>
       <thead>
         <tr>
           <th class="subject">Threads</th>
           <th class="views-replies">
-            <span class="pointer" @click="setSortField('post_count')">
+            <span class="pointer" @click.prevent="setSortField('post_count')">
               Replies
               <span :class="getSortClass('post_count')" class="do-sort"></span>
             </span>
-            <span class="pointer" @click="setSortField('views')">
+            <span class="pointer" @click.prevent="setSortField('views')">
               Views
               <span :class="getSortClass('views')" class="do-sort"></span>
             </span>
           </th>
           <th class="last-post">
-            <span class="pointer" @click="setSortField('updated_at')">
+            <span class="pointer" @click.prevent="setSortField('updated_at')">
               Last Post
               <span :class="getSortClass('updated_at')" class="do-sort"></span>
             </span>
@@ -87,7 +87,7 @@
       </thead>
       <tbody>
         <!-- Stick Threads -->
-        <tr class="threads-data sticky" v-for="thread in threadData.sticky" :key="thread.id">
+        <tr class="threads-data sticky" v-for="thread in threadData.data.sticky" :key="thread.id">
           <td class="subject">
             <div class="title">
               <div class="thread-state">
@@ -146,7 +146,7 @@
           </td>
         </tr>
 
-        <tr class="threads-data" v-for="thread in threadData.normal" :key="thread.id">
+        <tr class="threads-data" v-for="thread in threadData.data.normal" :key="thread.id">
           <td class="subject">
             <div class="title">
               <div class="thread-state">
@@ -200,12 +200,12 @@
     </table>
   </div>
 
-  <div class="board-sidebar">
+  <div class="board-sidebar" >
     <div class="board-actions" v-if="loggedIn">
       <a v-if="canCreate" class="button secondary" href="#" @click="loadEditor()">
         <i class="icon-epoch-add"></i>Start a New Thread
       </a>
-      <a class="button secondary" @click="watchBoard()" v-if="!threadData.board.watched">
+      <a class="button secondary" @click="watchBoard()"  v-if="threadData && threadData.data && threadData.data.board && !threadData.data.board.watched">
         <i class="icon-epoch-watch"></i>Watch This Board
       </a>
       <a class="button secondary" @click="showSetModerators = true"
@@ -218,34 +218,48 @@
 
 <script>
 import useSWRV from 'swrv'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import humanDate from '@/composables/filters/humanDate'
 import decode from '@/composables/filters/decode'
 import truncate from '@/composables/filters/truncate'
-import { inject, reactive, computed, toRefs } from 'vue'
+import { inject, reactive, computed, watch, toRefs } from 'vue'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
+import { countTotals, getLastPost, filterIgnoredBoards } from '@/composables/utils/boardUtils'
 
 export default {
   name: 'Threads',
   props: ['boardSlug', 'boardId'],
   setup(props) {
-    const fetchThreads = path => {
-      return new Promise(resolve => {
-        if (props.boardId) { resolve(props.boardId) }
-        else { resolve($api(`/api/boards/${props.boardSlug}/id`).then(data => data.id)) }
-      })
+    /* Internal Methods */
+    const processThreads = () => {
+      return Promise.resolve(props.boardId)
       .then(boardId => {
         const opts = {
           params: {
             board_id: boardId,
             limit: v.prefs.threads_per_page,
-            page: $route.params.page || 1,
-            field: $route.params.field,
-            desc: $route.params.desc
+            page: $route.query.page || 1,
+            field: $route.query.field,
+            desc: $route.query.desc
           }
         }
-        return $api(path, opts)
+        return $api('/api/threads', opts)
+        .then(data => {
+          // filter out ignored child boards
+          data.board.children = filterIgnoredBoards(data.board.children, v.prefs.ignored_boards)
+
+          // set total_thread_count and total_post_count for all child board
+          data.board.children.map(childBoard => {
+            let children = countTotals(childBoard.children)
+            let lastPost = getLastPost([childBoard])
+            childBoard.total_thread_count = children.thread_count + childBoard.thread_count
+            childBoard.total_post_count = children.post_count + childBoard.post_count
+            console.log(childBoard,  Object.assign(childBoard, lastPost))
+            return Object.assign(childBoard, lastPost)
+          })
+          return data
+        })
       })
     }
 
@@ -254,22 +268,32 @@ export default {
 
     const watchBoard = () => console.log('watchBoard()')
 
-    const setSortField = field => console.log(`setSortField(${field})`)
+    const setSortField = newField => {
+      // Get/Set new sort field
+      if (newField) v.sortField = newField
+      else newField = v.sortField
+      // Convert desc query param to boolean
+      let desc = $route.query.desc === 'false' ? false : true
+      // Sort Field hasn't changed just toggle desc
+      const defaultField = newField === 'updated_at' && !$route.query.field
+      if (defaultField || newField === $route.query.field) desc = !desc
+      else desc = true // Sort field changed, default to desc true
+      // Update router to have new query params, watch on query params will update data
+      let query = { field: newField }
+      if (!desc) query.desc = false  // only display desc in query string when false
+      if (newField === 'updated_at') delete query.field // do not display default field in qs
+      const params = { ...$route.params, saveScrollPos: true } // save scroll pos when sorting table
+      $router.replace({ name: $route.name, params: params, query: query })
+    }
 
     const getSortClass = field => {
-      let sortClass
-      const desc = v.threadData.desc
-      const curField = v.threadData.field
-      if (field === 'updated_at' && !curField && !desc) {
-        sortClass = 'fa fa-sort-desc'
-      }
-      else if (curField === field && desc) {
-        sortClass = 'fa fa-sort-desc'
-      }
-      else if (curField === field && !desc) {
-        sortClass = 'fa fa-sort-asc';
-      }
-      else { sortClass = 'fa fa-sort'; }
+      let sortClass = 'fa '
+      const desc = v.threadData.data.desc
+      const curField = v.threadData.data.field
+      const defaultField = field === 'updated_at' && !curField
+      if ((defaultField || curField === field) && desc) sortClass += 'fa-sort-down'
+      else if ((defaultField || curField === field) && !desc) sortClass += 'fa-sort-up'
+      else sortClass += 'fa-sort'
       return sortClass
     }
 
@@ -277,16 +301,22 @@ export default {
     const $api = inject('$api')
     const $swrvCache = inject('$swrvCache')
     const $route = useRoute()
+    const $router = useRouter()
     const preferences = inject(PreferencesStore)
     const auth = inject(AuthStore)
 
     /* View Data */
     const v = reactive({
-      threadData: useSWRV(`/api/threads`, fetchThreads, { cache: $swrvCache }).data,
+      threadData: useSWRV(() => {
+        let params = new URLSearchParams($route.query)
+        let queryStr = params.toString()
+        let urlPath = queryStr ? `${props.boardSlug}?${queryStr}` : `${props.boardSlug}`
+        return `/boards/${urlPath}`
+      }, processThreads, { cache: $swrvCache, dedupingInterval: 100, ttl: 100000 }),
       prefs: preferences.data,
       loggedIn: auth.loggedIn,
       showSetModerators: true,
-      sortVal: 'updated_at',
+      sortField: $route.params.field ? $route.params.field : 'updated_at',
       sortItems: [
         {
           value: 'updated_at',
@@ -307,12 +337,15 @@ export default {
       ]
     })
 
+    /* Watched Data */
+    watch(() => v.loggedIn, () => v.threadData.mutate(processThreads)) // Update threads on login
+    watch(() => $route.query, () => v.threadData.mutate(processThreads)) // Update on query change
+
     /* Computed Data */
-    const canCreate = computed(() => { return true })
-    const canSetModerator = computed(() => { return true })
+    const canCreate = computed(() => true)
+    const canSetModerator = computed(() => true)
 
     return { ...toRefs(v), canCreate, canSetModerator, loadEditor, watchBoard, setSortField, getSortClass, humanDate, decode, truncate }
-
   }
 }
 </script>
@@ -741,6 +774,7 @@ export default {
   .title {
     display: flex;
     flex: 0 auto;
+    position: relative;
   }
 
   .thread-state {

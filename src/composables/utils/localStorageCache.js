@@ -1,18 +1,4 @@
-const toBinary = string => {
-  const codeUnits = new Uint16Array(string.length)
-  for (let i = 0; i < codeUnits.length; i++) {
-    codeUnits[i] = string.charCodeAt(i)
-  }
-  return String.fromCharCode(...new Uint8Array(codeUnits.buffer))
-}
-
-const fromBinary = binary => {
-  const bytes = new Uint8Array(binary.length)
-  for (let i = 0; i < bytes.length; i++) {
-    bytes[i] = binary.charCodeAt(i)
-  }
-  return String.fromCharCode(...new Uint16Array(bytes.buffer))
-}
+const DEBUG = false
 
 class LocalStorageCache {
   constructor (ttl, storageKey) {
@@ -21,19 +7,35 @@ class LocalStorageCache {
     this.ttl = ttl
   }
 
-  encode (storage) { return btoa(toBinary(JSON.stringify(storage))) }
-  decode (storage) { return JSON.parse(fromBinary(atob(storage))) }
+  encode (storage) {
+    const string = JSON.stringify(storage)
+    if (DEBUG) { return string }
+    else {
+      const bytes = new Uint16Array(string.length)
+      for (let i = 0; i < bytes.length; i++) { bytes[i] = string.charCodeAt(i) }
+      return btoa(new Uint8Array(bytes.buffer).reduce((d, b) => d + String.fromCharCode(b), ''))
+    }
+  }
+
+  decode (storage) {
+    if (DEBUG) { return JSON.parse(storage) }
+    else {
+      const binary = atob(storage)
+      const bytes = new Uint8Array(binary.length)
+      for (let i = 0; i < bytes.length; i++) { bytes[i] = binary.charCodeAt(i) }
+      return JSON.parse(new Uint16Array(bytes.buffer).reduce((d, b) => d + String.fromCharCode(b), ''))
+    }
+  }
 
   get (k) {
     const encodedStore = localStorage.getItem(this.STORAGE_KEY)
     if (encodedStore) {
-      let store = JSON.parse(fromBinary(atob(encodedStore)))
+      let store = this.decode(encodedStore)
       if (k) return store[k]
       else return store
     }
     else return undefined
   }
-
 
   set (k, v, ttl) {
     let timeToLive = ttl || this.ttl

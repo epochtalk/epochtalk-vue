@@ -151,7 +151,7 @@
                   </a>
                 </li>
                 <li>
-                  <a href="#">About</a>
+                  <router-link :to="{ name: 'About' }">About</router-link>
                 </li>
                 <li>
                   <a href="#" @click="logout()">Logout</a>
@@ -175,9 +175,10 @@
         </div>
       </div>
 
+      <alert></alert>
       <!--
       <motd></motd>
-      <alert></alert>
+
       -->
       <login-modal :show="showLogin" @close="showLogin = false"></login-modal>
       <register-modal :show="showRegister" @close="showRegister = false"></register-modal>
@@ -186,16 +187,18 @@
 </template>
 
 <script>
-import { debounce } from 'lodash'
-import decode from '@/composables/filters/decode'
-import truncate from '@/composables/filters/truncate'
+
+import Alert from '@/components/layout/Alert.vue'
 import LoginModal from '@/components/modals/auth/Login.vue'
 import RegisterModal from '@/components/modals/auth/Register.vue'
-import { reactive, toRefs, onMounted, onUnmounted, inject } from 'vue'
+import decode from '@/composables/filters/decode'
+import truncate from '@/composables/filters/truncate'
 import { AuthStore } from '@/composables/stores/auth'
+import { reactive, toRefs, onMounted, onUnmounted, inject } from 'vue'
+import { debounce } from 'lodash'
 
 export default {
-  components: { LoginModal, RegisterModal },
+  components: { LoginModal, RegisterModal, Alert },
   setup() {
     /* Internal Methods */
     const scrollHeader = () => {

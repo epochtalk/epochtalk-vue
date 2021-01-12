@@ -1,8 +1,10 @@
 import { createWebHistory, createRouter } from 'vue-router'
+import { inject } from 'vue'
 import Boards from '@/views/Boards.vue'
 import Threads from '@/views/Threads.vue'
 import About from '@/views/About.vue'
 import NotFound from '@/views/NotFound.vue'
+import NProgress from 'nprogress'
 
 const routes = [
   {
@@ -15,14 +17,17 @@ const routes = [
     path: '/boards/:boardSlug',
     name: 'Threads',
     component: Threads,
-    props: true,
+    props: route => ({
+      boardSlug: route.params.boardSlug,
+      boardId: inject('$api')(`/api/boards/${route.params.boardSlug}/id`).then(b => b.id)
+    }),
     meta: { requiresAuth: false, bodyClass: 'threads' }
   },
   {
     path: '/about',
     name: 'About',
     component: About,
-    meta: { requiresAuth: false }
+    meta: { requiresAuth: false, bodyClass: 'about' }
   },
   {
     path: '/:catchAll(.*)',
@@ -33,13 +38,25 @@ const routes = [
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
+  routes,
+  scrollBehavior(to) {
+    if (!to.params.saveScrollPos) { document.getElementsByTagName('html')[0].scrollIntoView() }
+  }
 })
 
 router.beforeEach(to => {
+  // Start progress bar
+  if (!to.hash) { NProgress.start() }
+
+  // Apply route.meta.bodyClass as body class if present
   const bodyClass = to.meta.bodyClass
   if (bodyClass) { document.body.className = bodyClass }
   else { document.body.className = '' }
+})
+
+router.afterEach(to => {
+  // Stop progress bar
+  if (!to.hash) { NProgress.done() }
 })
 
 export default router

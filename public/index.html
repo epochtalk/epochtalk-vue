@@ -14,5 +14,10 @@
     <div id="app"></div>
     <div id="modals"></div>
     <!-- built files will be auto injected -->
+    <script type="text/javascript" async>
+      let script = document.createElement('script')
+      script.src = '<%= BASE_URL %>config.js'
+      document.write(script.outerHTML)
+    </script>
   </body>
 </html>
