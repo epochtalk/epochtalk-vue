@@ -49,7 +49,7 @@ export default {
 
   @include break-mobile-sm {
     overflow-x: hidden;
-    margin-top: calc(#{$header-offset} - 0.5rem);
+    margin-top: $header-offset;
   }
 }
 
@@ -96,7 +96,7 @@ main {
   .main { grid-area: main; }
 
   @include break-mobile-sm {
-    padding: 0 1rem;
+    padding: 2rem 1rem 0;
 
     #public-content,
     .posts #public-content {
