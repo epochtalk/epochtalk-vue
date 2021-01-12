@@ -88,7 +88,6 @@
 </template>
 
 <script>
-import useSWRV from 'swrv'
 import humanDate from '@/composables/filters/humanDate'
 import RecentThreads from '@/components/threads/RecentThreads.vue'
 import LoginModal from '@/components/modals/auth/Login.vue'
@@ -164,23 +163,19 @@ export default {
       return latestPost
     }
 
-    const processBoards = path => $api.boards(`${path}`)
-      .then(data => {
-        // let ignoredBoards = []
-        data.boards.map(category => {
-          // category.boards = filterIgnoredBoards(category.boards)
-
-          // set total_thread_count and total_post_count for all boards
-          category.boards.map(board => {
-            let children = countTotals([board])
-            let lastPost = getLastPost([board])
-            board.total_thread_count = children.thread_count
-            board.total_post_count = children.post_count
-            return Object.assign(board, lastPost)
-          })
+    const processBoards = data => {
+      data.boards.map(category => {
+        // set total_thread_count and total_post_count for all boards
+        category.boards.map(board => {
+          let children = countTotals([board])
+          let lastPost = getLastPost([board])
+          board.total_thread_count = children.thread_count
+          board.total_post_count = children.post_count
+          return Object.assign(board, lastPost)
         })
-        return data
       })
+      return data
+    }
 
     /* View Methods */
     const generateCatId = (name, viewOrder) => {

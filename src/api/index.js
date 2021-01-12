@@ -1,4 +1,5 @@
 import { provide, inject } from 'vue'
+import useSWRV from 'swrv'
 
 const API_KEY = 'api'
 
@@ -30,7 +31,17 @@ export default {
     }
 
     /* provided methods */
-    const boards = path => { return api(path) }
+    const boards = {
+      getBoards: (config, processBoardsCallback) => {
+        let result = api('/api/boards')
+        // use processor if available
+        if (processBoardsCallback) {
+          result = result.then(processBoardsCallback)
+        }
+        return useSWRV(`/api/boards`, () => result, config)
+      }
+    }
+
     const login = opts => { return api('/api/login', opts) }
     const register = opts => { return api('/api/register', opts) }
     const usersPreferences = () => { return api('/api/users/preferences') }
