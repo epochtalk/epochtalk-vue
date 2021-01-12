@@ -42,6 +42,9 @@ export default {
 
     /* provided methods */
     const boards = {
+      slugToBoardId: (slug) => {
+        return api(`/api/boards/${slug}/id`)
+      },
       getBoards: (config, processBoardsCallback) => {
         let result = api('/api/boards')
         // use processor if available
