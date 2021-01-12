@@ -14,6 +14,9 @@ app.provide('$appCache', appCache)
 /* Provide SWR Cache for caching API data */
 app.provide('$swrvCache', localStorageCache(0, 'swrv'))
 
+/* Provide Alert Store */
+app.provide('$alertStore', alertStore)
+
 /* Setup and Provide Axios */
 const $axios = axios.create({
   baseURL: 'http://localhost:8080',
@@ -24,10 +27,6 @@ const auth = appCache.get('auth')
 const user = auth ? auth.data : undefined
 if (user) { $axios.defaults.headers.common['Authorization'] = `BEARER ${user.token}` }
 app.provide('$axios', $axios)
-/* Provide Alert Store */
-app.provide('$alertStore', alertStore)
-app.provide('$swrvCache', localStorageCache(0, 'swrv'))
-app.provide('$appCache', appCache)
 
 /* Mount App */
 app.mount('#app')
