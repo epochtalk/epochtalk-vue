@@ -220,9 +220,9 @@ export default {
     /* Template Methods */
     const logout = () => auth.logout()
 
-    const searchForum = () => { console.log('SEARCH!') }
+    const searchForum = () => console.log('SEARCH!')
 
-    const dismissNotifications = params => { console.log('DISMISS NOTIFICATIONS!', params) }
+    const dismissNotifications = params => console.log('DISMISS NOTIFICATIONS!', params)
 
     const toggleFocusSearch = () => {
       v.focusSearch = !v.focusSearch
@@ -285,14 +285,12 @@ header {
     .header-contents {
       transform: translateY(-100%);
     }
-    // transform: translateY(-100%);
   }
 
   &.is-visible {
     .header-contents {
       transform: translateY(0);
     }
-    // transform: translateY(0);
   }
 
   .header-contents {
@@ -493,7 +491,6 @@ header {
       }
 
       a { padding-left: 0; }
-      // span { padding-left: 0.8rem; }
       .burger-icon {
         display: none;
         @include break-mobile-sm {
@@ -871,7 +868,6 @@ header {
         }
       }
 
-      // h3 #logo-text { padding-right: 0.8rem; }
       #menu-left {
         float: left;
         .menu-btn, .menu-btn-selected {

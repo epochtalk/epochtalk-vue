@@ -254,7 +254,6 @@ export default {
             let lastPost = getLastPost([childBoard])
             childBoard.total_thread_count = children.thread_count + childBoard.thread_count
             childBoard.total_post_count = children.post_count + childBoard.post_count
-            console.log(childBoard,  Object.assign(childBoard, lastPost))
             return Object.assign(childBoard, lastPost)
           })
           return data

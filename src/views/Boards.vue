@@ -181,8 +181,6 @@ img.avatar-small {
   object-fit: cover;
 }
 .category {
-  // @include row;
-  // border-top: $border;
   margin-bottom: 0.875rem;
   padding-top: 0.375rem;
   .title {
@@ -190,16 +188,13 @@ img.avatar-small {
       display: inline-block;
       font-size: $font-size-sm;
       line-height: 1.5;
-      // margin-top: 0.5rem;
       padding-left: 0;
     }
     a {
       display: inline-block;
       color: $secondary-font-color;
       width: 1rem;
-      // font-size: 0.65rem;
       position: relative;
-      // top: -0.2rem;
       &:hover,
       &:focus {
         text-decoration: none;
@@ -401,7 +396,6 @@ img.avatar-small {
 
   @include break-min-large {
     border-top: none;
-    // border-left: $border;
     padding-left: 1rem;
     padding-top: 0;
   }
