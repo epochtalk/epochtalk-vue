@@ -202,7 +202,7 @@ export default {
       loggedIn: auth.loggedIn,
       showLogin: false,
       showRegister: false,
-      boardData: useSWRV(`/api/boards`, processBoards, { cache: $swrvCache })
+      boardData: $api.boards.getBoards({ cache: $swrvCache }, processBoards)
     })
 
     /* Watch Data */
