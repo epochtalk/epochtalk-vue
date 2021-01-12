@@ -27,7 +27,7 @@ const routes = [
     path: '/about',
     name: 'About',
     component: About,
-    meta: { requiresAuth: false }
+    meta: { requiresAuth: false, bodyClass: 'about' }
   },
   {
     path: '/:catchAll(.*)',
