@@ -1,5 +1,6 @@
 import { provide, computed, inject, reactive, readonly } from 'vue'
 import { cloneDeep } from 'lodash'
+import { Api } from '@/api'
 import { PreferencesStore } from '@/composables/stores/prefs'
 
 const AUTH_KEY = 'auth'
@@ -9,7 +10,7 @@ export const AuthStore = Symbol(AUTH_KEY)
 export default {
   setup() {
     /* Internal Data */
-    const $api = inject('$api')
+    const $api = inject(Api)
     const $appCache = inject('$appCache')
     const $axios = inject('$axios')
     const $alertStore = inject('$alertStore')
