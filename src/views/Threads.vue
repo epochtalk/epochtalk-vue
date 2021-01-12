@@ -38,8 +38,7 @@
           <td class="last-post">
             <div v-if="childBoard.last_thread_id">
               <span v-if="!childBoard.last_post_username">deleted</span>
-              <img v-if="childBoard.last_post_username" class="avatar-small round"
-                :src="childBoard.last_post_avatar || require('@/assets/images/avatar.png')" @error="$event.target.src=require('@/assets/images/avatar.png')" />
+              <img v-if="childBoard.last_post_username" class="avatar-small" :class="defaultAvatarShape" :src="childBoard.last_post_avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
               <a v-if="childBoard.last_post_username" href="#">{{childBoard.last_post_username}}</a>
               <span v-if="childBoard.last_thread_id">
                 posted in
@@ -137,7 +136,7 @@
 
           <td class="last-post">
             <span v-if="thread.last_deleted">deleted</span>
-            <img v-if="!thread.last_deleted" class="avatar-small round" :src="thread.last_post_avatar || require('@/assets/images/avatar.png')" @error="$event.target.src=require('@/assets/images/avatar.png')" />
+            <img v-if="!thread.last_deleted" class="avatar-small" :class="defaultAvatarShape" :src="thread.last_post_avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
             <a v-if="!thread.last_deleted" href="#">{{thread.last_post_username}}</a> posted on
             <a href="#">{{ humanDate(thread.last_post_created_at) }}.</a>
             <span v-if="thread.has_new_post">
@@ -188,7 +187,7 @@
 
           <td class="last-post">
             <span v-if="thread.last_deleted">deleted</span>
-            <img v-if="!thread.last_deleted" class="avatar-small round" :src="thread.last_post_avatar || require('@/assets/images/avatar.png')" @error="$event.target.src=require('@/assets/images/avatar.png')" />
+            <img v-if="!thread.last_deleted" class="avatar-small" :class="defaultAvatar" :src="thread.last_post_avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
             <a v-if="!thread.last_deleted" href="">{{thread.last_post_username}}</a> posted on
             <a href="">{{ humanDate(thread.last_post_created_at) }}.</a>
             <span v-if="thread.has_new_post">
@@ -316,6 +315,8 @@ export default {
       prefs: preferences.data,
       loggedIn: auth.loggedIn,
       showSetModerators: true,
+      defaultAvatar: window.default_avatar,
+      defaultAvatarShape: window.default_avatar_shape,
       sortField: $route.params.field ? $route.params.field : 'updated_at',
       sortItems: [
         {

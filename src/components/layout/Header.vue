@@ -4,7 +4,7 @@
     <div class="burger-close-overlay" :class="{ 'open': showMobileMenu }" @click="showMobileMenu = false" ></div>
     <div class="burger-menu show-mobile" :class="{ 'open' : showMobileMenu }">
       <a @click="showMobileMenu = false" class="profile" href="#">
-        <img :src="currentUser.avatar || require('@/assets/images/avatar.png')" @error="$event.target.src=require('@/assets/images/avatar.png')" class="avatar circle">
+        <img :src="currentUser.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" class="avatar" :class="defaultAvatarShape">
         <span class="username">{{currentUser.username}}</span>
       </a>
       <div class="close-menu" @click="showMobileMenu = false">
@@ -118,7 +118,7 @@
               <div>
                 <a href="#">
                   <div class="avatar-wrap">
-                    <img :src="currentUser.avatar || require('@/assets/images/avatar.png')" @error="$event.target.src=require('@/assets/images/avatar.png')" class="avatar circle">
+                    <img :src="currentUser.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" class="avatar" :class="defaultAvatarShape">
                   </div>
                   <span>{{currentUser.username}}</span>
                 </a>
@@ -250,6 +250,8 @@ export default {
       search: null,
       notificationMessages: null,
       notificationMentions: null,
+      defaultAvatar: window.default_avatar,
+      defaultAvatarShape: window.default_avatar_shape,
       breadcrumbs: [{label:'Home', state: '#', opts: {}}]
     })
 

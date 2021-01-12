@@ -64,7 +64,7 @@
                 <div class="last-post">
                   <div v-if="board.last_post_username">
                     <span v-if="board.user_deleted || board.post_deleted">deleted</span>
-                    <img v-if="!board.user_deleted && !board.post_deleted" class="avatar-small round" :src="board.last_post_avatar || require('@/assets/images/avatar.png')" @error="$event.target.src=require('@/assets/images/avatar.png')" />
+                    <img v-if="!board.user_deleted && !board.post_deleted" class="avatar-small" :class="defaultAvatarShape" :src="board.last_post_avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
                     <a v-if="!board.user_deleted && !board.post_deleted" href="#">{{board.last_post_username}}</a> posted in
                     <span v-if="board.last_thread_title">
                       <a href="#">{{board.last_thread_title }}</a> on
@@ -156,6 +156,8 @@ export default {
       loggedIn: auth.loggedIn,
       showLogin: false,
       showRegister: false,
+      defaultAvatar: window.default_avatar,
+      defaultAvatarShape: window.default_avatar_shape,
       boardData: useSWRV(`/api/boards`, processBoards, { cache: $swrvCache, dedupingInterval: 750 })
     })
 
