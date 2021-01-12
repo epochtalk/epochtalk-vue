@@ -125,6 +125,7 @@
 import Modal from '@/components/layout/Modal.vue'
 import { debounce, cloneDeep } from 'lodash'
 import { reactive, toRefs, watch, inject } from 'vue'
+import { Api } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 
 export default {
@@ -156,7 +157,7 @@ export default {
 
     /* Internal Data */
     const auth = inject(AuthStore)
-    const $api = inject('$api')
+    const $api = inject(Api)
 
     /* Template Data */
     const initForm = {
