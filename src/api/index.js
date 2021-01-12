@@ -1,5 +1,6 @@
 import { provide, inject } from 'vue'
 import useSWRV from 'swrv'
+import { get } from 'lodash'
 
 const API_KEY = 'api'
 

@@ -2,7 +2,6 @@ import { createApp } from 'vue'
 import App from '@/App.vue'
 import router from '@/router'
 import axios from 'axios'
-import { get } from 'lodash'
 import localStorageCache from '@/composables/utils/localStorageCache'
 import alertStore from '@/composables/stores/alert'
 
