@@ -33,7 +33,7 @@ export default {
       if (handleErrors) {
         return reqPromise.catch(err => {
           const msg = get(err, 'response.data.message')
-          if (msg) { alertStore.error(msg) }
+          if (msg) { $alertStore.error(msg) }
           return Promise.reject(err)
         })
       }
@@ -60,6 +60,7 @@ export default {
 
     /* internal data */
     const $axios = inject('$axios')
+    const $alertStore = inject('$alertStore')
 
     /* Provide API request util */
     return provide(Api, {
