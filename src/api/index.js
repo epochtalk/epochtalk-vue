@@ -38,8 +38,6 @@ export default {
         })
       }
       else { return reqPromise }
-
-      return req.then(res => res.status === 200 ? res.data : res)
     }
 
     /* provided methods */
