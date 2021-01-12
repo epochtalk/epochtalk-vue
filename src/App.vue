@@ -1,18 +1,18 @@
 <template>
-  <ProvidePreferences>
-    <ProvideAuth>
-      <ProvideApi>
-        <div id="wrapper">
-            <Header></Header>
-            <main>
-              <div id="public-content">
-                <router-view />
-              </div>
-          </main>
-        </div>
-      </ProvideApi>
-    </ProvideAuth>
-  </ProvidePreferences>
+  <ProvideApi>
+    <ProvidePreferences>
+        <ProvideAuth>
+            <div id="wrapper">
+                <Header></Header>
+                <main>
+                  <div id="public-content">
+                    <router-view />
+                  </div>
+              </main>
+            </div>
+        </ProvideAuth>
+    </ProvidePreferences>
+  </ProvideApi>
 </template>
 
 <script>
