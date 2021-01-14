@@ -41,13 +41,6 @@ export default {
     /* Internal Data */
     const $alert = inject('$alertStore')
 
-    // setTimeout(() => {
-    //   $alert.warning('This is a sample warning alert!')
-    //   $alert.success('This is a sample success alert!')
-    //   $alert.error('This is a sample error alert!')
-    //   $alert.info('This is a sample info alert!')
-    // }, 1000)
-
     /* Template Data */
     const v = reactive({
       alerts: $alert.alerts,
