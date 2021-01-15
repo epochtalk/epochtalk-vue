@@ -56,7 +56,7 @@ export default {
     }
 
     const login = (opts, handleErrors) => { return api('/api/login', opts, handleErrors) }
-    const register = opts => { return api('/api/register', opts) }
+    const register = (opts, handleErrors) => { return api('/api/register', opts, handleErrors) }
     const usersPreferences = () => { return api('/api/users/preferences') }
 
     /* internal data */
