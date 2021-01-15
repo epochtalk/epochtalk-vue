@@ -68,6 +68,7 @@ export default {
     return provide(Api, {
       boards,
       login,
+      logout,
       register,
       usersPreferences
     })
