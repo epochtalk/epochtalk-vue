@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { inject, watch, reactive, toRefs } from 'vue'
+import { inject } from 'vue'
 import truncate from '@/composables/filters/truncate'
 import { BreadcrumbStore } from '@/composables/stores/breadcrumbs'
 
@@ -22,14 +22,7 @@ export default {
   setup() {
     const $breadcrumbs = inject(BreadcrumbStore)
 
-    /* Template Data */
-    const v = reactive({
-      breadcrumbs: $breadcrumbs.breadcrumbs
-    })
-
-    watch(() => v.breadcrumbs, (a,b) => { console.log('New',a,b) }, { deep: true })
-
-    return {...toRefs(v), truncate }
+    return { breadcrumbs: $breadcrumbs.breadcrumbs, truncate }
   }
 }
 </script>
