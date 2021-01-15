@@ -40,7 +40,8 @@ export default {
           rememberMe: rememberMe
         }
       }
-      $api.login(opts, true)
+      const handleErrors = true
+      $api.login(opts, handleErrors)
       .then(dbUser => {
         $axios.defaults.headers.common['Authorization'] = `BEARER ${dbUser.token}`
         $appCache.set(AUTH_KEY, dbUser)
@@ -73,7 +74,8 @@ export default {
           password: password
         }
       }
-      $api.register(opts, true)
+      const handleErrors = true
+      $api.register(opts, handleErrors)
       .then(dbUser => {
         // Set user session if account is already confirmed (log the user in)
         if (!dbUser.confirm_token) {
