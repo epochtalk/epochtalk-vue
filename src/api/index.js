@@ -59,6 +59,11 @@ export default {
     const login = (opts, handleErrors) => { return api('/api/login', opts, handleErrors) }
     const register = (opts, handleErrors) => { return api('/api/register', opts, handleErrors) }
     const usersPreferences = () => { return api('/api/users/preferences') }
+    const users = {
+      update: (userId, opts) => {
+        return api(`/api/users/${userId}`, opts)
+      }
+    }
 
     /* internal data */
     const $axios = inject('$axios')
@@ -70,7 +75,8 @@ export default {
       login,
       logout,
       register,
-      usersPreferences
+      usersPreferences,
+      users
     })
   },
   render() { return this.$slots.default() } // renderless component

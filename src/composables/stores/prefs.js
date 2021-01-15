@@ -59,7 +59,7 @@ export default {
             ...updatedPrefs
           }
         }
-        $api(`/api/users/${user.id}`, opts)
+        $api.users.update(user.id, opts)
         .then(() => $appCache.set(PREFS_KEY, updatedPrefs))
       }
       else { $appCache.set(PREFS_KEY, updatedPrefs) } // user not logged in, only update cache
