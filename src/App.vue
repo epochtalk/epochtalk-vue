@@ -1,14 +1,16 @@
 <template>
   <ProvidePreferences>
     <ProvideAuth>
-      <div id="wrapper">
-        <Header></Header>
-        <main>
-          <div id="public-content">
-            <router-view />
-          </div>
-        </main>
-      </div>
+      <ProvideBreadcrumbs>
+        <div id="wrapper">
+          <Header></Header>
+          <main>
+            <div id="public-content">
+              <router-view />
+            </div>
+          </main>
+        </div>
+      </ProvideBreadcrumbs>
     </ProvideAuth>
   </ProvidePreferences>
 </template>
@@ -17,10 +19,11 @@
 import Header from '@/components/layout/Header.vue'
 import ProvidePreferences from '@/composables/stores/prefs'
 import ProvideAuth from '@/composables/stores/auth'
+import ProvideBreadcrumbs from '@/composables/stores/breadcrumbs'
 
 export default {
   name: 'Epochtalk',
-  components: { Header, ProvidePreferences, ProvideAuth }
+  components: { Header, ProvidePreferences, ProvideBreadcrumbs, ProvideAuth }
 }
 </script>
 

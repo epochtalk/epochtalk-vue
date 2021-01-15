@@ -6,7 +6,7 @@
         <li v-for="(breadcrumb, i) in breadcrumbs" :key="i" :class="{ active: (i + 1) === breadcrumbs.length }">
           <a v-if="(i + 1) !== breadcrumbs.length && breadcrumb.state && breadcrumb.label" title="{{breadcrumb.label}}" href="{{breadcrumb.state}}">{{truncate(breadcrumb.label, 30)}}</a>
           <span v-if="((i + 1) === breadcrumbs.length || !breadcrumb.state) && breadcrumb.label" title="{{breadcrumb.label}}">{{truncate(breadcrumb.label, 30)}}</span>
-          <span v-if="((i + 1) === breadcrumbs.length || !breadcrumb.state) && breadcrumb.opts.locked" title="Locked" class="breadcrumbs-locked"><strong>(locked)</strong></span>
+          <span v-if="((i + 1) === breadcrumbs.length || !breadcrumb.state) && breadcrumb.opts && breadcrumb.opts.locked" title="Locked" class="breadcrumbs-locked"><strong>(locked)</strong></span>
         </li>
       </ul>
     </div>
@@ -14,17 +14,22 @@
 </template>
 
 <script>
-import { reactive, toRefs } from 'vue'
+import { inject, watch, reactive, toRefs } from 'vue'
 import truncate from '@/composables/filters/truncate'
+import { BreadcrumbStore } from '@/composables/stores/breadcrumbs'
 
 export default {
   setup() {
+    const $breadcrumbs = inject(BreadcrumbStore)
 
     /* Template Data */
     const v = reactive({
-      breadcrumbs: [{label:'Home', state: '#', opts: {}}]
+      breadcrumbs: $breadcrumbs.breadcrumbs
     })
-    return { ...toRefs(v), truncate }
+
+    watch(() => v.breadcrumbs, (a,b) => { console.log('New',a,b) }, { deep: true })
+
+    return {...toRefs(v), truncate }
   }
 }
 </script>
