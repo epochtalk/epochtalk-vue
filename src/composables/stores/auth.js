@@ -79,7 +79,7 @@ export default {
         }
       }
       const handleErrors = true
-      $api.register(opts, handleErrors)
+      $api.register.register(opts, handleErrors)
       .then(dbUser => {
         // Set user session if account is already confirmed (log the user in)
         if (!dbUser.confirm_token) {

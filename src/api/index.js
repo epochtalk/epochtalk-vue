@@ -57,7 +57,10 @@ export default {
 
     const logout = (opts, handleErrors) => { return api('/api/logout', opts, handleErrors) }
     const login = (opts, handleErrors) => { return api('/api/login', opts, handleErrors) }
-    const register = (opts, handleErrors) => { return api('/api/register', opts, handleErrors) }
+    const register = {
+      register: (opts, handleErrors) => { return api('/api/register', opts, handleErrors) },
+      emailAvailable: val => { return api(`/api/register/email/${val}`) }
+    }
     const users = {
       update: (userId, opts) => {
         return api(`/api/users/${userId}`, opts)

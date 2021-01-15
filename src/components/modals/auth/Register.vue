@@ -179,7 +179,7 @@ export default {
       v.form.email.valid = val && val.length >= 3 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)
       // check email unique
       if (val) {
-        $api('/api/register/email/' + val)
+        $api.register.emailAvailable(val)
         .then(data => {
           v.form.email.unique = !data.found
           checkFormValid()
