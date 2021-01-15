@@ -52,7 +52,11 @@ export default {
     }
 
     const logout = () => {
-      $api('/api/logout', { method: 'DELETE' }, true)
+      const opts = {
+        method: 'DELETE'
+      }
+      const handleErrors = true
+      $api.logout(opts, handleErrors)
       .then(() => {
         delete $axios.defaults.headers.common['Authorization']
         delete user.token // clear token to invalidate session immediately
