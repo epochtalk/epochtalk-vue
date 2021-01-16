@@ -54,6 +54,11 @@ export default {
         return useSWRV(`/api/boards`, () => result, config)
       }
     }
+    const threads = {
+      byBoard: opts => {
+        return api('/api/threads', opts)
+      }
+    }
 
     const logout = (opts, handleErrors) => { return api('/api/logout', opts, handleErrors) }
     const login = (opts, handleErrors) => { return api('/api/login', opts, handleErrors) }
@@ -78,6 +83,7 @@ export default {
     /* Provide API request util */
     return provide(Api, {
       boards,
+      threads,
       login,
       logout,
       register,

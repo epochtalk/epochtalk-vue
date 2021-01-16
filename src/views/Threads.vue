@@ -245,7 +245,7 @@ export default {
             desc: $route.query.desc
           }
         }
-        return $api('/api/threads', opts)
+        return $api.threads.byBoard(opts)
         .then(data => {
           // filter out ignored child boards
           data.board.children = filterIgnoredBoards(data.board.children, v.prefs.ignored_boards)
