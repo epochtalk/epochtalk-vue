@@ -191,7 +191,7 @@ export default {
       v.form.username.valid = val && val.length >= 3 && val.length <= 20 && /^[a-zA-Z\d-_.]+$/.test(val)
       // check email unique
       if (val) {
-        $api('/api/register/username/' + val)
+        $api.register.usernameAvailable(val)
         .then(data => {
           v.form.username.unique = !data.found
           checkFormValid()
