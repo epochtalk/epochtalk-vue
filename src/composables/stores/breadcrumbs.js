@@ -1,5 +1,5 @@
 import { provide, inject, reactive, readonly } from 'vue'
-import { without, intersection, isEmpty } from 'lodash'
+import { without, intersection, isEmpty, cloneDeep } from 'lodash'
 import { useRoute, useRouter } from 'vue-router'
 
 const BREADCRUMBS_KEY = 'breadcrumbs'
@@ -43,7 +43,7 @@ export default {
       breadcrumbs.splice(0, breadcrumbs.length)
       breadcrumbs.push(pathLookup.home)
       let path = $route.path
-      let routeParams = $route.params
+      let routeParams = cloneDeep($route.params)
       // Handle 403 breadcrumb
       if ($route.name === '403' || $route.name ===  '503') return
       // Strip query str params since stateParams includes query and route params together
