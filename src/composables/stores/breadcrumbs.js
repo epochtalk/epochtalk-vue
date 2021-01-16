@@ -8,18 +8,21 @@ export const BreadcrumbStore = Symbol(BREADCRUMBS_KEY)
 
 export default {
   setup() {
-    const store = reactive({ breadcrumbs: [] })
-
+    /* Internal Data */
     const $route = useRoute()
     const $router = useRouter()
     const $api = inject('$api')
 
-    $router.afterEach(async () => { Object.assign(store.breadcrumbs, await update()) })
+    // TODO(akinsey): update hapi breadcrumb api routes to not use angular states, then remove this
+    const stateToRoute = {
+      '^.home': 'Boards',
+      '^.boards': 'Boards',
+      'threads.data': 'Threads'
+    }
 
     const pathLookup = {
       home: {
         state: '^.home',
-        routeName: 'Boards',
         label: 'Home'
       },
       profiles: {
@@ -89,7 +92,6 @@ export default {
         for (let i = 0; i < breadcrumbs.length; i++) {
           breadcrumbs[i].routeName = stateToRoute[breadcrumbs[i].state]
           breadcrumbs[i].label = decodeURIComponent(breadcrumbs[i].label.replace(/%/g, '%25'))
-          console.log(breadcrumbs[i].opts && breadcrumbs[i].opts['#'], breadcrumbs[i].opts)
           if (breadcrumbs[i].opts && breadcrumbs[i].opts['#']) {
             breadcrumbs[i].hash = '#' + breadcrumbs[i].opts['#']
             delete breadcrumbs[i].opts['#']
