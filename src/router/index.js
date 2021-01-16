@@ -40,7 +40,8 @@ const router = createRouter({
   history: createWebHistory(),
   routes,
   scrollBehavior(to) {
-    if (!to.params.saveScrollPos) { document.getElementsByTagName('html')[0].scrollIntoView() }
+    if (to.hash) document.querySelector(to.hash).scrollIntoView()
+    else if (!to.params.saveScrollPos) document.getElementsByTagName('html')[0].scrollIntoView()
   }
 })
 
