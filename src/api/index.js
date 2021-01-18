@@ -75,6 +75,11 @@ export default {
         return api('/api/users/preferences')
       }
     }
+    const breadcrumbs = {
+      find: (id, type) => {
+        return api(`/api/breadcrumbs?id=${id}&type=${type}`)
+      }
+    }
 
     /* internal data */
     const $axios = inject('$axios')
