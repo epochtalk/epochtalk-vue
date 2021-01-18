@@ -2,6 +2,7 @@
   <ProvideApi>
     <ProvidePreferences>
         <ProvideAuth>
+          <ProvideBreadcrumbs>
             <div id="wrapper">
                 <Header></Header>
                 <main>
@@ -10,6 +11,7 @@
                   </div>
               </main>
             </div>
+          </ProvideBreadcrumbs>
         </ProvideAuth>
     </ProvidePreferences>
   </ProvideApi>
@@ -20,10 +22,11 @@ import Header from '@/components/layout/Header.vue'
 import ProvidePreferences from '@/composables/stores/prefs'
 import ProvideAuth from '@/composables/stores/auth'
 import ProvideApi from '@/api'
+import ProvideBreadcrumbs from '@/composables/stores/breadcrumbs'
 
 export default {
   name: 'Epochtalk',
-  components: { Header, ProvidePreferences, ProvideAuth, ProvideApi }
+  components: { Header, ProvidePreferences, ProvideBreadcrumbs, ProvideAuth, ProvideApi }
 }
 </script>
 
@@ -52,7 +55,7 @@ export default {
 
   @include break-mobile-sm {
     overflow-x: hidden;
-    margin-top: calc(#{$header-offset} - 0.5rem);
+    margin-top: $header-offset;
   }
 }
 
@@ -99,7 +102,7 @@ main {
   .main { grid-area: main; }
 
   @include break-mobile-sm {
-    padding: 0 1rem;
+    padding: 2rem 1rem 0;
 
     #public-content,
     .posts #public-content {

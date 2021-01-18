@@ -4,7 +4,7 @@
     <div class="burger-close-overlay" :class="{ 'open': showMobileMenu }" @click="showMobileMenu = false" ></div>
     <div class="burger-menu show-mobile" :class="{ 'open' : showMobileMenu }">
       <a @click="showMobileMenu = false" class="profile" href="#">
-        <img :src="currentUser.avatar || require('@/assets/images/avatar.png')" @error="$event.target.src=require('@/assets/images/avatar.png')" class="avatar circle">
+        <img :src="currentUser.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" class="avatar" :class="defaultAvatarShape">
         <span class="username">{{currentUser.username}}</span>
       </a>
       <div class="close-menu" @click="showMobileMenu = false">
@@ -118,7 +118,7 @@
               <div>
                 <a href="#">
                   <div class="avatar-wrap">
-                    <img :src="currentUser.avatar || require('@/assets/images/avatar.png')" @error="$event.target.src=require('@/assets/images/avatar.png')" class="avatar circle">
+                    <img :src="currentUser.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" class="avatar" :class="defaultAvatarShape">
                   </div>
                   <span>{{currentUser.username}}</span>
                 </a>
@@ -163,23 +163,15 @@
       </div>
 
       <!-- Breadcrumbs -->
-      <div id="breadcrumbs-wrap">
-        <div id="breadcrumbs">
-          <ul>
-            <li v-for="(breadcrumb, i) in breadcrumbs" :key="i" :class="{ active: (i + 1) === breadcrumbs.length }">
-              <a v-if="(i + 1) !== breadcrumbs.length && breadcrumb.state && breadcrumb.label" title="{{breadcrumb.label}}" href="{{breadcrumb.state}}">{{truncate(breadcrumb.label, 30)}}</a>
-              <span v-if="((i + 1) === breadcrumbs.length || !breadcrumb.state) && breadcrumb.label" title="{{breadcrumb.label}}">{{truncate(breadcrumb.label, 30)}}</span>
-              <span v-if="((i + 1) === breadcrumbs.length || !breadcrumb.state) && breadcrumb.opts.locked" title="Locked" class="breadcrumbs-locked"><strong>(locked)</strong></span>
-            </li>
-          </ul>
-        </div>
-      </div>
+      <breadcrumbs></breadcrumbs>
 
+      <!-- Alerts -->
       <alert></alert>
-      <!--
-      <motd></motd>
 
-      -->
+      <!-- Message of the Day -->
+      <!-- <motd></motd> -->
+
+      <!-- Auth Modals -->
       <login-modal :show="showLogin" @close="showLogin = false"></login-modal>
       <register-modal :show="showRegister" @close="showRegister = false"></register-modal>
     </div>
@@ -191,14 +183,14 @@
 import Alert from '@/components/layout/Alert.vue'
 import LoginModal from '@/components/modals/auth/Login.vue'
 import RegisterModal from '@/components/modals/auth/Register.vue'
+import Breadcrumbs from '@/components/layout/Breadcrumbs.vue'
 import decode from '@/composables/filters/decode'
-import truncate from '@/composables/filters/truncate'
 import { AuthStore } from '@/composables/stores/auth'
 import { reactive, toRefs, onMounted, onUnmounted, inject } from 'vue'
 import { debounce } from 'lodash'
 
 export default {
-  components: { LoginModal, RegisterModal, Alert },
+  components: { Breadcrumbs, LoginModal, RegisterModal, Alert },
   setup() {
     /* Internal Methods */
     const scrollHeader = () => {
@@ -220,9 +212,9 @@ export default {
     /* Template Methods */
     const logout = () => auth.logout()
 
-    const searchForum = () => { console.log('SEARCH!') }
+    const searchForum = () => console.log('SEARCH!')
 
-    const dismissNotifications = params => { console.log('DISMISS NOTIFICATIONS!', params) }
+    const dismissNotifications = params => console.log('DISMISS NOTIFICATIONS!', params)
 
     const toggleFocusSearch = () => {
       v.focusSearch = !v.focusSearch
@@ -250,6 +242,8 @@ export default {
       search: null,
       notificationMessages: null,
       notificationMentions: null,
+      defaultAvatar: window.default_avatar,
+      defaultAvatarShape: window.default_avatar_shape,
       breadcrumbs: [{label:'Home', state: '#', opts: {}}]
     })
 
@@ -262,7 +256,7 @@ export default {
       window.removeEventListener('scroll', debounce(scrollHeader, 10))
     })
 
-    return { ...toRefs(v), logout, searchForum, dismissNotifications, toggleFocusSearch, decode, truncate }
+    return { ...toRefs(v), logout, searchForum, dismissNotifications, toggleFocusSearch, decode }
   }
 }
 </script>
@@ -283,14 +277,12 @@ header {
     .header-contents {
       transform: translateY(-100%);
     }
-    // transform: translateY(-100%);
   }
 
   &.is-visible {
     .header-contents {
       transform: translateY(0);
     }
-    // transform: translateY(0);
   }
 
   .header-contents {
@@ -491,7 +483,6 @@ header {
       }
 
       a { padding-left: 0; }
-      // span { padding-left: 0.8rem; }
       .burger-icon {
         display: none;
         @include break-mobile-sm {
@@ -869,7 +860,6 @@ header {
         }
       }
 
-      // h3 #logo-text { padding-right: 0.8rem; }
       #menu-left {
         float: left;
         .menu-btn, .menu-btn-selected {
@@ -894,48 +884,6 @@ header {
           }
         }
       }
-    }
-  }
-
-  #breadcrumbs-wrap {
-    @include clearfix();
-    @include pad(0 $base-grid-padding);
-
-    @include break-mobile-sm {
-      padding: 0 1rem;
-    }
-
-    background-color: $sub-header-color;
-    border-bottom: 1px solid $breadcrumbs-border-color;
-    text-align: center;
-    height: $breadcrumbs-height;
-    #breadcrumbs {
-      @include base-layout-width;
-      min-width: 0;
-      padding: 0;
-      background: none;
-      text-transform: uppercase;
-      ul {
-        float: left;
-        display: inline-block;
-        margin: 0;
-        line-height: $breadcrumbs-height;
-        padding: 0;
-        list-style-type: none;
-        white-space: nowrap;
-        li { color: $breadcrumbs-dead-link-color; display: inline-block; }
-        li::before { content: "/"; padding: 0 0.4rem; }
-        li:first-child::before { content: none; }
-        li a { color: $breadcrumbs-dead-link-color; font-size: $breadcrumbs-font-size; cursor: pointer; }
-        li span { color: $breadcrumbs-link-color; font-size: $breadcrumbs-font-size; }
-        li a, li span { &.ng-enter, &.ng-leave { @include transition(none !important); } }
-      }
-    }
-
-    // Mobile Breadcrumbs Layout
-    @include break-mobile-sm {
-      #breadcrumbs::-webkit-scrollbar { height: 0; width: 0; }
-      #breadcrumbs { overflow: hidden; overflow-x: scroll; }
     }
   }
 
