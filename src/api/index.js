@@ -88,6 +88,7 @@ export default {
     /* Provide API request util */
     return provide(Api, {
       boards,
+      breadcrumbs,
       threads,
       login,
       logout,
