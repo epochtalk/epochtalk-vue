@@ -199,7 +199,7 @@
     </table>
   </div>
 
-  <div class="board-sidebar" >
+  <div class="board-sidebar">
     <div class="board-actions" v-if="loggedIn">
       <a v-if="canCreate" class="button secondary" href="#" @click="loadEditor()">
         <i class="icon-epoch-add"></i>Start a New Thread
@@ -212,12 +212,14 @@
         <i class="icon-epoch-watch"></i>Set Moderators
       </a>
     </div>
+    <pagination></pagination>
   </div>
 </template>
 
 <script>
 import useSWRV from 'swrv'
 import { useRoute, useRouter } from 'vue-router'
+import Pagination from '@/components/layout/Pagination.vue'
 import humanDate from '@/composables/filters/humanDate'
 import decode from '@/composables/filters/decode'
 import truncate from '@/composables/filters/truncate'
@@ -229,6 +231,7 @@ import { countTotals, getLastPost, filterIgnoredBoards } from '@/composables/uti
 export default {
   name: 'Threads',
   props: ['boardSlug', 'boardId'],
+  components: { Pagination },
   setup(props) {
     /* Internal Methods */
     const processThreads = () => {
