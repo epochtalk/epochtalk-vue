@@ -60,9 +60,9 @@ export default {
       }
     }
 
-    const logout = (opts, handleErrors) => { return api('/api/logout', opts, handleErrors) }
-    const login = (opts, handleErrors) => { return api('/api/login', opts, handleErrors) }
-    const register = {
+    const auth = {
+      login: (opts, handleErrors) => { return api('/api/login', opts, handleErrors) },
+      logout: (opts, handleErrors) => { return api('/api/logout', opts, handleErrors) },
       register: (opts, handleErrors) => { return api('/api/register', opts, handleErrors) },
       emailAvailable: val => { return api(`/api/register/email/${val}`) },
       usernameAvailable: val => { return api(`/api/register/username/${val}`) }
@@ -90,9 +90,7 @@ export default {
       boards,
       breadcrumbs,
       threads,
-      login,
-      logout,
-      register,
+      auth,
       users
     })
   },

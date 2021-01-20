@@ -41,7 +41,7 @@ export default {
         }
       }
       const handleErrors = true
-      $api.login(opts, handleErrors)
+      $api.auth.login(opts, handleErrors)
       .then(dbUser => {
         $axios.defaults.headers.common['Authorization'] = `BEARER ${dbUser.token}`
         $appCache.set(AUTH_KEY, dbUser)
@@ -56,7 +56,7 @@ export default {
         method: 'DELETE'
       }
       const handleErrors = true
-      $api.logout(opts, handleErrors)
+      $api.auth.logout(opts, handleErrors)
       .then(() => {
         delete $axios.defaults.headers.common['Authorization']
         delete user.token // clear token to invalidate session immediately
@@ -79,7 +79,7 @@ export default {
         }
       }
       const handleErrors = true
-      $api.register.register(opts, handleErrors)
+      $api.auth.register(opts, handleErrors)
       .then(dbUser => {
         // Set user session if account is already confirmed (log the user in)
         if (!dbUser.confirm_token) {
