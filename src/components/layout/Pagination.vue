@@ -1,6 +1,10 @@
 <template>
-  <div class="pagination-wrap">
-    <input class="pagination" type="range" />
+  <div class="pagination-component">
+    <label class="page-label">Page 1</label>
+    <div class="input-wrap">
+      <input class="pagination" type="range" />
+    </div>
+    <label class="page-label">Page 10</label>
   </div>
 </template>
 
@@ -17,13 +21,32 @@ export default {
 </script>
 
 <style lang="scss">
-.pagination-wrap {
+.pagination-component {
   display: flex;
-  flex-direction: column;
+  flex-flow: row wrap;
   height: 45vh;
 
+  label.page-label {
+    display: flex;
+    color: $secondary-font-color;
+    font-size: 0.8125rem;
+    flex: 1 100%;
+  }
+
+  div.input-wrap {
+    display: flex;
+    height: 45vh;
+    padding-left: 0.625rem;
+
+    input.pagination {
+      transform: rotate(90deg);
+      transform-origin: left;
+      height: 1rem;
+      width: 43vh;
+    }
+  }
+
   input[type=range] {
-    margin: 1.85px 0;
     background-color: transparent;
     -webkit-appearance: none;
     color: red;
@@ -33,21 +56,21 @@ export default {
   }
   input[type=range]::-webkit-slider-runnable-track {
     background: $border-color;
-    border: 0px solid $border-color;
+    border: 0 solid $border-color;
     border: 0;
-    border-radius: 25px;
+    border-radius: 1.5625rem;
     width: 100%;
-    height: 1.3px;
+    height: 0.08125rem;
     cursor: pointer;
   }
   input[type=range]::-webkit-slider-thumb {
-    margin-top: -1.85px;
-    width: 43px;
-    height: 5px;
+    margin-top: -0.115625rem;
+    width: 2.6875rem;
+    height: 0.3125rem;
     background: $color-primary;
-    border: 0px solid $border-color;
+    border: 0 solid $border-color;
     border: 0;
-    border-radius: 50px;
+    border-radius: 3.125rem;
     cursor: pointer;
     -webkit-appearance: none;
   }
@@ -56,51 +79,51 @@ export default {
   }
   input[type=range]::-moz-range-track {
     background: $border-color;
-    border: 0px solid $border-color;
+    border: 0 solid $border-color;
     border: 0;
-    border-radius: 25px;
+    border-radius: 1.5625rem;
     width: 100%;
-    height: 1.3px;
+    height: 0.08125rem;
     cursor: pointer;
   }
   input[type=range]::-moz-range-thumb {
-    width: 43px;
-    height: 5px;
+    width: 2.6875rem;
+    height: 0.3125rem;
     background: $color-primary;
-    border: 0px solid $border-color;
+    border: 0 solid $border-color;
     border: 0;
-    border-radius: 50px;
+    border-radius: 3.125rem;
     cursor: pointer;
   }
   input[type=range]::-ms-track {
     background: transparent;
     border-color: transparent;
-    border-width: 1.85px 0;
+    border-width: 0.115625rem 0;
     color: transparent;
     width: 100%;
-    height: 1.3px;
+    height: 0.08125rem;
     cursor: pointer;
   }
   input[type=range]::-ms-fill-lower {
     background: $border-color;
-    border: 0px solid $border-color;
+    border: 0 solid $border-color;
     border: 0;
-    border-radius: 50px;
+    border-radius: 3.125rem;
   }
   input[type=range]::-ms-fill-upper {
     background: $border-color;
-    border: 0px solid $border-color;
+    border: 0 solid $border-color;
     border: 0;
-    border-radius: 50px;
+    border-radius: 3.125rem;
   }
   input[type=range]::-ms-thumb {
-    width: 43px;
-    height: 5px;
+    width: 2.6875rem;
+    height: 0.3125rem;
     background: $color-primary;
     border: 0;
-    border-radius: 50px;
+    border-radius: 3.125rem;
     cursor: pointer;
-    margin-top: 0px;
+    margin-top: 0;
     /*Needed to keep the Edge thumb centred*/
   }
   input[type=range]:focus::-ms-fill-lower {
@@ -118,12 +141,6 @@ export default {
       margin: 0;
       /*Edge starts the margin from the thumb, not the track as other browsers do*/
     }
-  }
-
-  input.pagination {
-    transform: rotate(90deg);
-    transform-origin: left;
-    width: 100%;
   }
 }
 </style>
