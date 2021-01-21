@@ -212,7 +212,7 @@
         <i class="icon-epoch-watch"></i>Set Moderators
       </a>
     </div>
-    <pagination></pagination>
+    <pagination :page="threadData.data.page" :limit="threadData.data.limit" :count="threadData.data.board.thread_count"></pagination>
   </div>
 </template>
 

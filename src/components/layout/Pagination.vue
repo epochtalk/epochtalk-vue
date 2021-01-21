@@ -2,20 +2,21 @@
   <div class="pagination-component">
     <label class="page-label">Page 1</label>
     <div class="input-wrap">
-      <input class="pagination" type="range" />
+      <input class="pagination" type="range" min="1" :max="pageCount" :value="page" />
     </div>
-    <label class="page-label">Page 10</label>
+    <label class="page-label">Page {{pageCount}}</label>
   </div>
 </template>
 
 <script>
-// import { inject } from 'vue'
-// import truncate from '@/composables/filters/truncate'
+import { computed } from 'vue'
 
 export default {
-  setup() {
-
-    return { }
+  props: ['page', 'limit', 'count'],
+  setup(props) {
+    return {
+      pageCount: computed(() => Math.ceil(props.count / props.limit))
+    }
   }
 }
 </script>
