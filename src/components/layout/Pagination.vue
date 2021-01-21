@@ -2,19 +2,26 @@
   <div class="pagination-component">
     <label class="page-label">Page 1</label>
     <div class="input-wrap">
-      <input class="pagination" type="range" min="1" :max="pageCount" :value="page" />
+      <input v-model="currentPage" class="pagination" type="range" step="0.01" min="1" :max="pageCount" @change="smoothThumbDrag" />
     </div>
     <label class="page-label">Page {{pageCount}}</label>
   </div>
 </template>
 
 <script>
-import { computed } from 'vue'
+import { computed, reactive, toRefs } from 'vue'
 
 export default {
   props: ['page', 'limit', 'count'],
   setup(props) {
+    const v = reactive({
+      currentPage: props.page
+    })
+
+
     return {
+      ...toRefs(v),
+      smoothThumbDrag: (e) => v.currentPage = Math.round(e.target.value),
       pageCount: computed(() => Math.ceil(props.count / props.limit))
     }
   }
