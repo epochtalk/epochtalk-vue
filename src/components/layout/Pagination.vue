@@ -1,8 +1,9 @@
 <template>
   <div class="pagination-component">
     <label class="page-label">Page 1</label>
-    <div class="input-wrap">
-      <input v-model="currentPage" class="pagination" type="range" step="0.01" min="1" :max="pageCount" @change="smoothThumbDrag" />
+    <div class="range-wrap">
+      <input v-model="currentPage" class="pagination" type="range" step="0.01" min="1" :max="pageCount" @change="smoothThumbDrag" @input="updatePageDisplay" />
+      <div class="range-value" ref="valueBubble">Page {{currentPageDisplay}} of 2</div>
     </div>
     <label class="page-label">Page {{pageCount}}</label>
   </div>
@@ -15,14 +16,27 @@ export default {
   props: ['page', 'limit', 'count'],
   setup(props) {
     const v = reactive({
-      currentPage: props.page
+      currentPage: props.page,
+      valueBubble: null
     })
 
+    const updatePageDisplay = (e, value) => {
+      const range = e.target
+      value = value || range.value
+      const newVal = Number(value - range.min) * 100 / (range.max - range.min)
+      const newPos = 10 - (newVal * 0.625)
+      v.valueBubble.style.top = `calc(${newVal}% + (${newPos}px))`
+    }
 
     return {
       ...toRefs(v),
-      smoothThumbDrag: (e) => v.currentPage = Math.round(e.target.value),
-      pageCount: computed(() => Math.ceil(props.count / props.limit))
+      smoothThumbDrag: (e) => {
+        v.currentPage = Math.round(e.target.value)
+        updatePageDisplay(e, v.currentPage)
+      },
+      updatePageDisplay: updatePageDisplay,
+      pageCount: computed(() => Math.ceil(props.count / props.limit)),
+      currentPageDisplay: computed(() => Math.round(v.currentPage))
     }
   }
 }
@@ -41,16 +55,24 @@ export default {
     flex: 1 100%;
   }
 
-  div.input-wrap {
+  div.range-wrap {
     display: flex;
+    position: relative;
     height: 45vh;
     padding-left: 0.625rem;
-
     input.pagination {
       transform: rotate(90deg);
       transform-origin: left;
       height: 1rem;
       width: 43vh;
+    }
+    .range-value {
+      position: absolute;
+      font-weight: bold;
+      font-size: 0.8125rem;
+      margin-top: 0.625rem;
+      margin-left: 0.75rem;
+      top: 0.625rem;
     }
   }
 
