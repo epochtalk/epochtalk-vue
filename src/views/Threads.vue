@@ -225,6 +225,7 @@ import decode from '@/composables/filters/decode'
 import truncate from '@/composables/filters/truncate'
 import { inject, reactive, computed, watch, toRefs } from 'vue'
 import { Api } from '@/api'
+import { threads } from '@/api/others'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
 import { countTotals, getLastPost, filterIgnoredBoards } from '@/composables/utils/boardUtils'
@@ -247,7 +248,7 @@ export default {
             desc: $route.query.desc
           }
         }
-        return $api.threads.byBoard(opts)
+        return threads.byBoard($api, opts)
         .then(data => {
           // filter out ignored child boards
           data.board.children = filterIgnoredBoards(data.board.children, v.prefs.ignored_boards)
