@@ -38,7 +38,7 @@ export const users = {
 }
 
 export const breadcrumbs = {
-  find: (id, type) => {
+  find: (api, id, type) => {
     return api(`/api/breadcrumbs?id=${id}&type=${type}`)
   }
 }
