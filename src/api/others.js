@@ -21,9 +21,9 @@ export const threads = {
 }
 
 export const auth = {
-  login: (opts, handleErrors) => { return api('/api/login', opts, handleErrors) },
-  logout: (opts, handleErrors) => { return api('/api/logout', opts, handleErrors) },
-  register: (opts, handleErrors) => { return api('/api/register', opts, handleErrors) },
+  login: (api, opts, handleErrors) => { return api('/api/login', opts, handleErrors) },
+  logout: (api, opts, handleErrors) => { return api('/api/logout', opts, handleErrors) },
+  register: (api, opts, handleErrors) => { return api('/api/register', opts, handleErrors) },
   emailAvailable: (api, val) => { return api(`/api/register/email/${val}`) },
   usernameAvailable: (api, val) => { return api(`/api/register/username/${val}`) }
 }

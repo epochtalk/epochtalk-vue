@@ -1,6 +1,7 @@
 import { provide, computed, inject, reactive, readonly } from 'vue'
 import { cloneDeep } from 'lodash'
 import { Api } from '@/api'
+import { auth } from '@/api/others'
 import { PreferencesStore } from '@/composables/stores/prefs'
 
 const AUTH_KEY = 'auth'
@@ -41,7 +42,7 @@ export default {
         }
       }
       const handleErrors = true
-      $api.auth.login(opts, handleErrors)
+      auth.login($api, opts, handleErrors)
       .then(dbUser => {
         $axios.defaults.headers.common['Authorization'] = `BEARER ${dbUser.token}`
         $appCache.set(AUTH_KEY, dbUser)
@@ -56,7 +57,7 @@ export default {
         method: 'DELETE'
       }
       const handleErrors = true
-      $api.auth.logout(opts, handleErrors)
+      auth.logout($api, opts, handleErrors)
       .then(() => {
         delete $axios.defaults.headers.common['Authorization']
         delete user.token // clear token to invalidate session immediately
@@ -79,7 +80,7 @@ export default {
         }
       }
       const handleErrors = true
-      $api.auth.register(opts, handleErrors)
+      auth.register($api, opts, handleErrors)
       .then(dbUser => {
         // Set user session if account is already confirmed (log the user in)
         if (!dbUser.confirm_token) {
