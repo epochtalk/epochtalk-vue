@@ -4,7 +4,7 @@ export const boards = {
   slugToBoardId: (api, slug) => {
     return api(`/api/boards/${slug}/id`)
   },
-  getBoards: (config, processBoardsCallback) => {
+  getBoards: (api, config, processBoardsCallback) => {
     let result = api('/api/boards')
     // use processor if available
     if (processBoardsCallback) {

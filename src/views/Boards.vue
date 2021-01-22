@@ -93,6 +93,7 @@ import LoginModal from '@/components/modals/auth/Login.vue'
 import RegisterModal from '@/components/modals/auth/Register.vue'
 import { inject, reactive, toRefs, watch } from 'vue'
 import { Api } from '@/api'
+import boards from '@/api/others'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
 import { countTotals, getLastPost, filterIgnoredBoards } from '@/composables/utils/boardUtils'
@@ -157,7 +158,7 @@ export default {
       showRegister: false,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
-      boardData: $api.boards.getBoards({ cache: $swrvCache, dedupingInterval: 750 }, processBoards)
+      boardData: boards.getBoards($api, { cache: $swrvCache, dedupingInterval: 750 }, processBoards)
     })
 
     /* Watch Data */
