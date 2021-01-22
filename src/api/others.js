@@ -1,7 +1,7 @@
 import useSWRV from 'swrv'
 
 export const boards = {
-  slugToBoardId: (slug) => {
+  slugToBoardId: (api, slug) => {
     return api(`/api/boards/${slug}/id`)
   },
   getBoards: (config, processBoardsCallback) => {
