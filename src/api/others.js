@@ -24,8 +24,8 @@ export const auth = {
   login: (opts, handleErrors) => { return api('/api/login', opts, handleErrors) },
   logout: (opts, handleErrors) => { return api('/api/logout', opts, handleErrors) },
   register: (opts, handleErrors) => { return api('/api/register', opts, handleErrors) },
-  emailAvailable: val => { return api(`/api/register/email/${val}`) },
-  usernameAvailable: val => { return api(`/api/register/username/${val}`) }
+  emailAvailable: (api, val) => { return api(`/api/register/email/${val}`) },
+  usernameAvailable: (api, val) => { return api(`/api/register/username/${val}`) }
 }
 
 export const users = {
