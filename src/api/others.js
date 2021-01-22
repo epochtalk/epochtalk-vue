@@ -29,10 +29,10 @@ export const auth = {
 }
 
 export const users = {
-  update: (userId, opts) => {
+  update: (api, userId, opts) => {
     return api(`/api/users/${userId}`, opts)
   },
-  preferences: () => {
+  preferences: (api) => {
     return api('/api/users/preferences')
   }
 }

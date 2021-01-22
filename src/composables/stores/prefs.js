@@ -1,6 +1,7 @@
 import { provide, inject, reactive, toRefs } from 'vue'
 import { cloneDeep } from 'lodash'
 import { Api } from '@/api'
+import { users } from '@/api/others'
 
 const PREFS_KEY = 'preferences'
 const AUTH_KEY = 'auth'
@@ -28,7 +29,7 @@ export default {
 
     /* Provided Methods */
     const fetch = () => {
-      $api.users.preferences()
+      users.preferences($api)
       .then(dbPrefs => {
         $appCache.set(PREFS_KEY, dbPrefs)
         Object.assign(prefs, dbPrefs)
@@ -59,7 +60,7 @@ export default {
             ...updatedPrefs
           }
         }
-        $api.users.update(user.id, opts)
+        users.update($api, user.id, opts)
         .then(() => $appCache.set(PREFS_KEY, updatedPrefs))
       }
       else { $appCache.set(PREFS_KEY, updatedPrefs) } // user not logged in, only update cache
