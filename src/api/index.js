@@ -1,5 +1,4 @@
 import { provide, inject } from 'vue'
-import useSWRV from 'swrv'
 import { get } from 'lodash'
 
 const API_KEY = 'api'
@@ -9,7 +8,7 @@ export const Api = Symbol(API_KEY)
 export default {
   name: 'Api',
   setup() {
-    /* internal methods */
+    /* provided methods */
     const api = (path, opts, handleErrors) => {
 
       opts = opts || {}
@@ -40,59 +39,12 @@ export default {
       else { return reqPromise }
     }
 
-    /* provided methods */
-    const boards = {
-      slugToBoardId: (slug) => {
-        return api(`/api/boards/${slug}/id`)
-      },
-      getBoards: (config, processBoardsCallback) => {
-        let result = api('/api/boards')
-        // use processor if available
-        if (processBoardsCallback) {
-          result = result.then(processBoardsCallback)
-        }
-        return useSWRV(`/api/boards`, () => result, config)
-      }
-    }
-    const threads = {
-      byBoard: opts => {
-        return api('/api/threads', opts)
-      }
-    }
-
-    const auth = {
-      login: (opts, handleErrors) => { return api('/api/login', opts, handleErrors) },
-      logout: (opts, handleErrors) => { return api('/api/logout', opts, handleErrors) },
-      register: (opts, handleErrors) => { return api('/api/register', opts, handleErrors) },
-      emailAvailable: val => { return api(`/api/register/email/${val}`) },
-      usernameAvailable: val => { return api(`/api/register/username/${val}`) }
-    }
-    const users = {
-      update: (userId, opts) => {
-        return api(`/api/users/${userId}`, opts)
-      },
-      preferences: () => {
-        return api('/api/users/preferences')
-      }
-    }
-    const breadcrumbs = {
-      find: (id, type) => {
-        return api(`/api/breadcrumbs?id=${id}&type=${type}`)
-      }
-    }
-
     /* internal data */
     const $axios = inject('$axios')
     const $alertStore = inject('$alertStore')
 
     /* Provide API request util */
-    return provide(Api, {
-      boards,
-      breadcrumbs,
-      threads,
-      auth,
-      users
-    })
+    return provide(Api, api)
   },
   render() { return this.$slots.default() } // renderless component
 }
