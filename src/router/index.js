@@ -1,7 +1,7 @@
 import { createWebHistory, createRouter } from 'vue-router'
 import { inject } from 'vue'
 import { Api } from '@/api'
-import boards from '@/api/others'
+import { boards } from '@/api/others'
 import Boards from '@/views/Boards.vue'
 import Threads from '@/views/Threads.vue'
 import About from '@/views/About.vue'
