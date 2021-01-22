@@ -212,7 +212,7 @@
         <i class="icon-epoch-watch"></i>Set Moderators
       </a>
     </div>
-    <pagination :page="threadData.data.page" :limit="threadData.data.limit" :count="threadData.data.board.thread_count"></pagination>
+    <pagination v-if="threadData.data" :page="threadData.data.page" :limit="threadData.data.limit" :count="threadData.data.board.thread_count"></pagination>
   </div>
 </template>
 
@@ -281,8 +281,9 @@ export default {
       else desc = true // Sort field changed, default to desc true
       // Update router to have new query params, watch on query params will update data
       let query = { field: newField, page: $route.query.page }
-      if (!desc) query.desc = false  // only display desc in query string when false
+      if (!query.page) delete query.page // don't include page if undefined
       if (newField === 'updated_at') delete query.field // do not display default field in qs
+      if (!desc) query.desc = false  // only display desc in query string when false
       const params = { ...$route.params, saveScrollPos: true } // save scroll pos when sorting table
       $router.replace({ name: $route.name, params: params, query: query })
     }
@@ -313,7 +314,7 @@ export default {
         let queryStr = params.toString()
         let urlPath = queryStr ? `${props.boardSlug}?${queryStr}` : `${props.boardSlug}`
         return `/boards/${urlPath}`
-      }, processThreads, { cache: $swrvCache, dedupingInterval: 100, ttl: 100000 }),
+      }, processThreads, { cache: $swrvCache, dedupingInterval: 100, ttl: 500 }),
       prefs: preferences.data,
       loggedIn: auth.loggedIn,
       showSetModerators: true,

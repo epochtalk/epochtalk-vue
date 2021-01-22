@@ -2,42 +2,55 @@
   <div class="pagination-component">
     <label class="page-label">Page 1</label>
     <div class="range-wrap">
-      <input v-model="currentPage" class="pagination" type="range" step="0.01" min="1" :max="pageCount" @change="smoothThumbDrag" @input="updatePageDisplay" />
-      <div class="range-value" ref="valueBubble">Page {{currentPageDisplay}} of 2</div>
+      <input v-model="currentPage" ref="rangeInput" class="pagination" type="range" step="0.01" min="1" :max="pageCount" @change="smoothThumbDrag" @input="updatePageDisplay" />
+      <div class="range-value" ref="valueBubble">Page {{currentPageDisplay}} of {{pageCount}}</div>
     </div>
     <label class="page-label">Page {{pageCount}}</label>
   </div>
 </template>
 
 <script>
-import { computed, reactive, toRefs } from 'vue'
+import { computed, reactive, toRefs, nextTick } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 export default {
   props: ['page', 'limit', 'count'],
   setup(props) {
-    const v = reactive({
-      currentPage: props.page,
-      valueBubble: null
-    })
+    /* View Methods */
+    const smoothThumbDrag = e => {
+      v.currentPage = Math.round(e.target.value) // Round up since were using step = 0.01
+      updatePageDisplay(e, v.currentPage)
+      const params = { ...$route.params, saveScrollPos: true }
+      let query = { ...$route.query, page: v.currentPage }
+      if (query.page ===1 || !query.page) delete query.page
+      $router.replace({ name: $route.name, params: params, query: query })
+    }
 
     const updatePageDisplay = (e, value) => {
-      const range = e.target
-      value = value || range.value
-      const newVal = Number(value - range.min) * 100 / (range.max - range.min)
+      const range = e.target || e // account for passing in ref in nextTick
+      value = value || range.value // account for passing in custom page
+      const newVal = Number((value - range.min) * 100 / (range.max - range.min))
       const newPos = 10 - (newVal * 0.625)
       v.valueBubble.style.top = `calc(${newVal}% + (${newPos}px))`
     }
 
-    return {
-      ...toRefs(v),
-      smoothThumbDrag: (e) => {
-        v.currentPage = Math.round(e.target.value)
-        updatePageDisplay(e, v.currentPage)
-      },
-      updatePageDisplay: updatePageDisplay,
+    /* Internal Data */
+    const $route = useRoute()
+    const $router = useRouter()
+
+    /* View Data */
+    const v = reactive({
+      rangeInput: null,
+      valueBubble: null,
+      currentPage: props.page,
       pageCount: computed(() => Math.ceil(props.count / props.limit)),
       currentPageDisplay: computed(() => Math.round(v.currentPage))
-    }
+    })
+
+    /* Next Tick - waits for dom to load so refs are populated */
+    nextTick(() => updatePageDisplay(v.rangeInput, v.currentPage)) // set init pos of page disp
+
+    return { ...toRefs(v), smoothThumbDrag, updatePageDisplay }
   }
 }
 </script>
@@ -56,7 +69,6 @@ export default {
   }
 
   div.range-wrap {
-    display: flex;
     position: relative;
     height: 45vh;
     padding-left: 0.625rem;
@@ -87,7 +99,6 @@ export default {
   input[type=range]::-webkit-slider-runnable-track {
     background: $border-color;
     border: 0 solid $border-color;
-    border: 0;
     border-radius: 1.5625rem;
     width: 100%;
     height: 0.08125rem;
@@ -99,7 +110,6 @@ export default {
     height: 0.3125rem;
     background: $color-primary;
     border: 0 solid $border-color;
-    border: 0;
     border-radius: 3.125rem;
     cursor: pointer;
     -webkit-appearance: none;
@@ -110,7 +120,6 @@ export default {
   input[type=range]::-moz-range-track {
     background: $border-color;
     border: 0 solid $border-color;
-    border: 0;
     border-radius: 1.5625rem;
     width: 100%;
     height: 0.08125rem;
@@ -121,7 +130,6 @@ export default {
     height: 0.3125rem;
     background: $color-primary;
     border: 0 solid $border-color;
-    border: 0;
     border-radius: 3.125rem;
     cursor: pointer;
   }
@@ -143,14 +151,12 @@ export default {
   input[type=range]::-ms-fill-upper {
     background: $border-color;
     border: 0 solid $border-color;
-    border: 0;
     border-radius: 3.125rem;
   }
   input[type=range]::-ms-thumb {
     width: 2.6875rem;
     height: 0.3125rem;
     background: $color-primary;
-    border: 0;
     border-radius: 3.125rem;
     cursor: pointer;
     margin-top: 0;
