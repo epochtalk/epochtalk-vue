@@ -319,7 +319,7 @@ export default {
       showSetModerators: true,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
-      sortField: $route.params.field ? $route.params.field : 'updated_at',
+      sortField: $route.query.field ? $route.query.field : 'updated_at',
       sortItems: [
         {
           value: 'updated_at',
