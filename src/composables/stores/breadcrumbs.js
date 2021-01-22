@@ -2,7 +2,7 @@ import { provide, inject, reactive, readonly } from 'vue'
 import { without, intersection, isEmpty, cloneDeep } from 'lodash'
 import { useRoute, useRouter } from 'vue-router'
 import { Api } from '@/api'
-import { breadcrumbs } from '@/api/others'
+import { apiBreadcrumbs } from '@/api/others'
 
 const BREADCRUMBS_KEY = 'breadcrumbs'
 
@@ -71,7 +71,7 @@ export default {
         let idKey = routeParamKeys.reverse()[0]
         let id = routeParams[idKey]
         let type = keyToType[idKey]
-        breadcrumbs.push(...await breadcrumbs.find($api, id, type))
+        breadcrumbs.push(...await apiBreadcrumbs.find($api, id, type))
       }
       // routeParams is empty, route is static
       else if (path !== '/') {
