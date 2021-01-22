@@ -141,7 +141,7 @@ export default {
 
     /* Template Methods */
     const register = () => {
-      auth.register(v.form.email.val, v.form.username.val, v.form.password.val)
+      $auth.register(v.form.email.val, v.form.username.val, v.form.password.val)
       close()
     }
 
@@ -156,7 +156,7 @@ export default {
     }
 
     /* Internal Data */
-    const auth = inject(AuthStore)
+    const $auth = inject(AuthStore)
     const $api = inject(Api)
 
     /* Template Data */
