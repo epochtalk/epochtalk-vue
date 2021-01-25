@@ -19,11 +19,14 @@ export default {
     /* View Methods */
     const smoothThumbDrag = e => {
       v.currentPage = Math.round(e.target.value) // Round up since were using step = 0.01
+
       updatePageDisplay(e, v.currentPage)
       const params = { ...$route.params, saveScrollPos: true }
       let query = { ...$route.query, page: v.currentPage }
-      if (query.page ===1 || !query.page) delete query.page
-      $router.replace({ name: $route.name, params: params, query: query })
+      if (query.page === 1 || !query.page) delete query.page
+      if (props.page !== v.currentPage) {
+        $router.replace({ name: $route.name, params: params, query: query })
+      }
     }
 
     const updatePageDisplay = (e, value) => {
