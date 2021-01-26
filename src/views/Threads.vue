@@ -214,12 +214,14 @@
     </div>
     <pagination v-if="threadData.data" :page="threadData.data.page" :limit="threadData.data.limit" :count="threadData.data.board.thread_count"></pagination>
   </div>
+  <set-moderators-modal :show="showSetModerators" @close="showSetModerators = false"></set-moderators-modal>
 </template>
 
 <script>
 import useSWRV from 'swrv'
 import { useRoute, useRouter } from 'vue-router'
 import Pagination from '@/components/layout/Pagination.vue'
+import SetModeratorsModal from '@/components/modals/threads/SetModerators.vue'
 import humanDate from '@/composables/filters/humanDate'
 import decode from '@/composables/filters/decode'
 import truncate from '@/composables/filters/truncate'
@@ -232,7 +234,7 @@ import { countTotals, getLastPost, filterIgnoredBoards } from '@/composables/uti
 export default {
   name: 'Threads',
   props: ['boardSlug', 'boardId'],
-  components: { Pagination },
+  components: { Pagination, SetModeratorsModal },
   setup(props) {
     /* Internal Methods */
     const processThreads = () => {
@@ -318,7 +320,7 @@ export default {
       }, processThreads, { cache: $swrvCache, dedupingInterval: 100, ttl: 500 }),
       prefs: preferences.data,
       loggedIn: auth.loggedIn,
-      showSetModerators: true,
+      showSetModerators: false,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
       sortField: $route.query.field ? $route.query.field : 'updated_at',
