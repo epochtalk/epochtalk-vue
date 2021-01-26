@@ -87,12 +87,12 @@
 </template>
 
 <script>
-import useSWRV from 'swrv'
 import humanDate from '@/composables/filters/humanDate'
 import RecentThreads from '@/components/threads/RecentThreads.vue'
 import LoginModal from '@/components/modals/auth/Login.vue'
 import RegisterModal from '@/components/modals/auth/Register.vue'
 import { inject, reactive, toRefs, watch } from 'vue'
+import { Api } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
 import { countTotals, getLastPost, filterIgnoredBoards } from '@/composables/utils/boardUtils'
@@ -106,23 +106,22 @@ export default {
   },
   setup() {
     /* Internal View Methods */
-    const processBoards = path => $api(`${path}`)
-      .then(data => {
-        data.boards.map(category => {
-          // filter out ignored boards
-          category.boards = filterIgnoredBoards(category.boards, v.ignoredBoards)
+    const processBoards = data => {
+      data.boards.map(category => {
+        // filter out ignored boards
+        category.boards = filterIgnoredBoards(category.boards, v.ignoredBoards)
 
-          // set total_thread_count and total_post_count for all boards
-          category.boards.map(board => {
-            let children = countTotals([board])
-            let lastPost = getLastPost([board])
-            board.total_thread_count = children.thread_count
-            board.total_post_count = children.post_count
-            return Object.assign(board, lastPost)
-          })
+        // set total_thread_count and total_post_count for all boards
+        category.boards.map(board => {
+          let children = countTotals([board])
+          let lastPost = getLastPost([board])
+          board.total_thread_count = children.thread_count
+          board.total_post_count = children.post_count
+          return Object.assign(board, lastPost)
         })
-        return data
       })
+      return data
+    }
 
     /* View Methods */
     const generateCatId = (name, viewOrder) => {
@@ -143,7 +142,7 @@ export default {
     }
 
     /* Internal Data */
-    const $api = inject('$api')
+    const $api = inject(Api)
     const $swrvCache = inject('$swrvCache')
     const $alertStore = inject('$alertStore')
     const auth = inject(AuthStore)
@@ -158,7 +157,7 @@ export default {
       showRegister: false,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
-      boardData: useSWRV(`/api/boards`, processBoards, { cache: $swrvCache, dedupingInterval: 750 })
+      boardData: $api.boards.getBoards({ cache: $swrvCache, dedupingInterval: 750 }, processBoards)
     })
 
     /* Watch Data */

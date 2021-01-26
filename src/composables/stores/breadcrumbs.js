@@ -1,6 +1,7 @@
 import { provide, inject, reactive, readonly } from 'vue'
 import { without, intersection, isEmpty, cloneDeep } from 'lodash'
 import { useRoute, useRouter } from 'vue-router'
+import { Api } from '@/api'
 
 const BREADCRUMBS_KEY = 'breadcrumbs'
 
@@ -11,7 +12,7 @@ export default {
     /* Internal Data */
     const $route = useRoute()
     const $router = useRouter()
-    const $api = inject('$api')
+    const $api = inject(Api)
 
     // TODO(akinsey): update hapi breadcrumb api routes to not use angular states, then remove this
     const stateToRoute = {
@@ -67,7 +68,9 @@ export default {
       // matches, route is dynamic
       if (!isEmpty(matches)) {
         let idKey = routeParamKeys.reverse()[0]
-        breadcrumbs.push(...await $api(`/api/breadcrumbs?id=${routeParams[idKey]}&type=${keyToType[idKey]}`))
+        let id = routeParams[idKey]
+        let type = keyToType[idKey]
+        breadcrumbs.push(...await $api.breadcrumbs.find(id, type))
       }
       // routeParams is empty, route is static
       else if (path !== '/') {

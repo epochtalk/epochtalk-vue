@@ -125,6 +125,7 @@
 import Modal from '@/components/layout/Modal.vue'
 import { debounce, cloneDeep } from 'lodash'
 import { reactive, toRefs, watch, inject } from 'vue'
+import { Api } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 
 export default {
@@ -156,7 +157,7 @@ export default {
 
     /* Internal Data */
     const auth = inject(AuthStore)
-    const $api = inject('$api')
+    const $api = inject(Api)
 
     /* Template Data */
     const initForm = {
@@ -178,7 +179,7 @@ export default {
       v.form.email.valid = val && val.length >= 3 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)
       // check email unique
       if (val) {
-        $api('/api/register/email/' + val)
+        $api.auth.emailAvailable(val)
         .then(data => {
           v.form.email.unique = !data.found
           checkFormValid()
@@ -190,7 +191,7 @@ export default {
       v.form.username.valid = val && val.length >= 3 && val.length <= 20 && /^[a-zA-Z\d-_.]+$/.test(val)
       // check email unique
       if (val) {
-        $api('/api/register/username/' + val)
+        $api.auth.usernameAvailable(val)
         .then(data => {
           v.form.username.unique = !data.found
           checkFormValid()
