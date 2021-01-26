@@ -1,6 +1,6 @@
 <template>
   <modal :name="$options.name" :show="show" @close="close()" :focusInput="focusInput">
-    <template v-slot:header>Set Moderators</template>
+    <template v-slot:header>Set Moderators for {{boardName}}</template>
 
     <template v-slot:body>
       <form action="." class="css-form">
@@ -25,7 +25,7 @@ import { reactive, toRefs } from 'vue'
 
 export default {
   name: 'set-moderators-modal',
-  props: ['show'],
+  props: ['show', 'boardName'],
   emits: ['close'],
   components: { Modal },
   setup(props, { emit }) {
@@ -47,6 +47,7 @@ export default {
     const initMods = []
 
     const v = reactive({
+      boardName: props.boardName,
       mods: cloneDeep(initMods),
       focusInput: null
     })
