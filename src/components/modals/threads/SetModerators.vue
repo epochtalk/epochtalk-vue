@@ -6,7 +6,11 @@
       <form action="." class="css-form">
         <div class="input-section">
           <label for="mods-to-add">Moderators</label>
-          <input id="mods-to-add" type="text" class="input-text" placeholder="Enter moderator username" v-model="mods" ref="focusInput" required />
+          <Multiselect
+            v-model="multi.value"
+            v-bind="multi"
+          ></Multiselect>
+
         </div>
         <br><br>
         <button class="fill" @click.prevent="setModerators()" type="submit" :disabled="false">
@@ -19,15 +23,16 @@
 
 <script>
 import Modal from '@/components/layout/Modal.vue'
-import { cloneDeep } from 'lodash'
+// import { cloneDeep } from 'lodash'
 import { reactive, toRefs } from 'vue'
 // import { AuthStore } from '@/composables/stores/auth'
+import Multiselect from '@vueform/multiselect'
 
 export default {
   name: 'set-moderators-modal',
   props: ['show', 'boardName'],
   emits: ['close'],
-  components: { Modal },
+  components: { Modal, Multiselect },
   setup(props, { emit }) {
     /* Template Methods */
     const setModerators = () => {
@@ -36,7 +41,7 @@ export default {
     }
 
     const close = () => {
-      v.mods = cloneDeep(initMods)
+      // v.mods = cloneDeep(initMods)
       emit('close')
     }
 
@@ -44,15 +49,25 @@ export default {
     // const auth = inject(AuthStore)
 
     /* Template Data */
-    const initMods = []
+    // const initMods = []
 
     const v = reactive({
       boardName: props.boardName,
-      mods: cloneDeep(initMods),
-      focusInput: null
+      focusInput: null,
+      multi: {
+        mode: 'multiple',
+        value: ['robin'],
+        options: {
+          batman: 'Batman',
+          robin: 'Robin',
+          joker: 'Joker'
+        }
+      }
     })
 
     return { ...toRefs(v), setModerators, close }
   }
 }
 </script>
+
+<style src="@vueform/multiselect/themes/default.css"></style>
