@@ -214,7 +214,7 @@
     </div>
     <pagination v-if="threadData.data" :page="threadData.data.page" :limit="threadData.data.limit" :count="threadData.data.board.thread_count"></pagination>
   </div>
-  <set-moderators-modal v-if="threadData && threadData.data" :board-name="threadData.data.board.name" :show="showSetModerators" @close="showSetModerators = false"></set-moderators-modal>
+  <set-moderators-modal v-if="threadData.data?.board" :board="threadData.data.board" :show="showSetModerators" @close="showSetModerators = false"></set-moderators-modal>
 </template>
 
 <script>

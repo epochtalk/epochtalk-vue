@@ -3,6 +3,7 @@
     <template v-slot:header>Set Moderators for {{boardName}}</template>
 
     <template v-slot:body>
+      {{moderators}}
       <form action="." class="css-form">
         <div class="input-section">
           <label for="mods-to-add">Moderators</label>
@@ -27,7 +28,7 @@ import Multiselect from '@vueform/multiselect'
 
 export default {
   name: 'set-moderators-modal',
-  props: ['show', 'boardName'],
+  props: ['show', 'board'],
   emits: ['close'],
   components: { Modal, Multiselect },
   setup(props, { emit }) {
@@ -50,7 +51,8 @@ export default {
     // const initMods = []
 
     const v = reactive({
-      boardName: props.boardName,
+      boardName: props.board.name,
+      moderators: props.board.moderators,
       modTagsInput: {
         mode: 'tags',
         value: [],
@@ -60,6 +62,7 @@ export default {
         resolveOnLoad: false,
         delay: 0,
         searchable: true,
+        maxHeight: 100,
         options: async q => {
           return await $axios.get('/api/users/search?username=' + q)
           .then(res => res.status === 200 ? res.data : res)
