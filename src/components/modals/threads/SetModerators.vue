@@ -54,7 +54,8 @@ export default {
       modTagsInput: {
         mode: 'tags',
         value: [],
-        placeholder: 'Choose your stack',
+        placeholder: 'Type username of moderator(s) to add',
+        noOptionsText: 'Enter a username to start lookup',
         minChars: 1,
         resolveOnLoad: false,
         delay: 0,
