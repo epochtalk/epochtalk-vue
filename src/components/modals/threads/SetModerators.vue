@@ -1,16 +1,13 @@
 <template>
-  <modal :name="$options.name" :show="show" @close="close()" :focusInput="focusInput">
+  <modal :name="$options.name" :show="show" @close="close()">
     <template v-slot:header>Set Moderators for {{boardName}}</template>
 
     <template v-slot:body>
       <form action="." class="css-form">
         <div class="input-section">
           <label for="mods-to-add">Moderators</label>
-          <Multiselect
-            v-model="multi.value"
-            v-bind="multi"
-          ></Multiselect>
-
+          <br>
+          <Multiselect v-model="modTagsInput.value" v-bind="modTagsInput" />
         </div>
         <br><br>
         <button class="fill" @click.prevent="setModerators()" type="submit" :disabled="false">
@@ -24,7 +21,7 @@
 <script>
 import Modal from '@/components/layout/Modal.vue'
 // import { cloneDeep } from 'lodash'
-import { reactive, toRefs } from 'vue'
+import { reactive, toRefs, inject } from 'vue'
 // import { AuthStore } from '@/composables/stores/auth'
 import Multiselect from '@vueform/multiselect'
 
@@ -47,20 +44,25 @@ export default {
 
     /* Internal Data */
     // const auth = inject(AuthStore)
+    const $axios = inject('$axios')
 
     /* Template Data */
     // const initMods = []
 
     const v = reactive({
       boardName: props.boardName,
-      focusInput: null,
-      multi: {
-        mode: 'multiple',
-        value: ['robin'],
-        options: {
-          batman: 'Batman',
-          robin: 'Robin',
-          joker: 'Joker'
+      modTagsInput: {
+        mode: 'tags',
+        value: [],
+        placeholder: 'Choose your stack',
+        minChars: 1,
+        resolveOnLoad: false,
+        delay: 0,
+        searchable: true,
+        options: async q => {
+          return await $axios.get('/api/users/search?username=' + q)
+          .then(res => res.status === 200 ? res.data : res)
+          .then(d => d.reduce((o, k) => (o[k] = k, o), {}))
         }
       }
     })
