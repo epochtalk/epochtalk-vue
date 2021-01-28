@@ -77,3 +77,8 @@ export default {
 </script>
 
 <style src="@vueform/multiselect/themes/default.css"></style>
+<style lang="scss">
+.multiselect-tag { background: $color-primary; }
+.multiselect-tag i:before { color: $color-primary-alt; }
+.multiselect-options { overflow-x: hidden; }
+</style>
