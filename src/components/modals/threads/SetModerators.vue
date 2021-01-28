@@ -3,14 +3,17 @@
     <template v-slot:header>Set Moderators for {{boardName}}</template>
 
     <template v-slot:body>
-      {{moderators}}
       <form action="." class="css-form">
-        <div class="input-section">
-          <label for="mods-to-add">Moderators</label>
-          <br>
-          <Multiselect v-model="modTagsInput.value" v-bind="modTagsInput" />
+        <label>Current Moderators of {{boardName}} </label>
+        <div v-for="mod in moderators" :key="mod.id" class="multiselect-tag mod-tags">
+          {{mod.username}} <i></i>
         </div>
-        <br><br>
+        <label>Moderators to Add</label>
+        <Multiselect v-model="modTagsInput.value" v-bind="modTagsInput" />
+        <br>
+        <label>
+          <strong>Note:</strong> Moderator changes will take affect upon clicking save changes.
+        </label>
         <button class="fill" @click.prevent="setModerators()" type="submit" :disabled="false">
           Set Moderators
         </button>
@@ -66,6 +69,9 @@ export default {
         options: async q => {
           return await $axios.get('/api/users/search?username=' + q)
           .then(res => res.status === 200 ? res.data : res)
+          // filter out existing mods
+          .then(d => d.filter(u => !v.moderators.find(o => o.username === u)))
+          // convert array into array of objects
           .then(d => d.reduce((o, k) => (o[k] = k, o), {}))
         }
       }
@@ -78,6 +84,13 @@ export default {
 
 <style src="@vueform/multiselect/themes/default.css"></style>
 <style lang="scss">
+.mod-tags {
+  display: inline-flex;
+  &.multiselect-tag {
+    background: #2299DD;
+    i:before { color: $base-background-color; }
+  }
+}
 .multiselect-tag { background: $color-primary; }
 .multiselect-tag i:before { color: $color-primary-alt; }
 .multiselect-options { overflow-x: hidden; }
