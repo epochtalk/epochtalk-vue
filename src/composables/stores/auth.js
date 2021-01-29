@@ -1,6 +1,6 @@
 import { provide, computed, inject, reactive, readonly } from 'vue'
 import { cloneDeep } from 'lodash'
-import { auth } from '@/api/others'
+import { auth } from '@/api/index'
 import { PreferencesStore } from '@/composables/stores/prefs'
 
 const AUTH_KEY = 'auth'
