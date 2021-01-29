@@ -92,7 +92,6 @@ import RecentThreads from '@/components/threads/RecentThreads.vue'
 import LoginModal from '@/components/modals/auth/Login.vue'
 import RegisterModal from '@/components/modals/auth/Register.vue'
 import { inject, reactive, toRefs, watch } from 'vue'
-import { Api } from '@/api'
 import { boards } from '@/api/others'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
@@ -143,7 +142,7 @@ export default {
     }
 
     /* Internal Data */
-    const $api = inject(Api)
+    const $http = inject('$http')
     const $swrvCache = inject('$swrvCache')
     const $alertStore = inject('$alertStore')
     const auth = inject(AuthStore)
@@ -158,7 +157,7 @@ export default {
       showRegister: false,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
-      boardData: boards.getBoards($api, { cache: $swrvCache, dedupingInterval: 750 }, processBoards)
+      boardData: boards.getBoards($http, { cache: $swrvCache, dedupingInterval: 750 }, processBoards)
     })
 
     /* Watch Data */

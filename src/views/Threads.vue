@@ -224,7 +224,6 @@ import humanDate from '@/composables/filters/humanDate'
 import decode from '@/composables/filters/decode'
 import truncate from '@/composables/filters/truncate'
 import { inject, reactive, computed, watch, toRefs } from 'vue'
-import { Api } from '@/api'
 import { threads } from '@/api/others'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
@@ -248,7 +247,7 @@ export default {
             desc: $route.query.desc
           }
         }
-        return threads.byBoard($api, opts)
+        return threads.byBoard($http, opts)
         .then(data => {
           // filter out ignored child boards
           data.board.children = filterIgnoredBoards(data.board.children, v.prefs.ignored_boards)
@@ -301,7 +300,7 @@ export default {
     }
 
     /* Internal Data */
-    const $api = inject(Api)
+    const $http = inject('$http')
     const $swrvCache = inject('$swrvCache')
     const $route = useRoute()
     const $router = useRouter()
