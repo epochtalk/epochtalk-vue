@@ -1,12 +1,12 @@
 <template>
   <modal :name="$options.name" :show="show" @close="close()">
-    <template v-slot:header>Set Moderators for {{boardName}}</template>
+    <template v-slot:header>Manage Moderators of {{boardName}}</template>
 
     <template v-slot:body>
       <form action="." class="css-form">
         <label>Current Moderators of {{boardName}} </label>
         <div v-for="mod in moderators" :key="mod.id" class="multiselect-tag mod-tags">
-          {{mod.username}} <i></i>
+          {{mod.username}} <i @click.prevent="removeModerator(mod.username)"></i>
         </div>
         <label>Moderators to Add</label>
         <Multiselect v-model="modTagsInput.value" v-bind="modTagsInput" />
@@ -24,7 +24,7 @@
 
 <script>
 import Modal from '@/components/layout/Modal.vue'
-// import { cloneDeep } from 'lodash'
+import { cloneDeep } from 'lodash'
 import { reactive, toRefs, inject } from 'vue'
 // import { AuthStore } from '@/composables/stores/auth'
 import Multiselect from '@vueform/multiselect'
@@ -37,18 +37,30 @@ export default {
   setup(props, { emit }) {
     /* Template Methods */
     const setModerators = () => {
-      console.log('Set Moderators!')
+      console.log('Set Moderators!', originalModList, v.modTagsInput.value, v.modsToRemove)
+
+      // Compare against original mod list, if net add/remove of mods is same just alert success
+
+      // Call API to remove mods on v.modsToRemove
+
+      // Call API to add mods on v.modsTagsInput.value
       close()
     }
 
+    const removeModerator = username => {
+      const oldLen = v.moderators.length
+      v.moderators = v.moderators.filter(u => u.username !== username)
+      if (v.moderators.length < oldLen) v.modsToRemove.push(username)
+    }
+
     const close = () => {
-      // v.mods = cloneDeep(initMods)
       emit('close')
     }
 
     /* Internal Data */
     // const auth = inject(AuthStore)
     const $axios = inject('$axios')
+    const originalModList = cloneDeep(props.board.moderators)
 
     /* Template Data */
     // const initMods = []
@@ -56,6 +68,7 @@ export default {
     const v = reactive({
       boardName: props.board.name,
       moderators: props.board.moderators,
+      modsToRemove: [],
       modTagsInput: {
         mode: 'tags',
         value: [],
@@ -67,6 +80,7 @@ export default {
         searchable: true,
         maxHeight: 100,
         options: async q => {
+          // TODO(akinsey): extract to api file
           return await $axios.get('/api/users/search?username=' + q)
           .then(res => res.status === 200 ? res.data : res)
           // filter out existing mods
@@ -77,7 +91,7 @@ export default {
       }
     })
 
-    return { ...toRefs(v), setModerators, close }
+    return { ...toRefs(v), setModerators, removeModerator, close }
   }
 }
 </script>
