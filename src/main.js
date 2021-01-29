@@ -4,6 +4,7 @@ import router from '@/router'
 import axios from 'axios'
 import localStorageCache from '@/composables/utils/localStorageCache'
 import alertStore from '@/composables/stores/alert'
+import { Http } from '@/composables/utils/http'
 
 const app = createApp(App).use(router)
 
@@ -16,6 +17,9 @@ app.provide('$swrvCache', localStorageCache(0, 'swrv'))
 
 /* Provide Alert Store */
 app.provide('$alertStore', alertStore)
+
+/* Provide Http */
+app.provide('$http', Http)
 
 /* Setup and Provide Axios */
 const $axios = axios.create({
