@@ -1,15 +1,15 @@
 import { provide, inject } from 'vue'
 import { get } from 'lodash'
 
-const API_KEY = 'api'
+const HTTP_KEY = 'http'
 
-export const Api = Symbol(API_KEY)
+export const Http = Symbol(HTTP_KEY)
 
 export default {
-  name: 'Api',
+  name: 'Http',
   setup() {
     /* provided methods */
-    const api = (path, opts, handleErrors) => {
+    const http = (path, opts, handleErrors) => {
 
       opts = opts || {}
       const method = (opts.method || 'get').toLowerCase()
@@ -43,8 +43,8 @@ export default {
     const $axios = inject('$axios')
     const $alertStore = inject('$alertStore')
 
-    /* Provide API request util */
-    return provide(Api, api)
+    /* Provide HTTP request util */
+    return provide(Http, http)
   },
   render() { return this.$slots.default() } // renderless component
 }
