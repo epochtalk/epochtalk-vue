@@ -40,16 +40,9 @@ export default {
       const modsToAdd = v.modTagsInput.value
       const modsToRemove = v.modsToRemove
       const mods = props.board.moderators
-      console.log('Set Moderators!', mods, modsToAdd, modsToRemove)
-
-      // Compare against original mod list, if net add/remove of mods is same just alert success
-
-      // Call API to remove mods on v.modsToRemove
-
-      // Call API to add mods on v.modsTagsInput.value
 
       // figure out which are duplicates
-      let inter = intersection(modsToAdd, modsToRemove)
+      const inter = intersection(modsToAdd, modsToRemove)
       inter.forEach(interName => {
         remove(modsToAdd, name => name === interName)
         remove(modsToRemove, name => name === interName)
@@ -58,25 +51,26 @@ export default {
       // build save params
       let addParams = { usernames: modsToAdd, board_id: props.board.id };
       let removeParams = { usernames: modsToRemove, board_id: props.board.id };
-
       // remove moderators if needed
       return new Promise(resolve => {
-        if (!modsToRemove.length) return resolve()
-
+        if (!modsToRemove.length) {
+          return resolve()
+        }
         let promise = $axios.post('/api/admin/moderators/remove', removeParams)
         .then(res => res.status === 200 ? res.data : res)
         .then(users => {
           users.forEach(user => {
-            console.log(remove(mods, mod => mod.username === user.username))
+            remove(mods, mod => mod.username === user.username)
           })
         })
+        //   .then(function(users) { return ctrl.checkPermissions(users); })
+        //   .then(function(bpUsers) { ctrl.usersWithBadPermissions = bpUsers; });
 
         return resolve(promise);
       })
       // add moderators if needed
       .then(() => {
         if (!modsToAdd.length) return
-
         return $axios.post('/api/admin/moderators', addParams)
         .then(res => res.status === 200 ? res.data : res)
         .then(users => {
@@ -84,9 +78,12 @@ export default {
           return users
         })
       })
+      .then(() => { v.moderators = mods })
       .then(function() { $alertStore.success('Moderators successfully updated'); })
       .catch(function() { $alertStore.error('There was an error updating moderators'); })
       .finally(() => {
+        //   if (!ctrl.usersWithBadPermissions.length) { ctrl.closeModerators(); }
+        v.modTagsInput.value = []
         close()
       })
       // Moderators.add(addParams).$promise
