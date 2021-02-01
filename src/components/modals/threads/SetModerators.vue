@@ -5,6 +5,7 @@
     <template v-slot:body>
       <form action="." class="css-form">
         <label>Current Moderators of {{boardName}} </label>
+        <div v-if="!moderators?.length" class="no-mods">There are currently no moderators assigned to this board</div>
         <div v-for="mod in moderators" :key="mod.id" class="multiselect-tag mod-tags">
           {{mod.username}} <i @click.prevent="removeModerator(mod.username)"></i>
         </div>
@@ -15,7 +16,7 @@
           <strong>Note:</strong> Moderator changes will take affect upon clicking save changes.
         </label>
         <button class="fill" @click.prevent="setModerators()" type="submit" :disabled="false">
-          Set Moderators
+          Save Changes
         </button>
       </form>
     </template>
@@ -24,7 +25,7 @@
 
 <script>
 import Modal from '@/components/layout/Modal.vue'
-import { intersection, remove } from 'lodash'
+import { cloneDeep, intersection, remove } from 'lodash'
 import { reactive, toRefs, inject } from 'vue'
 // import { AuthStore } from '@/composables/stores/auth'
 import Multiselect from '@vueform/multiselect'
@@ -78,12 +79,13 @@ export default {
           return users
         })
       })
-      .then(() => { v.moderators = mods })
+      .then(() => { v.moderators = cloneDeep(mods) })
       .then(function() { $alertStore.success('Moderators successfully updated'); })
-      .catch(function() { $alertStore.error('There was an error updating moderators'); })
+      .catch(function(e) { console.log(e); $alertStore.error('There was an error updating moderators'); })
       .finally(() => {
         //   if (!ctrl.usersWithBadPermissions.length) { ctrl.closeModerators(); }
         v.modTagsInput.value = []
+        v.modsToRemove = []
         close()
       })
       // Moderators.add(addParams).$promise
@@ -131,7 +133,7 @@ export default {
         mode: 'tags',
         value: [],
         placeholder: 'Type username of moderator(s) to add',
-        noOptionsText: 'Enter a username to start lookup',
+        noOptionsText: 'Enter a username to start lookup...',
         minChars: 1,
         resolveOnLoad: false,
         delay: 0,
@@ -156,6 +158,7 @@ export default {
 
 <style src="@vueform/multiselect/themes/default.css"></style>
 <style lang="scss">
+.no-mods { margin-bottom: .45rem; }
 .mod-tags {
   display: inline-flex;
   &.multiselect-tag {

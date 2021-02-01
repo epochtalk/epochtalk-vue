@@ -251,6 +251,9 @@ export default {
         }
         return $api.threads.byBoard(opts)
         .then(data => {
+          // always supply moderators array so property remains reactive even when passed to children
+          data.board.moderators = data.board.moderators || []
+
           // filter out ignored child boards
           data.board.children = filterIgnoredBoards(data.board.children, v.prefs.ignored_boards)
 
