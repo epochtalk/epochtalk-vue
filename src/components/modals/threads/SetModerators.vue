@@ -25,7 +25,7 @@
 
 <script>
 import Modal from '@/components/layout/Modal.vue'
-import { cloneDeep, intersection, remove } from 'lodash'
+import { cloneDeep, intersection, remove, filter, get, some } from 'lodash'
 import { reactive, toRefs, inject } from 'vue'
 // import { AuthStore } from '@/composables/stores/auth'
 import Multiselect from '@vueform/multiselect'
@@ -36,6 +36,40 @@ export default {
   emits: ['close'],
   components: { Modal, Multiselect },
   setup(props, { emit }) {
+    /* Internal Methods */
+    const checkPermissions = mods => {
+      // check that the user has at least one of these permissions set
+      const modPermissions = [
+        'boards.update.allow',
+        'posts.update.bypass',
+        'posts.delete.bypass',
+        'posts.purge.bypass',
+        'posts.find.bypass',
+        'posts.create.bypass',
+        'threads.title.bypass',
+        'threads.createPoll.bypass.owner.admin',
+        'threads.editPoll.bypass.owner.admin',
+        'threads.lockPoll.bypass.owner.admin',
+        'threads.lock.bypass.owner.admin',
+        'threads.move.bypass.owner.admin',
+        'threads.purge.bypass.owner.admin',
+        'threads.sticky.bypass.owner.admin',
+        'threads.title.bypass.owner.admin'
+      ]
+       console.log(mods)
+      return filter(mods.map(mod => {
+        console.log(mod)
+        let hasSomeModePrivileges = some(mod.roles.map(role => {
+          let hasModPermission = false;
+          modPermissions.forEach(perm => {
+            if (get(role.base_permissions, perm) || get(role.custom_permissions, perm)) { hasModPermission = true }
+          })
+          return hasModPermission
+        }))
+        return hasSomeModePrivileges ? undefined : mod.username
+      }), undefined)
+    }
+
     /* Template Methods */
     const setModerators = () => {
       const modsToAdd = v.modTagsInput.value
@@ -54,20 +88,14 @@ export default {
       let removeParams = { usernames: modsToRemove, board_id: props.board.id };
       // remove moderators if needed
       return new Promise(resolve => {
-        if (!modsToRemove.length) {
-          return resolve()
-        }
+        if (!modsToRemove.length) return resolve()
         let promise = $axios.post('/api/admin/moderators/remove', removeParams)
         .then(res => res.status === 200 ? res.data : res)
         .then(users => {
-          users.forEach(user => {
-            remove(mods, mod => mod.username === user.username)
-          })
+          users.forEach(u => remove(mods, mod => mod.username === u.username))
+          return users
         })
-        //   .then(function(users) { return ctrl.checkPermissions(users); })
-        //   .then(function(bpUsers) { ctrl.usersWithBadPermissions = bpUsers; });
-
-        return resolve(promise);
+        return resolve(promise)
       })
       // add moderators if needed
       .then(() => {
@@ -78,32 +106,13 @@ export default {
           users.forEach(user => mods.push({ username: user.username, id: user.id }))
           return users
         })
+        .then(users => checkPermissions(users))
+        .then(bpUsers => v.modsWithBadPermissions = bpUsers)
       })
-      .then(() => { v.moderators = cloneDeep(mods) })
-      .then(function() { $alertStore.success('Moderators successfully updated'); })
-      .catch(function(e) { console.log(e); $alertStore.error('There was an error updating moderators'); })
-      .finally(() => {
-        //   if (!ctrl.usersWithBadPermissions.length) { ctrl.closeModerators(); }
-        v.modTagsInput.value = []
-        v.modsToRemove = []
-        close()
-      })
-      // Moderators.add(addParams).$promise
-      //   .then(function(users) {
-      //     users.forEach(function(user) {
-      //       ctrl.board.moderators.push({ username: user.username, id: user.id });
-      //     });
-      //     return users;
-      //   })
-      //   .then(function(users) { return ctrl.checkPermissions(users); })
-      //   .then(function(bpUsers) { ctrl.usersWithBadPermissions = bpUsers; });
-      // })
-      // .then(function() { ctrl.mods = angular.copy(ctrl.board.moderators); })
-      // .then(function() { Alert.success('Moderators successfully updated'); })
-      // .catch(function() { Alert.error('There was an error updating moderators'); })
-      // .finally(function() {
-      //   if (!ctrl.usersWithBadPermissions.length) { ctrl.closeModerators(); }
-      // });
+      .then(() => v.moderators = cloneDeep(mods))
+      .then(() => $alertStore.success('Moderators successfully updated'))
+      .catch(() => $alertStore.error('There was an error updating moderators'))
+      .finally(() => { if (!v.modsWithBadPermissions.length) close() })
     }
 
     const removeModerator = username => {
@@ -114,6 +123,9 @@ export default {
 
     const close = () => {
       emit('close')
+      v.modTagsInput.value = []
+      v.modsToRemove = []
+      v.modsWithBadPermissions = []
     }
 
     /* Internal Data */
@@ -129,6 +141,7 @@ export default {
       boardName: props.board.name,
       moderators: props.board.moderators,
       modsToRemove: [],
+      modsWithBadPermissions: [],
       modTagsInput: {
         mode: 'tags',
         value: [],
