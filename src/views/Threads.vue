@@ -250,7 +250,7 @@ export default {
             desc: $route.query.desc
           }
         }
-        return threads.byBoard($http, opts)
+        return threads.byBoardApi($http, opts)
         .then(data => {
           // always supply moderators array so property remains reactive even when passed to children
           data.board.moderators = data.board.moderators || []
