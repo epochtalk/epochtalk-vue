@@ -40,7 +40,7 @@ export const users = {
   }
 }
 
-export const apiBreadcrumbs = {
+export const breadcrumbsApi = {
   find: (http, id, type) => {
     return http(`/api/breadcrumbs?id=${id}&type=${type}`)
   }
