@@ -38,7 +38,7 @@ import { cloneDeep, intersection, remove, filter, get, some } from 'lodash'
 import { reactive, toRefs, inject } from 'vue'
 // import { AuthStore } from '@/composables/stores/auth'
 import Multiselect from '@vueform/multiselect'
-import { adminApi, users } from '@/api/index'
+import { adminApi, usersApi } from '@/api/index'
 import { Http } from '@/composables/utils/http'
 
 export default {
@@ -162,7 +162,7 @@ export default {
         searchable: true,
         maxHeight: 100,
         options: async q => {
-          return await users.searchApi($http, q)
+          return await usersApi.search($http, q)
           .then(res => res.status === 200 ? res.data : res)
           // filter out existing mods
           .then(d => d.filter(u => !v.moderators.find(o => o.username === u)))

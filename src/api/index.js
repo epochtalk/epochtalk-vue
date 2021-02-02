@@ -28,14 +28,14 @@ export const authApi = {
   usernameAvailable: (http, val) => { return http(`/api/register/username/${val}`) }
 }
 
-export const users = {
-  searchApi: (http, username) => {
+export const usersApi = {
+  search: (http, username) => {
     return http(`/api/users/search?username=${username}`)
   },
-  updateApi: (http, userId, opts) => {
+  update: (http, userId, opts) => {
     return http(`/api/users/${userId}`, opts)
   },
-  preferencesApi: (http) => {
+  preferences: (http) => {
     return http('/api/users/preferences')
   }
 }
