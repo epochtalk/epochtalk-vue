@@ -42,11 +42,3 @@ export const apiBreadcrumbs = {
     return http(`/api/breadcrumbs?id=${id}&type=${type}`)
   }
 }
-
-// {
-//   boards,
-//   breadcrumbs,
-//   threads,
-//   auth,
-//   users
-// }
