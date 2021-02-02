@@ -29,13 +29,13 @@ export const auth = {
 }
 
 export const users = {
-  search: (http, username) => {
+  searchApi: (http, username) => {
     return http(`/api/users/search?username=${username}`)
   },
-  update: (http, userId, opts) => {
+  updateApi: (http, userId, opts) => {
     return http(`/api/users/${userId}`, opts)
   },
-  preferences: (http) => {
+  preferencesApi: (http) => {
     return http('/api/users/preferences')
   }
 }

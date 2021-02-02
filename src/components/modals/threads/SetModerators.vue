@@ -162,7 +162,7 @@ export default {
         searchable: true,
         maxHeight: 100,
         options: async q => {
-          return await users.search($http, q)
+          return await users.searchApi($http, q)
           .then(res => res.status === 200 ? res.data : res)
           // filter out existing mods
           .then(d => d.filter(u => !v.moderators.find(o => o.username === u)))

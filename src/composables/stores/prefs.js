@@ -29,7 +29,7 @@ export default {
 
     /* Provided Methods */
     const fetch = () => {
-      users.preferences($http)
+      users.preferencesApi($http)
       .then(dbPrefs => {
         $appCache.set(PREFS_KEY, dbPrefs)
         Object.assign(prefs, dbPrefs)
@@ -60,7 +60,7 @@ export default {
             ...updatedPrefs
           }
         }
-        users.update($http, user.id, opts)
+        users.updateApi($http, user.id, opts)
         .then(() => $appCache.set(PREFS_KEY, updatedPrefs))
       }
       else { $appCache.set(PREFS_KEY, updatedPrefs) } // user not logged in, only update cache
