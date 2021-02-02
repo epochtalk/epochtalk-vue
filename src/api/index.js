@@ -46,7 +46,7 @@ export const breadcrumbsApi = {
   }
 }
 
-export const admin = {
+export const adminApi = {
   moderators: {
     remove: (http, opts) => {
       return http('/api/admin/moderators/remove', opts)
