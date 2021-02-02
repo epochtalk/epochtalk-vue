@@ -1,11 +1,11 @@
 import useSWRV from 'swrv'
 
 export const boards = {
-  slugToBoardId: (api, slug) => {
-    return api(`/api/boards/${slug}/id`)
+  slugToBoardId: (http, slug) => {
+    return http(`/api/boards/${slug}/id`)
   },
-  getBoards: (api, config, processBoardsCallback) => {
-    let result = api('/api/boards')
+  getBoards: (http, config, processBoardsCallback) => {
+    let result = http('/api/boards')
     // use processor if available
     if (processBoardsCallback) {
       result = result.then(processBoardsCallback)
@@ -15,31 +15,31 @@ export const boards = {
 }
 
 export const threads = {
-  byBoard: (api, opts) => {
-    return api('/api/threads', opts)
+  byBoard: (http, opts) => {
+    return http('/api/threads', opts)
   }
 }
 
 export const auth = {
-  login: (api, opts, handleErrors) => { return api('/api/login', opts, handleErrors) },
-  logout: (api, opts, handleErrors) => { return api('/api/logout', opts, handleErrors) },
-  register: (api, opts, handleErrors) => { return api('/api/register', opts, handleErrors) },
-  emailAvailable: (api, val) => { return api(`/api/register/email/${val}`) },
-  usernameAvailable: (api, val) => { return api(`/api/register/username/${val}`) }
+  login: (http, opts, handleErrors) => { return http('/api/login', opts, handleErrors) },
+  logout: (http, opts, handleErrors) => { return http('/api/logout', opts, handleErrors) },
+  register: (http, opts, handleErrors) => { return http('/api/register', opts, handleErrors) },
+  emailAvailable: (http, val) => { return http(`/api/register/email/${val}`) },
+  usernameAvailable: (http, val) => { return http(`/api/register/username/${val}`) }
 }
 
 export const users = {
-  update: (api, userId, opts) => {
-    return api(`/api/users/${userId}`, opts)
+  update: (http, userId, opts) => {
+    return http(`/api/users/${userId}`, opts)
   },
-  preferences: (api) => {
-    return api('/api/users/preferences')
+  preferences: (http) => {
+    return http('/api/users/preferences')
   }
 }
 
 export const apiBreadcrumbs = {
-  find: (api, id, type) => {
-    return api(`/api/breadcrumbs?id=${id}&type=${type}`)
+  find: (http, id, type) => {
+    return http(`/api/breadcrumbs?id=${id}&type=${type}`)
   }
 }
 
