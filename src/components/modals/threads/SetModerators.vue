@@ -38,6 +38,8 @@ import { cloneDeep, intersection, remove, filter, get, some } from 'lodash'
 import { reactive, toRefs, inject } from 'vue'
 // import { AuthStore } from '@/composables/stores/auth'
 import Multiselect from '@vueform/multiselect'
+import { admin, users } from '@/api/index'
+import { Http } from '@/composables/utils/http'
 
 export default {
   name: 'set-moderators-modal',
@@ -96,7 +98,7 @@ export default {
       // remove moderators if needed
       return new Promise(resolve => {
         if (!modsToRemove.length) return resolve()
-        let promise = $axios.post('/api/admin/moderators/remove', removeParams)
+        let promise = admin.moderators.remove($http, removeParams)
         .then(res => res.status === 200 ? res.data : res)
         .then(users => {
           users.forEach(u => remove(mods, mod => mod.username === u.username))
@@ -107,7 +109,7 @@ export default {
       // add moderators if needed
       .then(() => {
         if (!modsToAdd.length) return
-        return $axios.post('/api/admin/moderators', addParams)
+        return admin.moderators.add($http, addParams)
         .then(res => res.status === 200 ? res.data : res)
         .then(users => {
           users.forEach(user => mods.push({ username: user.username, id: user.id }))
@@ -137,7 +139,7 @@ export default {
 
     /* Internal Data */
     // const auth = inject(AuthStore)
-    const $axios = inject('$axios')
+    const $http = inject(Http)
     const $alertStore = inject('$alertStore')
     // const originalModList = cloneDeep(props.board.moderators)
 
@@ -160,8 +162,7 @@ export default {
         searchable: true,
         maxHeight: 100,
         options: async q => {
-          // TODO(akinsey): extract to api file
-          return await $axios.get('/api/users/search?username=' + q)
+          return await users.search($http, q)
           .then(res => res.status === 200 ? res.data : res)
           // filter out existing mods
           .then(d => d.filter(u => !v.moderators.find(o => o.username === u)))

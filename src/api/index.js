@@ -29,6 +29,9 @@ export const auth = {
 }
 
 export const users = {
+  search: (http, username) => {
+    return http(`/api/users/search?username=${username}`)
+  },
   update: (http, userId, opts) => {
     return http(`/api/users/${userId}`, opts)
   },
@@ -40,5 +43,16 @@ export const users = {
 export const apiBreadcrumbs = {
   find: (http, id, type) => {
     return http(`/api/breadcrumbs?id=${id}&type=${type}`)
+  }
+}
+
+export const admin = {
+  moderators: {
+    remove: (http, opts) => {
+      return http('/api/admin/moderators/remove', opts)
+    },
+    add: (http, opts) => {
+      return http('/api/admin/moderators', opts)
+    }
   }
 }
