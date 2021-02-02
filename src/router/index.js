@@ -21,7 +21,7 @@ const routes = [
     component: Threads,
     props: route => ({
       boardSlug: route.params.boardSlug,
-      boardId: boards.slugToBoardId(inject(Http), route.params.boardSlug).then(b => b.id)
+      boardId: boards.slugToBoardIdApi(inject(Http), route.params.boardSlug).then(b => b.id)
     }),
     meta: { requiresAuth: false, bodyClass: 'threads' }
   },

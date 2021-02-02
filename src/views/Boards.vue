@@ -158,7 +158,7 @@ export default {
       showRegister: false,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
-      boardData: boards.getBoards($http, { cache: $swrvCache, dedupingInterval: 750 }, processBoards)
+      boardData: boards.getBoardsApi($http, { cache: $swrvCache, dedupingInterval: 750 }, processBoards)
     })
 
     /* Watch Data */
