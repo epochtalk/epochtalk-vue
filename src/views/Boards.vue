@@ -92,7 +92,7 @@ import RecentThreads from '@/components/threads/RecentThreads.vue'
 import LoginModal from '@/components/modals/auth/Login.vue'
 import RegisterModal from '@/components/modals/auth/Register.vue'
 import { inject, reactive, toRefs, watch } from 'vue'
-import { boards } from '@/api/index'
+import { boardsApi } from '@/api/index'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
 import { Http } from '@/composables/utils/http'
@@ -158,7 +158,7 @@ export default {
       showRegister: false,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
-      boardData: boards.getBoardsApi($http, { cache: $swrvCache, dedupingInterval: 750 }, processBoards)
+      boardData: boardsApi.getBoards($http, { cache: $swrvCache, dedupingInterval: 750 }, processBoards)
     })
 
     /* Watch Data */

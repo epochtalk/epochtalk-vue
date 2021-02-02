@@ -1,6 +1,6 @@
 import { createWebHistory, createRouter } from 'vue-router'
 import { inject } from 'vue'
-import { boards } from '@/api/index'
+import { boardsApi } from '@/api/index'
 import { Http } from '@/composables/utils/http'
 import Boards from '@/views/Boards.vue'
 import Threads from '@/views/Threads.vue'
@@ -21,7 +21,7 @@ const routes = [
     component: Threads,
     props: route => ({
       boardSlug: route.params.boardSlug,
-      boardId: boards.slugToBoardIdApi(inject(Http), route.params.boardSlug).then(b => b.id)
+      boardId: boardsApi.slugToBoardId(inject(Http), route.params.boardSlug).then(b => b.id)
     }),
     meta: { requiresAuth: false, bodyClass: 'threads' }
   },

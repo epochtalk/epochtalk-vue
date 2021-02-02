@@ -1,10 +1,10 @@
 import useSWRV from 'swrv'
 
-export const boards = {
-  slugToBoardIdApi: (http, slug) => {
+export const boardsApi = {
+  slugToBoardId: (http, slug) => {
     return http(`/api/boards/${slug}/id`)
   },
-  getBoardsApi: (http, config, processBoardsCallback) => {
+  getBoards: (http, config, processBoardsCallback) => {
     let result = http('/api/boards')
     // use processor if available
     if (processBoardsCallback) {
