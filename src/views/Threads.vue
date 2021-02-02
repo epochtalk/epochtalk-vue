@@ -226,7 +226,7 @@ import humanDate from '@/composables/filters/humanDate'
 import decode from '@/composables/filters/decode'
 import truncate from '@/composables/filters/truncate'
 import { inject, reactive, computed, watch, toRefs } from 'vue'
-import { threads } from '@/api/index'
+import { threadsApi } from '@/api/index'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
 import { Http } from '@/composables/utils/http'
@@ -250,7 +250,7 @@ export default {
             desc: $route.query.desc
           }
         }
-        return threads.byBoardApi($http, opts)
+        return threadsApi.byBoard($http, opts)
         .then(data => {
           // always supply moderators array so property remains reactive even when passed to children
           data.board.moderators = data.board.moderators || []

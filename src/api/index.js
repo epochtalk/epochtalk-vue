@@ -14,8 +14,8 @@ export const boardsApi = {
   }
 }
 
-export const threads = {
-  byBoardApi: (http, opts) => {
+export const threadsApi = {
+  byBoard: (http, opts) => {
     return http('/api/threads', opts)
   }
 }
