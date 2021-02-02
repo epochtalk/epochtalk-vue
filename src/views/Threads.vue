@@ -212,14 +212,16 @@
         <i class="icon-epoch-watch"></i>Set Moderators
       </a>
     </div>
-    <pagination></pagination>
+    <pagination v-if="threadData.data" :page="threadData.data.page" :limit="threadData.data.limit" :count="threadData.data.board.thread_count"></pagination>
   </div>
+  <set-moderators-modal v-if="threadData.data?.board" :board="threadData.data.board" :show="showSetModerators" @close="showSetModerators = false"></set-moderators-modal>
 </template>
 
 <script>
 import useSWRV from 'swrv'
 import { useRoute, useRouter } from 'vue-router'
 import Pagination from '@/components/layout/Pagination.vue'
+import SetModeratorsModal from '@/components/modals/threads/SetModerators.vue'
 import humanDate from '@/composables/filters/humanDate'
 import decode from '@/composables/filters/decode'
 import truncate from '@/composables/filters/truncate'
@@ -233,7 +235,7 @@ import { countTotals, getLastPost, filterIgnoredBoards } from '@/composables/uti
 export default {
   name: 'Threads',
   props: ['boardSlug', 'boardId'],
-  components: { Pagination },
+  components: { Pagination, SetModeratorsModal },
   setup(props) {
     /* Internal Methods */
     const processThreads = () => {
@@ -250,6 +252,9 @@ export default {
         }
         return threads.byBoard($http, opts)
         .then(data => {
+          // always supply moderators array so property remains reactive even when passed to children
+          data.board.moderators = data.board.moderators || []
+
           // filter out ignored child boards
           data.board.children = filterIgnoredBoards(data.board.children, v.prefs.ignored_boards)
 
@@ -282,9 +287,10 @@ export default {
       if (defaultField || newField === $route.query.field) desc = !desc
       else desc = true // Sort field changed, default to desc true
       // Update router to have new query params, watch on query params will update data
-      let query = { field: newField }
-      if (!desc) query.desc = false  // only display desc in query string when false
+      let query = { field: newField, page: $route.query.page }
+      if (!query.page) delete query.page // don't include page if undefined
       if (newField === 'updated_at') delete query.field // do not display default field in qs
+      if (!desc) query.desc = false  // only display desc in query string when false
       const params = { ...$route.params, saveScrollPos: true } // save scroll pos when sorting table
       $router.replace({ name: $route.name, params: params, query: query })
     }
@@ -315,13 +321,13 @@ export default {
         let queryStr = params.toString()
         let urlPath = queryStr ? `${props.boardSlug}?${queryStr}` : `${props.boardSlug}`
         return `/boards/${urlPath}`
-      }, processThreads, { cache: $swrvCache, dedupingInterval: 100, ttl: 100000 }),
+      }, processThreads, { cache: $swrvCache, dedupingInterval: 100, ttl: 500 }),
       prefs: preferences.data,
       loggedIn: auth.loggedIn,
-      showSetModerators: true,
+      showSetModerators: false,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
-      sortField: $route.params.field ? $route.params.field : 'updated_at',
+      sortField: $route.query.field ? $route.query.field : 'updated_at',
       sortItems: [
         {
           value: 'updated_at',
