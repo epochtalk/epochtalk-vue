@@ -180,7 +180,7 @@ export default {
       v.form.email.valid = val && val.length >= 3 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)
       // check email unique
       if (val) {
-        auth.emailAvailable($http, val)
+        auth.emailAvailableApi($http, val)
         .then(data => {
           v.form.email.unique = !data.found
           checkFormValid()
@@ -192,7 +192,7 @@ export default {
       v.form.username.valid = val && val.length >= 3 && val.length <= 20 && /^[a-zA-Z\d-_.]+$/.test(val)
       // check email unique
       if (val) {
-        auth.usernameAvailable($http, val)
+        auth.usernameAvailableApi($http, val)
         .then(data => {
           v.form.username.unique = !data.found
           checkFormValid()
