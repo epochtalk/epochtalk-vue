@@ -1,6 +1,7 @@
 import { provide, inject, reactive, toRefs } from 'vue'
 import { cloneDeep } from 'lodash'
 import { users } from '@/api/index'
+import { Http } from '@/composables/utils/http'
 
 const PREFS_KEY = 'preferences'
 const AUTH_KEY = 'auth'
@@ -10,7 +11,7 @@ export const PreferencesStore = Symbol(PREFS_KEY)
 export default {
   setup() {
     /* Internal Data */
-    const $http = inject('$http')
+    const $http = inject(Http)
     const $appCache = inject('$appCache')
 
     const cachedPrefs = $appCache.get(PREFS_KEY)

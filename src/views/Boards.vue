@@ -95,6 +95,7 @@ import { inject, reactive, toRefs, watch } from 'vue'
 import { boards } from '@/api/index'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
+import { Http } from '@/composables/utils/http'
 import { countTotals, getLastPost, filterIgnoredBoards } from '@/composables/utils/boardUtils'
 
 export default {
@@ -142,7 +143,7 @@ export default {
     }
 
     /* Internal Data */
-    const $http = inject('$http')
+    const $http = inject(Http)
     const $swrvCache = inject('$swrvCache')
     const $alertStore = inject('$alertStore')
     const auth = inject(AuthStore)
