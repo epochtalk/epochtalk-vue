@@ -210,7 +210,7 @@ export default {
     }
 
     /* Template Methods */
-    const logout = () => auth.logout()
+    const logout = () => $auth.logout()
 
     const searchForum = () => console.log('SEARCH!')
 
@@ -223,7 +223,7 @@ export default {
     }
 
     /* Internal Data */
-    const auth = inject(AuthStore)
+    const $auth = inject(AuthStore)
 
     /* Template Data */
     const v = reactive({
@@ -234,11 +234,11 @@ export default {
       showInvite: false,
       showRegister: false,
       showLogin: false,
-      loggedIn: auth.loggedIn,
+      loggedIn: $auth.loggedIn,
       logo: '',
       scrollDownPos: 95,
       lastScrollTop: 0,
-      currentUser: auth.user,
+      currentUser: $auth.user,
       search: null,
       notificationMessages: null,
       notificationMentions: null,

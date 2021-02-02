@@ -146,14 +146,14 @@ export default {
     const $http = inject(Http)
     const $swrvCache = inject('$swrvCache')
     const $alertStore = inject('$alertStore')
-    const auth = inject(AuthStore)
+    const $auth = inject(AuthStore)
     const preferences = inject(PreferencesStore)
 
     /* View Data */
     const v = reactive({
       collapsedCats: preferences.data.collapsed_categories,
       ignoredBoards: preferences.data.ignored_boards,
-      loggedIn: auth.loggedIn,
+      loggedIn: $auth.loggedIn,
       showLogin: false,
       showRegister: false,
       defaultAvatar: window.default_avatar,

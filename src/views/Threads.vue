@@ -312,7 +312,7 @@ export default {
     const $route = useRoute()
     const $router = useRouter()
     const preferences = inject(PreferencesStore)
-    const auth = inject(AuthStore)
+    const $auth = inject(AuthStore)
 
     /* View Data */
     const v = reactive({
@@ -323,7 +323,7 @@ export default {
         return `/boards/${urlPath}`
       }, processThreads, { cache: $swrvCache, dedupingInterval: 100, ttl: 500 }),
       prefs: preferences.data,
-      loggedIn: auth.loggedIn,
+      loggedIn: $auth.loggedIn,
       showSetModerators: false,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,

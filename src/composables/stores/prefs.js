@@ -42,8 +42,8 @@ export default {
     }
 
     const update = () => {
-      const auth = $appCache.get(AUTH_KEY)
-      const user = auth ? auth.data : undefined
+      const $auth = $appCache.get(AUTH_KEY)
+      const user = $auth ? $auth.data : undefined
       const updatedPrefs = { // spread prefs to get rid of proxy object before storing in cache
         posts_per_page: prefs.posts_per_page,
         threads_per_page: prefs.threads_per_page,
