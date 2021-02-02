@@ -3,7 +3,7 @@
     <template v-slot:header>Manage Moderators of {{boardName}}</template>
 
     <template v-slot:body>
-      <form action="." class="css-form">
+      <form v-if="!modsWithBadPermissions.length" action="." class="css-form">
         <label>Current Moderators of {{boardName}} </label>
         <div v-if="!moderators?.length" class="no-mods">There are currently no moderators assigned to this board</div>
         <div v-for="mod in moderators" :key="mod.id" class="multiselect-tag mod-tags">
@@ -15,10 +15,19 @@
         <label>
           <strong>Note:</strong> Moderator changes will take affect upon clicking save changes.
         </label>
-        <button class="fill" @click.prevent="setModerators()" type="submit" :disabled="false">
+        <button class="fill" @click.prevent="setModerators()" type="submit" :disabled="!modsToRemove.length && !modTagsInput.value.length">
           Save Changes
         </button>
       </form>
+      <div v-if="modsWithBadPermissions.length">
+        <label>Successfully updated list of moderators for <strong>{{boardName}}</strong> but the following user{{ modsWithBadPermissions.length > 1 ? 's do not ' : ' does not ' }}have a role with moderation permissions assigned:
+        </label>
+        <ul class="mod-list-bp">
+          <li v-for="mod in modsWithBadPermissions" :key="mod">{{mod}}</li>
+        </ul>
+        <label>Visit the Roles Management page to add a moderation type role. The user{{ modsWithBadPermissions.length > 1 ? 's ' : ' ' }}will appear in the list of board moderators, but until an appropriate role is assigned they will not be able to perform any moderation tasks.</label><br>
+        <button class="fill" @click.prevent="close()">Okay</button>
+      </div>
     </template>
   </modal>
 </template>
@@ -56,9 +65,7 @@ export default {
         'threads.sticky.bypass.owner.admin',
         'threads.title.bypass.owner.admin'
       ]
-       console.log(mods)
       return filter(mods.map(mod => {
-        console.log(mod)
         let hasSomeModePrivileges = some(mod.roles.map(role => {
           let hasModPermission = false;
           modPermissions.forEach(perm => {
@@ -172,6 +179,13 @@ export default {
 <style src="@vueform/multiselect/themes/default.css"></style>
 <style lang="scss">
 .no-mods { margin-bottom: .45rem; }
+.mod-list-bp {
+  margin-top: 1rem;
+  display: block;
+  padding-left: 0;
+  font-size: 0.6375rem;
+  margin-left: 2rem;
+}
 .mod-tags {
   display: inline-flex;
   &.multiselect-tag {
