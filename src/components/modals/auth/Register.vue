@@ -125,7 +125,7 @@
 import Modal from '@/components/layout/Modal.vue'
 import { debounce, cloneDeep } from 'lodash'
 import { reactive, toRefs, watch, inject } from 'vue'
-import { authApi } from '@/api/index'
+import { authApi } from '@/api'
 import { Http } from '@/composables/utils/http'
 import { AuthStore } from '@/composables/stores/auth'
 

@@ -1,6 +1,6 @@
 import { provide, inject, reactive, toRefs } from 'vue'
 import { cloneDeep } from 'lodash'
-import { usersApi } from '@/api/index'
+import { usersApi } from '@/api'
 import { Http } from '@/composables/utils/http'
 
 const PREFS_KEY = 'preferences'

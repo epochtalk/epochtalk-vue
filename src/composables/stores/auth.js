@@ -1,6 +1,6 @@
 import { provide, computed, inject, reactive, readonly } from 'vue'
 import { cloneDeep } from 'lodash'
-import { authApi } from '@/api/index'
+import { authApi } from '@/api'
 import { Http } from '@/composables/utils/http'
 import { PreferencesStore } from '@/composables/stores/prefs'
 

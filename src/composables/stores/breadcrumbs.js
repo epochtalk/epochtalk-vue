@@ -1,7 +1,7 @@
 import { provide, inject, reactive, readonly } from 'vue'
 import { without, intersection, isEmpty, cloneDeep } from 'lodash'
 import { useRoute, useRouter } from 'vue-router'
-import { breadcrumbsApi } from '@/api/index'
+import { breadcrumbsApi } from '@/api'
 import { Http } from '@/composables/utils/http'
 
 const BREADCRUMBS_KEY = 'breadcrumbs'
