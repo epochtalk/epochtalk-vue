@@ -92,9 +92,10 @@ import RecentThreads from '@/components/threads/RecentThreads.vue'
 import LoginModal from '@/components/modals/auth/Login.vue'
 import RegisterModal from '@/components/modals/auth/Register.vue'
 import { inject, reactive, toRefs, watch } from 'vue'
-import { Api } from '@/api'
+import { boardsApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
+import { Http } from '@/composables/utils/http'
 import { countTotals, getLastPost, filterIgnoredBoards } from '@/composables/utils/boardUtils'
 
 export default {
@@ -142,26 +143,32 @@ export default {
     }
 
     /* Internal Data */
-    const $api = inject(Api)
+    const $http = inject(Http)
     const $swrvCache = inject('$swrvCache')
     const $alertStore = inject('$alertStore')
-    const auth = inject(AuthStore)
+    const $auth = inject(AuthStore)
     const preferences = inject(PreferencesStore)
 
     /* View Data */
     const v = reactive({
       collapsedCats: preferences.data.collapsed_categories,
       ignoredBoards: preferences.data.ignored_boards,
-      loggedIn: auth.loggedIn,
+      loggedIn: $auth.loggedIn,
       showLogin: false,
       showRegister: false,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
-      boardData: $api.boards.getBoards({ cache: $swrvCache, dedupingInterval: 750 }, processBoards)
+      boardData: boardsApi.getBoards($http, {
+        config: {
+          cache: $swrvCache,
+          dedupingInterval: 750
+        },
+        processBoardsCallback: processBoards
+      })
     })
 
     /* Watch Data */
-    watch(() => v.loggedIn, () => v.boardData.mutate(processBoards)) // Update boards on login
+    watch(() => v.loggedIn, () => v.boardData.mutate(boardsApi.getBoards($http, { processBoardsCallback: processBoards }))) // Update boards on login
     watch(() => v.boardData.error, () => $alertStore.error(v.boardData)) // Handle errors
 
     return { ...toRefs(v), generateCatId, toggleCategory, humanDate }

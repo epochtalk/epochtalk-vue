@@ -125,7 +125,8 @@
 import Modal from '@/components/layout/Modal.vue'
 import { debounce, cloneDeep } from 'lodash'
 import { reactive, toRefs, watch, inject } from 'vue'
-import { Api } from '@/api'
+import { authApi } from '@/api'
+import { Http } from '@/composables/utils/http'
 import { AuthStore } from '@/composables/stores/auth'
 
 export default {
@@ -141,7 +142,7 @@ export default {
 
     /* Template Methods */
     const register = () => {
-      auth.register(v.form.email.val, v.form.username.val, v.form.password.val)
+      $auth.register(v.form.email.val, v.form.username.val, v.form.password.val)
       close()
     }
 
@@ -156,8 +157,8 @@ export default {
     }
 
     /* Internal Data */
-    const auth = inject(AuthStore)
-    const $api = inject(Api)
+    const $auth = inject(AuthStore)
+    const $http = inject(Http)
 
     /* Template Data */
     const initForm = {
@@ -179,7 +180,7 @@ export default {
       v.form.email.valid = val && val.length >= 3 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)
       // check email unique
       if (val) {
-        $api.auth.emailAvailable(val)
+        authApi.emailAvailable($http, val)
         .then(data => {
           v.form.email.unique = !data.found
           checkFormValid()
@@ -191,7 +192,7 @@ export default {
       v.form.username.valid = val && val.length >= 3 && val.length <= 20 && /^[a-zA-Z\d-_.]+$/.test(val)
       // check email unique
       if (val) {
-        $api.auth.usernameAvailable(val)
+        authApi.usernameAvailable($http, val)
         .then(data => {
           v.form.username.unique = !data.found
           checkFormValid()

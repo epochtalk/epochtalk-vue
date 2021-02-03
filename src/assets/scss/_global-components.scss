@@ -275,6 +275,23 @@ input[type="checkbox"] + label, input[type="radio"] + label {
   vertical-align: baseline;
 }
 
+label {
+  font-size: $font-size-tiny;
+  width: 100%;
+  cursor: pointer;
+  display: block;
+  font-weight: normal;
+  line-height: 1.5;
+  margin-bottom: 0;
+  box-sizing: border-box;
+  height: 31px;
+  padding-bottom: 8px;
+  padding-right: 8px;
+  padding-top: 8px;
+  text-align: left;
+  text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+}
 .input-section {
   position: relative;
   margin-bottom: 1rem;

@@ -1,98 +1,66 @@
-import { provide, inject } from 'vue'
 import useSWRV from 'swrv'
-import { get } from 'lodash'
 
-const API_KEY = 'api'
-
-export const Api = Symbol(API_KEY)
-
-export default {
-  name: 'Api',
-  setup() {
-    /* internal methods */
-    const api = (path, opts, handleErrors) => {
-
-      opts = opts || {}
-      const method = (opts.method || 'get').toLowerCase()
-      delete opts.method
-      const data = opts.data
-      delete opts.data
-
-      let req = (m => {
-        switch(m) {
-          case 'post':
-          case 'put':
-          case 'patch':
-            return $axios[method](path, data, opts)
-          default: return $axios[method](path, opts)
-        }
-      })(method)
-
-      const reqPromise = req.then(res => res.status === 200 ? res.data : res)
-
-      if (handleErrors) {
-        return reqPromise.catch(err => {
-          const msg = get(err, 'response.data.message')
-          if (msg) { $alertStore.error(msg) }
-          return Promise.reject(err)
-        })
-      }
-      else { return reqPromise }
-    }
-
-    /* provided methods */
-    const boards = {
-      slugToBoardId: (slug) => {
-        return api(`/api/boards/${slug}/id`)
-      },
-      getBoards: (config, processBoardsCallback) => {
-        let result = api('/api/boards')
-        // use processor if available
-        if (processBoardsCallback) {
-          result = result.then(processBoardsCallback)
-        }
-        return useSWRV(`/api/boards`, () => result, config)
-      }
-    }
-    const threads = {
-      byBoard: opts => {
-        return api('/api/threads', opts)
-      }
-    }
-
-    const auth = {
-      login: (opts, handleErrors) => { return api('/api/login', opts, handleErrors) },
-      logout: (opts, handleErrors) => { return api('/api/logout', opts, handleErrors) },
-      register: (opts, handleErrors) => { return api('/api/register', opts, handleErrors) },
-      emailAvailable: val => { return api(`/api/register/email/${val}`) },
-      usernameAvailable: val => { return api(`/api/register/username/${val}`) }
-    }
-    const users = {
-      update: (userId, opts) => {
-        return api(`/api/users/${userId}`, opts)
-      },
-      preferences: () => {
-        return api('/api/users/preferences')
-      }
-    }
-    const breadcrumbs = {
-      find: (id, type) => {
-        return api(`/api/breadcrumbs?id=${id}&type=${type}`)
-      }
-    }
-
-    /* internal data */
-    const $axios = inject('$axios')
-    const $alertStore = inject('$alertStore')
-
-    /* Provide API request util */
-    return provide(Api, {
-      boards,
-      breadcrumbs,
-      threads,
-      auth,
-      users
-    })
+export const boardsApi = {
+  slugToBoardId: (http, slug) => {
+    return http(`/api/boards/${slug}/id`)
   },
-  render() { return this.$slots.default() } // renderless component
+  getBoards: (http, { config, processBoardsCallback }) => {
+    if (config) {
+      let result = http('/api/boards')
+      // use processor if available
+      if (processBoardsCallback) {
+        result = result.then(processBoardsCallback)
+      }
+      return useSWRV(`/api/boards`, () => result, config)
+    }
+    else {
+      return () => {
+        return http('/api/boards')
+        .then(processBoardsCallback)
+      }
+    }
+  }
+}
+
+export const threadsApi = {
+  byBoard: (http, opts) => {
+    return http('/api/threads', opts)
+  }
+}
+
+export const authApi = {
+  login: (http, opts, handleErrors) => { return http('/api/login', opts, handleErrors) },
+  logout: (http, opts, handleErrors) => { return http('/api/logout', opts, handleErrors) },
+  register: (http, opts, handleErrors) => { return http('/api/register', opts, handleErrors) },
+  emailAvailable: (http, val) => { return http(`/api/register/email/${val}`) },
+  usernameAvailable: (http, val) => { return http(`/api/register/username/${val}`) }
+}
+
+export const usersApi = {
+  search: (http, username) => {
+    return http(`/api/users/search?username=${username}`)
+  },
+  update: (http, userId, opts) => {
+    return http(`/api/users/${userId}`, opts)
+  },
+  preferences: (http) => {
+    return http('/api/users/preferences')
+  }
+}
+
+export const breadcrumbsApi = {
+  find: (http, id, type) => {
+    return http(`/api/breadcrumbs?id=${id}&type=${type}`)
+  }
+}
+
+export const adminApi = {
+  moderators: {
+    remove: (http, opts) => {
+      return http('/api/admin/moderators/remove', opts)
+    },
+    add: (http, opts) => {
+      return http('/api/admin/moderators', opts)
+    }
+  }
 }

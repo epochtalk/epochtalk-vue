@@ -52,7 +52,7 @@ export default {
   setup(props, { emit }) {
     /* Template Methods */
     const login = () => {
-      auth.login(v.user.username, v.user.password, v.user.rememberMe)
+      $auth.login(v.user.username, v.user.password, v.user.rememberMe)
       close()
     }
 
@@ -67,7 +67,7 @@ export default {
     }
 
     /* Internal Data */
-    const auth = inject(AuthStore)
+    const $auth = inject(AuthStore)
 
     /* Template Data */
     const initUser = { username: '', password: '', rememberMe: false }

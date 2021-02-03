@@ -147,7 +147,7 @@ export default {
   }
 
   .modal-body {
-    padding: 2rem;
+    padding: 1rem;
 
     .secondary-actions {
       border-top: $border;

@@ -1,6 +1,7 @@
 import { provide, inject, reactive, toRefs } from 'vue'
 import { cloneDeep } from 'lodash'
-import { Api } from '@/api'
+import { usersApi } from '@/api'
+import { Http } from '@/composables/utils/http'
 
 const PREFS_KEY = 'preferences'
 const AUTH_KEY = 'auth'
@@ -10,7 +11,7 @@ export const PreferencesStore = Symbol(PREFS_KEY)
 export default {
   setup() {
     /* Internal Data */
-    const $api = inject(Api)
+    const $http = inject(Http)
     const $appCache = inject('$appCache')
 
     const cachedPrefs = $appCache.get(PREFS_KEY)
@@ -28,7 +29,7 @@ export default {
 
     /* Provided Methods */
     const fetch = () => {
-      $api.users.preferences()
+      usersApi.preferences($http)
       .then(dbPrefs => {
         $appCache.set(PREFS_KEY, dbPrefs)
         Object.assign(prefs, dbPrefs)
@@ -41,8 +42,8 @@ export default {
     }
 
     const update = () => {
-      const auth = $appCache.get(AUTH_KEY)
-      const user = auth ? auth.data : undefined
+      const $auth = $appCache.get(AUTH_KEY)
+      const user = $auth ? $auth.data : undefined
       const updatedPrefs = { // spread prefs to get rid of proxy object before storing in cache
         posts_per_page: prefs.posts_per_page,
         threads_per_page: prefs.threads_per_page,
@@ -59,7 +60,7 @@ export default {
             ...updatedPrefs
           }
         }
-        $api.users.update(user.id, opts)
+        usersApi.update($http, user.id, opts)
         .then(() => $appCache.set(PREFS_KEY, updatedPrefs))
       }
       else { $appCache.set(PREFS_KEY, updatedPrefs) } // user not logged in, only update cache
