@@ -158,11 +158,17 @@ export default {
       showRegister: false,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
-      boardData: boardsApi.getBoards($http, { cache: $swrvCache, dedupingInterval: 750 }, processBoards)
+      boardData: boardsApi.getBoards($http, {
+        config: {
+          cache: $swrvCache,
+          dedupingInterval: 750
+        },
+        processBoardsCallback: processBoards
+      })
     })
 
     /* Watch Data */
-    watch(() => v.loggedIn, () => v.boardData.mutate(processBoards)) // Update boards on login
+    watch(() => v.loggedIn, () => v.boardData.mutate(boardsApi.getBoards($http, { processBoardsCallback: processBoards }))) // Update boards on login
     watch(() => v.boardData.error, () => $alertStore.error(v.boardData)) // Handle errors
 
     return { ...toRefs(v), generateCatId, toggleCategory, humanDate }

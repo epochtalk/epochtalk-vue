@@ -4,13 +4,21 @@ export const boardsApi = {
   slugToBoardId: (http, slug) => {
     return http(`/api/boards/${slug}/id`)
   },
-  getBoards: (http, config, processBoardsCallback) => {
-    let result = http('/api/boards')
-    // use processor if available
-    if (processBoardsCallback) {
-      result = result.then(processBoardsCallback)
+  getBoards: (http, { config, processBoardsCallback }) => {
+    if (config) {
+      let result = http('/api/boards')
+      // use processor if available
+      if (processBoardsCallback) {
+        result = result.then(processBoardsCallback)
+      }
+      return useSWRV(`/api/boards`, () => result, config)
     }
-    return useSWRV(`/api/boards`, () => result, config)
+    else {
+      return () => {
+        return http('/api/boards')
+        .then(processBoardsCallback)
+      }
+    }
   }
 }
 
