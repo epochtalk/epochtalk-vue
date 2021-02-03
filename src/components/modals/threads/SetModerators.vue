@@ -107,7 +107,6 @@ export default {
       return new Promise(resolve => {
         if (!modsToRemove.length) return resolve()
         let promise = adminApi.moderators.remove($http, removeParams)
-        .then(res => res.status === 200 ? res.data : res)
         .then(users => {
           users.forEach(u => remove(mods, mod => mod.username === u.username))
           return users
@@ -118,7 +117,6 @@ export default {
       .then(() => {
         if (!modsToAdd.length) return
         return adminApi.moderators.add($http, addParams)
-        .then(res => res.status === 200 ? res.data : res)
         .then(users => {
           users.forEach(user => mods.push({ username: user.username, id: user.id }))
           return users
@@ -171,7 +169,6 @@ export default {
         maxHeight: 100,
         options: async q => {
           return await usersApi.search($http, q)
-          .then(res => res.status === 200 ? res.data : res)
           // filter out existing mods
           .then(d => d.filter(u => !v.moderators.find(o => o.username === u)))
           // convert array into array of objects
