@@ -226,9 +226,10 @@ import humanDate from '@/composables/filters/humanDate'
 import decode from '@/composables/filters/decode'
 import truncate from '@/composables/filters/truncate'
 import { inject, reactive, computed, watch, toRefs } from 'vue'
-import { Api } from '@/api'
+import { threadsApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
+import { Http } from '@/composables/utils/http'
 import { countTotals, getLastPost, filterIgnoredBoards } from '@/composables/utils/boardUtils'
 
 export default {
@@ -249,7 +250,7 @@ export default {
             desc: $route.query.desc
           }
         }
-        return $api.threads.byBoard(opts)
+        return threadsApi.byBoard($http, opts)
         .then(data => {
           // always supply moderators array so property remains reactive even when passed to children
           data.board.moderators = data.board.moderators || []
@@ -306,12 +307,12 @@ export default {
     }
 
     /* Internal Data */
-    const $api = inject(Api)
+    const $http = inject(Http)
     const $swrvCache = inject('$swrvCache')
     const $route = useRoute()
     const $router = useRouter()
     const preferences = inject(PreferencesStore)
-    const auth = inject(AuthStore)
+    const $auth = inject(AuthStore)
 
     /* View Data */
     const v = reactive({
@@ -322,7 +323,7 @@ export default {
         return `/boards/${urlPath}`
       }, processThreads, { cache: $swrvCache, dedupingInterval: 100, ttl: 500 }),
       prefs: preferences.data,
-      loggedIn: auth.loggedIn,
+      loggedIn: $auth.loggedIn,
       showSetModerators: false,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,

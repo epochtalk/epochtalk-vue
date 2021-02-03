@@ -23,8 +23,8 @@ const $axios = axios.create({
   timeout: 3000,
   crossDomain: true
 })
-const auth = appCache.get('auth')
-const user = auth ? auth.data : undefined
+const $auth = appCache.get('auth')
+const user = $auth ? $auth.data : undefined
 if (user) { $axios.defaults.headers.common['Authorization'] = `BEARER ${user.token}` }
 app.provide('$axios', $axios)
 

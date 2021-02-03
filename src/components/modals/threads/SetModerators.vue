@@ -38,6 +38,8 @@ import { cloneDeep, intersection, remove, filter, get, some } from 'lodash'
 import { reactive, toRefs, inject } from 'vue'
 // import { AuthStore } from '@/composables/stores/auth'
 import Multiselect from '@vueform/multiselect'
+import { adminApi, usersApi } from '@/api'
+import { Http } from '@/composables/utils/http'
 
 export default {
   name: 'set-moderators-modal',
@@ -91,13 +93,24 @@ export default {
       })
 
       // build save params
-      let addParams = { usernames: modsToAdd, board_id: props.board.id };
-      let removeParams = { usernames: modsToRemove, board_id: props.board.id };
+      let addParams = {
+        method: 'POST',
+        data: {
+          usernames: modsToAdd,
+          board_id: props.board.id
+        }
+      }
+      let removeParams = {
+        method: 'POST',
+        data: {
+          usernames: modsToRemove,
+          board_id: props.board.id
+        }
+      }
       // remove moderators if needed
       return new Promise(resolve => {
         if (!modsToRemove.length) return resolve()
-        let promise = $axios.post('/api/admin/moderators/remove', removeParams)
-        .then(res => res.status === 200 ? res.data : res)
+        let promise = adminApi.moderators.remove($http, removeParams)
         .then(users => {
           users.forEach(u => remove(mods, mod => mod.username === u.username))
           return users
@@ -107,8 +120,7 @@ export default {
       // add moderators if needed
       .then(() => {
         if (!modsToAdd.length) return
-        return $axios.post('/api/admin/moderators', addParams)
-        .then(res => res.status === 200 ? res.data : res)
+        return adminApi.moderators.add($http, addParams)
         .then(users => {
           users.forEach(user => mods.push({ username: user.username, id: user.id }))
           return users
@@ -137,7 +149,7 @@ export default {
 
     /* Internal Data */
     // const auth = inject(AuthStore)
-    const $axios = inject('$axios')
+    const $http = inject(Http)
     const $alertStore = inject('$alertStore')
     // const originalModList = cloneDeep(props.board.moderators)
 
@@ -160,9 +172,7 @@ export default {
         searchable: true,
         maxHeight: 100,
         options: async q => {
-          // TODO(akinsey): extract to api file
-          return await $axios.get('/api/users/search?username=' + q)
-          .then(res => res.status === 200 ? res.data : res)
+          return await usersApi.search($http, q)
           // filter out existing mods
           .then(d => d.filter(u => !v.moderators.find(o => o.username === u)))
           // convert array into array of objects

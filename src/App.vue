@@ -1,5 +1,5 @@
 <template>
-  <ProvideApi>
+  <ProvideHttp>
     <ProvidePreferences>
         <ProvideAuth>
           <ProvideBreadcrumbs>
@@ -14,19 +14,19 @@
           </ProvideBreadcrumbs>
         </ProvideAuth>
     </ProvidePreferences>
-  </ProvideApi>
+  </ProvideHttp>
 </template>
 
 <script>
 import Header from '@/components/layout/Header.vue'
 import ProvidePreferences from '@/composables/stores/prefs'
 import ProvideAuth from '@/composables/stores/auth'
-import ProvideApi from '@/api'
+import ProvideHttp from '@/composables/utils/http'
 import ProvideBreadcrumbs from '@/composables/stores/breadcrumbs'
 
 export default {
   name: 'Epochtalk',
-  components: { Header, ProvidePreferences, ProvideBreadcrumbs, ProvideAuth, ProvideApi }
+  components: { Header, ProvidePreferences, ProvideBreadcrumbs, ProvideAuth, ProvideHttp }
 }
 </script>
 
