@@ -95,13 +95,17 @@ export default {
       // build save params
       let addParams = {
         method: 'POST',
-        usernames: modsToAdd,
-        board_id: props.board.id
+        data: {
+          usernames: modsToAdd,
+          board_id: props.board.id
+        }
       }
       let removeParams = {
         method: 'POST',
-        usernames: modsToRemove,
-        board_id: props.board.id
+        data: {
+          usernames: modsToRemove,
+          board_id: props.board.id
+        }
       }
       // remove moderators if needed
       return new Promise(resolve => {
