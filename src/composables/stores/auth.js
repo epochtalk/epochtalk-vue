@@ -13,7 +13,6 @@ export default {
     /* Internal Data */
     const $http = inject(Http)
     const $appCache = inject('$appCache')
-    const $axios = inject('$axios')
     const $alertStore = inject('$alertStore')
     const preferences = inject(PreferencesStore)
 
@@ -44,7 +43,6 @@ export default {
       const handleErrors = true
       authApi.login($http, opts, handleErrors)
       .then(dbUser => {
-        $axios.defaults.headers.common['Authorization'] = `BEARER ${dbUser.token}`
         $appCache.set(AUTH_KEY, dbUser)
         Object.assign(user, dbUser)
         preferences.fetch()
@@ -59,7 +57,6 @@ export default {
       const handleErrors = true
       authApi.logout($http, opts, handleErrors)
       .then(() => {
-        delete $axios.defaults.headers.common['Authorization']
         delete user.token // clear token to invalidate session immediately
         $appCache.delete(AUTH_KEY)
         preferences.clear()
@@ -84,7 +81,6 @@ export default {
       .then(dbUser => {
         // Set user session if account is already confirmed (log the user in)
         if (!dbUser.confirm_token) {
-          $axios.defaults.headers.common['Authorization'] = `BEARER ${dbUser.token}`
           $appCache.set(AUTH_KEY, dbUser)
           Object.assign(user, dbUser)
           preferences.fetch()
