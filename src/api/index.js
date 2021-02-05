@@ -72,21 +72,21 @@ export const threadsApi = {
 }
 
 export const authApi = {
-  login: (a, opts, handleErrors) => {
+  login: (opts, handleErrors) => {
     return http('/api/login', opts, handleErrors)
     .then(dbUser => {
       $axios.defaults.headers.common['Authorization'] = `BEARER ${dbUser.token}`
       return dbUser
     })
   },
-  logout: (a, opts, handleErrors) => {
+  logout: (opts, handleErrors) => {
     return http('/api/logout', opts, handleErrors)
     .then(dbUser => {
       delete $axios.defaults.headers.common['Authorization']
       return dbUser
     })
   },
-  register: (a, opts, handleErrors) => {
+  register: (opts, handleErrors) => {
     return http('/api/register', opts, handleErrors)
     .then(dbUser => {
       $axios.defaults.headers.common['Authorization'] = `BEARER ${dbUser.token}`

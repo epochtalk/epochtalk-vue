@@ -1,7 +1,6 @@
 import { provide, computed, inject, reactive, readonly } from 'vue'
 import { cloneDeep } from 'lodash'
 import { authApi } from '@/api'
-import { Http } from '@/composables/utils/http'
 import { PreferencesStore } from '@/composables/stores/prefs'
 
 const AUTH_KEY = 'auth'
@@ -11,7 +10,6 @@ export const AuthStore = Symbol(AUTH_KEY)
 export default {
   setup() {
     /* Internal Data */
-    const $http = inject(Http)
     const $appCache = inject('$appCache')
     const $alertStore = inject('$alertStore')
     const preferences = inject(PreferencesStore)
@@ -41,7 +39,7 @@ export default {
         }
       }
       const handleErrors = true
-      authApi.login($http, opts, handleErrors)
+      authApi.login(opts, handleErrors)
       .then(dbUser => {
         $appCache.set(AUTH_KEY, dbUser)
         Object.assign(user, dbUser)
@@ -55,7 +53,7 @@ export default {
         method: 'DELETE'
       }
       const handleErrors = true
-      authApi.logout($http, opts, handleErrors)
+      authApi.logout(opts, handleErrors)
       .then(() => {
         delete user.token // clear token to invalidate session immediately
         $appCache.delete(AUTH_KEY)
@@ -77,7 +75,7 @@ export default {
         }
       }
       const handleErrors = true
-      authApi.register($http, opts, handleErrors)
+      authApi.register(opts, handleErrors)
       .then(dbUser => {
         // Set user session if account is already confirmed (log the user in)
         if (!dbUser.confirm_token) {
