@@ -151,7 +151,6 @@ export default {
 
     .secondary-actions {
       border-top: $border;
-      margin: 0 -3rem -3rem;
       margin-top: 2rem;
       padding: 1rem;
       text-align: center;
