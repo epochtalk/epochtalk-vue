@@ -3,6 +3,7 @@ import { cloneDeep } from 'lodash'
 import { authApi } from '@/api'
 import { Http } from '@/composables/utils/http'
 import { PreferencesStore } from '@/composables/stores/prefs'
+import PermissionUtils from '@/composables/utils/permissions'
 
 const AUTH_KEY = 'auth'
 
@@ -98,6 +99,7 @@ export default {
     /* Provide Store Data */
     return provide(AuthStore, {
       user: readonly(user),
+      permissionUtils: new PermissionUtils(user),
       loggedIn: computed(() => !!user.token),
       login,
       logout,
