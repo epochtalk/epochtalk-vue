@@ -2,6 +2,7 @@ import { provide, computed, inject, reactive, readonly } from 'vue'
 import { cloneDeep } from 'lodash'
 import { authApi } from '@/api'
 import { PreferencesStore } from '@/composables/stores/prefs'
+import PermissionUtils from '@/composables/utils/permissions'
 
 const AUTH_KEY = 'auth'
 
@@ -92,6 +93,7 @@ export default {
     /* Provide Store Data */
     return provide(AuthStore, {
       user: readonly(user),
+      permissionUtils: new PermissionUtils(user),
       loggedIn: computed(() => !!user.token),
       login,
       logout,

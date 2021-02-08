@@ -14,11 +14,10 @@
         </svg>
       </div>
       <ul>
-        <li @click="showMobileMenu = false">
-        <!--v-if="hasPermission('adminAccess')"> -->
+        <li @click="showMobileMenu = false" v-if="permissionUtils.hasPermission('adminAccess')">
           <a href="#"><i class="fa fa-cogs" aria-hidden="true"></i>Admin Panel</a>
         </li>
-        <li @click="showMobileMenu = false"> <!--v-if="hasPermission('modAccess') && !hasPermission('adminAccess')"> -->
+        <li @click="showMobileMenu = false" v-if="permissionUtils.hasPermission('modAccess') && !permissionUtils.hasPermission('adminAccess')">
           <a href="#"><i class="fa fa-cogs" aria-hidden="true"></i>Mod Panel</a>
         </li>
         <li @click="showMobileMenu = false"> <!-- v-if="isPatroller()">-->
@@ -89,7 +88,7 @@
 
           <!-- User Dropdown -->
           <ul v-if="loggedIn">
-            <li class="search"> <!--v-if="hasPermission('posts.search.allow')"-->
+            <li class="search" v-if="permissionUtils.hasPermission('posts.search.allow')">
               <form action="." class="search-btn" autocomplete="off" @submit.prevent="searchForum">
                 <div class="balloon" data-balloon="Search" data-balloon-pos="down">
                   <label for="search" class="fa fa-search" :class="{ 'search-label-expanded' : searchExpanded || focusSearch }" @click="toggleFocusSearch()"></label>
@@ -98,7 +97,7 @@
               </form>
             </li>
             <li id="notifications-tray" class="hide-mobile">
-              <div class="tray-icon" href="user-search" data-balloon="Member Search" data-balloon-pos="down"> <!--v-if="hasPermission('users.pagePublic.allow')"-->
+              <div class="tray-icon" href="user-search" data-balloon="Member Search" data-balloon-pos="down" v-if="permissionUtils.hasPermission('users.pagePublic.allow')">
                 <i class="fa fa-users"></i>
               </div>
 
@@ -124,10 +123,10 @@
                 </a>
               </div>
               <ul id="user-dropdown">
-                <li> <!--v-if="hasPermission('adminAccess')">-->
+                <li v-if="permissionUtils.hasPermission('adminAccess')">
                   <a href="#">Admin Panel</a>
                 </li>
-                <li><!-- v-if="hasPermission('modAccess') && !hasPermission('adminAccess')">-->
+                <li v-if="permissionUtils.hasPermission('modAccess') && !permissionUtils.hasPermission('adminAccess')">
                   <a href="#">Mod Panel</a>
                 </li>
                 <li> <!--v-if="isPatroller()">-->
@@ -239,6 +238,7 @@ export default {
       scrollDownPos: 95,
       lastScrollTop: 0,
       currentUser: $auth.user,
+      permissionUtils: $auth.permissionUtils,
       search: null,
       notificationMessages: null,
       notificationMentions: null,

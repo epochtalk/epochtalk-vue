@@ -34,11 +34,12 @@
 
 <script>
 import Modal from '@/components/layout/Modal.vue'
-import { cloneDeep, intersection, remove, filter, get, some } from 'lodash'
+import { cloneDeep, intersection, remove } from 'lodash'
 import { reactive, toRefs, inject } from 'vue'
 // import { AuthStore } from '@/composables/stores/auth'
 import Multiselect from '@vueform/multiselect'
 import { adminApi, usersApi } from '@/api'
+import { AuthStore } from '@/composables/stores/auth'
 
 export default {
   name: 'set-moderators-modal',
@@ -46,38 +47,6 @@ export default {
   emits: ['close'],
   components: { Modal, Multiselect },
   setup(props, { emit }) {
-    /* Internal Methods */
-    const checkPermissions = mods => {
-      // check that the user has at least one of these permissions set
-      const modPermissions = [
-        'boards.update.allow',
-        'posts.update.bypass',
-        'posts.delete.bypass',
-        'posts.purge.bypass',
-        'posts.find.bypass',
-        'posts.create.bypass',
-        'threads.title.bypass',
-        'threads.createPoll.bypass.owner.admin',
-        'threads.editPoll.bypass.owner.admin',
-        'threads.lockPoll.bypass.owner.admin',
-        'threads.lock.bypass.owner.admin',
-        'threads.move.bypass.owner.admin',
-        'threads.purge.bypass.owner.admin',
-        'threads.sticky.bypass.owner.admin',
-        'threads.title.bypass.owner.admin'
-      ]
-      return filter(mods.map(mod => {
-        let hasSomeModePrivileges = some(mod.roles.map(role => {
-          let hasModPermission = false;
-          modPermissions.forEach(perm => {
-            if (get(role.base_permissions, perm) || get(role.custom_permissions, perm)) { hasModPermission = true }
-          })
-          return hasModPermission
-        }))
-        return hasSomeModePrivileges ? undefined : mod.username
-      }), undefined)
-    }
-
     /* Template Methods */
     const setModerators = () => {
       const modsToAdd = v.modTagsInput.value
@@ -124,7 +93,7 @@ export default {
           users.forEach(user => mods.push({ username: user.username, id: user.id }))
           return users
         })
-        .then(users => checkPermissions(users))
+        .then(users => $auth.permissionUtils.checkModPermissions(users))
         .then(bpUsers => v.modsWithBadPermissions = bpUsers)
       })
       .then(() => v.moderators = cloneDeep(mods))
@@ -147,9 +116,8 @@ export default {
     }
 
     /* Internal Data */
-    // const auth = inject(AuthStore)
     const $alertStore = inject('$alertStore')
-    // const originalModList = cloneDeep(props.board.moderators)
+    const $auth = inject(AuthStore)
 
     /* Template Data */
     // const initMods = []
