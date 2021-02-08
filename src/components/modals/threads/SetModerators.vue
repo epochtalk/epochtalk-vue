@@ -68,17 +68,14 @@ export default {
           board_id: props.board.id
         }
       }
-      let removeParams = {
-        method: 'POST',
-        data: {
-          usernames: modsToRemove,
-          board_id: props.board.id
-        }
+      let data = {
+        usernames: modsToRemove,
+        board_id: props.board.id
       }
       // remove moderators if needed
       return new Promise(resolve => {
         if (!modsToRemove.length) return resolve()
-        let promise = adminApi.moderators.remove(removeParams)
+        let promise = adminApi.moderators.remove(data)
         .then(users => {
           users.forEach(u => remove(mods, mod => mod.username === u.username))
           return users

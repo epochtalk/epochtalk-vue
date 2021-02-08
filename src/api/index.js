@@ -117,8 +117,8 @@ export const breadcrumbsApi = {
 
 export const adminApi = {
   moderators: {
-    remove: (opts) => {
-      return http('/api/admin/moderators/remove', opts)
+    remove: data => {
+      return http('/api/admin/moderators/remove', { method: 'POST', data: data })
     },
     add: (opts) => {
       return http('/api/admin/moderators', opts)
