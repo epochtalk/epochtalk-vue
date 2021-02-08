@@ -44,10 +44,10 @@ const http = (path, opts, handleErrors) => {
 }
 
 export const boardsApi = {
-  slugToBoardId: (a, slug) => {
+  slugToBoardId: (slug) => {
     return http(`/api/boards/${slug}/id`)
   },
-  getBoards: (a, { config, processBoardsCallback }) => {
+  getBoards: ({ config, processBoardsCallback }) => {
     if (config) {
       let result = http('/api/boards')
       // use processor if available

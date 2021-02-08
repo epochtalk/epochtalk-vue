@@ -95,7 +95,6 @@ import { inject, reactive, toRefs, watch } from 'vue'
 import { boardsApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
-import { Http } from '@/composables/utils/http'
 import { countTotals, getLastPost, filterIgnoredBoards } from '@/composables/utils/boardUtils'
 
 export default {
@@ -143,7 +142,6 @@ export default {
     }
 
     /* Internal Data */
-    const $http = inject(Http)
     const $swrvCache = inject('$swrvCache')
     const $alertStore = inject('$alertStore')
     const $auth = inject(AuthStore)
@@ -158,7 +156,7 @@ export default {
       showRegister: false,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
-      boardData: boardsApi.getBoards($http, {
+      boardData: boardsApi.getBoards({
         config: {
           cache: $swrvCache,
           dedupingInterval: 750
@@ -168,7 +166,7 @@ export default {
     })
 
     /* Watch Data */
-    watch(() => v.loggedIn, () => v.boardData.mutate(boardsApi.getBoards($http, { processBoardsCallback: processBoards }))) // Update boards on login
+    watch(() => v.loggedIn, () => v.boardData.mutate(boardsApi.getBoards({ processBoardsCallback: processBoards }))) // Update boards on login
     watch(() => v.boardData.error, () => $alertStore.error(v.boardData)) // Handle errors
 
     return { ...toRefs(v), generateCatId, toggleCategory, humanDate }
