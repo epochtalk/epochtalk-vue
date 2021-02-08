@@ -431,7 +431,7 @@ export default {
 .board-sidebar {
   grid-area: sidebar;
 
-  button, .button { margin: 0 0 1.25rem; }
+  button, button:focus, .button, .button:focus { margin: 0 0 1.25rem; }
 
   .board-actions {
     display: flex;

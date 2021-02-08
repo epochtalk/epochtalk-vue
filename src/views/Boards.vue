@@ -356,7 +356,7 @@ img.avatar-small {
   justify-content: center;
   margin-bottom: 2rem;
 
-  .button {
+  .button, .button:focus {
     margin: 0 1rem;
     min-width: 160px;
   }
