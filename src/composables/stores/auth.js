@@ -31,16 +31,13 @@ export default {
 
     /* Provided Methods */
     const login = (username, password, rememberMe) => {
-      const opts = {
-        method: 'POST',
-        data: {
-          username: username,
-          password: password,
-          rememberMe: rememberMe
-        }
+      const data =  {
+        username: username,
+        password: password,
+        rememberMe: rememberMe
       }
       const handleErrors = true
-      authApi.login(opts, handleErrors)
+      authApi.login(data, handleErrors)
       .then(dbUser => {
         $appCache.set(AUTH_KEY, dbUser)
         Object.assign(user, dbUser)
