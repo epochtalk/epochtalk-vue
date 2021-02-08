@@ -110,7 +110,7 @@ export const usersApi = {
 }
 
 export const breadcrumbsApi = {
-  find: (a, id, type) => {
+  find: (id, type) => {
     return http(`/api/breadcrumbs?id=${id}&type=${type}`)
   }
 }
