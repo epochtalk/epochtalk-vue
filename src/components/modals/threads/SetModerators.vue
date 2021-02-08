@@ -61,21 +61,18 @@ export default {
       })
 
       // build save params
-      let addParams = {
-        method: 'POST',
-        data: {
-          usernames: modsToAdd,
-          board_id: props.board.id
-        }
+      let addData = {
+        usernames: modsToAdd,
+        board_id: props.board.id
       }
-      let data = {
+      let removeData = {
         usernames: modsToRemove,
         board_id: props.board.id
       }
       // remove moderators if needed
       return new Promise(resolve => {
         if (!modsToRemove.length) return resolve()
-        let promise = adminApi.moderators.remove(data)
+        let promise = adminApi.moderators.remove(removeData)
         .then(users => {
           users.forEach(u => remove(mods, mod => mod.username === u.username))
           return users
@@ -85,7 +82,7 @@ export default {
       // add moderators if needed
       .then(() => {
         if (!modsToAdd.length) return
-        return adminApi.moderators.add(addParams)
+        return adminApi.moderators.add(addData)
         .then(users => {
           users.forEach(user => mods.push({ username: user.username, id: user.id }))
           return users

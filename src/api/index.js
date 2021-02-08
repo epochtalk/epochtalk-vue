@@ -120,8 +120,8 @@ export const adminApi = {
     remove: data => {
       return http('/api/admin/moderators/remove', { method: 'POST', data: data })
     },
-    add: (opts) => {
-      return http('/api/admin/moderators', opts)
+    add: data => {
+      return http('/api/admin/moderators', { method: 'POST', data: data })
     }
   }
 }
