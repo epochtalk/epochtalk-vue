@@ -16,7 +16,7 @@ export default {
     const $appCache = inject('$appCache')
     const $axios = inject('$axios')
     const $alertStore = inject('$alertStore')
-    const preferences = inject(PreferencesStore)
+    const $prefs = inject(PreferencesStore)
 
     const cachedUser = $appCache.get(AUTH_KEY)
     const emtpyUser = {
@@ -48,7 +48,7 @@ export default {
         $axios.defaults.headers.common['Authorization'] = `BEARER ${dbUser.token}`
         $appCache.set(AUTH_KEY, dbUser)
         Object.assign(user, dbUser)
-        preferences.fetch()
+        $prefs.fetch()
         $alertStore.success(`Welcome ${user.username}, you have successfully logged in!`)
       }).catch(() => {})
     }
@@ -63,7 +63,7 @@ export default {
         delete $axios.defaults.headers.common['Authorization']
         delete user.token // clear token to invalidate session immediately
         $appCache.delete(AUTH_KEY)
-        preferences.clear()
+        $prefs.clear()
         $alertStore.warn(`Goodbye ${user.username}, you have successfully logged out!`)
         // delay clearing reactive user to give css transitions time to complete
         setTimeout(() => { Object.assign(user, cloneDeep(emtpyUser)) }, 500)
@@ -88,7 +88,7 @@ export default {
           $axios.defaults.headers.common['Authorization'] = `BEARER ${dbUser.token}`
           $appCache.set(AUTH_KEY, dbUser)
           Object.assign(user, dbUser)
-          preferences.fetch()
+          $prefs.fetch()
           $alertStore.success(`Welcome ${user.username}, you have successfully registered!`)
         }
         // TODO(akinsey): implement flow for when email confirmation is enabled

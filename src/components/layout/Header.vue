@@ -20,7 +20,7 @@
         <li @click="showMobileMenu = false" v-if="permissionUtils.hasPermission('modAccess') && !permissionUtils.hasPermission('adminAccess')">
           <a href="#"><i class="fa fa-cogs" aria-hidden="true"></i>Mod Panel</a>
         </li>
-        <li @click="showMobileMenu = false"> <!-- v-if="isPatroller()">-->
+        <li @click="showMobileMenu = false" v-if="isPatroller()">
           <a href="#"><i class="fa fa-binoculars" aria-hidden="true"></i>Patrol</a>
         </li>
         <li @click="showMobileMenu = false" >
@@ -129,7 +129,7 @@
                 <li v-if="permissionUtils.hasPermission('modAccess') && !permissionUtils.hasPermission('adminAccess')">
                   <a href="#">Mod Panel</a>
                 </li>
-                <li> <!--v-if="isPatroller()">-->
+                <li v-if="isPatroller()">
                   <a href="#">Patrol</a>
                 </li>
                 <li>
@@ -185,6 +185,7 @@ import RegisterModal from '@/components/modals/auth/Register.vue'
 import Breadcrumbs from '@/components/layout/Breadcrumbs.vue'
 import decode from '@/composables/filters/decode'
 import { AuthStore } from '@/composables/stores/auth'
+import { PreferencesStore } from '@/composables/stores/prefs'
 import { reactive, toRefs, onMounted, onUnmounted, inject } from 'vue'
 import { debounce } from 'lodash'
 
@@ -215,6 +216,8 @@ export default {
 
     const dismissNotifications = params => console.log('DISMISS NOTIFICATIONS!', params)
 
+    const isPatroller = () => v.prefs.patroller_view || $auth.permissionUtils.isPatroller()
+
     const toggleFocusSearch = () => {
       v.focusSearch = !v.focusSearch
       v.searchExpanded = v.focusSearch
@@ -223,6 +226,7 @@ export default {
 
     /* Internal Data */
     const $auth = inject(AuthStore)
+    const $prefs = inject(PreferencesStore)
 
     /* Template Data */
     const v = reactive({
@@ -239,6 +243,7 @@ export default {
       lastScrollTop: 0,
       currentUser: $auth.user,
       permissionUtils: $auth.permissionUtils,
+      prefs: $prefs.data,
       search: null,
       notificationMessages: null,
       notificationMentions: null,
@@ -256,7 +261,7 @@ export default {
       window.removeEventListener('scroll', debounce(scrollHeader, 10))
     })
 
-    return { ...toRefs(v), logout, searchForum, dismissNotifications, toggleFocusSearch, decode }
+    return { ...toRefs(v), logout, isPatroller, searchForum, dismissNotifications, toggleFocusSearch, decode }
   }
 }
 </script>

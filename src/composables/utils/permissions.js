@@ -14,6 +14,12 @@ export default class PermissionUtils {
     else return Number.MAX_SAFE_INTEGER
   }
 
+  isPatroller() {
+    let patroller = false
+    this.user.roles.map(r => { if (r === 'patroller') patroller = true })
+    return patroller
+  }
+
   globalModeratorCheck() {
     let globalMod = false
     if (this.user.permissions) {

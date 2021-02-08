@@ -139,7 +139,7 @@ export default {
         }
       }
       else if (v.collapsedCats.indexOf(cat.id) < 0) { v.collapsedCats.push(cat.id) }
-      preferences.update()
+      $prefs.update()
     }
 
     /* Internal Data */
@@ -147,12 +147,12 @@ export default {
     const $swrvCache = inject('$swrvCache')
     const $alertStore = inject('$alertStore')
     const $auth = inject(AuthStore)
-    const preferences = inject(PreferencesStore)
+    const $prefs = inject(PreferencesStore)
 
     /* View Data */
     const v = reactive({
-      collapsedCats: preferences.data.collapsed_categories,
-      ignoredBoards: preferences.data.ignored_boards,
+      collapsedCats: $prefs.data.collapsed_categories,
+      ignoredBoards: $prefs.data.ignored_boards,
       loggedIn: $auth.loggedIn,
       showLogin: false,
       showRegister: false,

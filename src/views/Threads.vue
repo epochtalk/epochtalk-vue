@@ -311,7 +311,7 @@ export default {
     const $swrvCache = inject('$swrvCache')
     const $route = useRoute()
     const $router = useRouter()
-    const preferences = inject(PreferencesStore)
+    const $prefs = inject(PreferencesStore)
     const $auth = inject(AuthStore)
 
     /* View Data */
@@ -322,7 +322,7 @@ export default {
         let urlPath = queryStr ? `${props.boardSlug}?${queryStr}` : `${props.boardSlug}`
         return `/boards/${urlPath}`
       }, processThreads, { cache: $swrvCache, dedupingInterval: 100, ttl: 500 }),
-      prefs: preferences.data,
+      prefs: $prefs.data,
       loggedIn: $auth.loggedIn,
       showSetModerators: false,
       defaultAvatar: window.default_avatar,
