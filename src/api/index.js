@@ -101,8 +101,8 @@ export const usersApi = {
   search: (username) => {
     return http(`/api/users/search?username=${username}`)
   },
-  update: (userId, opts) => {
-    return http(`/api/users/${userId}`, opts)
+  update: (userId, data) => {
+    return http(`/api/users/${userId}`, { method: 'PUT', data: data })
   },
   preferences: () => {
     return http('/api/users/preferences')

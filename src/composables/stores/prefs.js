@@ -51,14 +51,11 @@ export default {
         ignored_boards: [...prefs.ignored_boards]
       }
       if (user && user.token) { // user is logged in update cache and server
-        const opts = {
-          method: 'PUT',
-          data: {
-            username: user.username,
-            ...updatedPrefs
-          }
+        const data = {
+          username: user.username,
+          ...updatedPrefs
         }
-        usersApi.update(user.id, opts)
+        usersApi.update(user.id, data)
         .then(() => $appCache.set(PREFS_KEY, updatedPrefs))
       }
       else { $appCache.set(PREFS_KEY, updatedPrefs) } // user not logged in, only update cache
