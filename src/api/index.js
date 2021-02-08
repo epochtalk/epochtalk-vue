@@ -79,8 +79,8 @@ export const authApi = {
       return dbUser
     })
   },
-  logout: (opts, handleErrors) => {
-    return http('/api/logout', opts, handleErrors)
+  logout: (handleErrors) => {
+    return http('/api/logout', { method: 'DELETE' }, handleErrors)
     .then(dbUser => {
       delete $axios.defaults.headers.common['Authorization']
       return dbUser

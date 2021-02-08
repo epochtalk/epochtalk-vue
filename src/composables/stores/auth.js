@@ -47,11 +47,8 @@ export default {
     }
 
     const logout = () => {
-      const opts = {
-        method: 'DELETE'
-      }
       const handleErrors = true
-      authApi.logout(opts, handleErrors)
+      authApi.logout(handleErrors)
       .then(() => {
         delete user.token // clear token to invalidate session immediately
         $appCache.delete(AUTH_KEY)
