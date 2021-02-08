@@ -39,7 +39,6 @@ import { reactive, toRefs, inject } from 'vue'
 // import { AuthStore } from '@/composables/stores/auth'
 import Multiselect from '@vueform/multiselect'
 import { adminApi, usersApi } from '@/api'
-import { Http } from '@/composables/utils/http'
 
 export default {
   name: 'set-moderators-modal',
@@ -149,7 +148,6 @@ export default {
 
     /* Internal Data */
     // const auth = inject(AuthStore)
-    const $http = inject(Http)
     const $alertStore = inject('$alertStore')
     // const originalModList = cloneDeep(props.board.moderators)
 
@@ -172,7 +170,7 @@ export default {
         searchable: true,
         maxHeight: 100,
         options: async q => {
-          return await usersApi.search($http, q)
+          return await usersApi.search(q)
           // filter out existing mods
           .then(d => d.filter(u => !v.moderators.find(o => o.username === u)))
           // convert array into array of objects

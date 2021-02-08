@@ -98,7 +98,7 @@ export const authApi = {
 }
 
 export const usersApi = {
-  search: (a, username) => {
+  search: (username) => {
     return http(`/api/users/search?username=${username}`)
   },
   update: (a, userId, opts) => {
