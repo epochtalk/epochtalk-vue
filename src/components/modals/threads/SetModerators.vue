@@ -109,7 +109,7 @@ export default {
       // remove moderators if needed
       return new Promise(resolve => {
         if (!modsToRemove.length) return resolve()
-        let promise = adminApi.moderators.remove($http, removeParams)
+        let promise = adminApi.moderators.remove(removeParams)
         .then(users => {
           users.forEach(u => remove(mods, mod => mod.username === u.username))
           return users
@@ -119,7 +119,7 @@ export default {
       // add moderators if needed
       .then(() => {
         if (!modsToAdd.length) return
-        return adminApi.moderators.add($http, addParams)
+        return adminApi.moderators.add(addParams)
         .then(users => {
           users.forEach(user => mods.push({ username: user.username, id: user.id }))
           return users

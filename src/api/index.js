@@ -117,10 +117,10 @@ export const breadcrumbsApi = {
 
 export const adminApi = {
   moderators: {
-    remove: (a, opts) => {
+    remove: (opts) => {
       return http('/api/admin/moderators/remove', opts)
     },
-    add: (a, opts) => {
+    add: (opts) => {
       return http('/api/admin/moderators', opts)
     }
   }
