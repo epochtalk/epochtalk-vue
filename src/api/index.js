@@ -101,7 +101,7 @@ export const usersApi = {
   search: (username) => {
     return http(`/api/users/search?username=${username}`)
   },
-  update: (a, userId, opts) => {
+  update: (userId, opts) => {
     return http(`/api/users/${userId}`, opts)
   },
   preferences: () => {
