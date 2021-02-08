@@ -240,32 +240,30 @@ export default {
     const processThreads = () => {
       return Promise.resolve(props.boardId)
       .then(boardId => {
-        const opts = {
-          params: {
-            board_id: boardId,
-            limit: v.prefs.threads_per_page,
-            page: $route.query.page || 1,
-            field: $route.query.field,
-            desc: $route.query.desc
-          }
+        const data = {
+          board_id: boardId,
+          limit: v.prefs.threads_per_page,
+          page: $route.query.page || 1,
+          field: $route.query.field,
+          desc: $route.query.desc
         }
-        return threadsApi.byBoard(opts)
-        .then(data => {
+        return threadsApi.byBoard(data)
+        .then(tData => {
           // always supply moderators array so property remains reactive even when passed to children
-          data.board.moderators = data.board.moderators || []
+          tData.board.moderators = tData.board.moderators || []
 
           // filter out ignored child boards
-          data.board.children = filterIgnoredBoards(data.board.children, v.prefs.ignored_boards)
+          tData.board.children = filterIgnoredBoards(tData.board.children, v.prefs.ignored_boards)
 
           // set total_thread_count and total_post_count for all child board
-          data.board.children.map(childBoard => {
+          tData.board.children.map(childBoard => {
             let children = countTotals(childBoard.children)
             let lastPost = getLastPost([childBoard])
             childBoard.total_thread_count = children.thread_count + childBoard.thread_count
             childBoard.total_post_count = children.post_count + childBoard.post_count
             return Object.assign(childBoard, lastPost)
           })
-          return data
+          return tData
         })
       })
     }
