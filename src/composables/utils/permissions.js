@@ -28,8 +28,8 @@ export default class PermissionUtils {
       ]
       // If user has any of the permissions above set to true they are a global mod
       globalModPermissions.forEach(permission => {
-        const allPermission = get(this.user.permissions, permission);
-        globalMod = globalMod || allPermission;
+        const allPermission = get(this.user.permissions, permission)
+        globalMod = globalMod || allPermission
       })
     }
     return globalMod
@@ -56,9 +56,9 @@ export default class PermissionUtils {
     ]
     return filter(mods.map(mod => {
       let hasSomeModePrivileges = some(mod.roles.map(role => {
-        let hasModPermission = false;
+        let hasModPermission = false
         modPermissions.forEach(perm => {
-          if (get(role.base_permissions, perm) || get(role.custom_permissions, perm)) { hasModPermission = true }
+          if (get(role.base_permissions, perm) || get(role.custom_permissions, perm))hasModPermission = true
         })
         return hasModPermission
       }))
@@ -79,9 +79,8 @@ export default class PermissionUtils {
     return result
   }
 
-
   getModPanelControlAccess() {
-    let result = {};
+    let result = {}
     if (this.user.permissions) {
       let perm = p => {
         p = get(this.user.permissions, p)
