@@ -229,7 +229,6 @@ import { inject, reactive, computed, watch, toRefs } from 'vue'
 import { threadsApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
-import { Http } from '@/composables/utils/http'
 import { countTotals, getLastPost, filterIgnoredBoards } from '@/composables/utils/boardUtils'
 
 export default {
@@ -250,7 +249,7 @@ export default {
             desc: $route.query.desc
           }
         }
-        return threadsApi.byBoard($http, opts)
+        return threadsApi.byBoard(opts)
         .then(data => {
           // always supply moderators array so property remains reactive even when passed to children
           data.board.moderators = data.board.moderators || []
@@ -307,7 +306,6 @@ export default {
     }
 
     /* Internal Data */
-    const $http = inject(Http)
     const $swrvCache = inject('$swrvCache')
     const $route = useRoute()
     const $router = useRouter()
