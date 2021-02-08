@@ -61,16 +61,13 @@ export default {
     }
 
     const register = (email, username, password) => {
-      const opts = {
-        method: 'POST',
-        data: {
-          email: email,
-          username: username,
-          password: password
-        }
+      const data = {
+        email: email,
+        username: username,
+        password: password
       }
       const handleErrors = true
-      authApi.register(opts, handleErrors)
+      authApi.register(data, handleErrors)
       .then(dbUser => {
         // Set user session if account is already confirmed (log the user in)
         if (!dbUser.confirm_token) {

@@ -86,8 +86,8 @@ export const authApi = {
       return dbUser
     })
   },
-  register: (opts, handleErrors) => {
-    return http('/api/register', opts, handleErrors)
+  register: (data, handleErrors) => {
+    return http('/api/register', { method: 'POST', data: data }, handleErrors)
     .then(dbUser => {
       $axios.defaults.headers.common['Authorization'] = `BEARER ${dbUser.token}`
       return dbUser
