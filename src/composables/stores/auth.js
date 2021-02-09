@@ -1,7 +1,6 @@
 import { provide, computed, inject, reactive, readonly } from 'vue'
 import { cloneDeep } from 'lodash'
 import { authApi } from '@/api'
-import { Http } from '@/composables/utils/http'
 import { PreferencesStore } from '@/composables/stores/prefs'
 import PermissionUtils from '@/composables/utils/permissions'
 
@@ -12,9 +11,7 @@ export const AuthStore = Symbol(AUTH_KEY)
 export default {
   setup() {
     /* Internal Data */
-    const $http = inject(Http)
     const $appCache = inject('$appCache')
-    const $axios = inject('$axios')
     const $alertStore = inject('$alertStore')
     const $prefs = inject(PreferencesStore)
 
@@ -34,18 +31,14 @@ export default {
 
     /* Provided Methods */
     const login = (username, password, rememberMe) => {
-      const opts = {
-        method: 'POST',
-        data: {
-          username: username,
-          password: password,
-          rememberMe: rememberMe
-        }
+      const data =  {
+        username: username,
+        password: password,
+        rememberMe: rememberMe
       }
       const handleErrors = true
-      authApi.login($http, opts, handleErrors)
+      authApi.login(data, handleErrors)
       .then(dbUser => {
-        $axios.defaults.headers.common['Authorization'] = `BEARER ${dbUser.token}`
         $appCache.set(AUTH_KEY, dbUser)
         Object.assign(user, dbUser)
         $prefs.fetch()
@@ -54,13 +47,9 @@ export default {
     }
 
     const logout = () => {
-      const opts = {
-        method: 'DELETE'
-      }
       const handleErrors = true
-      authApi.logout($http, opts, handleErrors)
+      authApi.logout(handleErrors)
       .then(() => {
-        delete $axios.defaults.headers.common['Authorization']
         delete user.token // clear token to invalidate session immediately
         $appCache.delete(AUTH_KEY)
         $prefs.clear()
@@ -72,20 +61,16 @@ export default {
     }
 
     const register = (email, username, password) => {
-      const opts = {
-        method: 'POST',
-        data: {
-          email: email,
-          username: username,
-          password: password
-        }
+      const data = {
+        email: email,
+        username: username,
+        password: password
       }
       const handleErrors = true
-      authApi.register($http, opts, handleErrors)
+      authApi.register(data, handleErrors)
       .then(dbUser => {
         // Set user session if account is already confirmed (log the user in)
         if (!dbUser.confirm_token) {
-          $axios.defaults.headers.common['Authorization'] = `BEARER ${dbUser.token}`
           $appCache.set(AUTH_KEY, dbUser)
           Object.assign(user, dbUser)
           $prefs.fetch()

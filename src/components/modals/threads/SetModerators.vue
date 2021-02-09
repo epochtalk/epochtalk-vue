@@ -38,7 +38,6 @@ import { cloneDeep, intersection, remove } from 'lodash'
 import { reactive, toRefs, inject } from 'vue'
 import Multiselect from '@vueform/multiselect'
 import { adminApi, usersApi } from '@/api'
-import { Http } from '@/composables/utils/http'
 import { AuthStore } from '@/composables/stores/auth'
 
 export default {
@@ -61,24 +60,18 @@ export default {
       })
 
       // build save params
-      let addParams = {
-        method: 'POST',
-        data: {
-          usernames: modsToAdd,
-          board_id: props.board.id
-        }
+      let addData = {
+        usernames: modsToAdd,
+        board_id: props.board.id
       }
-      let removeParams = {
-        method: 'POST',
-        data: {
-          usernames: modsToRemove,
-          board_id: props.board.id
-        }
+      let removeData = {
+        usernames: modsToRemove,
+        board_id: props.board.id
       }
       // remove moderators if needed
       return new Promise(resolve => {
         if (!modsToRemove.length) return resolve()
-        let promise = adminApi.moderators.remove($http, removeParams)
+        let promise = adminApi.moderators.remove(removeData)
         .then(users => {
           users.forEach(u => remove(mods, mod => mod.username === u.username))
           return users
@@ -88,7 +81,7 @@ export default {
       // add moderators if needed
       .then(() => {
         if (!modsToAdd.length) return
-        return adminApi.moderators.add($http, addParams)
+        return adminApi.moderators.add(addData)
         .then(users => {
           users.forEach(user => mods.push({ username: user.username, id: user.id }))
           return users
@@ -116,7 +109,6 @@ export default {
     }
 
     /* Internal Data */
-    const $http = inject(Http)
     const $alertStore = inject('$alertStore')
     const $auth = inject(AuthStore)
 
@@ -139,7 +131,7 @@ export default {
         searchable: true,
         maxHeight: 100,
         options: async q => {
-          return await usersApi.search($http, q)
+          return await usersApi.search(q)
           // filter out existing mods
           .then(d => d.filter(u => !v.moderators.find(o => o.username === u)))
           // convert array into array of objects
