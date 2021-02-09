@@ -44,9 +44,7 @@ const http = (path, opts, handleErrors) => {
 }
 
 export const boardsApi = {
-  slugToBoardId: (slug) => {
-    return http(`/api/boards/${slug}/id`)
-  },
+  slugToBoardId: slug => http(`/api/boards/${slug}/id`),
   getBoards: ({ config, processBoardsCallback }) => {
     if (config) {
       let result = http('/api/boards')
@@ -66,9 +64,7 @@ export const boardsApi = {
 }
 
 export const threadsApi = {
-  byBoard: (data) => {
-    return http('/api/threads', { data: data })
-  }
+  byBoard: data => http('/api/threads', { data: data })
 }
 
 export const authApi = {
@@ -79,7 +75,7 @@ export const authApi = {
       return dbUser
     })
   },
-  logout: (handleErrors) => {
+  logout: handleErrors => {
     return http('/api/logout', { method: 'DELETE' }, handleErrors)
     .then(dbUser => {
       delete $axios.defaults.headers.common['Authorization']
@@ -93,20 +89,16 @@ export const authApi = {
       return dbUser
     })
   },
-  emailAvailable: (val) => { return http(`/api/register/email/${val}`) },
-  usernameAvailable: (val) => { return http(`/api/register/username/${val}`) }
+  emailAvailable: val => http(`/api/register/email/${val}`),
+  usernameAvailable: val => http(`/api/register/username/${val}`)
 }
 
 export const usersApi = {
-  search: (username) => {
-    return http(`/api/users/search?username=${username}`)
-  },
+  search: username => http(`/api/users/search?username=${username}`),
   update: (userId, data) => {
     return http(`/api/users/${userId}`, { method: 'PUT', data: data })
   },
-  preferences: () => {
-    return http('/api/users/preferences')
-  }
+  preferences: () => http('/api/users/preferences')
 }
 
 export const breadcrumbsApi = {
@@ -117,11 +109,7 @@ export const breadcrumbsApi = {
 
 export const adminApi = {
   moderators: {
-    remove: data => {
-      return http('/api/admin/moderators/remove', { method: 'POST', data: data })
-    },
-    add: data => {
-      return http('/api/admin/moderators', { method: 'POST', data: data })
-    }
+    remove: data => http('/api/admin/moderators/remove', { method: 'POST', data: data }),
+    add: data => http('/api/admin/moderators', { method: 'POST', data: data })
   }
 }
