@@ -201,14 +201,14 @@
 
   <div class="board-sidebar">
     <div class="board-actions" v-if="loggedIn">
-      <a v-if="canCreate" class="button secondary" href="#" @click="loadEditor()">
+      <a v-if="canCreate()" class="button secondary" href="#" @click="loadEditor()">
         <i class="icon-epoch-add"></i>Start a New Thread
       </a>
       <a class="button secondary" @click="watchBoard()"  v-if="threadData && threadData.data && threadData.data.board && !threadData.data.board.watched">
         <i class="icon-epoch-watch"></i>Watch This Board
       </a>
       <a class="button secondary" @click="showSetModerators = true"
-        v-if="canSetModerator">
+        v-if="canSetModerator()">
         <i class="icon-epoch-watch"></i>Set Moderators
       </a>
     </div>
@@ -225,7 +225,7 @@ import SetModeratorsModal from '@/components/modals/threads/SetModerators.vue'
 import humanDate from '@/composables/filters/humanDate'
 import decode from '@/composables/filters/decode'
 import truncate from '@/composables/filters/truncate'
-import { inject, reactive, computed, watch, toRefs } from 'vue'
+import { inject, reactive, watch, toRefs } from 'vue'
 import { threadsApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
@@ -306,6 +306,18 @@ export default {
       return sortClass
     }
 
+    const canSetModerator = () => {
+      // TODO(akinsey): Implement ban status check
+      // if (BanSvc.banStatus()) return false
+      return v.permissionUtils.hasPermission('moderators.add.allow') && v.permissionUtils.hasPermission('moderators.remove.allow')
+    }
+
+    const canCreate = () => {
+      // TODO(akinsey): Implement ban status check
+      // if (BanSvc.banStatus()) return false
+      return v.threadData.data?.write_access || v.permissionUtils.hasPermission('threads.create.allow')
+    }
+
     /* Internal Data */
     const $http = inject(Http)
     const $swrvCache = inject('$swrvCache')
@@ -324,6 +336,7 @@ export default {
       }, processThreads, { cache: $swrvCache, dedupingInterval: 100, ttl: 500 }),
       prefs: $prefs.data,
       loggedIn: $auth.loggedIn,
+      permissionUtils: $auth.permissionUtils,
       showSetModerators: false,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
@@ -351,10 +364,6 @@ export default {
     /* Watched Data */
     watch(() => v.loggedIn, () => v.threadData.mutate(processThreads)) // Update threads on login
     watch(() => $route.query, () => v.threadData.mutate(processThreads)) // Update on query change
-
-    /* Computed Data */
-    const canCreate = computed(() => true)
-    const canSetModerator = computed(() => true)
 
     return { ...toRefs(v), canCreate, canSetModerator, loadEditor, watchBoard, setSortField, getSortClass, humanDate, decode, truncate }
   }
