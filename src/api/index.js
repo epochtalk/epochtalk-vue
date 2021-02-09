@@ -52,22 +52,22 @@ export const threadsApi = {
 }
 
 export const authApi = {
-  login: (data, handleErrors) => {
-    return http('/api/login', { method: 'POST', data: data }, handleErrors)
+  login: data => {
+    return http('/api/login', { method: 'POST', data: data }, true)
     .then(dbUser => {
       $axios.defaults.headers.common['Authorization'] = `BEARER ${dbUser.token}`
       return dbUser
     })
   },
-  logout: handleErrors => {
-    return http('/api/logout', { method: 'DELETE' }, handleErrors)
+  logout: () => {
+    return http('/api/logout', { method: 'DELETE' }, true)
     .then(dbUser => {
       delete $axios.defaults.headers.common['Authorization']
       return dbUser
     })
   },
-  register: (data, handleErrors) => {
-    return http('/api/register', { method: 'POST', data: data }, handleErrors)
+  register: data => {
+    return http('/api/register', { method: 'POST', data: data }, true)
     .then(dbUser => {
       $axios.defaults.headers.common['Authorization'] = `BEARER ${dbUser.token}`
       return dbUser

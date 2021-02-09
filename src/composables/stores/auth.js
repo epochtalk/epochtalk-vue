@@ -31,13 +31,7 @@ export default {
 
     /* Provided Methods */
     const login = (username, password, rememberMe) => {
-      const data =  {
-        username: username,
-        password: password,
-        rememberMe: rememberMe
-      }
-      const handleErrors = true
-      authApi.login(data, handleErrors)
+      authApi.login({ username, password, rememberMe })
       .then(dbUser => {
         $appCache.set(AUTH_KEY, dbUser)
         Object.assign(user, dbUser)
@@ -47,8 +41,7 @@ export default {
     }
 
     const logout = () => {
-      const handleErrors = true
-      authApi.logout(handleErrors)
+      authApi.logout()
       .then(() => {
         delete user.token // clear token to invalidate session immediately
         $appCache.delete(AUTH_KEY)
@@ -61,13 +54,7 @@ export default {
     }
 
     const register = (email, username, password) => {
-      const data = {
-        email: email,
-        username: username,
-        password: password
-      }
-      const handleErrors = true
-      authApi.register(data, handleErrors)
+      authApi.register({ email, username, password })
       .then(dbUser => {
         // Set user session if account is already confirmed (log the user in)
         if (!dbUser.confirm_token) {
