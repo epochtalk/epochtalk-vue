@@ -9,11 +9,11 @@ const $axios = axios.create({
   crossDomain: true
 })
 const $auth = localStorageCache(0, 'app').get('auth')
-const user = $auth ? $auth.data : undefined
-if (user) { $axios.defaults.headers.common['Authorization'] = `BEARER ${user.token}` }
+const initUser = $auth ? $auth.data : undefined
+if (initUser) { $axios.defaults.headers.common['Authorization'] = `BEARER ${initUser.token}` }
 
 /* provided methods */
-const http = (path, opts, handleErrors) => {
+const $http = (path, opts, handleErrors) => {
   opts = opts || {}
   const method = (opts.method || 'get').toLowerCase()
   delete opts.method
@@ -43,57 +43,47 @@ const http = (path, opts, handleErrors) => {
 }
 
 export const boardsApi = {
-  slugToBoardId: slug => http(`/api/boards/${slug}/id`),
-  getBoards: () => http('/api/boards')
+  slugToBoardId: slug => $http(`/api/boards/${slug}/id`),
+  getBoards: () => $http('/api/boards')
 }
 
 export const threadsApi = {
-  byBoard: params => http('/api/threads', { params: params })
+  byBoard: params => $http('/api/threads', { params })
 }
 
 export const authApi = {
-  login: data => {
-    return http('/api/login', { method: 'POST', data: data }, true)
-    .then(dbUser => {
-      $axios.defaults.headers.common['Authorization'] = `BEARER ${dbUser.token}`
-      return dbUser
-    })
-  },
-  logout: () => {
-    return http('/api/logout', { method: 'DELETE' }, true)
-    .then(dbUser => {
-      delete $axios.defaults.headers.common['Authorization']
-      return dbUser
-    })
-  },
-  register: data => {
-    return http('/api/register', { method: 'POST', data: data }, true)
-    .then(dbUser => {
-      $axios.defaults.headers.common['Authorization'] = `BEARER ${dbUser.token}`
-      return dbUser
-    })
-  },
-  emailAvailable: email => http(`/api/register/email/${email}`),
-  usernameAvailable: username => http(`/api/register/username/${username}`)
+  login: data => $http('/api/login', { method: 'POST', data }, true)
+  .then(user => {
+    $axios.defaults.headers.common['Authorization'] = `BEARER ${user.token}`
+    return user
+  }),
+  logout: () => $http('/api/logout', { method: 'DELETE' }, true)
+  .then(user => {
+    delete $axios.defaults.headers.common['Authorization']
+    return user
+  }),
+  register: data => $http('/api/register', { method: 'POST', data }, true)
+  .then(user => {
+    $axios.defaults.headers.common['Authorization'] = `BEARER ${user.token}`
+    return user
+  }),
+  emailAvailable: email => $http(`/api/register/email/${email}`),
+  usernameAvailable: username => $http(`/api/register/username/${username}`)
 }
 
 export const usersApi = {
-  search: username => http(`/api/users/search?username=${username}`),
-  update: (userId, data) => {
-    return http(`/api/users/${userId}`, { method: 'PUT', data: data })
-  },
-  preferences: () => http('/api/users/preferences')
+  search: username => $http('/api/users/search', { params: { username } }),
+  update: (userId, data) => $http(`/api/users/${userId}`, { method: 'PUT', data }),
+  preferences: () => $http('/api/users/preferences')
 }
 
 export const breadcrumbsApi = {
-  find: (id, type) => {
-    return http(`/api/breadcrumbs?id=${id}&type=${type}`)
-  }
+  find: (id, type) => $http('/api/breadcrumbs', { params: { id, type } })
 }
 
 export const adminApi = {
   moderators: {
-    remove: data => http('/api/admin/moderators/remove', { method: 'POST', data: data }),
-    add: data => http('/api/admin/moderators', { method: 'POST', data: data })
+    remove: data => $http('/api/admin/moderators/remove', { method: 'POST', data }),
+    add: data => $http('/api/admin/moderators', { method: 'POST', data })
   }
 }

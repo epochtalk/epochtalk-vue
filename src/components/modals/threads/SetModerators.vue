@@ -113,8 +113,6 @@ export default {
     const $auth = inject(AuthStore)
 
     /* Template Data */
-    // const initMods = []
-
     const v = reactive({
       boardName: props.board.name,
       moderators: props.board.moderators,
