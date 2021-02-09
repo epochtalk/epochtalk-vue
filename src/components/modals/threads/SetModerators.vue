@@ -36,7 +36,6 @@
 import Modal from '@/components/layout/Modal.vue'
 import { cloneDeep, intersection, remove } from 'lodash'
 import { reactive, toRefs, inject } from 'vue'
-// import { AuthStore } from '@/composables/stores/auth'
 import Multiselect from '@vueform/multiselect'
 import { adminApi, usersApi } from '@/api'
 import { Http } from '@/composables/utils/http'
