@@ -87,6 +87,7 @@
 </template>
 
 <script>
+import useSWRV from 'swrv'
 import humanDate from '@/composables/filters/humanDate'
 import RecentThreads from '@/components/threads/RecentThreads.vue'
 import LoginModal from '@/components/modals/auth/Login.vue'
@@ -106,22 +107,23 @@ export default {
   },
   setup() {
     /* Internal View Methods */
-    const processBoards = data => {
-      data.boards.map(category => {
-        // filter out ignored boards
-        category.boards = filterIgnoredBoards(category.boards, v.ignoredBoards)
+    const processBoards = () => boardsApi.getBoards()
+      .then(data => {
+        data.boards.map(category => {
+          // filter out ignored boards
+          category.boards = filterIgnoredBoards(category.boards, v.ignoredBoards)
 
-        // set total_thread_count and total_post_count for all boards
-        category.boards.map(board => {
-          let children = countTotals([board])
-          let lastPost = getLastPost([board])
-          board.total_thread_count = children.thread_count
-          board.total_post_count = children.post_count
-          return Object.assign(board, lastPost)
+          // set total_thread_count and total_post_count for all boards
+          category.boards.map(board => {
+            let children = countTotals([board])
+            let lastPost = getLastPost([board])
+            board.total_thread_count = children.thread_count
+            board.total_post_count = children.post_count
+            return Object.assign(board, lastPost)
+          })
         })
+        return data
       })
-      return data
-    }
 
     /* View Methods */
     const generateCatId = (name, viewOrder) => {
@@ -156,17 +158,11 @@ export default {
       showRegister: false,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
-      boardData: boardsApi.getBoards({
-        config: {
-          cache: $swrvCache,
-          dedupingInterval: 750
-        },
-        processBoardsCallback: processBoards
-      })
+      boardData: useSWRV(() => `/api/boards`, processBoards, { cache: $swrvCache, dedupingInterval: 750 })
     })
 
     /* Watch Data */
-    watch(() => v.loggedIn, () => v.boardData.mutate(boardsApi.getBoards({ processBoardsCallback: processBoards }))) // Update boards on login
+    watch(() => v.loggedIn, () => v.boardData.mutate(processBoards)) // Update boards on login
     watch(() => v.boardData.error, () => $alertStore.error(v.boardData)) // Handle errors
 
     return { ...toRefs(v), generateCatId, toggleCategory, humanDate }

@@ -1,4 +1,3 @@
-import useSWRV from 'swrv'
 import axios from 'axios'
 import { get } from 'lodash'
 import localStorageCache from '@/composables/utils/localStorageCache'
@@ -45,22 +44,7 @@ const http = (path, opts, handleErrors) => {
 
 export const boardsApi = {
   slugToBoardId: slug => http(`/api/boards/${slug}/id`),
-  getBoards: ({ config, processBoardsCallback }) => {
-    if (config) {
-      let result = http('/api/boards')
-      // use processor if available
-      if (processBoardsCallback) {
-        result = result.then(processBoardsCallback)
-      }
-      return useSWRV(`/api/boards`, () => result, config)
-    }
-    else {
-      return () => {
-        return http('/api/boards')
-        .then(processBoardsCallback)
-      }
-    }
-  }
+  getBoards: () => http('/api/boards')
 }
 
 export const threadsApi = {
