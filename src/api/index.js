@@ -48,7 +48,7 @@ export const boardsApi = {
 }
 
 export const threadsApi = {
-  byBoard: data => http('/api/threads', { data: data })
+  byBoard: params => http('/api/threads', { params: params })
 }
 
 export const authApi = {

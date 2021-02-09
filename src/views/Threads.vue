@@ -240,14 +240,14 @@ export default {
     const processThreads = () => {
       return Promise.resolve(props.boardId)
       .then(boardId => {
-        const data = {
+        const params = {
           board_id: boardId,
           limit: v.prefs.threads_per_page,
           page: $route.query.page || 1,
           field: $route.query.field,
           desc: $route.query.desc
         }
-        return threadsApi.byBoard(data)
+        return threadsApi.byBoard(params)
         .then(tData => {
           // always supply moderators array so property remains reactive even when passed to children
           tData.board.moderators = tData.board.moderators || []
