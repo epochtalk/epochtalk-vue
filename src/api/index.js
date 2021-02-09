@@ -89,8 +89,8 @@ export const authApi = {
       return dbUser
     })
   },
-  emailAvailable: val => http(`/api/register/email/${val}`),
-  usernameAvailable: val => http(`/api/register/username/${val}`)
+  emailAvailable: email => http(`/api/register/email/${email}`),
+  usernameAvailable: username => http(`/api/register/username/${username}`)
 }
 
 export const usersApi = {
