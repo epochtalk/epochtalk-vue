@@ -204,8 +204,8 @@
       <a v-if="canCreate()" class="button secondary" href="#" @click="loadEditor()">
         <i class="icon-epoch-add"></i>Start a New Thread
       </a>
-      <a class="button secondary" @click="watchBoard()"  v-if="threadData && threadData.data && threadData.data.board && !threadData.data.board.watched">
-        <i class="icon-epoch-watch"></i>Watch This Board
+      <a class="button secondary" @click="watchBoard()" v-if="threadData && threadData.data && threadData.data.board">
+        <i class="icon-epoch-watch"></i>{{ threadData.data.board.watched ? 'Unwatch ' : 'Watch ' }}This Board
       </a>
       <a class="button secondary" @click="showSetModerators = true"
         v-if="canSetModerator()">
@@ -226,7 +226,7 @@ import humanDate from '@/composables/filters/humanDate'
 import decode from '@/composables/filters/decode'
 import truncate from '@/composables/filters/truncate'
 import { inject, reactive, watch, toRefs } from 'vue'
-import { threadsApi } from '@/api'
+import { threadsApi, watchlistApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
 import { countTotals, getLastPost, filterIgnoredBoards } from '@/composables/utils/boardUtils'
@@ -271,7 +271,18 @@ export default {
     /* View Methods */
     const loadEditor = () => console.log('loadEditor()')
 
-    const watchBoard = () => console.log('watchBoard()')
+    const watchBoard = () => {
+      if (v.threadData.data.board.watched) {
+        watchlistApi.unwatchBoard(v.threadData.data.board.id)
+        .then(() => v.threadData.data.board.watched = false)
+        .catch(() => $alertStore.error('There was an error unwatching this board'))
+      }
+      else {
+        watchlistApi.watchBoard(v.threadData.data.board.id)
+        .then(() => v.threadData.data.board.watched = true)
+        .catch(() => $alertStore.error('There was an error watching this board'))
+      }
+    }
 
     const setSortField = newField => {
       // Get/Set new sort field
@@ -321,6 +332,7 @@ export default {
     const $router = useRouter()
     const $prefs = inject(PreferencesStore)
     const $auth = inject(AuthStore)
+    const $alertStore = inject('$alertStore')
 
     /* View Data */
     const v = reactive({

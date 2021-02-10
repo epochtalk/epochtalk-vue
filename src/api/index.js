@@ -51,6 +51,11 @@ export const threadsApi = {
   byBoard: params => $http('/api/threads', { params })
 }
 
+export const watchlistApi = {
+  watchBoard: boardId => $http(`/api/watchlist/boards/${boardId}`, { method: 'POST' }),
+  unwatchBoard: boardId => $http(`/api/watchlist/boards/${boardId}`, { method: 'DELETE' })
+}
+
 export const authApi = {
   login: data => $http('/api/login', { method: 'POST', data }, true)
   .then(user => {
