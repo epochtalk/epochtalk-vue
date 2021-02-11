@@ -14,7 +14,7 @@
         <h1>{{postData.data.thread.title}}</h1>
         <!-- TODO(boka): add data-balloon plugin -->
         <!-- <a data-balloon="Edit Thread Title" ng-href="#" class="do-edit" v-if="PostsParentCtrl.canEditTitle()" ng-click="PostsParentCtrl.openEditThread()"> -->
-        <a href="#" class="do-edit" v-if="canEditTitle()" ng-click="PostsParentCtrl.openEditThread()">
+        <a href="#" class="do-edit" v-if="canEditTitle()" @click.prevent="openEditThread()">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
             <title></title>
             <path d="M7.38,33.74h0L4,44l10.26-3.39h0L41.74,13.14,34.86,6.26Zm31-21.15.54.55L14.26,37.79l-.54-.54" />
@@ -24,7 +24,7 @@
         <div class="threadStates">
           <div class="badge locked" v-if="PostsParentCtrl.thread.locked">
             <div class="">
-              <a ng-href="#" id="lockThread" v-if="PostsParentCtrl.canLock()" ng-class="{'clicked' : PostsParentCtrl.thread.locked }"
+              <a href="#" id="lockThread" v-if="PostsParentCtrl.canLock()" ng-class="{'clicked' : PostsParentCtrl.thread.locked }"
                 ng-click="PostsParentCtrl.updateThreadLock()" class="badgeContents" data-balloon="{{PostsParentCtrl.thread.locked ? 'Unlock Thread' : 'Lock Thread'}}">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                   <title></title>
@@ -44,7 +44,7 @@
             </div>
           </div>
           <div class="badge sticky" v-if="PostsParentCtrl.thread.sticky">
-            <a ng-href="#" id="badge__stickyThread"
+            <a href="#" id="badge__stickyThread"
               ng-class="{'clicked' : PostsParentCtrl.thread.sticky }"
               v-if="PostsParentCtrl.canSticky()"
               ng-click="PostsParentCtrl.updateThreadSticky()" class="badgeContents"
@@ -161,7 +161,7 @@
 
           <ul class="post-action">
             <li v-if="PostsCtrl.canPurge() && post.position !== 1">
-              <a ng-href="" class="post-action-icon" data-balloon="Purge" ng-click="PostsParentCtrl.openPurgeModal($index)">
+              <a href="" class="post-action-icon" data-balloon="Purge" ng-click="PostsParentCtrl.openPurgeModal($index)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                   <title></title>
                   <path
@@ -172,7 +172,7 @@
               </a>
             </li>
             <li v-if="PostsCtrl.canDelete(post) && post.position !== 1 && !post.deleted">
-              <a ng-href="" class="post-action-icon" data-balloon="Hide" ng-click="PostsParentCtrl.openDeleteModal($index, post.locked)">
+              <a href="" class="post-action-icon" data-balloon="Hide" ng-click="PostsParentCtrl.openDeleteModal($index, post.locked)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                   <title></title>
                   <path
@@ -184,7 +184,7 @@
               </a>
             </li>
             <li v-if="PostsCtrl.canDelete(post) && post.deleted">
-              <a ng-href="" class="post-action-icon selected" data-balloon="Unhide" ng-click="PostsParentCtrl.openUndeleteModal($index)">
+              <a href="" class="post-action-icon selected" data-balloon="Unhide" ng-click="PostsParentCtrl.openUndeleteModal($index)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                   <title></title>
                   <path
@@ -196,7 +196,7 @@
               </a>
             </li>
             <li v-if="PostsCtrl.canPostLock(post) && !post.locked">
-              <a ng-href="" class="post-action-icon" data-balloon="Lock Post" ng-click="PostsParentCtrl.lockPost(post)">
+              <a href="" class="post-action-icon" data-balloon="Lock Post" ng-click="PostsParentCtrl.lockPost(post)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                   <title></title>
                   <path
@@ -205,7 +205,7 @@
               </a>
             </li>
             <li v-if="PostsCtrl.canPostLock(post) && post.locked">
-              <a ng-href="" class="post-action-icon selected" data-balloon="Unlock Post" ng-click="PostsParentCtrl.unlockPost(post)">
+              <a href="" class="post-action-icon selected" data-balloon="Unlock Post" ng-click="PostsParentCtrl.unlockPost(post)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                   <title></title>
                   <path
@@ -214,7 +214,7 @@
               </a>
             </li>
             <li v-if="PostsParentCtrl.loggedIn() && (PostsParentCtrl.reportControlAccess.reportPosts || PostsParentCtrl.reportControlAccess.reportUsers) && !PostsParentCtrl.bannedFromBoard">
-              <a ng-href="" class="post-action-icon" data-balloon="Report" ng-click="PostsCtrl.openReportModal(post)">
+              <a href="" class="post-action-icon" data-balloon="Report" ng-click="PostsCtrl.openReportModal(post)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                   <title></title>
                   <path
@@ -223,7 +223,7 @@
               </a>
             </li>
             <li v-if="PostsCtrl.canUpdate(post)">
-              <a ng-href="" class="post-action-icon" data-balloon="Edit" ng-click="PostsCtrl.loadEditor(post)">
+              <a href="" class="post-action-icon" data-balloon="Edit" ng-click="PostsCtrl.loadEditor(post)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                   <title></title>
                   <path d="M7.38,33.74h0L4,44l10.26-3.39h0L41.74,13.14,34.86,6.26Zm31-21.15.54.55L14.26,37.79l-.54-.54" />
@@ -232,7 +232,7 @@
               </a>
             </li>
             <li v-if="PostsCtrl.canPost()">
-              <a ng-href="" class="post-action-icon" data-balloon="Quote" ng-click="PostsCtrl.addQuote(post)">
+              <a href="" class="post-action-icon" data-balloon="Quote" ng-click="PostsCtrl.addQuote(post)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                   <title></title>
                   <path
@@ -241,7 +241,7 @@
               </a>
             </li>
             <li v-if="PostsParentCtrl.loggedIn() && PostsCtrl.thread.locked">
-              <a ng-href="" data-balloon="Quote" ng-click="PostsCtrl.copyQuote(post)">
+              <a href="" data-balloon="Quote" ng-click="PostsCtrl.copyQuote(post)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                   <title></title>
                   <path
@@ -250,7 +250,7 @@
               </a>
             </li>
             <li>
-              <a ng-href="{{::PostsCtrl.rootUrl}}?start={{::post.position}}#{{::post.id}}" ng-click="PostsCtrl.highlightPost()" class="post-action-icon" data-balloon="Permalink">
+              <a href="{{::PostsCtrl.rootUrl}}?start={{::post.position}}#{{::post.id}}" ng-click="PostsCtrl.highlightPost()" class="post-action-icon" data-balloon="Permalink">
                 <!-- <i class="icon-epoch-link"></i> -->
                 <strong>#{{post.position}}</strong>
               </a>
@@ -305,7 +305,7 @@
           <!-- Thread Lock -->
           <div class="control" data-balloon="{{PostsParentCtrl.thread.locked ? 'Unlock Thread' : 'Lock Thread'}}"
             v-if="PostsParentCtrl.canLock()">
-            <a ng-href="#" id="lockThread" ng-class="{'clicked' : PostsParentCtrl.thread.locked }"
+            <a href="#" id="lockThread" ng-class="{'clicked' : PostsParentCtrl.thread.locked }"
               ng-click="PostsParentCtrl.updateThreadLock()">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <title></title>
@@ -318,7 +318,7 @@
           <!-- Thread Sticky -->
           <div class="control" data-balloon="{{PostsParentCtrl.thread.sticky ? 'Unsticky Thread' : 'Sticky Thread'}}"
             v-if="PostsParentCtrl.canSticky()">
-            <a ng-href="#" id="stickyThread" ng-class="{'clicked' : PostsParentCtrl.thread.sticky }"
+            <a href="#" id="stickyThread" ng-class="{'clicked' : PostsParentCtrl.thread.sticky }"
               ng-click="PostsParentCtrl.updateThreadSticky()">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <title></title>
@@ -330,7 +330,7 @@
 
           <!-- Purge Delete -->
           <div class="control" data-balloon="Purge Thread" v-if="PostsParentCtrl.canPurge()">
-            <a ng-href="#" id="purgeThread" ng-class="{'clicked' : PostsParentCtrl.showPurgeThreadModal }"
+            <a href="#" id="purgeThread" ng-class="{'clicked' : PostsParentCtrl.showPurgeThreadModal }"
               ng-click="PostsParentCtrl.showPurgeThreadModal = true">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <title></title>
@@ -342,7 +342,7 @@
 
           <!-- Move Thread -->
           <div class="control" data-balloon="Move Thread" v-if="PostsParentCtrl.canMove()">
-            <a ng-href="#" id="moveBoard" ng-class="{'clicked' : PostsParentCtrl.showMoveThreadModal }"
+            <a href="#" id="moveBoard" ng-class="{'clicked' : PostsParentCtrl.showMoveThreadModal }"
               ng-click="PostsParentCtrl.openMoveThreadModal()">
               <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                 <title></title>
