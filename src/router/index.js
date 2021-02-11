@@ -3,6 +3,7 @@ import { boardsApi } from '@/api'
 import Boards from '@/views/Boards.vue'
 import Threads from '@/views/Threads.vue'
 import About from '@/views/About.vue'
+import Settings from '@/views/Settings.vue'
 import NotFound from '@/views/NotFound.vue'
 import NProgress from 'nprogress'
 
@@ -22,6 +23,12 @@ const routes = [
       boardId: boardsApi.slugToBoardId(route.params.boardSlug).then(b => b.id)
     }),
     meta: { requiresAuth: false, bodyClass: 'threads' }
+  },
+  {
+    path: '/settings',
+    name: 'Settings',
+    component: Settings,
+    meta: { requiresAuth: true, bodyClass: 'settings' }
   },
   {
     path: '/about',
