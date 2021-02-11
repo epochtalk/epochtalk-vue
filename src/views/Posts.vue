@@ -126,7 +126,7 @@
             </span>
             <img ng-style="" ng-src="{{::post.avatar || $webConfigs.default_avatar}}">
           </div>
-          <div class="original-poster" v-if="::post.user.original_poster">OP</div>
+          <div class="original-poster" v-if="post.user.original_poster">OP</div>
           <div v-if="post.user.activity > -1" title="{{ 'Activity: ' + post.user.activity }}" class="user-activity">Act: <span ng-bind="post.user.activity" class="user-activity-value"></span></div>
         </a>
 
@@ -146,14 +146,14 @@
         <!-- Post Title -->
         <div class="post-title">
           <div class="post-title-user">
-            <a class="username" data-balloon="{{post.user.role_name || 'User'}}" ui-sref="profile.posts({ username: post.user.username})"  ng-bind="::post.user.username"></a>
+            <a class="username" data-balloon="{{post.user.role_name || 'User'}}" ui-sref="profile.posts({ username: post.user.username})"  ng-bind="post.user.username"></a>
             <div title="{{post.user.name}}" v-if="post.user.name" class="display-name">
-              <span ng-bind-html="::post.user.name | truncate:33"></span>
+              <span ng-bind-html="post.user.name | truncate:33"></span>
               <span class="hide-mobile">&nbsp;&mdash;&nbsp;</span>
             </div>
             <div title="{{post.user.role_name || 'user'}}" class="user-role" ng-bind="post.user.role_name || 'user'" ng-style="PostsCtrl.userRoleHighlight(post.user.highlight_color)"></div>
             <div class="timestamp">
-              <span ng-bind="::post.created_at | humanDate"></span>
+              <span ng-bind="post.created_at | humanDate"></span>
               <span v-if="PostsCtrl.showEditDate(post) && post.metadata.edited_by_username" ng-bind-html="'&nbsp;&mdash;&nbsp;Edited ' + (post.updated_at | humanDate) + ' by '"></span><a v-if="PostsCtrl.showEditDate(post) && post.metadata.edited_by_username" ui-sref="profile.posts({ username: post.metadata.edited_by_username})" ng-bind="post.metadata.edited_by_username"></a>
               <span v-if="PostsCtrl.showEditDate(post) && !post.metadata.edited_by_username" ng-bind-html="'&nbsp;&mdash;&nbsp;Edited ' + (post.updated_at | humanDate)"></span>
               <span v-if="post.metadata.locked_by_username" ng-bind-html="'&nbsp;&mdash;&nbsp;Locked ' + (post.metadata.locked_at | humanDate) + ' by '"></span>
@@ -252,7 +252,7 @@
               </a>
             </li>
             <li>
-              <a href="{{::PostsCtrl.rootUrl}}?start={{::post.position}}#{{::post.id}}" @click.prevent="PostsCtrl.highlightPost()" class="post-action-icon" data-balloon="Permalink">
+              <a href="{{PostsCtrl.rootUrl}}?start={{post.position}}#{{post.id}}" @click.prevent="PostsCtrl.highlightPost()" class="post-action-icon" data-balloon="Permalink">
                 <!-- <i class="icon-epoch-link"></i> -->
                 <strong>#{{post.position}}</strong>
               </a>
