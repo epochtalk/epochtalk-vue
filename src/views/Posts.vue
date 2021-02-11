@@ -46,7 +46,7 @@
           </div>
           <div class="badge sticky" v-if="PostsParentCtrl.thread.sticky">
             <a href="#" id="badge__stickyThread"
-              ng-class="{'clicked' : PostsParentCtrl.thread.sticky }"
+              :class="{'clicked' : PostsParentCtrl.thread.sticky }"
               v-if="PostsParentCtrl.canSticky()"
               @click.prevent="PostsParentCtrl.updateThreadSticky()" class="badgeContents"
               data-balloon="{{PostsParentCtrl.thread.canSticky ? 'Sticky Thread' : 'Unsticky Thread'}}">
@@ -58,7 +58,7 @@
               Sticky
             </a>
             <span id="badge__cannotStickyThread"
-              ng-class="{'clicked' : PostsParentCtrl.thread.sticky }"
+              :class="{'clicked' : PostsParentCtrl.thread.sticky }"
               v-if="!PostsParentCtrl.canSticky()"
               class="badgeContents">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -99,7 +99,7 @@
   <!-- <ad-viewer page="PostsParentCtrl.page"></ad-viewer> -->
 
   <!-- Posts Listing -->
-  <div id="{{::post.id}}" ng-repeat="post in PostsCtrl.posts track by post.id" class="post-block" ng-class="{ 'highlighted': post.highlighted, 'hidden': post.hidden, 'deleted': post._deleted || post.user.ignored,  'editing': post.id === PostsParentCtrl.posting.post.id }">
+  <div id="{{::post.id}}" ng-repeat="post in PostsCtrl.posts track by post.id" class="post-block" :class="{ 'highlighted': post.highlighted, 'hidden': post.hidden, 'deleted': post._deleted || post.user.ignored,  'editing': post.id === PostsParentCtrl.posting.post.id }">
     <!-- Delete Post View -->
     <div class="deleted" v-if="post._deleted || post.user.ignored">
       Post
@@ -260,7 +260,7 @@
           <!-- <div class="clear"></div> -->
         </div>
         <!-- Post Body -->
-        <div class="post-body" ng-class="{ 'rtl': post.right_to_left }" post-processing="post.body_html" style-fix="true"></div>
+        <div class="post-body" :class="{ 'rtl': post.right_to_left }" post-processing="post.body_html" style-fix="true"></div>
         <div v-if="post.user.signature && !PostsParentCtrl.disableSignature">
           <div class="post-signature" post-processing="post.user.signature" style-fix="true"></div>
         </div>
@@ -306,7 +306,7 @@
           <!-- Thread Lock -->
           <div class="control" data-balloon="{{PostsParentCtrl.thread.locked ? 'Unlock Thread' : 'Lock Thread'}}"
             v-if="PostsParentCtrl.canLock()">
-            <a href="#" id="lockThread" ng-class="{'clicked' : PostsParentCtrl.thread.locked }"
+            <a href="#" id="lockThread" :class="{'clicked' : PostsParentCtrl.thread.locked }"
               @click.prevent="PostsParentCtrl.updateThreadLock()">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <title></title>
@@ -319,7 +319,7 @@
           <!-- Thread Sticky -->
           <div class="control" data-balloon="{{PostsParentCtrl.thread.sticky ? 'Unsticky Thread' : 'Sticky Thread'}}"
             v-if="PostsParentCtrl.canSticky()">
-            <a href="#" id="stickyThread" ng-class="{'clicked' : PostsParentCtrl.thread.sticky }"
+            <a href="#" id="stickyThread" :class="{'clicked' : PostsParentCtrl.thread.sticky }"
               @click.prevent="PostsParentCtrl.updateThreadSticky()">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <title></title>
@@ -331,7 +331,7 @@
 
           <!-- Purge Delete -->
           <div class="control" data-balloon="Purge Thread" v-if="PostsParentCtrl.canPurge()">
-            <a href="#" id="purgeThread" ng-class="{'clicked' : PostsParentCtrl.showPurgeThreadModal }"
+            <a href="#" id="purgeThread" :class="{'clicked' : PostsParentCtrl.showPurgeThreadModal }"
               @click.prevent="PostsParentCtrl.showPurgeThreadModal = true">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <title></title>
@@ -343,7 +343,7 @@
 
           <!-- Move Thread -->
           <div class="control" data-balloon="Move Thread" v-if="PostsParentCtrl.canMove()">
-            <a href="#" id="moveBoard" ng-class="{'clicked' : PostsParentCtrl.showMoveThreadModal }"
+            <a href="#" id="moveBoard" :class="{'clicked' : PostsParentCtrl.showMoveThreadModal }"
               @click.prevent="PostsParentCtrl.openMoveThreadModal()">
               <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                 <title></title>
