@@ -414,11 +414,39 @@ export default {
   // components: { Pagination },
   setup(props) {
     console.log(props)
+    /* Internal Methods */
+    /* View Methods */
+    const canEditTitle = () => true
+    const canPost = () => true
+    const canSave = () => true
+    const canMove = () => true
+    const canPurge = () => true
+    const canSticky = () => true
+    const canLock = () => true
+    const canCreatePoll = () => true
+    const canUpdate = () => true
+    const canPostLock = () => true
+    const canDelete = () => true
+    /* Internal Data */
+    /* View Data */
     const v = reactive({
       threadData: {},
       editThread: false
     })
-    return { ...toRefs(v) }
+    return {
+      ...toRefs(v),
+      canEditTitle,
+      canPost,
+      canSave,
+      canMove,
+      canPurge,
+      canSticky,
+      canLock,
+      canCreatePoll,
+      canUpdate,
+      canPostLock,
+      canDelete
+    }
   }
 }
 </script>
