@@ -17,9 +17,10 @@
 
 export default {
   name: 'Posts',
-  // props: ['threadSlug', 'threadId'],
+  props: ['threadSlug', 'threadId'],
   // components: { Pagination },
-  setup() {
+  setup(props) {
+    console.log(props)
     return {}
   }
 }

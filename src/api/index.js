@@ -48,7 +48,8 @@ export const boardsApi = {
 }
 
 export const threadsApi = {
-  byBoard: params => $http('/api/threads', { params })
+  byBoard: params => $http('/api/threads', { params }),
+  slugToThreadId: slug => $http(`/api/threads/${slug}/id`)
 }
 
 export const authApi = {
