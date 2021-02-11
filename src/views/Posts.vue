@@ -116,15 +116,18 @@
     <div v-if="!post._deleted && !post.user.ignored" class="post-block-grid">
       <!-- Post Profile Section -->
       <div class="post-user">
-        <a ui-sref="profile.posts({ username: post.user.username})">
-          <div class="user-avatar {{$webConfigs.default_avatar_shape}}">
-            <span v-if="post.user.online" class="online green" data-balloon="{{post.user.username}} is online">
+        <a href="#">
+        <!-- <a ui-sref="profile.posts({ username: post.user.username})"> -->
+          <div class="user-avatar" :class="defaultAvatarShape">
+            <!-- TODO(boka): add data-balloon plugin -->
+            <!-- data-balloon="{{post.user.username}} is online" -->
+            <span v-if="post.user.online" class="online green">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <title></title>
                 <circle cx="24" cy="24" r="16" />
               </svg>
             </span>
-            <img ng-style="" ng-src="{{::post.avatar || $webConfigs.default_avatar}}">
+            <img :src="post.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
           </div>
           <div class="original-poster" v-if="post.user.original_poster">OP</div>
           <div v-if="post.user.activity > -1" title="{{ 'Activity: ' + post.user.activity }}" class="user-activity">Act: <span ng-bind="post.user.activity" class="user-activity-value"></span></div>
@@ -444,7 +447,9 @@ export default {
       pollValid: false,
       posting: {
         post: {}
-      }
+      },
+      defaultAvatar: window.default_avatar,
+      defaultAvatarShape: window.default_avatar_shape
     })
     return {
       ...toRefs(v),
