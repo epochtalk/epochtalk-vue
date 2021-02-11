@@ -34,7 +34,7 @@
                 </svg>
                 Locked
               </a>
-              <span id="cannotThread" v-if="!PostsParentCtrl.canLock()" ng-class="{'clicked' : PostsParentCtrl.thread.locked }" class="badgeContents">
+              <span id="cannotThread" v-if="!canLock()" :class="{'clicked' : postData.data.thread.locked }" class="badgeContents">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                   <title></title>
                   <path
@@ -44,12 +44,13 @@
               </span>
             </div>
           </div>
-          <div class="badge sticky" v-if="PostsParentCtrl.thread.sticky">
+          <div class="badge sticky" v-if="postData.data.thread.sticky">
             <a href="#" id="badge__stickyThread"
-              :class="{'clicked' : PostsParentCtrl.thread.sticky }"
-              v-if="PostsParentCtrl.canSticky()"
-              @click.prevent="PostsParentCtrl.updateThreadSticky()" class="badgeContents"
-              data-balloon="{{PostsParentCtrl.thread.canSticky ? 'Sticky Thread' : 'Unsticky Thread'}}">
+              :class="{'clicked' : postData.data.thread.sticky }"
+              v-if="canSticky()"
+              @click.prevent="updateThreadSticky()" class="badgeContents">
+              <!-- TODO(boka): add data-balloon plugin -->
+              <!-- data-balloon="{{PostsParentCtrl.thread.canSticky ? 'Sticky Thread' : 'Unsticky Thread'}}"> -->
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <title></title>
                   <g id="icons"><path d="M44.27,11.92,35.08,2.73a2.5,2.5,0,1,0-3.53,3.53l9.19,9.19a2.5,2.5,0,0,0,3.53-3.53Z"/><path d="M16.34,16.51a3,3,0,1,0-4.24,4.25l5.66,5.65L6.44,37.73l-2.12,5,4.95-2.12L20.59,29.24l5.65,5.66a3,3,0,1,0,4.25-4.24Z"/><rect x="21.78" y="11.22" width="16" height="12" transform="translate(-3.46 26.1) rotate(-45)"/>
@@ -58,8 +59,8 @@
               Sticky
             </a>
             <span id="badge__cannotStickyThread"
-              :class="{'clicked' : PostsParentCtrl.thread.sticky }"
-              v-if="!PostsParentCtrl.canSticky()"
+              :class="{'clicked' : postData.data.thread.sticky }"
+              v-if="!canSticky()"
               class="badgeContents">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <title></title>
@@ -72,12 +73,12 @@
         </div>
       </div>
       <!-- Edit Title -->
-      <div v-if="PostsParentCtrl.editThread" class="edit-thread-title">
-        <form ng-submit="PostsParentCtrl.updateThreadTitle()">
-          <input type="text" ng-model="PostsParentCtrl.thread.title" maxlength="255">
+      <div v-if="editThread" class="edit-thread-title">
+        <form @submit.prevent="updateThreadTitle()">
+          <input type="text" v-model="postData.data.thread.title" maxlength="255">
           <div class="actions">
-            <button @click.prevent="PostsParentCtrl.closeEditThread()" class="secondary small">Cancel</button>
-            <button type="submit" ng-disabled="PostsParentCtrl.thread.title.length === 0" class="small">Save</button>
+            <button @click.prevent="closeEditThread()" class="secondary small">Cancel</button>
+            <button type="submit" :disabled="postData.data.thread.title.length === 0" class="small">Save</button>
           </div>
         </form>
       </div>
@@ -85,9 +86,9 @@
 
 
     <!-- Polls -->
-    <div class="fill-row" v-if="PostsParentCtrl.addPoll">
+    <div class="fill-row" v-if="addPoll">
       <!-- <poll-creator poll="PostsParentCtrl.poll" valid="PostsParentCtrl.pollValid"></poll-creator> -->
-      <button class="fill-row" ng-disabled="!PostsParentCtrl.pollValid" @click.prevent="PostsParentCtrl.createPoll()">Create Poll</button>
+      <button class="fill-row" :disabled="!pollValid" @click.prevent="createPoll()">Create Poll</button>
     </div>
     <!-- <poll-viewer thread="PostsParentCtrl.thread" user-priority="PostsParentCtrl.posts[0].user.priority" reset="PostsParentCtrl.resetPoll"></poll-viewer> -->
 
@@ -99,7 +100,7 @@
   <!-- <ad-viewer page="PostsParentCtrl.page"></ad-viewer> -->
 
   <!-- Posts Listing -->
-  <div id="{{::post.id}}" ng-repeat="post in PostsCtrl.posts track by post.id" class="post-block" :class="{ 'highlighted': post.highlighted, 'hidden': post.hidden, 'deleted': post._deleted || post.user.ignored,  'editing': post.id === PostsParentCtrl.posting.post.id }">
+  <div :id="post.id" v-for="post in postData.data.posts" :key="post.id" class="post-block" :class="{ 'highlighted': post.highlighted, 'hidden': post.hidden, 'deleted': post._deleted || post.user.ignored,  'editing': post.id === posting.post.id }">
     <!-- Delete Post View -->
     <div class="deleted" v-if="post._deleted || post.user.ignored">
       Post
@@ -430,11 +431,20 @@ export default {
     const canDelete = () => true
     const openEditThread = () => console.log('openEditThread')
     const updateThreadLock = () => console.log('updateThreadLock')
+    const updateThreadSticky = () => console.log('updateThreadSticky')
+    const updateThreadTitle = () => console.log('updateThreadTitle')
+    const closeEditThread = () => console.log('closeEditThread')
+    const createPoll = () => console.log('createPoll')
     /* Internal Data */
     /* View Data */
     const v = reactive({
       threadData: {},
-      editThread: false
+      editThread: false,
+      addPoll: false,
+      pollValid: false,
+      posting: {
+        post: {}
+      }
     })
     return {
       ...toRefs(v),
@@ -450,7 +460,11 @@ export default {
       canPostLock,
       canDelete,
       openEditThread,
-      updateThreadLock
+      updateThreadLock,
+      updateThreadSticky,
+      updateThreadTitle,
+      closeEditThread,
+      createPoll
     }
   }
 }
