@@ -244,7 +244,8 @@
             </li>
             <li v-if="canUpdate(post)">
               <!-- TODO(boka): add data-balloon plugin -->
-              <a href="" class="post-action-icon" data-balloon="Edit" @click.prevent="PostsCtrl.loadEditor(post)">
+              <!-- data-balloon="Edit" -->
+              <a href="" class="post-action-icon" @click.prevent="loadEditor(post)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                   <title></title>
                   <path d="M7.38,33.74h0L4,44l10.26-3.39h0L41.74,13.14,34.86,6.26Zm31-21.15.54.55L14.26,37.79l-.54-.54" />
@@ -252,7 +253,7 @@
                 </svg>
               </a>
             </li>
-            <li v-if="PostsCtrl.canPost()">
+            <li v-if="canPost()">
               <!-- TODO(boka): add data-balloon plugin -->
               <a href="" class="post-action-icon" data-balloon="Quote" @click.prevent="PostsCtrl.addQuote(post)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -295,7 +296,7 @@
   <div class="sidebar">
     <div class="sidebar-block">
       <div v-if="PostsParentCtrl.canPost()" class="sidebar-actions">
-        <!-- <a class="button" @click.prevent="PostsParentCtrl.loadEditor()" v-if="PostsParentCtrl.canPost()">Post Reply</a> -->
+        <!-- <a class="button" @click.prevent="loadEditor()" v-if="PostsParentCtrl.canPost()">Post Reply</a> -->
 
         <!-- Post Tools -->
         <div class="post-tools">
@@ -400,7 +401,7 @@
         <!-- <pagination page-count="PostsParentCtrl.pageCount" page="PostsParentCtrl.page"></pagination> -->
       </div>
       <div v-if="PostsParentCtrl.canPost()" class="sidebar-actions">
-        <a class="button small" @click.prevent="PostsParentCtrl.loadEditor()" v-if="PostsParentCtrl.canPost()">Post Reply</a>
+        <a class="button small" @click.prevent="loadEditor()" v-if="PostsParentCtrl.canPost()">Post Reply</a>
       </div>
     </div>
   </div>
@@ -483,6 +484,7 @@ export default {
     const openReportModal = (post) => console.log(post, 'openReportModal')
     const lockPost = (post) => console.log(post, 'lockPost')
     const unlockPost = (post) => console.log(post, 'unlockPost')
+    const loadEditor = (post) => const.log(post, 'loadEditor')
     /* Internal Data */
     const $auth = inject(AuthStore)
     /* View Data */
@@ -528,7 +530,8 @@ export default {
       openUndeleteModal,
       openReportModal,
       lockPost,
-      unlockPost
+      unlockPost,
+      loadEditor
     }
   }
 }
