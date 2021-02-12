@@ -162,13 +162,15 @@
               <span v-if="showEditDate(post) && post.metadata.edited_by_username">{{'&nbsp;&mdash;&nbsp;Edited ' + humanDate(post.updated_at) + ' by '}}</span><a v-if="showEditDate(post) && post.metadata.edited_by_username" href="#">{{post.metadata.edited_by_username}}</a>
               <span v-if="showEditDate(post) && !post.metadata.edited_by_username">{{'&nbsp;&mdash;&nbsp;Edited ' + humanDate(post.updated_at)}}</span>
               <span v-if="post.metadata.locked_by_username">{{'&nbsp;&mdash;&nbsp;Locked ' + humanDate(post.metadata.locked_at) + ' by '}}</span>
-              <a v-if="post.metadata.locked_by_username" ui-sref="profile.posts({ username: post.metadata.locked_by_username})" ng-bind-html="post.metadata.locked_by_username"></a>
+              <a v-if="post.metadata.locked_by_username" href="#">{{post.metadata.locked_by_username}}</a>
             </div>
           </div>
 
           <ul class="post-action">
-            <li v-if="PostsCtrl.canPurge() && post.position !== 1">
-              <a href="" class="post-action-icon" data-balloon="Purge" @click.prevent="PostsParentCtrl.openPurgeModal($index)">
+            <li v-if="canPurge() && post.position !== 1">
+              <!-- TODO(boka): add data-balloon plugin -->
+              <!-- data-balloon="Purge" -->
+              <a href="" class="post-action-icon" @click.prevent="openPurgeModal(i)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                   <title></title>
                   <path
@@ -446,6 +448,7 @@ export default {
       console.log(post)
       return true
     }
+    const openPurgeModal = (i) => console.log(i, 'openPurgeModal')
     /* Internal Data */
     /* View Data */
     const v = reactive({
@@ -481,7 +484,8 @@ export default {
       loggedIn,
       truncate,
       humanDate,
-      showEditDate
+      showEditDate,
+      openPurgeModal
     }
   }
 }
