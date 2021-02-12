@@ -130,7 +130,7 @@
             <img :src="post.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
           </div>
           <div class="original-poster" v-if="post.user.original_poster">OP</div>
-          <div v-if="post.user.activity > -1" :title="('Activity: ' + post.user.activity)" class="user-activity">Act: <span ng-bind="post.user.activity" class="user-activity-value"></span></div>
+          <div v-if="post.user.activity > -1" :title="('Activity: ' + post.user.activity)" class="user-activity">Act: <span class="user-activity-value">{{post.user.activity}}</span></div>
         </a>
 
 
