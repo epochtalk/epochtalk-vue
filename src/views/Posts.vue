@@ -151,7 +151,7 @@
           <div class="post-title-user">
             <a class="username" data-balloon="{{post.user.role_name || 'User'}}" ui-sref="profile.posts({ username: post.user.username})"  ng-bind="post.user.username"></a>
             <div title="{{post.user.name}}" v-if="post.user.name" class="display-name">
-              <span ng-bind-html="post.user.name | truncate:33"></span>
+              <span>{{truncate(post.user.name, 33)}}</span>
               <span class="hide-mobile">&nbsp;&mdash;&nbsp;</span>
             </div>
             <div title="{{post.user.role_name || 'user'}}" class="user-role" ng-bind="post.user.role_name || 'user'" v-style="userRoleHighlight(post.user.highlight_color)"></div>
@@ -405,7 +405,7 @@
 //import Pagination from '@/components/layout/Pagination.vue'
 //import humanDate from '@/composables/filters/humanDate'
 //import decode from '@/composables/filters/decode'
-//import truncate from '@/composables/filters/truncate'
+import truncate from '@/composables/filters/truncate'
 //import { inject, reactive, watch, toRefs } from 'vue'
 import { reactive, toRefs } from 'vue'
 //import { threadsApi } from '@/api'
