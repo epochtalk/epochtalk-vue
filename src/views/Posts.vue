@@ -515,7 +515,6 @@ export default {
       updateThreadTitle,
       closeEditThread,
       createPoll,
-      loggedIn,
       truncate,
       humanDate,
       userRoleHighlight,
