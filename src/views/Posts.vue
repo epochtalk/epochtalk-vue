@@ -134,7 +134,7 @@
         </a>
 
 
-        <div class="user-trust" v-if="loggedIn()">
+        <div class="user-trust" v-if="loggedIn">
           <!-- <trust-score user="post.user" visible="postData.data.thread.trust_visible"></trust-score> -->
         </div>
 
@@ -230,7 +230,7 @@
                 </svg>
               </a>
             </li>
-            <li v-if="PostsParentCtrl.loggedIn() && (PostsParentCtrl.reportControlAccess.reportPosts || PostsParentCtrl.reportControlAccess.reportUsers) && !PostsParentCtrl.bannedFromBoard">
+            <li v-if="loggedIn && (PostsParentCtrl.reportControlAccess.reportPosts || PostsParentCtrl.reportControlAccess.reportUsers) && !PostsParentCtrl.bannedFromBoard">
               <!-- TODO(boka): add data-balloon plugin -->
               <a href="" class="post-action-icon" data-balloon="Report" @click.prevent="PostsCtrl.openReportModal(post)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -260,7 +260,7 @@
                 </svg>
               </a>
             </li>
-            <li v-if="PostsParentCtrl.loggedIn() && PostsCtrl.thread.locked">
+            <li v-if="PostsParentCtrl.loggedIn && PostsCtrl.thread.locked">
               <!-- TODO(boka): add data-balloon plugin -->
               <a href="" data-balloon="Quote" @click.prevent="PostsCtrl.copyQuote(post)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
