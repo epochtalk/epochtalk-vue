@@ -443,9 +443,6 @@ export default {
     /* Internal Data */
     /* View Data */
     const v = reactive({
-      pageData: {
-        metadata: {}
-      },
       threadData: {},
       editThread: false,
       addPoll: false,
