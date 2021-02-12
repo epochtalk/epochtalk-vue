@@ -255,7 +255,8 @@
             </li>
             <li v-if="canPost()">
               <!-- TODO(boka): add data-balloon plugin -->
-              <a href="" class="post-action-icon" data-balloon="Quote" @click.prevent="PostsCtrl.addQuote(post)">
+              <!-- data-balloon="Quote" -->
+              <a href="" class="post-action-icon" @click.prevent="addQuote(post)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                   <title></title>
                   <path
@@ -263,9 +264,10 @@
                 </svg>
               </a>
             </li>
-            <li v-if="PostsParentCtrl.loggedIn && PostsCtrl.thread.locked">
+            <li v-if="loggedIn && pageData.data.thread.locked">
               <!-- TODO(boka): add data-balloon plugin -->
-              <a href="" data-balloon="Quote" @click.prevent="PostsCtrl.copyQuote(post)">
+              <!-- data-balloon="Quote" -->
+              <a href="" @click.prevent="copyQuote(post)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                   <title></title>
                   <path
@@ -275,7 +277,8 @@
             </li>
             <li>
               <!-- TODO(boka): add data-balloon plugin -->
-              <a href="{{PostsCtrl.rootUrl}}?start={{post.position}}#{{post.id}}" @click.prevent="PostsCtrl.highlightPost()" class="post-action-icon" data-balloon="Permalink">
+              <!-- data-balloon="Permalink" -->
+              <a href="#" @click.prevent="highlightPost()" class="post-action-icon">
                 <!-- <i class="icon-epoch-link"></i> -->
                 <strong>#{{post.position}}</strong>
               </a>
@@ -492,6 +495,9 @@ export default {
     const lockPost = (post) => console.log(post, 'lockPost')
     const unlockPost = (post) => console.log(post, 'unlockPost')
     const loadEditor = (post) => console.log(post, 'loadEditor')
+    const addQuote = (post) => console.log(post, 'addQuote')
+    const copyQuote = (post) => console.log(post, 'copyQuote')
+    const highlightPost = () => console.log('highlightPost')
     /* Internal Data */
     const $auth = inject(AuthStore)
     /* View Data */
@@ -538,7 +544,10 @@ export default {
       openReportModal,
       lockPost,
       unlockPost,
-      loadEditor
+      loadEditor,
+      addQuote,
+      copyQuote,
+      highlightPost
     }
   }
 }
