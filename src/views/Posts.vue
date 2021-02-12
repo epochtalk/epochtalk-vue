@@ -134,7 +134,7 @@
         </a>
 
 
-        <div class="user-trust" v-if="PostsParentCtrl.loggedIn()">
+        <div class="user-trust" v-if="loggedIn()">
           <trust-score user="post.user" visible="PostsParentCtrl.thread.trust_visible"></trust-score>
         </div>
 
@@ -432,6 +432,7 @@ export default {
     const canUpdate = () => true
     const canPostLock = () => true
     const canDelete = () => true
+    const loggedIn = () => false
     const openEditThread = () => console.log('openEditThread')
     const updateThreadLock = () => console.log('updateThreadLock')
     const updateThreadSticky = () => console.log('updateThreadSticky')
@@ -469,7 +470,8 @@ export default {
       updateThreadSticky,
       updateThreadTitle,
       closeEditThread,
-      createPoll
+      createPoll,
+      loggedIn
     }
   }
 }
