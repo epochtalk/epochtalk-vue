@@ -453,7 +453,10 @@ export default {
     const canLock = () => true
     const canCreatePoll = () => true
     const canUpdate = () => true
-    const canPostLock = () => true
+    const canPostLock = (post) => {
+      console.log(post, 'canPostLock')
+      return true
+    }
     const canDelete = (post) => {
       console.log(post, 'canDelete')
       return true
@@ -473,6 +476,8 @@ export default {
     const openPurgeModal = (i) => console.log(i, 'openPurgeModal')
     const openDeleteModal = (i, postLocked) => console.log(i, postLocked, 'openDeleteModal')
     const openUndeleteModal = (i) => console.log(i, 'openUndeleteModal')
+    const lockPost = (post) => console.log(post, 'lockPost')
+    const unlockPost = (post) => console.log(post, 'unlockPost')
     /* Internal Data */
     /* View Data */
     const v = reactive({
@@ -512,7 +517,9 @@ export default {
       showEditDate,
       openPurgeModal,
       openDeleteModal,
-      openUndeleteModal
+      openUndeleteModal,
+      lockPost,
+      unlockPost
     }
   }
 }
