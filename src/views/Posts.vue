@@ -158,8 +158,8 @@
             </div>
             <div :title="post.user.role_name || 'user'" class="user-role" v-style="userRoleHighlight(post.user.highlight_color)">{{post.user.role_name || 'user'}}</div>
             <div class="timestamp">
-              <span ng-bind="post.created_at | humanDate"></span>
-              <span v-if="PostsCtrl.showEditDate(post) && post.metadata.edited_by_username" ng-bind-html="'&nbsp;&mdash;&nbsp;Edited ' + (post.updated_at | humanDate) + ' by '"></span><a v-if="PostsCtrl.showEditDate(post) && post.metadata.edited_by_username" ui-sref="profile.posts({ username: post.metadata.edited_by_username})" ng-bind="post.metadata.edited_by_username"></a>
+              <span>{{post.created_at | humanDate}}</span>
+              <span v-if="PostsCtrl.showEditDate(post) && post.metadata.edited_by_username">{{'&nbsp;&mdash;&nbsp;Edited ' + (post.updated_at | humanDate) + ' by '}}</span><a v-if="PostsCtrl.showEditDate(post) && post.metadata.edited_by_username" ui-sref="profile.posts({ username: post.metadata.edited_by_username})" ng-bind="post.metadata.edited_by_username"></a>
               <span v-if="PostsCtrl.showEditDate(post) && !post.metadata.edited_by_username" ng-bind-html="'&nbsp;&mdash;&nbsp;Edited ' + (post.updated_at | humanDate)"></span>
               <span v-if="post.metadata.locked_by_username" ng-bind-html="'&nbsp;&mdash;&nbsp;Locked ' + (post.metadata.locked_at | humanDate) + ' by '"></span>
               <a v-if="post.metadata.locked_by_username" ui-sref="profile.posts({ username: post.metadata.locked_by_username})" ng-bind-html="post.metadata.locked_by_username"></a>
