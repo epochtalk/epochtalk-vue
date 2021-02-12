@@ -472,7 +472,8 @@ export default {
       updateThreadTitle,
       closeEditThread,
       createPoll,
-      loggedIn
+      loggedIn,
+      truncate
     }
   }
 }
