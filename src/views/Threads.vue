@@ -323,7 +323,7 @@ export default {
     const canCreate = () => {
       // TODO(akinsey): Implement ban status check
       // if (BanSvc.banStatus()) return false
-      return v.threadData.data?.write_access || v.permissionUtils.hasPermission('threads.create.allow')
+      return v.threadData.data?.write_access && v.permissionUtils.hasPermission('threads.create.allow')
     }
 
     /* Internal Data */
