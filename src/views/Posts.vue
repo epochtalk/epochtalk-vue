@@ -439,7 +439,7 @@ export default {
     const updateThreadTitle = () => console.log('updateThreadTitle')
     const closeEditThread = () => console.log('closeEditThread')
     const createPoll = () => console.log('createPoll')
-    const userRoleHighlight = () => console.log('userRoleHighlight')
+    const userRoleHighlight = () => { return {} }
     /* Internal Data */
     /* View Data */
     const v = reactive({
