@@ -208,8 +208,8 @@
                 </svg>
               </a>
             </li>
-            <li v-if="PostsCtrl.canPostLock(post) && !post.locked">
-              <a href="" class="post-action-icon" data-balloon="Lock Post" @click.prevent="PostsParentCtrl.lockPost(post)">
+            <li v-if="canPostLock(post) && !post.locked">
+              <a href="" class="post-action-icon" @click.prevent="lockPost(post)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                   <title></title>
                   <path
@@ -217,8 +217,8 @@
                 </svg>
               </a>
             </li>
-            <li v-if="PostsCtrl.canPostLock(post) && post.locked">
-              <a href="" class="post-action-icon selected" data-balloon="Unlock Post" @click.prevent="PostsParentCtrl.unlockPost(post)">
+            <li v-if="canPostLock(post) && post.locked">
+              <a href="" class="post-action-icon selected" @click.prevent="unlockPost(post)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                   <title></title>
                   <path
