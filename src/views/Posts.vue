@@ -242,7 +242,7 @@
                 </svg>
               </a>
             </li>
-            <li v-if="PostsCtrl.canUpdate(post)">
+            <li v-if="canUpdate(post)">
               <!-- TODO(boka): add data-balloon plugin -->
               <a href="" class="post-action-icon" data-balloon="Edit" @click.prevent="PostsCtrl.loadEditor(post)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -454,7 +454,10 @@ export default {
     const canSticky = () => true
     const canLock = () => true
     const canCreatePoll = () => true
-    const canUpdate = () => true
+    const canUpdate = (post) => {
+      console.log(post, 'canUpdate')
+      return true
+    }
     const canPostLock = (post) => {
       console.log(post, 'canPostLock')
       return true
