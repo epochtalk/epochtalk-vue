@@ -194,8 +194,10 @@
                 </svg>
               </a>
             </li>
-            <li v-if="PostsCtrl.canDelete(post) && post.deleted">
-              <a href="" class="post-action-icon selected" data-balloon="Unhide" @click.prevent="PostsParentCtrl.openUndeleteModal($index)">
+            <li v-if="canDelete(post) && post.deleted">
+              <!-- TODO(boka): add data-balloon plugin -->
+              <!-- data-balloon="Unhide" -->
+              <a href="" class="post-action-icon selected" @click.prevent="openUndeleteModal(i)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                   <title></title>
                   <path
@@ -455,6 +457,7 @@ export default {
     }
     const openPurgeModal = (i) => console.log(i, 'openPurgeModal')
     const openDeleteModal = (i, postLocked) => console.log(i, postLocked, 'openDeleteModal')
+    const openUndeleteModal = (i) => console.log(i, 'openUndeleteModal')
     /* Internal Data */
     /* View Data */
     const v = reactive({
@@ -492,7 +495,8 @@ export default {
       humanDate,
       showEditDate,
       openPurgeModal,
-      openDeleteModal
+      openDeleteModal,
+      openUndeleteModal
     }
   }
 }
