@@ -461,7 +461,6 @@ export default {
       console.log(post, 'canDelete')
       return true
     }
-    const loggedIn = () => false
     const openEditThread = () => console.log('openEditThread')
     const updateThreadLock = () => console.log('updateThreadLock')
     const updateThreadSticky = () => console.log('updateThreadSticky')
@@ -481,6 +480,7 @@ export default {
     /* Internal Data */
     /* View Data */
     const v = reactive({
+      loggedIn: true,
       threadData: {},
       editThread: false,
       addPoll: false,
