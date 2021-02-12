@@ -156,7 +156,7 @@
               <span>{{truncate(post.user.name, 33)}}</span>
               <span class="hide-mobile">&nbsp;&mdash;&nbsp;</span>
             </div>
-            <div :title="post.user.role_name || 'user'" class="user-role" ng-bind="post.user.role_name || 'user'" v-style="userRoleHighlight(post.user.highlight_color)"></div>
+            <div :title="post.user.role_name || 'user'" class="user-role" v-style="userRoleHighlight(post.user.highlight_color)">{{post.user.role_name || 'user'}}</div>
             <div class="timestamp">
               <span ng-bind="post.created_at | humanDate"></span>
               <span v-if="PostsCtrl.showEditDate(post) && post.metadata.edited_by_username" ng-bind-html="'&nbsp;&mdash;&nbsp;Edited ' + (post.updated_at | humanDate) + ' by '"></span><a v-if="PostsCtrl.showEditDate(post) && post.metadata.edited_by_username" ui-sref="profile.posts({ username: post.metadata.edited_by_username})" ng-bind="post.metadata.edited_by_username"></a>
