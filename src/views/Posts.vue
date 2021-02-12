@@ -100,7 +100,7 @@
   <!-- <ad-viewer page="PostsParentCtrl.page"></ad-viewer> -->
 
   <!-- Posts Listing -->
-  <div :id="post.id" v-for="post in postData.data.posts" :key="post.id" class="post-block" :class="{ 'highlighted': post.highlighted, 'hidden': post.hidden, 'deleted': post._deleted || post.user.ignored,  'editing': post.id === posting.post.id }">
+  <div :id="post.id" v-for="(post, i) in postData.data.posts" :key="post.id" class="post-block" :class="{ 'highlighted': post.highlighted, 'hidden': post.hidden, 'deleted': post._deleted || post.user.ignored,  'editing': post.id === posting.post.id }">
     <!-- Delete Post View -->
     <div class="deleted" v-if="post._deleted || post.user.ignored">
       Post
@@ -145,7 +145,7 @@
       </div>
 
       <!-- Post Body Section -->
-      <div ng-attr-id="{{$last ? 'last' : ''}}" class="post-content">
+      <div :id="(i + 1) === postData.data.posts.length ? 'last' : ''" class="post-content">
         <!-- Post Title -->
         <div class="post-title">
           <div class="post-title-user">
