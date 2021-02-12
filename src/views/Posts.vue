@@ -493,6 +493,7 @@ export default {
       loggedIn,
       truncate,
       humanDate,
+      userRoleHighlight,
       showEditDate,
       openPurgeModal,
       openDeleteModal,
