@@ -130,7 +130,7 @@
             <img :src="post.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
           </div>
           <div class="original-poster" v-if="post.user.original_poster">OP</div>
-          <div v-if="post.user.activity > -1" title="{{ 'Activity: ' + post.user.activity }}" class="user-activity">Act: <span ng-bind="post.user.activity" class="user-activity-value"></span></div>
+          <div v-if="post.user.activity > -1" :title="('Activity: ' + post.user.activity)" class="user-activity">Act: <span ng-bind="post.user.activity" class="user-activity-value"></span></div>
         </a>
 
 
@@ -150,11 +150,11 @@
         <div class="post-title">
           <div class="post-title-user">
             <a class="username" data-balloon="{{post.user.role_name || 'User'}}" ui-sref="profile.posts({ username: post.user.username})"  ng-bind="post.user.username"></a>
-            <div title="{{post.user.name}}" v-if="post.user.name" class="display-name">
+            <div :title="post.user.name" v-if="post.user.name" class="display-name">
               <span>{{truncate(post.user.name, 33)}}</span>
               <span class="hide-mobile">&nbsp;&mdash;&nbsp;</span>
             </div>
-            <div title="{{post.user.role_name || 'user'}}" class="user-role" ng-bind="post.user.role_name || 'user'" v-style="userRoleHighlight(post.user.highlight_color)"></div>
+            <div :title="post.user.role_name || 'user'" class="user-role" ng-bind="post.user.role_name || 'user'" v-style="userRoleHighlight(post.user.highlight_color)"></div>
             <div class="timestamp">
               <span ng-bind="post.created_at | humanDate"></span>
               <span v-if="PostsCtrl.showEditDate(post) && post.metadata.edited_by_username" ng-bind-html="'&nbsp;&mdash;&nbsp;Edited ' + (post.updated_at | humanDate) + ' by '"></span><a v-if="PostsCtrl.showEditDate(post) && post.metadata.edited_by_username" ui-sref="profile.posts({ username: post.metadata.edited_by_username})" ng-bind="post.metadata.edited_by_username"></a>
