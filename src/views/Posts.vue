@@ -149,7 +149,9 @@
         <!-- Post Title -->
         <div class="post-title">
           <div class="post-title-user">
-            <a class="username" data-balloon="{{post.user.role_name || 'User'}}" ui-sref="profile.posts({ username: post.user.username})"  ng-bind="post.user.username"></a>
+            <!-- TODO(boka): add data-balloon plugin -->
+            <!-- <a class="username" data-balloon="{{post.user.role_name || 'User'}}" ui-sref="profile.posts({ username: post.user.username})"  ng-bind="post.user.username"></a> -->
+            <a class="username" href="#">{{post.user.username}}</a>
             <div :title="post.user.name" v-if="post.user.name" class="display-name">
               <span>{{truncate(post.user.name, 33)}}</span>
               <span class="hide-mobile">&nbsp;&mdash;&nbsp;</span>
