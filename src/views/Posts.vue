@@ -139,7 +139,7 @@
         </div>
 
         <div class="user-rank">
-          <!-- <rank-display ranks="pageData.metadata.ranks" maps="pageData.metadata.rank_metric_maps" user="post.user"></rank-display> -->
+          <!-- <rank-display ranks="postData.data.metadata.ranks" maps="postData.data.metadata.rank_metric_maps" user="post.user"></rank-display> -->
         </div>
         <ignore-posts post="post"></ignore-posts>
       </div>
