@@ -135,11 +135,11 @@
 
 
         <div class="user-trust" v-if="loggedIn()">
-          <trust-score user="post.user" visible="PostsParentCtrl.thread.trust_visible"></trust-score>
+          <trust-score user="post.user" visible="postData.data.thread.trust_visible"></trust-score>
         </div>
 
         <div class="user-rank">
-          <rank-display ranks="PostsParentCtrl.pageData.metadata.ranks" maps="PostsParentCtrl.pageData.metadata.rank_metric_maps" user="post.user"></rank-display>
+          <rank-display ranks="pageData.metadata.ranks" maps="pageData.metadata.rank_metric_maps" user="post.user"></rank-display>
         </div>
         <ignore-posts post="post"></ignore-posts>
       </div>
@@ -442,6 +442,9 @@ export default {
     /* Internal Data */
     /* View Data */
     const v = reactive({
+      pageData: {
+        metadata: {}
+      },
       threadData: {},
       editThread: false,
       addPoll: false,
