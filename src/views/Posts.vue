@@ -180,8 +180,10 @@
                 </svg>
               </a>
             </li>
-            <li v-if="PostsCtrl.canDelete(post) && post.position !== 1 && !post.deleted">
-              <a href="" class="post-action-icon" data-balloon="Hide" @click.prevent="PostsParentCtrl.openDeleteModal($index, post.locked)">
+            <li v-if="canDelete(post) && post.position !== 1 && !post.deleted">
+              <!-- TODO(boka): add data-balloon plugin -->
+              <!-- data-balloon="Hide"  -->
+              <a href="" class="post-action-icon" @click.prevent="openDeleteModal(i, post.locked)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                   <title></title>
                   <path
@@ -435,7 +437,10 @@ export default {
     const canCreatePoll = () => true
     const canUpdate = () => true
     const canPostLock = () => true
-    const canDelete = () => true
+    const canDelete = (post) => {
+      console.log(post, 'canDelete')
+      return true
+    }
     const loggedIn = () => false
     const openEditThread = () => console.log('openEditThread')
     const updateThreadLock = () => console.log('updateThreadLock')
@@ -449,6 +454,7 @@ export default {
       return true
     }
     const openPurgeModal = (i) => console.log(i, 'openPurgeModal')
+    const openDeleteModal = (i, postLocked) => console.log(i, postLocked, 'openDeleteModal')
     /* Internal Data */
     /* View Data */
     const v = reactive({
@@ -485,7 +491,8 @@ export default {
       truncate,
       humanDate,
       showEditDate,
-      openPurgeModal
+      openPurgeModal,
+      openDeleteModal
     }
   }
 }
