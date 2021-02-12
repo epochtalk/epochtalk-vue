@@ -230,7 +230,7 @@
                 </svg>
               </a>
             </li>
-            <li v-if="loggedIn && (PostsParentCtrl.reportControlAccess.reportPosts || PostsParentCtrl.reportControlAccess.reportUsers) && !PostsParentCtrl.bannedFromBoard">
+            <li v-if="loggedIn && (reportControlAccess.reportPosts || reportControlAccess.reportUsers) && !PostsParentCtrl.bannedFromBoard">
               <!-- TODO(boka): add data-balloon plugin -->
               <a href="" class="post-action-icon" data-balloon="Report" @click.prevent="PostsCtrl.openReportModal(post)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -487,6 +487,10 @@ export default {
       pollValid: false,
       posting: {
         post: {}
+      },
+      reportControlAccess: {
+        reportPosts: null,
+        reportUsers: null
       },
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape
