@@ -158,10 +158,10 @@
             </div>
             <div :title="post.user.role_name || 'user'" class="user-role" v-style="userRoleHighlight(post.user.highlight_color)">{{post.user.role_name || 'user'}}</div>
             <div class="timestamp">
-              <span>{{post.created_at | humanDate}}</span>
-              <span v-if="PostsCtrl.showEditDate(post) && post.metadata.edited_by_username">{{'&nbsp;&mdash;&nbsp;Edited ' + (post.updated_at | humanDate) + ' by '}}</span><a v-if="PostsCtrl.showEditDate(post) && post.metadata.edited_by_username" ui-sref="profile.posts({ username: post.metadata.edited_by_username})" ng-bind="post.metadata.edited_by_username"></a>
-              <span v-if="PostsCtrl.showEditDate(post) && !post.metadata.edited_by_username" ng-bind-html="'&nbsp;&mdash;&nbsp;Edited ' + (post.updated_at | humanDate)"></span>
-              <span v-if="post.metadata.locked_by_username" ng-bind-html="'&nbsp;&mdash;&nbsp;Locked ' + (post.metadata.locked_at | humanDate) + ' by '"></span>
+              <span>{{humanDate(post.created_at)}}</span>
+              <span v-if="PostsCtrl.showEditDate(post) && post.metadata.edited_by_username">{{'&nbsp;&mdash;&nbsp;Edited ' + humanDate(post.updated_at) + ' by '}}</span><a v-if="PostsCtrl.showEditDate(post) && post.metadata.edited_by_username" ui-sref="profile.posts({ username: post.metadata.edited_by_username})" ng-bind="post.metadata.edited_by_username"></a>
+              <span v-if="PostsCtrl.showEditDate(post) && !post.metadata.edited_by_username">{{'&nbsp;&mdash;&nbsp;Edited ' + humanDate(post.updated_at)}}</span>
+              <span v-if="post.metadata.locked_by_username">{{'&nbsp;&mdash;&nbsp;Locked ' + humanDate(post.metadata.locked_at) + ' by '}}</span>
               <a v-if="post.metadata.locked_by_username" ui-sref="profile.posts({ username: post.metadata.locked_by_username})" ng-bind-html="post.metadata.locked_by_username"></a>
             </div>
           </div>
@@ -405,7 +405,7 @@
 //import useSWRV from 'swrv'
 //import { useRoute, useRouter } from 'vue-router'
 //import Pagination from '@/components/layout/Pagination.vue'
-//import humanDate from '@/composables/filters/humanDate'
+import humanDate from '@/composables/filters/humanDate'
 //import decode from '@/composables/filters/decode'
 import truncate from '@/composables/filters/truncate'
 //import { inject, reactive, watch, toRefs } from 'vue'
@@ -475,7 +475,8 @@ export default {
       closeEditThread,
       createPoll,
       loggedIn,
-      truncate
+      truncate,
+      humanDate
     }
   }
 }
