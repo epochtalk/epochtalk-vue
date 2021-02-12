@@ -491,7 +491,7 @@ export default {
     const openReportModal = (post) => console.log(post, 'openReportModal')
     const lockPost = (post) => console.log(post, 'lockPost')
     const unlockPost = (post) => console.log(post, 'unlockPost')
-    const loadEditor = (post) => const.log(post, 'loadEditor')
+    const loadEditor = (post) => console.log(post, 'loadEditor')
     /* Internal Data */
     const $auth = inject(AuthStore)
     /* View Data */
