@@ -230,7 +230,8 @@
                 </svg>
               </a>
             </li>
-            <li v-if="loggedIn && (reportControlAccess.reportPosts || reportControlAccess.reportUsers) && !bannedFromBoard">
+
+            <li v-if="loggedIn && (permissionUtils.hasPermission('reports.createPostReport') || permissionUtils.hasPermission('reports.createUserReport')) && !bannedFromBoard">
               <!-- TODO(boka): add data-balloon plugin -->
               <a href="" class="post-action-icon" data-balloon="Report" @click.prevent="PostsCtrl.openReportModal(post)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -430,9 +431,9 @@ import humanDate from '@/composables/filters/humanDate'
 //import decode from '@/composables/filters/decode'
 import truncate from '@/composables/filters/truncate'
 //import { inject, reactive, watch, toRefs } from 'vue'
-import { reactive, toRefs } from 'vue'
+import { inject, reactive, toRefs } from 'vue'
 //import { threadsApi } from '@/api'
-//import { AuthStore } from '@/composables/stores/auth'
+import { AuthStore } from '@/composables/stores/auth'
 //import { PreferencesStore } from '@/composables/stores/prefs'
 //import { countTotals, getLastPost, filterIgnoredBoards } from '@/composables/utils/boardUtils'
 
@@ -478,9 +479,10 @@ export default {
     const lockPost = (post) => console.log(post, 'lockPost')
     const unlockPost = (post) => console.log(post, 'unlockPost')
     /* Internal Data */
+    const $auth = inject(AuthStore)
     /* View Data */
     const v = reactive({
-      loggedIn: true,
+      loggedIn: $auth.loggedIn,
       threadData: {},
       editThread: false,
       addPoll: false,
@@ -488,10 +490,7 @@ export default {
       posting: {
         post: {}
       },
-      reportControlAccess: {
-        reportPosts: null,
-        reportUsers: null
-      },
+      permissionUtils: $auth.permissionUtils,
       bannedFromBoard: false,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape
