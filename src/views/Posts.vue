@@ -209,6 +209,8 @@
               </a>
             </li>
             <li v-if="canPostLock(post) && !post.locked">
+              <!-- TODO(boka): add data-balloon plugin -->
+              <!-- data-balloon="Lock Post" -->
               <a href="" class="post-action-icon" @click.prevent="lockPost(post)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                   <title></title>
@@ -218,6 +220,8 @@
               </a>
             </li>
             <li v-if="canPostLock(post) && post.locked">
+              <!-- TODO(boka): add data-balloon plugin -->
+              <!-- data-balloon="Unlock Post" -->
               <a href="" class="post-action-icon selected" @click.prevent="unlockPost(post)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                   <title></title>
@@ -227,6 +231,7 @@
               </a>
             </li>
             <li v-if="PostsParentCtrl.loggedIn() && (PostsParentCtrl.reportControlAccess.reportPosts || PostsParentCtrl.reportControlAccess.reportUsers) && !PostsParentCtrl.bannedFromBoard">
+              <!-- TODO(boka): add data-balloon plugin -->
               <a href="" class="post-action-icon" data-balloon="Report" @click.prevent="PostsCtrl.openReportModal(post)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                   <title></title>
@@ -236,6 +241,7 @@
               </a>
             </li>
             <li v-if="PostsCtrl.canUpdate(post)">
+              <!-- TODO(boka): add data-balloon plugin -->
               <a href="" class="post-action-icon" data-balloon="Edit" @click.prevent="PostsCtrl.loadEditor(post)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                   <title></title>
@@ -245,6 +251,7 @@
               </a>
             </li>
             <li v-if="PostsCtrl.canPost()">
+              <!-- TODO(boka): add data-balloon plugin -->
               <a href="" class="post-action-icon" data-balloon="Quote" @click.prevent="PostsCtrl.addQuote(post)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                   <title></title>
@@ -254,6 +261,7 @@
               </a>
             </li>
             <li v-if="PostsParentCtrl.loggedIn() && PostsCtrl.thread.locked">
+              <!-- TODO(boka): add data-balloon plugin -->
               <a href="" data-balloon="Quote" @click.prevent="PostsCtrl.copyQuote(post)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                   <title></title>
@@ -263,6 +271,7 @@
               </a>
             </li>
             <li>
+              <!-- TODO(boka): add data-balloon plugin -->
               <a href="{{PostsCtrl.rootUrl}}?start={{post.position}}#{{post.id}}" @click.prevent="PostsCtrl.highlightPost()" class="post-action-icon" data-balloon="Permalink">
                 <!-- <i class="icon-epoch-link"></i> -->
                 <strong>#{{post.position}}</strong>
@@ -289,6 +298,7 @@
         <!-- Post Tools -->
         <div class="post-tools">
           <!-- Watch Thread -->
+          <!-- TODO(boka): add data-balloon plugin -->
           <div v-if="PostsParentCtrl.showUserControls()" data-balloon="Watch Thread">
             <a class="" v-if="!PostsParentCtrl.thread.watched" @click.prevent="PostsParentCtrl.watchThread()" >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -301,6 +311,7 @@
           </div>
 
           <!-- Add a Poll -->
+          <!-- TODO(boka): add data-balloon plugin -->
           <div v-if="PostsParentCtrl.showUserControls()" data-balloon="Add a Poll">
             <a class="" v-if="PostsParentCtrl.canCreatePoll()"
               @click.prevent="PostsParentCtrl.addPoll = !PostsParentCtrl.addPoll">
@@ -316,6 +327,7 @@
           </div>
 
           <!-- Thread Lock -->
+          <!-- TODO(boka): add data-balloon plugin -->
           <div class="control" data-balloon="{{PostsParentCtrl.thread.locked ? 'Unlock Thread' : 'Lock Thread'}}"
             v-if="PostsParentCtrl.canLock()">
             <a href="#" id="lockThread" :class="{'clicked' : PostsParentCtrl.thread.locked }"
@@ -329,6 +341,7 @@
           </div>
 
           <!-- Thread Sticky -->
+          <!-- TODO(boka): add data-balloon plugin -->
           <div class="control" data-balloon="{{PostsParentCtrl.thread.sticky ? 'Unsticky Thread' : 'Sticky Thread'}}"
             v-if="PostsParentCtrl.canSticky()">
             <a href="#" id="stickyThread" :class="{'clicked' : PostsParentCtrl.thread.sticky }"
@@ -342,6 +355,7 @@
           </div>
 
           <!-- Purge Delete -->
+          <!-- TODO(boka): add data-balloon plugin -->
           <div class="control" data-balloon="Purge Thread" v-if="PostsParentCtrl.canPurge()">
             <a href="#" id="purgeThread" :class="{'clicked' : PostsParentCtrl.showPurgeThreadModal }"
               @click.prevent="PostsParentCtrl.showPurgeThreadModal = true">
@@ -354,6 +368,7 @@
           </div>
 
           <!-- Move Thread -->
+          <!-- TODO(boka): add data-balloon plugin -->
           <div class="control" data-balloon="Move Thread" v-if="PostsParentCtrl.canMove()">
             <a href="#" id="moveBoard" :class="{'clicked' : PostsParentCtrl.showMoveThreadModal }"
               @click.prevent="PostsParentCtrl.openMoveThreadModal()">
