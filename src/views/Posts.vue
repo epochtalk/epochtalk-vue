@@ -141,7 +141,7 @@
         <div class="user-rank">
           <!-- <rank-display ranks="postData.data.metadata.ranks" maps="postData.data.metadata.rank_metric_maps" user="post.user"></rank-display> -->
         </div>
-        <ignore-posts post="post"></ignore-posts>
+        <!-- TODO(akinsey): <ignore-posts post="post"></ignore-posts> -->
       </div>
 
       <!-- Post Body Section -->
