@@ -309,7 +309,7 @@
           <!-- TODO(boka): add data-balloon plugin -->
           <!-- data-balloon="Watch Thread" -->
           <div v-if="showUserControls()">
-            <a class="" v-if="!PostsParentCtrl.thread.watched" @click.prevent="PostsParentCtrl.watchThread()" >
+            <a class="" v-if="!pageData.data?.thread.watched" @click.prevent="watchThread()" >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <title></title>
                 <path
@@ -503,6 +503,7 @@ export default {
     const copyQuote = (post) => console.log(post, 'copyQuote')
     const highlightPost = () => console.log('highlightPost')
     const showUserControls = () => console.log('showUserControls')
+    const watchThread = () => console.log('watchThread')
     /* Internal Data */
     const $auth = inject(AuthStore)
     /* View Data */
@@ -562,7 +563,8 @@ export default {
       addQuote,
       copyQuote,
       highlightPost,
-      showUserControls
+      showUserControls,
+      watchThread
     }
   }
 }
