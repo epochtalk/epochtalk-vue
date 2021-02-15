@@ -457,6 +457,7 @@ export default {
     const canEditTitle = () => true
     const canPost = () => {
       // TODO(akinsey): Implement ban status check
+      // TODO(boka): make sure it's correct
       if (v.bannedFromBoard || !v.postData.data?.write_access || !v.permissionUtils.hasPermission('posts.create.allow')) { return false }
       if (v.postData.data.thread.locked) {
         return v.permissionUtils.hasPermission('posts.create.bypass.locked.admin') || (v.permissionUtils.hasPermission('posts.create.bypass.locked.mod') && v.permissionUtils.moderatesBoard(v.postData.data.board.id))
