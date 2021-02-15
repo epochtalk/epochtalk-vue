@@ -307,7 +307,8 @@
         <div class="post-tools">
           <!-- Watch Thread -->
           <!-- TODO(boka): add data-balloon plugin -->
-          <div v-if="PostsParentCtrl.showUserControls()" data-balloon="Watch Thread">
+          <!-- data-balloon="Watch Thread" -->
+          <div v-if="showUserControls()">
             <a class="" v-if="!PostsParentCtrl.thread.watched" @click.prevent="PostsParentCtrl.watchThread()" >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <title></title>
@@ -320,7 +321,8 @@
 
           <!-- Add a Poll -->
           <!-- TODO(boka): add data-balloon plugin -->
-          <div v-if="PostsParentCtrl.showUserControls()" data-balloon="Add a Poll">
+          <!-- data-balloon="Add a Poll" -->
+          <div v-if="showUserControls()">
             <a class="" v-if="PostsParentCtrl.canCreatePoll()"
               @click.prevent="PostsParentCtrl.addPoll = !PostsParentCtrl.addPoll">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -500,6 +502,7 @@ export default {
     const addQuote = (post) => console.log(post, 'addQuote')
     const copyQuote = (post) => console.log(post, 'copyQuote')
     const highlightPost = () => console.log('highlightPost')
+    const showUserControls = () => console.log('showUserControls')
     /* Internal Data */
     const $auth = inject(AuthStore)
     /* View Data */
@@ -550,7 +553,8 @@ export default {
       loadEditor,
       addQuote,
       copyQuote,
-      highlightPost
+      highlightPost,
+      showUserControls
     }
   }
 }
