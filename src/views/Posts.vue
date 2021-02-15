@@ -300,7 +300,7 @@
   <!-- Sidebar -->
   <div class="sidebar">
     <div class="sidebar-block">
-      <div v-if="PostsParentCtrl.canPost()" class="sidebar-actions">
+      <div v-if="canPost()" class="sidebar-actions">
         <!-- <a class="button" @click.prevent="loadEditor()" v-if="PostsParentCtrl.canPost()">Post Reply</a> -->
 
         <!-- Post Tools -->
@@ -405,8 +405,8 @@
       <div id="pagination-bottom" class="pagination-bottom">
         <!-- <pagination page-count="PostsParentCtrl.pageCount" page="PostsParentCtrl.page"></pagination> -->
       </div>
-      <div v-if="PostsParentCtrl.canPost()" class="sidebar-actions">
-        <a class="button small" @click.prevent="loadEditor()" v-if="PostsParentCtrl.canPost()">Post Reply</a>
+      <div v-if="canPost()" class="sidebar-actions">
+        <a class="button small" @click.prevent="loadEditor()" v-if="canPost()">Post Reply</a>
       </div>
     </div>
   </div>
