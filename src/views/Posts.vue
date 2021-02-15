@@ -515,6 +515,14 @@ export default {
       posting: {
         post: {}
       },
+      postData: {
+        data: {
+          thread: {},
+          board: {},
+          posts: [],
+          write_access: true
+        }
+      },
       permissionUtils: $auth.permissionUtils,
       bannedFromBoard: false,
       defaultAvatar: window.default_avatar,
