@@ -323,8 +323,8 @@
           <!-- TODO(boka): add data-balloon plugin -->
           <!-- data-balloon="Add a Poll" -->
           <div v-if="showUserControls()">
-            <a class="" v-if="PostsParentCtrl.canCreatePoll()"
-              @click.prevent="PostsParentCtrl.addPoll = !PostsParentCtrl.addPoll">
+            <a class="" v-if="canCreatePoll()"
+              @click.prevent="addPoll = !addPoll">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <title></title>
                 <polygon points="43.25 41.75 4.75 41.75 4.75 6.25 7.75 6.25 7.75 38.75 43.25 38.75 43.25 41.75" />
