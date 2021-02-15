@@ -2,7 +2,7 @@
   <div class="thread-controls-wrap">
     <!-- Moderated Thread Banner -->
     <div class="banner-container">
-      <div class="banner warning" v-if="postData.data.thread.moderated">
+      <div class="banner warning" v-if="postData.data?.thread.moderated">
         Moderated Thread &mdash; <em>Thread starter can moderate posts.</em>
       </div>
     </div>
