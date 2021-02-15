@@ -338,10 +338,10 @@
 
           <!-- Thread Lock -->
           <!-- TODO(boka): add data-balloon plugin -->
-          <div class="control" data-balloon="{{PostsParentCtrl.thread.locked ? 'Unlock Thread' : 'Lock Thread'}}"
-            v-if="PostsParentCtrl.canLock()">
-            <a href="#" id="lockThread" :class="{'clicked' : PostsParentCtrl.thread.locked }"
-              @click.prevent="PostsParentCtrl.updateThreadLock()">
+          <!-- data-balloon="{{PostsParentCtrl.thread.locked ? 'Unlock Thread' : 'Lock Thread'}}" -->
+          <div class="control" v-if="canLock()">
+            <a href="#" id="lockThread" :class="{'clicked' : pageData.data?.thread.locked }"
+              @click.prevent="updateThreadLock()">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <title></title>
                 <path
