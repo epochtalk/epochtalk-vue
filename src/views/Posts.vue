@@ -287,9 +287,11 @@
           <!-- <div class="clear"></div> -->
         </div>
         <!-- Post Body -->
-        <div class="post-body" :class="{ 'rtl': post.right_to_left }" post-processing="post.body_html" style-fix="true"></div>
-        <div v-if="post.user.signature && !PostsParentCtrl.disableSignature">
-          <div class="post-signature" post-processing="post.user.signature" style-fix="true"></div>
+        <!-- TODO(akinsey): post-processing="post.body_html" style-fix="true" -->
+        <div class="post-body" :class="{ 'rtl': post.right_to_left }">{{post.body_html}}</div>
+        <div v-if="post.user.signature && !disableSignature">
+          <!-- TODO(akinsey): post-processing="post.user.signature" style-fix="true" -->
+          <div class="post-signature">{{post.user.signature}}</div>
         </div>
       </div>
     </div>
@@ -513,7 +515,8 @@ export default {
       permissionUtils: $auth.permissionUtils,
       bannedFromBoard: false,
       defaultAvatar: window.default_avatar,
-      defaultAvatarShape: window.default_avatar_shape
+      defaultAvatarShape: window.default_avatar_shape,
+      disableSignature: false
     })
     return {
       ...toRefs(v),
