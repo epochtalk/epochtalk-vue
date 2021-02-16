@@ -17,6 +17,36 @@
       </div>
     </form>
   </div>
+  <div>
+    <h3 class="panel-title">Timezone Offset</h3>
+    <div class="fieldgroup">
+      <select v-model="timezone_offset_sign" placeholder="+/-">
+        <option v-for="offset_sign in timezone_offset_sign_options" :key="offset_sign.value" :value="offset_sign.value" :disabled="offset_sign.disabled">
+          {{offset_sign.label}}
+        </option>
+      </select>
+      <select v-model="timezone_offset_hours">
+        <option v-for="offset_hours in timezone_offset_hours_options" :key="offset_hours.value" :value="offset_hours.value" :disabled="offset_hours.disabled">
+          {{offset_hours.label}}
+        </option>
+      </select>
+      <select v-model="timezone_offset_minutes">
+        <option v-for="offset_minutes in timezone_offset_minutes_options" :key="offset_minutes.value" :value="offset_minutes.value" :disabled="offset_minutes.disabled">
+          {{offset_minutes.label}}
+        </option>
+      </select>
+    </div>
+    <br />
+
+    <div class="action-bar-panel">
+      <button class="outline" ng-click="SettingsCtrl.resetTimezoneOffset()">
+        Reset
+      </button>
+      <button ng-click="SettingsCtrl.saveTimezoneOffset()" ng-disabled="!SettingsCtrl.timezoneOffsetValid()">
+        Save
+      </button>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -37,7 +67,40 @@ export default {
 
     const v = reactive({
       posts_per_page: $prefs.data.posts_per_page,
-      threads_per_page: $prefs.data.threads_per_page
+      threads_per_page: $prefs.data.threads_per_page,
+      timezone_offset_sign_options: [
+        { value: '', label: '+/-', disabled: true },
+        { value: '+', label: '+' },
+        { value: '-', label: '-' }
+      ],
+      timezone_offset_hours_options: [
+        { value: '', label: 'HH', disabled: true },
+        { value: '00', label: '00' },
+        { value: '01', label: '01' },
+        { value: '02', label: '02' },
+        { value: '03', label: '03' },
+        { value: '04', label: '04' },
+        { value: '05', label: '05' },
+        { value: '06', label: '06' },
+        { value: '07', label: '07' },
+        { value: '08', label: '08' },
+        { value: '09', label: '09' },
+        { value: '10', label: '10' },
+        { value: '11', label: '11' },
+        { value: '12', label: '12' },
+        { value: '13', label: '13' },
+        { value: '14', label: '14' }
+      ],
+      timezone_offset_minutes_options: [
+        { value: '', label: 'MM', disabled: true },
+        { value: '00', label: '00' },
+        { value: '15', label: '15' },
+        { value: '30', label: '30' },
+        { value: '45', label: '45' }
+      ],
+      timezone_offset_sign: null,
+      timezone_offset_hours: null,
+      timezone_offset_minutes: null
     })
     return { ...toRefs(v), resetPrefrences, savePreferences }
   }
