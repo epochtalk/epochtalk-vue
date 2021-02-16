@@ -264,7 +264,7 @@
                 </svg>
               </a>
             </li>
-            <li v-if="loggedIn && pageData.data.thread.locked">
+            <li v-if="loggedIn && postData.data.thread.locked">
               <!-- TODO(boka): add data-balloon plugin -->
               <!-- data-balloon="Quote" -->
               <a href="" @click.prevent="copyQuote(post)">
@@ -309,7 +309,7 @@
           <!-- TODO(boka): add data-balloon plugin -->
           <!-- data-balloon="Watch Thread" -->
           <div v-if="showUserControls()">
-            <a class="" v-if="!pageData.data?.thread.watched" @click.prevent="watchThread()" >
+            <a class="" v-if="!postData.data?.thread.watched" @click.prevent="watchThread()" >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <title></title>
                 <path
@@ -340,7 +340,7 @@
           <!-- TODO(boka): add data-balloon plugin -->
           <!-- data-balloon="{{PostsParentCtrl.thread.locked ? 'Unlock Thread' : 'Lock Thread'}}" -->
           <div class="control" v-if="canLock()">
-            <a href="#" id="lockThread" :class="{'clicked' : pageData.data?.thread.locked }"
+            <a href="#" id="lockThread" :class="{'clicked' : postData.data?.thread.locked }"
               @click.prevent="updateThreadLock()">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <title></title>
@@ -354,7 +354,7 @@
           <!-- TODO(boka): add data-balloon plugin -->
           <!-- data-balloon="{{PostsParentCtrl.thread.sticky ? 'Unsticky Thread' : 'Sticky Thread'}}" -->
           <div class="control" v-if="canSticky()">
-            <a href="#" id="stickyThread" :class="{'clicked' : pageData.data?.thread.sticky }"
+            <a href="#" id="stickyThread" :class="{'clicked' : postData.data?.thread.sticky }"
               @click.prevent="updateThreadSticky()">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <title></title>
