@@ -156,7 +156,7 @@
               <span>{{truncate(post.user.name, 33)}}</span>
               <span class="hide-mobile">&nbsp;&mdash;&nbsp;</span>
             </div>
-            <div :title="post.user.role_name || 'user'" class="user-role" v-style="userRoleHighlight(post.user.highlight_color)">{{post.user.role_name || 'user'}}</div>
+            <div :title="post.user.role_name || 'user'" class="user-role" :style="userRoleHighlight(post.user.highlight_color)">{{post.user.role_name || 'user'}}</div>
             <div class="timestamp">
               <span>{{humanDate(post.created_at)}}</span>
               <span v-if="showEditDate(post) && post.metadata.edited_by_username">{{'&nbsp;&mdash;&nbsp;Edited ' + humanDate(post.updated_at) + ' by '}}</span><a v-if="showEditDate(post) && post.metadata.edited_by_username" href="#">{{post.metadata.edited_by_username}}</a>
