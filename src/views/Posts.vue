@@ -366,9 +366,10 @@
 
           <!-- Purge Delete -->
           <!-- TODO(boka): add data-balloon plugin -->
-          <div class="control" data-balloon="Purge Thread" v-if="PostsParentCtrl.canPurge()">
-            <a href="#" id="purgeThread" :class="{'clicked' : PostsParentCtrl.showPurgeThreadModal }"
-              @click.prevent="PostsParentCtrl.showPurgeThreadModal = true">
+          <!-- data-balloon="Purge Thread" -->
+          <div class="control" v-if="canPurge()">
+            <a href="#" id="purgeThread" :class="{'clicked' : showPurgeThreadModal}"
+              @click.prevent="showPurgeThreadModal = true">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <title></title>
                 <path
@@ -529,7 +530,8 @@ export default {
       bannedFromBoard: false,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
-      disableSignature: false
+      disableSignature: false,
+      showPurgeThreadModal: true
     })
     return {
       ...toRefs(v),
