@@ -52,6 +52,11 @@ export const threadsApi = {
   slugToThreadId: slug => $http(`/api/threads/${slug}/id`)
 }
 
+export const postsApi = {
+  byThread: params => $http('/api/posts', { params }),
+  slugToPostId: slug => $http(`/api/posts/${slug}/id`)
+}
+
 export const authApi = {
   login: data => $http('/api/login', { method: 'POST', data }, true)
   .then(user => {
