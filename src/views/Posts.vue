@@ -435,17 +435,17 @@
 </template>
 
 <script>
-//import useSWRV from 'swrv'
-//import { useRoute, useRouter } from 'vue-router'
+import useSWRV from 'swrv'
+import { useRoute } from 'vue-router'
 //import Pagination from '@/components/layout/Pagination.vue'
 import humanDate from '@/composables/filters/humanDate'
 //import decode from '@/composables/filters/decode'
 import truncate from '@/composables/filters/truncate'
 //import { inject, reactive, watch, toRefs } from 'vue'
 import { inject, reactive, toRefs } from 'vue'
-//import { threadsApi } from '@/api'
+import { postsApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
-//import { PreferencesStore } from '@/composables/stores/prefs'
+import { PreferencesStore } from '@/composables/stores/prefs'
 //import { countTotals, getLastPost, filterIgnoredBoards } from '@/composables/utils/boardUtils'
 
 export default {
@@ -453,8 +453,20 @@ export default {
   props: ['threadSlug', 'threadId'],
   // components: { Pagination },
   setup(props) {
-    console.log(props)
     /* Internal Methods */
+    const processPosts = () => {
+      return Promise.resolve(props.threadId)
+      .then(threadId => {
+        const params = {
+          thread_id: threadId,
+          limit: v.prefs.posts_per_page,
+          page: $route.query.page || 1,
+          field: $route.query.field,
+          desc: $route.query.desc
+        }
+        return postsApi.byThread(params)
+      })
+    }
     /* View Methods */
     const canEditTitle = () => true
     const canPost = () => {
@@ -508,25 +520,28 @@ export default {
     const showUserControls = () => console.log('showUserControls')
     const watchThread = () => console.log('watchThread')
     const openMoveThreadModal = () => console.log('openMoveThreadModal')
+
     /* Internal Data */
+    const $swrvCache = inject('$swrvCache')
+    const $route = useRoute()
+    const $prefs = inject(PreferencesStore)
     const $auth = inject(AuthStore)
+
     /* View Data */
     const v = reactive({
+      prefs: $prefs.data,
       loggedIn: $auth.loggedIn,
-      threadData: {},
+      postData: useSWRV(() => {
+        let params = new URLSearchParams($route.query)
+        let queryStr = params.toString()
+        let urlPath = queryStr ? `${props.threadSlug}?${queryStr}` : `${props.threadSlug}`
+        return `/threads/${urlPath}`
+      }, processPosts, { cache: $swrvCache, dedupingInterval: 100, ttl: 500 }),
       editThread: false,
       addPoll: false,
       pollValid: false,
       posting: {
         post: {}
-      },
-      postData: {
-        data: {
-          thread: {},
-          board: {},
-          posts: [],
-          write_access: true
-        }
       },
       permissionUtils: $auth.permissionUtils,
       bannedFromBoard: false,
