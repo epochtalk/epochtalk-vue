@@ -1,5 +1,5 @@
 <template>
-  <div class="thread-controls-wrap">
+  <div class="thread-controls-wrap" v-if="postData.data?.thread">
     <!-- Moderated Thread Banner -->
     <div class="banner-container">
       <div class="banner warning" v-if="postData.data?.thread.moderated">
@@ -100,198 +100,200 @@
   <!-- <ad-viewer page="PostsParentCtrl.page"></ad-viewer> -->
 
   <!-- Posts Listing -->
-  <div :id="post.id" v-for="(post, i) in postData.data.posts" :key="post.id" class="post-block" :class="{ 'highlighted': post.highlighted, 'hidden': post.hidden, 'deleted': post._deleted || post.user.ignored,  'editing': post.id === posting.post.id }">
-    <!-- Delete Post View -->
-    <div class="deleted" v-if="post._deleted || post.user.ignored">
-      Post
-      <span v-if="post._deleted">Hidden</span>
-      <div class="right bold secondary-font-color-light" v-if="post._deleted">#{{post.position}}</div>
-      <span v-if="post.user.ignored">Ignored</span>
-      <small class="pointer" v-if="post.user.ignored" @click.prevent="post.user.ignored = false">
-        <strong>- Show Post</strong>
-      </small>
-    </div>
-
-    <!-- Visible Post View -->
-    <div v-if="!post._deleted && !post.user.ignored" class="post-block-grid">
-      <!-- Post Profile Section -->
-      <div class="post-user">
-        <a href="#">
-        <!-- <a ui-sref="profile.posts({ username: post.user.username})"> -->
-          <div class="user-avatar" :class="defaultAvatarShape">
-            <!-- TODO(boka): add data-balloon plugin -->
-            <!-- data-balloon="{{post.user.username}} is online" -->
-            <span v-if="post.user.online" class="online green">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-                <title></title>
-                <circle cx="24" cy="24" r="16" />
-              </svg>
-            </span>
-            <img :src="post.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
-          </div>
-          <div class="original-poster" v-if="post.user.original_poster">OP</div>
-          <div v-if="post.user.activity > -1" :title="('Activity: ' + post.user.activity)" class="user-activity">Act: <span class="user-activity-value">{{post.user.activity}}</span></div>
-        </a>
-
-
-        <div class="user-trust" v-if="loggedIn">
-          <!-- <trust-score user="post.user" visible="postData.data.thread.trust_visible"></trust-score> -->
-        </div>
-
-        <div class="user-rank">
-          <!-- <rank-display ranks="postData.data.metadata.ranks" maps="postData.data.metadata.rank_metric_maps" user="post.user"></rank-display> -->
-        </div>
-        <!-- TODO(akinsey): <ignore-posts post="post"></ignore-posts> -->
+  <div v-if="postData.data?.posts">
+    <div :id="post.id" v-for="(post, i) in postData.data.posts" :key="post.id" class="post-block" :class="{ 'highlighted': post.highlighted, 'hidden': post.hidden, 'deleted': post._deleted || post.user.ignored,  'editing': post.id === posting.post.id }">
+      <!-- Delete Post View -->
+      <div class="deleted" v-if="post._deleted || post.user.ignored">
+        Post
+        <span v-if="post._deleted">Hidden</span>
+        <div class="right bold secondary-font-color-light" v-if="post._deleted">#{{post.position}}</div>
+        <span v-if="post.user.ignored">Ignored</span>
+        <small class="pointer" v-if="post.user.ignored" @click.prevent="post.user.ignored = false">
+          <strong>- Show Post</strong>
+        </small>
       </div>
 
-      <!-- Post Body Section -->
-      <div :id="(i + 1) === postData.data.posts.length ? 'last' : ''" class="post-content">
-        <!-- Post Title -->
-        <div class="post-title">
-          <div class="post-title-user">
-            <!-- TODO(boka): add data-balloon plugin -->
-            <!-- <a class="username" data-balloon="{{post.user.role_name || 'User'}}" ui-sref="profile.posts({ username: post.user.username})"  ng-bind="post.user.username"></a> -->
-            <a class="username" href="#">{{post.user.username}}</a>
-            <div :title="post.user.name" v-if="post.user.name" class="display-name">
-              <span>{{truncate(post.user.name, 33)}}</span>
-              <span class="hide-mobile">&nbsp;&mdash;&nbsp;</span>
+      <!-- Visible Post View -->
+      <div v-if="!post._deleted && !post.user.ignored" class="post-block-grid">
+        <!-- Post Profile Section -->
+        <div class="post-user">
+          <a href="#">
+          <!-- <a ui-sref="profile.posts({ username: post.user.username})"> -->
+            <div class="user-avatar" :class="defaultAvatarShape">
+              <!-- TODO(boka): add data-balloon plugin -->
+              <!-- data-balloon="{{post.user.username}} is online" -->
+              <span v-if="post.user.online" class="online green">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                  <title></title>
+                  <circle cx="24" cy="24" r="16" />
+                </svg>
+              </span>
+              <img :src="post.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
             </div>
-            <div :title="post.user.role_name || 'user'" class="user-role" :style="userRoleHighlight(post.user.highlight_color)">{{post.user.role_name || 'user'}}</div>
-            <div class="timestamp">
-              <span>{{humanDate(post.created_at)}}</span>
-              <span v-if="showEditDate(post) && post.metadata.edited_by_username">{{'&nbsp;&mdash;&nbsp;Edited ' + humanDate(post.updated_at) + ' by '}}</span><a v-if="showEditDate(post) && post.metadata.edited_by_username" href="#">{{post.metadata.edited_by_username}}</a>
-              <span v-if="showEditDate(post) && !post.metadata.edited_by_username">{{'&nbsp;&mdash;&nbsp;Edited ' + humanDate(post.updated_at)}}</span>
-              <span v-if="post.metadata.locked_by_username">{{'&nbsp;&mdash;&nbsp;Locked ' + humanDate(post.metadata.locked_at) + ' by '}}</span>
-              <a v-if="post.metadata.locked_by_username" href="#">{{post.metadata.locked_by_username}}</a>
-            </div>
+            <div class="original-poster" v-if="post.user.original_poster">OP</div>
+            <div v-if="post.user.activity > -1" :title="('Activity: ' + post.user.activity)" class="user-activity">Act: <span class="user-activity-value">{{post.user.activity}}</span></div>
+          </a>
+
+
+          <div class="user-trust" v-if="loggedIn">
+            <!-- <trust-score user="post.user" visible="postData.data.thread.trust_visible"></trust-score> -->
           </div>
 
-          <ul class="post-action">
-            <li v-if="canPurge() && post.position !== 1">
-              <!-- TODO(boka): add data-balloon plugin -->
-              <!-- data-balloon="Purge" -->
-              <a href="" class="post-action-icon" @click.prevent="openPurgeModal(i)">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-                  <title></title>
-                  <path
-                    d="M7.73,14.82,12.08,45H35.92l4.35-30.18H7.73Zm9.69,25.26A1.23,1.23,0,0,1,16.08,39L14.52,21.08a1.23,1.23,0,0,1,1.12-1.34A1.22,1.22,0,0,1,17,20.86l1.57,17.89A1.22,1.22,0,0,1,17.42,40.08ZM31,20.86a1.22,1.22,0,0,1,1.33-1.12,1.23,1.23,0,0,1,1.12,1.34L31.92,39a1.23,1.23,0,0,1-2.46-.21Zm-5.8.08v18a1.23,1.23,0,1,1-2.46,0V20.94a1.23,1.23,0,1,1,2.46,0Z" />
-                  <path
-                    d="M39.32,7.64H32.14C32.14,3,28.39,3,28.39,3H19.61s-3.75,0-3.75,4.64H8.68a1.93,1.93,0,0,0-2.09,2v3.23H41.41V9.61A1.93,1.93,0,0,0,39.32,7.64Zm-10-.1H18.72V7A1.59,1.59,0,0,1,20.3,5.43h7.4A1.59,1.59,0,0,1,29.28,7Z" />
-                </svg>
-              </a>
-            </li>
-            <li v-if="canDelete(post) && post.position !== 1 && !post.deleted">
-              <!-- TODO(boka): add data-balloon plugin -->
-              <!-- data-balloon="Hide"  -->
-              <a href="" class="post-action-icon" @click.prevent="openDeleteModal(i, post.locked)">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-                  <title></title>
-                  <path
-                    d="M39.22,15.68l-3.64,5.2A12.36,12.36,0,0,1,36,24,12,12,0,0,1,25,36l-1.6,2.28.57,0C36.7,38.25,48,24,48,24A51.61,51.61,0,0,0,39.22,15.68Z" />
-                  <path
-                    d="M34.18,4.65l-4.25,6.08a19.49,19.49,0,0,0-5.93-1C11.3,9.75,0,24,0,24A49.75,49.75,0,0,0,12.93,35l-4.7,6.71,4.91,3.45,26-37.08ZM12,24A12,12,0,0,1,24,12a11.86,11.86,0,0,1,4.43.87l-1.78,2.54a8.62,8.62,0,0,0-5.71.16,3.93,3.93,0,1,1-5.37,5.37,8.8,8.8,0,0,0,1.26,8.49L15.05,32A12,12,0,0,1,12,24Z" />
-                  <path d="M33,24.6l-5.34,7.63A9,9,0,0,0,33,24.6Z" />
-                </svg>
-              </a>
-            </li>
-            <li v-if="canDelete(post) && post.deleted">
-              <!-- TODO(boka): add data-balloon plugin -->
-              <!-- data-balloon="Unhide" -->
-              <a href="" class="post-action-icon selected" @click.prevent="openUndeleteModal(i)">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-                  <title></title>
-                  <path
-                    d="M39.22,15.68l-3.64,5.2A12.36,12.36,0,0,1,36,24,12,12,0,0,1,25,36l-1.6,2.28.57,0C36.7,38.25,48,24,48,24A51.61,51.61,0,0,0,39.22,15.68Z" />
-                  <path
-                    d="M34.18,4.65l-4.25,6.08a19.49,19.49,0,0,0-5.93-1C11.3,9.75,0,24,0,24A49.75,49.75,0,0,0,12.93,35l-4.7,6.71,4.91,3.45,26-37.08ZM12,24A12,12,0,0,1,24,12a11.86,11.86,0,0,1,4.43.87l-1.78,2.54a8.62,8.62,0,0,0-5.71.16,3.93,3.93,0,1,1-5.37,5.37,8.8,8.8,0,0,0,1.26,8.49L15.05,32A12,12,0,0,1,12,24Z" />
-                  <path d="M33,24.6l-5.34,7.63A9,9,0,0,0,33,24.6Z" />
-                </svg>
-              </a>
-            </li>
-            <li v-if="canPostLock(post) && !post.locked">
-              <!-- TODO(boka): add data-balloon plugin -->
-              <!-- data-balloon="Lock Post" -->
-              <a href="" class="post-action-icon" @click.prevent="lockPost(post)">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-                  <title></title>
-                  <path
-                    d="M40,21H37.5V16.48a13.5,13.5,0,0,0-27,0V21H8a2,2,0,0,0-2,2V43a2,2,0,0,0,2,2H40a2,2,0,0,0,2-2V23A2,2,0,0,0,40,21ZM15.5,16.48a8.5,8.5,0,0,1,17,0V21h-17Z" />
-                </svg>
-              </a>
-            </li>
-            <li v-if="canPostLock(post) && post.locked">
-              <!-- TODO(boka): add data-balloon plugin -->
-              <!-- data-balloon="Unlock Post" -->
-              <a href="" class="post-action-icon selected" @click.prevent="unlockPost(post)">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-                  <title></title>
-                  <path
-                    d="M40,21H37.5V16.48a13.5,13.5,0,0,0-27,0V21H8a2,2,0,0,0-2,2V43a2,2,0,0,0,2,2H40a2,2,0,0,0,2-2V23A2,2,0,0,0,40,21ZM15.5,16.48a8.5,8.5,0,0,1,17,0V21h-17Z" />
-                </svg>
-              </a>
-            </li>
-
-            <li v-if="loggedIn && (permissionUtils.hasPermission('reports.createPostReport') || permissionUtils.hasPermission('reports.createUserReport')) && !bannedFromBoard">
-              <!-- TODO(boka): add data-balloon plugin -->
-              <!-- data-balloon="Report" -->
-              <a href="" class="post-action-icon" @click.prevent="openReportModal(post)">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-                  <title></title>
-                  <path
-                    d="M46.7,41.82l-21.4-37a1.5,1.5,0,0,0-2.6,0l-21.4,37A1.45,1.45,0,0,0,2.6,44H45.4A1.45,1.45,0,0,0,46.7,41.82ZM26.08,18,25.5,32h-3l-.57-14ZM24,39.21a2.5,2.5,0,1,1,2.43-2.5A2.35,2.35,0,0,1,24,39.21Z" />
-                </svg>
-              </a>
-            </li>
-            <li v-if="canUpdate(post)">
-              <!-- TODO(boka): add data-balloon plugin -->
-              <!-- data-balloon="Edit" -->
-              <a href="" class="post-action-icon" @click.prevent="loadEditor(post)">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-                  <title></title>
-                  <path d="M7.38,33.74h0L4,44l10.26-3.39h0L41.74,13.14,34.86,6.26Zm31-21.15.54.55L14.26,37.79l-.54-.54" />
-                  <path d="M45.48,6.89,41.11,2.52a1.78,1.78,0,0,0-2.5,0L36.11,5,43,11.89l2.5-2.5A1.76,1.76,0,0,0,45.48,6.89Z" />
-                </svg>
-              </a>
-            </li>
-            <li v-if="canPost()">
-              <!-- TODO(boka): add data-balloon plugin -->
-              <!-- data-balloon="Quote" -->
-              <a href="" class="post-action-icon" @click.prevent="addQuote(post)">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-                  <title></title>
-                  <path
-                    d="M42,2H6A4,4,0,0,0,2,6V32a4,4,0,0,0,4,4H27.74l10.88,9.71c.63.63,1.38.18,1.38-.71V36h2a4,4,0,0,0,4-4V6A4,4,0,0,0,42,2ZM22,18a13.67,13.67,0,0,1-.42,3.27,8.32,8.32,0,0,1-1.17,2.69,5.39,5.39,0,0,1-1.76,1.85,9.62,9.62,0,0,1-2.65.69V23.59a4.07,4.07,0,0,0,1.4-.49,3.53,3.53,0,0,0,.93-1.3A5.68,5.68,0,0,0,18.82,20a17.87,17.87,0,0,0,.09-2H16V12h6Zm9.88,3.27a8.39,8.39,0,0,1-1,2.69,6,6,0,0,1-2,1.85c-.79.46-.87.69-2.87.69V23.59a5,5,0,0,0,1.69-.49,3.86,3.86,0,0,0,1.08-1.3A6.29,6.29,0,0,0,29.33,20c.1-.68.16-2,.16-2H26V12h6v6A14,14,0,0,1,31.88,21.25Z" />
-                </svg>
-              </a>
-            </li>
-            <li v-if="loggedIn && postData.data.thread.locked">
-              <!-- TODO(boka): add data-balloon plugin -->
-              <!-- data-balloon="Quote" -->
-              <a href="" @click.prevent="copyQuote(post)">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-                  <title></title>
-                  <path
-                    d="M42,2H6A4,4,0,0,0,2,6V32a4,4,0,0,0,4,4H27.74l10.88,9.71c.63.63,1.38.18,1.38-.71V36h2a4,4,0,0,0,4-4V6A4,4,0,0,0,42,2ZM22,18a13.67,13.67,0,0,1-.42,3.27,8.32,8.32,0,0,1-1.17,2.69,5.39,5.39,0,0,1-1.76,1.85,9.62,9.62,0,0,1-2.65.69V23.59a4.07,4.07,0,0,0,1.4-.49,3.53,3.53,0,0,0,.93-1.3A5.68,5.68,0,0,0,18.82,20a17.87,17.87,0,0,0,.09-2H16V12h6Zm9.88,3.27a8.39,8.39,0,0,1-1,2.69,6,6,0,0,1-2,1.85c-.79.46-.87.69-2.87.69V23.59a5,5,0,0,0,1.69-.49,3.86,3.86,0,0,0,1.08-1.3A6.29,6.29,0,0,0,29.33,20c.1-.68.16-2,.16-2H26V12h6v6A14,14,0,0,1,31.88,21.25Z" />
-                </svg>
-              </a>
-            </li>
-            <li>
-              <!-- TODO(boka): add data-balloon plugin -->
-              <!-- data-balloon="Permalink" -->
-              <a href="#" @click.prevent="highlightPost()" class="post-action-icon">
-                <!-- <i class="icon-epoch-link"></i> -->
-                <strong>#{{post.position}}</strong>
-              </a>
-            </li>
-          </ul>
-          <!-- <div class="clear"></div> -->
+          <div class="user-rank">
+            <!-- <rank-display ranks="postData.data.metadata.ranks" maps="postData.data.metadata.rank_metric_maps" user="post.user"></rank-display> -->
+          </div>
+          <!-- TODO(akinsey): <ignore-posts post="post"></ignore-posts> -->
         </div>
-        <!-- Post Body -->
-        <!-- TODO(akinsey): post-processing="post.body_html" style-fix="true" -->
-        <div class="post-body" :class="{ 'rtl': post.right_to_left }">{{post.body_html}}</div>
-        <div v-if="post.user.signature && !disableSignature">
-          <!-- TODO(akinsey): post-processing="post.user.signature" style-fix="true" -->
-          <div class="post-signature">{{post.user.signature}}</div>
+
+        <!-- Post Body Section -->
+        <div :id="(i + 1) === postData.data.posts.length ? 'last' : ''" class="post-content">
+          <!-- Post Title -->
+          <div class="post-title">
+            <div class="post-title-user">
+              <!-- TODO(boka): add data-balloon plugin -->
+              <!-- <a class="username" data-balloon="{{post.user.role_name || 'User'}}" ui-sref="profile.posts({ username: post.user.username})"  ng-bind="post.user.username"></a> -->
+              <a class="username" href="#">{{post.user.username}}</a>
+              <div :title="post.user.name" v-if="post.user.name" class="display-name">
+                <span>{{truncate(post.user.name, 33)}}</span>
+                <span class="hide-mobile">&nbsp;&mdash;&nbsp;</span>
+              </div>
+              <div :title="post.user.role_name || 'user'" class="user-role" :style="userRoleHighlight(post.user.highlight_color)">{{post.user.role_name || 'user'}}</div>
+              <div class="timestamp">
+                <span>{{humanDate(post.created_at)}}</span>
+                <span v-if="showEditDate(post) && post.metadata?.edited_by_username">{{'&nbsp;&mdash;&nbsp;Edited ' + humanDate(post.updated_at) + ' by '}}</span><a v-if="showEditDate(post) && post.metadata?.edited_by_username" href="#">{{post.metadata.edited_by_username}}</a>
+                <span v-if="showEditDate(post) && !post.metadata?.edited_by_username">{{'&nbsp;&mdash;&nbsp;Edited ' + humanDate(post.updated_at)}}</span>
+                <span v-if="post.metadata?.locked_by_username">{{'&nbsp;&mdash;&nbsp;Locked ' + humanDate(post.metadata.locked_at) + ' by '}}</span>
+                <a v-if="post.metadata?.locked_by_username" href="#">{{post.metadata.locked_by_username}}</a>
+              </div>
+            </div>
+
+            <ul class="post-action">
+              <li v-if="canPurge() && post.position !== 1">
+                <!-- TODO(boka): add data-balloon plugin -->
+                <!-- data-balloon="Purge" -->
+                <a href="" class="post-action-icon" @click.prevent="openPurgeModal(i)">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                    <title></title>
+                    <path
+                      d="M7.73,14.82,12.08,45H35.92l4.35-30.18H7.73Zm9.69,25.26A1.23,1.23,0,0,1,16.08,39L14.52,21.08a1.23,1.23,0,0,1,1.12-1.34A1.22,1.22,0,0,1,17,20.86l1.57,17.89A1.22,1.22,0,0,1,17.42,40.08ZM31,20.86a1.22,1.22,0,0,1,1.33-1.12,1.23,1.23,0,0,1,1.12,1.34L31.92,39a1.23,1.23,0,0,1-2.46-.21Zm-5.8.08v18a1.23,1.23,0,1,1-2.46,0V20.94a1.23,1.23,0,1,1,2.46,0Z" />
+                    <path
+                      d="M39.32,7.64H32.14C32.14,3,28.39,3,28.39,3H19.61s-3.75,0-3.75,4.64H8.68a1.93,1.93,0,0,0-2.09,2v3.23H41.41V9.61A1.93,1.93,0,0,0,39.32,7.64Zm-10-.1H18.72V7A1.59,1.59,0,0,1,20.3,5.43h7.4A1.59,1.59,0,0,1,29.28,7Z" />
+                  </svg>
+                </a>
+              </li>
+              <li v-if="canDelete(post) && post.position !== 1 && !post.deleted">
+                <!-- TODO(boka): add data-balloon plugin -->
+                <!-- data-balloon="Hide"  -->
+                <a href="" class="post-action-icon" @click.prevent="openDeleteModal(i, post.locked)">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                    <title></title>
+                    <path
+                      d="M39.22,15.68l-3.64,5.2A12.36,12.36,0,0,1,36,24,12,12,0,0,1,25,36l-1.6,2.28.57,0C36.7,38.25,48,24,48,24A51.61,51.61,0,0,0,39.22,15.68Z" />
+                    <path
+                      d="M34.18,4.65l-4.25,6.08a19.49,19.49,0,0,0-5.93-1C11.3,9.75,0,24,0,24A49.75,49.75,0,0,0,12.93,35l-4.7,6.71,4.91,3.45,26-37.08ZM12,24A12,12,0,0,1,24,12a11.86,11.86,0,0,1,4.43.87l-1.78,2.54a8.62,8.62,0,0,0-5.71.16,3.93,3.93,0,1,1-5.37,5.37,8.8,8.8,0,0,0,1.26,8.49L15.05,32A12,12,0,0,1,12,24Z" />
+                    <path d="M33,24.6l-5.34,7.63A9,9,0,0,0,33,24.6Z" />
+                  </svg>
+                </a>
+              </li>
+              <li v-if="canDelete(post) && post.deleted">
+                <!-- TODO(boka): add data-balloon plugin -->
+                <!-- data-balloon="Unhide" -->
+                <a href="" class="post-action-icon selected" @click.prevent="openUndeleteModal(i)">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                    <title></title>
+                    <path
+                      d="M39.22,15.68l-3.64,5.2A12.36,12.36,0,0,1,36,24,12,12,0,0,1,25,36l-1.6,2.28.57,0C36.7,38.25,48,24,48,24A51.61,51.61,0,0,0,39.22,15.68Z" />
+                    <path
+                      d="M34.18,4.65l-4.25,6.08a19.49,19.49,0,0,0-5.93-1C11.3,9.75,0,24,0,24A49.75,49.75,0,0,0,12.93,35l-4.7,6.71,4.91,3.45,26-37.08ZM12,24A12,12,0,0,1,24,12a11.86,11.86,0,0,1,4.43.87l-1.78,2.54a8.62,8.62,0,0,0-5.71.16,3.93,3.93,0,1,1-5.37,5.37,8.8,8.8,0,0,0,1.26,8.49L15.05,32A12,12,0,0,1,12,24Z" />
+                    <path d="M33,24.6l-5.34,7.63A9,9,0,0,0,33,24.6Z" />
+                  </svg>
+                </a>
+              </li>
+              <li v-if="canPostLock(post) && !post.locked">
+                <!-- TODO(boka): add data-balloon plugin -->
+                <!-- data-balloon="Lock Post" -->
+                <a href="" class="post-action-icon" @click.prevent="lockPost(post)">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                    <title></title>
+                    <path
+                      d="M40,21H37.5V16.48a13.5,13.5,0,0,0-27,0V21H8a2,2,0,0,0-2,2V43a2,2,0,0,0,2,2H40a2,2,0,0,0,2-2V23A2,2,0,0,0,40,21ZM15.5,16.48a8.5,8.5,0,0,1,17,0V21h-17Z" />
+                  </svg>
+                </a>
+              </li>
+              <li v-if="canPostLock(post) && post.locked">
+                <!-- TODO(boka): add data-balloon plugin -->
+                <!-- data-balloon="Unlock Post" -->
+                <a href="" class="post-action-icon selected" @click.prevent="unlockPost(post)">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                    <title></title>
+                    <path
+                      d="M40,21H37.5V16.48a13.5,13.5,0,0,0-27,0V21H8a2,2,0,0,0-2,2V43a2,2,0,0,0,2,2H40a2,2,0,0,0,2-2V23A2,2,0,0,0,40,21ZM15.5,16.48a8.5,8.5,0,0,1,17,0V21h-17Z" />
+                  </svg>
+                </a>
+              </li>
+
+              <li v-if="loggedIn && (permissionUtils.hasPermission('reports.createPostReport') || permissionUtils.hasPermission('reports.createUserReport')) && !bannedFromBoard">
+                <!-- TODO(boka): add data-balloon plugin -->
+                <!-- data-balloon="Report" -->
+                <a href="" class="post-action-icon" @click.prevent="openReportModal(post)">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                    <title></title>
+                    <path
+                      d="M46.7,41.82l-21.4-37a1.5,1.5,0,0,0-2.6,0l-21.4,37A1.45,1.45,0,0,0,2.6,44H45.4A1.45,1.45,0,0,0,46.7,41.82ZM26.08,18,25.5,32h-3l-.57-14ZM24,39.21a2.5,2.5,0,1,1,2.43-2.5A2.35,2.35,0,0,1,24,39.21Z" />
+                  </svg>
+                </a>
+              </li>
+              <li v-if="canUpdate(post)">
+                <!-- TODO(boka): add data-balloon plugin -->
+                <!-- data-balloon="Edit" -->
+                <a href="" class="post-action-icon" @click.prevent="loadEditor(post)">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                    <title></title>
+                    <path d="M7.38,33.74h0L4,44l10.26-3.39h0L41.74,13.14,34.86,6.26Zm31-21.15.54.55L14.26,37.79l-.54-.54" />
+                    <path d="M45.48,6.89,41.11,2.52a1.78,1.78,0,0,0-2.5,0L36.11,5,43,11.89l2.5-2.5A1.76,1.76,0,0,0,45.48,6.89Z" />
+                  </svg>
+                </a>
+              </li>
+              <li v-if="canPost()">
+                <!-- TODO(boka): add data-balloon plugin -->
+                <!-- data-balloon="Quote" -->
+                <a href="" class="post-action-icon" @click.prevent="addQuote(post)">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                    <title></title>
+                    <path
+                      d="M42,2H6A4,4,0,0,0,2,6V32a4,4,0,0,0,4,4H27.74l10.88,9.71c.63.63,1.38.18,1.38-.71V36h2a4,4,0,0,0,4-4V6A4,4,0,0,0,42,2ZM22,18a13.67,13.67,0,0,1-.42,3.27,8.32,8.32,0,0,1-1.17,2.69,5.39,5.39,0,0,1-1.76,1.85,9.62,9.62,0,0,1-2.65.69V23.59a4.07,4.07,0,0,0,1.4-.49,3.53,3.53,0,0,0,.93-1.3A5.68,5.68,0,0,0,18.82,20a17.87,17.87,0,0,0,.09-2H16V12h6Zm9.88,3.27a8.39,8.39,0,0,1-1,2.69,6,6,0,0,1-2,1.85c-.79.46-.87.69-2.87.69V23.59a5,5,0,0,0,1.69-.49,3.86,3.86,0,0,0,1.08-1.3A6.29,6.29,0,0,0,29.33,20c.1-.68.16-2,.16-2H26V12h6v6A14,14,0,0,1,31.88,21.25Z" />
+                  </svg>
+                </a>
+              </li>
+              <li v-if="loggedIn && postData.data.thread.locked">
+                <!-- TODO(boka): add data-balloon plugin -->
+                <!-- data-balloon="Quote" -->
+                <a href="" @click.prevent="copyQuote(post)">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                    <title></title>
+                    <path
+                      d="M42,2H6A4,4,0,0,0,2,6V32a4,4,0,0,0,4,4H27.74l10.88,9.71c.63.63,1.38.18,1.38-.71V36h2a4,4,0,0,0,4-4V6A4,4,0,0,0,42,2ZM22,18a13.67,13.67,0,0,1-.42,3.27,8.32,8.32,0,0,1-1.17,2.69,5.39,5.39,0,0,1-1.76,1.85,9.62,9.62,0,0,1-2.65.69V23.59a4.07,4.07,0,0,0,1.4-.49,3.53,3.53,0,0,0,.93-1.3A5.68,5.68,0,0,0,18.82,20a17.87,17.87,0,0,0,.09-2H16V12h6Zm9.88,3.27a8.39,8.39,0,0,1-1,2.69,6,6,0,0,1-2,1.85c-.79.46-.87.69-2.87.69V23.59a5,5,0,0,0,1.69-.49,3.86,3.86,0,0,0,1.08-1.3A6.29,6.29,0,0,0,29.33,20c.1-.68.16-2,.16-2H26V12h6v6A14,14,0,0,1,31.88,21.25Z" />
+                  </svg>
+                </a>
+              </li>
+              <li>
+                <!-- TODO(boka): add data-balloon plugin -->
+                <!-- data-balloon="Permalink" -->
+                <a href="#" @click.prevent="highlightPost()" class="post-action-icon">
+                  <!-- <i class="icon-epoch-link"></i> -->
+                  <strong>#{{post.position}}</strong>
+                </a>
+              </li>
+            </ul>
+            <!-- <div class="clear"></div> -->
+          </div>
+          <!-- Post Body -->
+          <!-- TODO(akinsey): post-processing="post.body_html" style-fix="true" -->
+          <div class="post-body" :class="{ 'rtl': post.right_to_left }">{{post.body_html}}</div>
+          <div v-if="post.user.signature && !disableSignature">
+            <!-- TODO(akinsey): post-processing="post.user.signature" style-fix="true" -->
+            <div class="post-signature">{{post.user.signature}}</div>
+          </div>
         </div>
       </div>
     </div>
