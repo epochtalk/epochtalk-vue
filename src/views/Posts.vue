@@ -380,9 +380,10 @@
 
           <!-- Move Thread -->
           <!-- TODO(boka): add data-balloon plugin -->
-          <div class="control" data-balloon="Move Thread" v-if="PostsParentCtrl.canMove()">
-            <a href="#" id="moveBoard" :class="{'clicked' : PostsParentCtrl.showMoveThreadModal }"
-              @click.prevent="PostsParentCtrl.openMoveThreadModal()">
+          <!-- data-balloon="Move Thread" -->
+          <div class="control" v-if="canMove()">
+            <a href="#" id="moveBoard" :class="{'clicked' : showMoveThreadModal}"
+              @click.prevent="openMoveThreadModal()">
               <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                 <title></title>
                 <path d="m29.36 7.74a3 3 0 0 0 -4.25 4.26l9 9h-28.73a3 3 0 0 0 0 6h28.76l-9 9a3 3 0 0 0 4.25 4.24l16.23-16.24z" />
@@ -506,6 +507,7 @@ export default {
     const highlightPost = () => console.log('highlightPost')
     const showUserControls = () => console.log('showUserControls')
     const watchThread = () => console.log('watchThread')
+    const openMoveThreadModal = () => console.log('openMoveThreadModal')
     /* Internal Data */
     const $auth = inject(AuthStore)
     /* View Data */
@@ -531,7 +533,8 @@ export default {
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
       disableSignature: false,
-      showPurgeThreadModal: true
+      showPurgeThreadModal: true,
+      showMoveThreadModal: true
     })
     return {
       ...toRefs(v),
@@ -567,7 +570,8 @@ export default {
       copyQuote,
       highlightPost,
       showUserControls,
-      watchThread
+      watchThread,
+      openMoveThreadModal
     }
   }
 }
