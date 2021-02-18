@@ -42,7 +42,7 @@
               <a v-if="childBoard.last_post_username" href="#">{{childBoard.last_post_username}}</a>
               <span v-if="childBoard.last_thread_id">
                 posted in
-                <a href="#" :title="decode(childBoard.last_thread_title)">{{truncate(decode(childBoard.last_thread_title), 25)}}</a> on
+                <router-link :title="decode(childBoard.last_thread_title)" :to="{ name: 'Posts', params: { threadSlug: childBoard.last_thread_slug, threadId: childBoard.last_thread_id } }">{{truncate(decode(childBoard.last_thread_title), 25)}}</router-link> on
               </span>
               <span v-if="childBoard.last_thread_id">
                 {{humanDate(childBoard.last_post_created_at)}}
@@ -105,7 +105,7 @@
                 </svg>
 
               </div>
-              <a :class="{ 'bold': thread.has_new_post }" class="thread-title" href="#">{{thread.title}}</a>
+              <router-link :class="{ 'bold': thread.has_new_post }" class="thread-title" :title="decode(thread.title)" :to="{ name: 'Posts', params: { threadSlug: thread.slug, threadId: thread.id } }">{{decode(thread.title)}}</router-link>
               <div class="thread-state-secondary">
                 <span class="thread-state-locked" v-if="thread.locked" data-balloon="Locked">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -156,7 +156,7 @@
                   </g>
                 </svg>
               </div>
-              <a :class="{'bold': thread.has_new_post}" class="thread-title" href="#">{{thread.title}}</a>
+              <router-link :class="{ 'bold': thread.has_new_post }" class="thread-title" :title="decode(thread.title)" :to="{ name: 'Posts', params: { threadSlug: thread.slug, threadId: thread.id } }">{{decode(thread.title)}}</router-link>
                 <div class="thread-state-secondary">
                 <span class="thread-state-locked" v-if="thread.locked" data-balloon="Locked">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" data-balloon="Locked">
