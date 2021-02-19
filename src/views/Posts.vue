@@ -437,7 +437,6 @@
 </template>
 
 <script>
-import useSWRV from 'swrv'
 import { useRoute } from 'vue-router'
 //import Pagination from '@/components/layout/Pagination.vue'
 import humanDate from '@/composables/filters/humanDate'
@@ -524,7 +523,6 @@ export default {
     const openMoveThreadModal = () => console.log('openMoveThreadModal')
 
     /* Internal Data */
-    const $swrvCache = inject('$swrvCache')
     const $route = useRoute()
     const $prefs = inject(PreferencesStore)
     const $auth = inject(AuthStore)
@@ -533,12 +531,7 @@ export default {
     const v = reactive({
       prefs: $prefs.data,
       loggedIn: $auth.loggedIn,
-      postData: useSWRV(() => {
-        let params = new URLSearchParams($route.query)
-        let queryStr = params.toString()
-        let urlPath = queryStr ? `${props.threadSlug}?${queryStr}` : `${props.threadSlug}`
-        return `/threads/${urlPath}`
-      }, processPosts, { cache: $swrvCache, dedupingInterval: 100, ttl: 500 }),
+      postData: {data: {}},
       editThread: false,
       addPoll: false,
       pollValid: false,
@@ -553,6 +546,7 @@ export default {
       showPurgeThreadModal: true,
       showMoveThreadModal: true
     })
+    processPosts().then(data => v.postData.data = data)
     return {
       ...toRefs(v),
       canEditTitle,
