@@ -403,6 +403,8 @@
         <pagination page-count="PostsParentCtrl.pageCount" page="PostsParentCtrl.page"></pagination>
       </div> -->
     </div>
+    <pagination v-if="postData.data?.thread" :page="postData.data.page" :limit="postData.data.limit" :count="postData.data.thread.post_count"></pagination>
+
   </div>
 
   <!-- Bottom Actions and Pagination -->
@@ -438,7 +440,7 @@
 
 <script>
 import { useRoute } from 'vue-router'
-//import Pagination from '@/components/layout/Pagination.vue'
+import Pagination from '@/components/layout/Pagination.vue'
 import humanDate from '@/composables/filters/humanDate'
 //import decode from '@/composables/filters/decode'
 import truncate from '@/composables/filters/truncate'
@@ -452,7 +454,7 @@ import { PreferencesStore } from '@/composables/stores/prefs'
 export default {
   name: 'Posts',
   props: ['threadSlug', 'threadId'],
-  // components: { Pagination },
+  components: { Pagination },
   setup(props) {
     /* Internal Methods */
     const processPosts = () => {
