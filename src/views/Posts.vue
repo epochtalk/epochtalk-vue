@@ -444,8 +444,7 @@ import Pagination from '@/components/layout/Pagination.vue'
 import humanDate from '@/composables/filters/humanDate'
 //import decode from '@/composables/filters/decode'
 import truncate from '@/composables/filters/truncate'
-//import { inject, reactive, watch, toRefs } from 'vue'
-import { inject, reactive, toRefs } from 'vue'
+import { inject, reactive, watch, toRefs } from 'vue'
 import { postsApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
@@ -549,6 +548,9 @@ export default {
       showMoveThreadModal: true
     })
     processPosts().then(data => v.postData.data = data)
+    /* Watched Data */
+    watch(() => v.loggedIn, () => processPosts().then(data => v.postData.data = data)) // Update on login
+    watch(() => $route.query, () => processPosts().then(data => v.postData.data = data)) // Update on query params change
     return {
       ...toRefs(v),
       canEditTitle,
