@@ -68,6 +68,9 @@ export default {
     const v = reactive({
       posts_per_page: $prefs.data.posts_per_page,
       threads_per_page: $prefs.data.threads_per_page,
+      timezone_offset_sign: $prefs.data.timezone_offset.sign,
+      timezone_offset_hours: $prefs.data.timezone_offset.hours,
+      timezone_offset_minutes: $prefs.data.timezone_offset.minutes,
       timezone_offset_sign_options: [
         { value: '', label: '+/-', disabled: true },
         { value: '+', label: '+' },
@@ -98,9 +101,6 @@ export default {
         { value: '30', label: '30' },
         { value: '45', label: '45' }
       ],
-      timezone_offset_sign: null,
-      timezone_offset_hours: null,
-      timezone_offset_minutes: null
     })
     return { ...toRefs(v), resetPrefrences, savePreferences }
   }
