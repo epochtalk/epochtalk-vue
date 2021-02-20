@@ -279,10 +279,10 @@
               <li>
                 <!-- TODO(boka): add data-balloon plugin -->
                 <!-- data-balloon="Permalink" -->
-                <a href="#" @click.prevent="highlightPost()" class="post-action-icon">
+                <router-link :to="'#' + post.id" @click="highlightPost()" class="post-action-icon">
                   <!-- <i class="icon-epoch-link"></i> -->
                   <strong>#{{post.position}}</strong>
-                </a>
+                </router-link>
               </li>
             </ul>
             <!-- <div class="clear"></div> -->
