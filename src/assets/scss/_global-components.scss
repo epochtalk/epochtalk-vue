@@ -180,6 +180,13 @@ svg {
   }
 }
 
+/*-- Field Groups  --*/
+.fieldgroup {
+  display: grid;
+  grid-template-columns: 4rem 1fr 1fr;
+  grid-gap: 0.5rem;
+}
+
 /* Input Styling */
 input[type], textarea {
   box-shadow: none;
