@@ -439,36 +439,48 @@
 </template>
 
 <script>
-import { useRoute } from 'vue-router'
 import Pagination from '@/components/layout/Pagination.vue'
 import humanDate from '@/composables/filters/humanDate'
 //import decode from '@/composables/filters/decode'
 import truncate from '@/composables/filters/truncate'
-import { inject, reactive, watch, toRefs } from 'vue'
-import { postsApi } from '@/api'
+import { inject, reactive, toRefs } from 'vue'
+import { postsApi, threadsApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
-import { PreferencesStore } from '@/composables/stores/prefs'
+import { PreferencesStore, localStoragePrefs } from '@/composables/stores/prefs'
 //import { countTotals, getLastPost, filterIgnoredBoards } from '@/composables/utils/boardUtils'
 
 export default {
   name: 'Posts',
   props: ['threadSlug', 'threadId'],
   components: { Pagination },
-  setup(props) {
-    /* Internal Methods */
-    const processPosts = () => {
-      return Promise.resolve(props.threadId)
-      .then(threadId => {
-        const params = {
-          thread_id: threadId,
-          limit: v.prefs.posts_per_page,
-          page: $route.query.page || 1,
-          field: $route.query.field,
-          desc: $route.query.desc
-        }
-        return postsApi.byThread(params)
-      })
+  beforeRouteEnter(to, from, next) {
+    const params = {
+      limit: localStoragePrefs().data.posts_per_page,
+      page: to.query.page || 1,
+      field: to.query.field,
+      desc: to.query.desc
     }
+    threadsApi.slugToThreadId(to.params.threadSlug).then(t => t.id)
+      .then(threadId => {
+        params.thread_id = threadId
+        return postsApi.byThread(params).then(data => next(vm => vm.postData.data = data))
+      })
+  },
+  beforeRouteUpdate(to, from, next) {
+    const params = {
+      thread_id: to.params.threadId,
+      limit: localStoragePrefs().data.posts_per_page,
+      page: to.query.page || 1,
+      field: to.query.field,
+      desc: to.query.desc
+    }
+    postsApi.byThread(params).then(data => {
+      this.postData.data = data
+      next()
+    })
+  },
+  setup() {
+    /* Internal Methods */
     /* View Methods */
     const canEditTitle = () => true
     const canPost = () => {
@@ -524,7 +536,6 @@ export default {
     const openMoveThreadModal = () => console.log('openMoveThreadModal')
 
     /* Internal Data */
-    const $route = useRoute()
     const $prefs = inject(PreferencesStore)
     const $auth = inject(AuthStore)
 
@@ -547,10 +558,7 @@ export default {
       showPurgeThreadModal: true,
       showMoveThreadModal: true
     })
-    processPosts().then(data => v.postData.data = data)
     /* Watched Data */
-    watch(() => v.loggedIn, () => processPosts().then(data => v.postData.data = data)) // Update on login
-    watch(() => $route.query, () => processPosts().then(data => v.postData.data = data)) // Update on query params change
     return {
       ...toRefs(v),
       canEditTitle,
