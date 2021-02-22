@@ -1,4 +1,4 @@
-import { provide, inject, reactive, toRefs } from 'vue'
+import { provide, inject, reactive, toRefs, readonly } from 'vue'
 import { cloneDeep } from 'lodash'
 import { usersApi } from '@/api'
 
@@ -85,6 +85,7 @@ export default {
     /* Provide Store Data */
     return provide(PreferencesStore, {
       data: toRefs(prefs),
+      readonly: readonly(prefs),
       fetch,
       clear,
       update
