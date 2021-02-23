@@ -468,16 +468,19 @@ export default {
   },
   beforeRouteUpdate(to, from, next) {
     const params = {
-      thread_id: to.params.threadId,
       limit: localStoragePrefs().data.posts_per_page,
       page: to.query.page || 1,
       field: to.query.field,
       desc: to.query.desc
     }
-    postsApi.byThread(params).then(data => {
-      this.postData.data = data
-      next()
-    })
+    threadsApi.slugToThreadId(to.params.threadSlug).then(t => t.id)
+      .then(threadId => {
+        params.thread_id = threadId
+        return postsApi.byThread(params).then(data => {
+          this.postData.data = data
+          next()
+        })
+      })
   },
   setup() {
     /* Internal Methods */
