@@ -109,7 +109,7 @@ export default {
 </script>
 
 <style lang="scss">
-main #public-content { grid-template-areas: 'header header' 'main sidebar' 'main sidebar'; }
+.settings main #public-content { grid-template-areas: 'header header' 'main sidebar' 'main sidebar'; }
 
 .css-form {
   label {
