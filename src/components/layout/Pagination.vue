@@ -1,5 +1,5 @@
 <template>
-  <div class="pagination-component">
+  <div v-if="pageCount > 1" class="pagination-component">
     <label class="page-label">Page 1</label>
     <div class="range-wrap">
       <input v-model="currentPage" ref="rangeInput" class="pagination" type="range" step="0.01" min="1" :max="pageCount" @change="smoothThumbDrag" @input="updatePageDisplay" />
