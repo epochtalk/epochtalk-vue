@@ -6,6 +6,7 @@ import Posts from '@/views/Posts.vue'
 import About from '@/views/About.vue'
 import NotFound from '@/views/NotFound.vue'
 import NProgress from 'nprogress'
+import { nextTick } from 'vue'
 
 const routes = [
   {
@@ -51,7 +52,11 @@ const router = createRouter({
   history: createWebHistory(),
   routes,
   scrollBehavior(to) {
-    if (to.hash) document.querySelector(to.hash).scrollIntoView()
+    if (to.hash) {
+      nextTick(() => {
+        document.querySelector(to.hash).scrollIntoView()
+      })
+    }
     else if (!to.params.saveScrollPos) document.getElementsByTagName('html')[0].scrollIntoView()
   }
 })
