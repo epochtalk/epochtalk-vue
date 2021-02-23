@@ -439,11 +439,12 @@
 </template>
 
 <script>
+import { useRoute } from 'vue-router'
 import Pagination from '@/components/layout/Pagination.vue'
 import humanDate from '@/composables/filters/humanDate'
 //import decode from '@/composables/filters/decode'
 import truncate from '@/composables/filters/truncate'
-import { inject, reactive, toRefs } from 'vue'
+import { inject, reactive, watch, toRefs } from 'vue'
 import { postsApi, threadsApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore, localStoragePrefs } from '@/composables/stores/prefs'
@@ -482,8 +483,21 @@ export default {
         })
       })
   },
-  setup() {
+  setup(props) {
     /* Internal Methods */
+    const processPosts = () => {
+      return Promise.resolve(props.threadId)
+      .then(threadId => {
+        const params = {
+          thread_id: threadId,
+          limit: v.prefs.posts_per_page,
+          page: $route.query.page || 1,
+          field: $route.query.field,
+          desc: $route.query.desc
+        }
+        return postsApi.byThread(params)
+      })
+    }
     /* View Methods */
     const canEditTitle = () => true
     const canPost = () => {
@@ -539,6 +553,7 @@ export default {
     const openMoveThreadModal = () => console.log('openMoveThreadModal')
 
     /* Internal Data */
+    const $route = useRoute()
     const $prefs = inject(PreferencesStore)
     const $auth = inject(AuthStore)
 
@@ -561,7 +576,11 @@ export default {
       showPurgeThreadModal: true,
       showMoveThreadModal: true
     })
+
     /* Watched Data */
+    watch(() => v.loggedIn, () => processPosts().then(data => v.postData.data = data)) // Update on login
+    watch(() => $route.query, () => processPosts().then(data => v.postData.data = data)) // Update on query params change
+
     return {
       ...toRefs(v),
       canEditTitle,
