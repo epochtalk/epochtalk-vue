@@ -54,7 +54,7 @@ const router = createRouter({
   scrollBehavior(to) {
     if (to.hash) {
       nextTick(() => {
-        document.querySelector(to.hash).scrollIntoView()
+        document.querySelector(to.hash).scrollIntoView({behavior: 'smooth'})
       })
     }
     else if (!to.params.saveScrollPos) document.getElementsByTagName('html')[0].scrollIntoView()
