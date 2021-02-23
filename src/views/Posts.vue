@@ -279,7 +279,7 @@
               <li>
                 <!-- TODO(boka): add data-balloon plugin -->
                 <!-- data-balloon="Permalink" -->
-                <router-link :to="'#' + post.id" @click="highlightPost()" class="post-action-icon">
+                <router-link :to="{ name: 'Posts', query: { page: postData.data.page, limit: postData.data.limit }, hash: `#${post.id}`}" @click="highlightPost()" class="post-action-icon">
                   <!-- <i class="icon-epoch-link"></i> -->
                   <strong>#{{post.position}}</strong>
                 </router-link>
