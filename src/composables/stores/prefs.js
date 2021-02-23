@@ -1,4 +1,4 @@
-import { provide, inject, reactive, toRefs } from 'vue'
+import { provide, inject, reactive, toRefs, readonly } from 'vue'
 import { cloneDeep } from 'lodash'
 import { usersApi } from '@/api'
 import localStorageCache from '@/composables/utils/localStorageCache'
@@ -10,7 +10,11 @@ const appCache = localStorageCache(0, 'app')
 const emtpyPrefs = {
   posts_per_page: 25,
   threads_per_page: 25,
-  timezone_offset: '',
+  timezone_offset: {
+    sign: '',
+    hours: '',
+    minutes: ''
+  },
   patroller_view: false,
   collapsed_categories: [],
   ignored_boards: []
@@ -27,6 +31,15 @@ export default {
 
     const cachedPrefs = $appCache.get(PREFS_KEY)
 
+    /* Internal Methods */
+    const getTimezoneOffset = prefs => {
+      return {
+        sign: prefs.timezone_offset[0] || '',
+        hours: prefs.timezone_offset.slice(1, 3),
+        minutes: prefs.timezone_offset.slice(3, 5)
+      }
+    }
+
     /* Provided Data */
     const prefs = reactive(cachedPrefs ? cachedPrefs.data : cloneDeep(emtpyPrefs))
 
@@ -34,6 +47,7 @@ export default {
     const fetch = () => {
       usersApi.preferences()
       .then(dbPrefs => {
+        dbPrefs.timezone_offset = getTimezoneOffset(dbPrefs)
         $appCache.set(PREFS_KEY, dbPrefs)
         Object.assign(prefs, dbPrefs)
       })
@@ -50,7 +64,7 @@ export default {
       const updatedPrefs = { // spread prefs to get rid of proxy object before storing in cache
         posts_per_page: prefs.posts_per_page,
         threads_per_page: prefs.threads_per_page,
-        timezone_offset: prefs.timezone_offset,
+        timezone_offset: prefs.timezone_offset.sign + prefs.timezone_offset.hours + prefs.timezone_offset.minutes,
         patroller_view: prefs.patroller_view,
         collapsed_categories: [...prefs.collapsed_categories],
         ignored_boards: [...prefs.ignored_boards]
@@ -60,15 +74,23 @@ export default {
           username: user.username,
           ...updatedPrefs
         }
+        console.log(data)
         usersApi.update(user.id, data)
-        .then(() => $appCache.set(PREFS_KEY, updatedPrefs))
+        .then(() => {
+          updatedPrefs.timezone_offset = getTimezoneOffset(updatedPrefs)
+          $appCache.set(PREFS_KEY, updatedPrefs)
+        })
       }
-      else { $appCache.set(PREFS_KEY, updatedPrefs) } // user not logged in, only update cache
+      else { // user not logged in, only update cache
+        updatedPrefs.timezone_offset = getTimezoneOffset(updatedPrefs)
+        $appCache.set(PREFS_KEY, updatedPrefs)
+      }
     }
 
     /* Provide Store Data */
     return provide(PreferencesStore, {
       data: toRefs(prefs),
+      readonly: readonly(prefs),
       fetch,
       clear,
       update

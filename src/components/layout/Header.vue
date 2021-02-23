@@ -136,7 +136,7 @@
                   <a href="#">Profile</a>
                 </li>
                 <li>
-                  <a href="#">Settings</a>
+                  <router-link :to="{ name: 'Settings' }">Settings</router-link>
                 </li>
                 <li>
                   <a href="#">Messages</a>

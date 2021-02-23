@@ -4,6 +4,7 @@ import Boards from '@/views/Boards.vue'
 import Threads from '@/views/Threads.vue'
 import Posts from '@/views/Posts.vue'
 import About from '@/views/About.vue'
+import Settings from '@/views/Settings.vue'
 import NotFound from '@/views/NotFound.vue'
 import NProgress from 'nprogress'
 import { nextTick } from 'vue'
@@ -34,6 +35,12 @@ const routes = [
       threadId: threadsApi.slugToThreadId(route.params.threadSlug).then(t => t.id)
     }),
     meta: { requiresAuth: false, bodyClass: 'posts' }
+  },
+  {
+    path: '/settings',
+    name: 'Settings',
+    component: Settings,
+    meta: { requiresAuth: true, bodyClass: 'settings' }
   },
   {
     path: '/about',
