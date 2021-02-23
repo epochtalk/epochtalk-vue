@@ -402,8 +402,8 @@
       <!-- <div class="controls">
         <pagination page-count="PostsParentCtrl.pageCount" page="PostsParentCtrl.page"></pagination>
       </div> -->
+      <pagination v-if="postData.data?.thread" :page="postData.data.page" :limit="postData.data.limit" :count="postData.data.thread.post_count"></pagination>
     </div>
-    <pagination v-if="postData.data?.thread" :page="postData.data.page" :limit="postData.data.limit" :count="postData.data.thread.post_count"></pagination>
 
   </div>
 
