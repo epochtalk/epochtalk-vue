@@ -40,7 +40,8 @@
             <a :class="{bold: thread.latest}" class="thread-title" href="#" onclick="event.stopPropagation()">{{thread.title}}</a>
           </div>
           <div class="user">
-            in <a href="#" class="thread-board" onclick="event.stopPropagation()">{{thread.board.name}}</a>
+            in
+            <router-link class="thread-board" :title="decode(thread.board.name)" :to="{ name: 'Threads', params: { boardSlug: thread.board.slug } }" onclick="event.stopPropagation()">{{decode(thread.board.name)}}</router-link>
             by
             <span v-if="thread.deleted">deleted</span>
             <a v-if="!thread.deleted" href="#" onclick="event.stopPropagation()">{{thread.user.username}}</a>
@@ -56,10 +57,11 @@
 
 <script>
 import humanDate from '@/composables/filters/humanDate'
+import decode from '@/composables/filters/decode'
 
 export default {
   props: ['threads'],
-  setup() { return { humanDate }}
+  setup() { return { humanDate, decode }}
 }
 </script>
 
