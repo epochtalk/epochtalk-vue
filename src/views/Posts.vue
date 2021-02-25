@@ -545,8 +545,12 @@ export default {
     const openDeleteModal = (i, postLocked) => console.log(i, postLocked, 'openDeleteModal')
     const openUndeleteModal = (i) => console.log(i, 'openUndeleteModal')
     const openReportModal = (post) => console.log(post, 'openReportModal')
-    const lockPost = (post) => console.log(post, 'lockPost')
-    const unlockPost = (post) => console.log(post, 'unlockPost')
+    const lockPost = (post) => {
+      postsApi.lock(post.id).then(() => post.locked = true)
+    }
+    const unlockPost = (post) => {
+      postsApi.unlock(post.id).then(() => post.locked = false)
+    }
     const loadEditor = (post) => console.log(post, 'loadEditor')
     const addQuote = (post) => console.log(post, 'addQuote')
     const copyQuote = (post) => console.log(post, 'copyQuote')
