@@ -1,11 +1,13 @@
 import { createWebHistory, createRouter } from 'vue-router'
-import { boardsApi } from '@/api'
+import { boardsApi, threadsApi } from '@/api'
 import Boards from '@/views/Boards.vue'
 import Threads from '@/views/Threads.vue'
+import Posts from '@/views/Posts.vue'
 import About from '@/views/About.vue'
 import Settings from '@/views/Settings.vue'
 import NotFound from '@/views/NotFound.vue'
 import NProgress from 'nprogress'
+import { nextTick } from 'vue'
 
 const routes = [
   {
@@ -23,6 +25,16 @@ const routes = [
       boardId: boardsApi.slugToBoardId(route.params.boardSlug).then(b => b.id)
     }),
     meta: { requiresAuth: false, bodyClass: 'threads' }
+  },
+  {
+    path: '/threads/:threadSlug',
+    name: 'Posts',
+    component: Posts,
+    props: route => ({
+      threadSlug: route.params.threadSlug,
+      threadId: threadsApi.slugToThreadId(route.params.threadSlug).then(t => t.id)
+    }),
+    meta: { requiresAuth: false, bodyClass: 'posts' }
   },
   {
     path: '/settings',
@@ -47,7 +59,11 @@ const router = createRouter({
   history: createWebHistory(),
   routes,
   scrollBehavior(to) {
-    if (to.hash) document.querySelector(to.hash).scrollIntoView()
+    if (to.hash) {
+      nextTick(() => {
+        document.querySelector(to.hash).scrollIntoView({behavior: 'smooth'})
+      })
+    }
     else if (!to.params.saveScrollPos) document.getElementsByTagName('html')[0].scrollIntoView()
   }
 })

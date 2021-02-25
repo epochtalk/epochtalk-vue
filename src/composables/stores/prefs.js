@@ -1,11 +1,28 @@
 import { provide, inject, reactive, toRefs, readonly } from 'vue'
 import { cloneDeep } from 'lodash'
 import { usersApi } from '@/api'
+import localStorageCache from '@/composables/utils/localStorageCache'
 
 const PREFS_KEY = 'preferences'
 const AUTH_KEY = 'auth'
 
+const appCache = localStorageCache(0, 'app')
+const emtpyPrefs = {
+  posts_per_page: 25,
+  threads_per_page: 25,
+  timezone_offset: {
+    sign: '',
+    hours: '',
+    minutes: ''
+  },
+  patroller_view: false,
+  collapsed_categories: [],
+  ignored_boards: []
+}
+
 export const PreferencesStore = Symbol(PREFS_KEY)
+
+export const localStoragePrefs = () => appCache.get(PREFS_KEY) || { data: emtpyPrefs }
 
 export default {
   setup() {
@@ -13,18 +30,6 @@ export default {
     const $appCache = inject('$appCache')
 
     const cachedPrefs = $appCache.get(PREFS_KEY)
-    const emtpyPrefs = {
-      posts_per_page: 25,
-      threads_per_page: 25,
-      timezone_offset: {
-        sign: '',
-        hours: '',
-        minutes: ''
-      },
-      patroller_view: false,
-      collapsed_categories: [],
-      ignored_boards: []
-    }
 
     /* Internal Methods */
     const getTimezoneOffset = prefs => {
