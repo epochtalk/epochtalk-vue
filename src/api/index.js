@@ -48,11 +48,17 @@ export const boardsApi = {
 }
 
 export const threadsApi = {
+  lock: (threadId) => $http(`/api/threads/${threadId}/lock`, { data: { status: true }, method: 'POST'}),
+  unlock: (threadId) => $http(`/api/threads/${threadId}/lock`, { data: { status: false }, method: 'POST'}),
+  sticky: (threadId) => $http(`/api/threads/${threadId}/sticky`, { data: { status: true}, method: 'POST'}),
+  unsticky: (threadId) => $http(`/api/threads/${threadId}/sticky`, { data: { status: false }, method: 'POST'}),
   byBoard: params => $http('/api/threads', { params }),
   slugToThreadId: slug => $http(`/api/threads/${slug}/id`)
 }
 
 export const postsApi = {
+  lock: (postId) => $http(`/api/posts/${postId}/lock`, { method: 'POST'}),
+  unlock: (postId) => $http(`/api/posts/${postId}/unlock`, { method: 'POST'}),
   byThread: params => $http('/api/posts', { params }),
   slugToPostId: slug => $http(`/api/posts/${slug}/id`)
 }

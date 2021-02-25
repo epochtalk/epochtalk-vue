@@ -26,7 +26,7 @@
             <div class="">
               <!-- TODO(boka): add data-balloon plugin -->
               <!-- <a href="#" id="lockThread" v-if="canLock()" :class="{'clicked' : postData.data.thread.locked }" @click.prevent="updateThreadLock()" class="badgeContents" data-balloon="{{PostsParentCtrl.thread.locked ? 'Unlock Thread' : 'Lock Thread'}}"> -->
-              <a href="#" id="lockThread" v-if="canLock()" :class="{'clicked' : postData.data.thread.locked }" @click.prevent="updateThreadLock()" class="badgeContents">
+              <a href="" id="lockThread" v-if="canLock()" :class="{'clicked' : postData.data.thread.locked }" @click.prevent="updateThreadLock(postData.data.thread)" class="badgeContents">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                   <title></title>
                   <path
@@ -48,7 +48,7 @@
             <a href="#" id="badge__stickyThread"
               :class="{'clicked' : postData.data.thread.sticky }"
               v-if="canSticky()"
-              @click.prevent="updateThreadSticky()" class="badgeContents">
+              @click.prevent="updateThreadSticky(postData.data.thread)" class="badgeContents">
               <!-- TODO(boka): add data-balloon plugin -->
               <!-- data-balloon="{{PostsParentCtrl.thread.canSticky ? 'Sticky Thread' : 'Unsticky Thread'}}"> -->
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -343,7 +343,7 @@
           <!-- data-balloon="{{PostsParentCtrl.thread.locked ? 'Unlock Thread' : 'Lock Thread'}}" -->
           <div class="control" v-if="canLock()">
             <a href="#" id="lockThread" :class="{'clicked' : postData.data?.thread.locked }"
-              @click.prevent="updateThreadLock()">
+              @click.prevent="updateThreadLock(postData.data.thread)">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <title></title>
                 <path
@@ -357,7 +357,7 @@
           <!-- data-balloon="{{PostsParentCtrl.thread.sticky ? 'Unsticky Thread' : 'Sticky Thread'}}" -->
           <div class="control" v-if="canSticky()">
             <a href="#" id="stickyThread" :class="{'clicked' : postData.data?.thread.sticky }"
-              @click.prevent="updateThreadSticky()">
+              @click.prevent="updateThreadSticky(postData.data.thread)">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <title></title>
                   <g id="icons"><path d="M44.27,11.92,35.08,2.73a2.5,2.5,0,1,0-3.53,3.53l9.19,9.19a2.5,2.5,0,0,0,3.53-3.53Z"/><path d="M16.34,16.51a3,3,0,1,0-4.24,4.25l5.66,5.65L6.44,37.73l-2.12,5,4.95-2.12L20.59,29.24l5.65,5.66a3,3,0,1,0,4.25-4.24Z"/><rect x="21.78" y="11.22" width="16" height="12" transform="translate(-3.46 26.1) rotate(-45)"/>
@@ -528,8 +528,14 @@ export default {
       return true
     }
     const openEditThread = () => console.log('openEditThread')
-    const updateThreadLock = () => console.log('updateThreadLock')
-    const updateThreadSticky = () => console.log('updateThreadSticky')
+    const updateThreadLock = (thread) => {
+      const promise = thread.locked ? threadsApi.unlock(thread.id) : threadsApi.lock(thread.id)
+      promise.then(() => thread.locked = !thread.locked)
+    }
+    const updateThreadSticky = (thread) => {
+      const promise = thread.sticky ? threadsApi.unsticky(thread.id) : threadsApi.sticky(thread.id)
+      promise.then(() => thread.sticky = !thread.sticky)
+    }
     const updateThreadTitle = () => console.log('updateThreadTitle')
     const closeEditThread = () => console.log('closeEditThread')
     const createPoll = () => console.log('createPoll')
@@ -542,8 +548,12 @@ export default {
     const openDeleteModal = (i, postLocked) => console.log(i, postLocked, 'openDeleteModal')
     const openUndeleteModal = (i) => console.log(i, 'openUndeleteModal')
     const openReportModal = (post) => console.log(post, 'openReportModal')
-    const lockPost = (post) => console.log(post, 'lockPost')
-    const unlockPost = (post) => console.log(post, 'unlockPost')
+    const lockPost = (post) => {
+      postsApi.lock(post.id).then(() => post.locked = true)
+    }
+    const unlockPost = (post) => {
+      postsApi.unlock(post.id).then(() => post.locked = false)
+    }
     const loadEditor = (post) => console.log(post, 'loadEditor')
     const addQuote = (post) => console.log(post, 'addQuote')
     const copyQuote = (post) => console.log(post, 'copyQuote')
