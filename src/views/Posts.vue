@@ -26,7 +26,7 @@
             <div class="">
               <!-- TODO(boka): add data-balloon plugin -->
               <!-- <a href="#" id="lockThread" v-if="canLock()" :class="{'clicked' : postData.data.thread.locked }" @click.prevent="updateThreadLock()" class="badgeContents" data-balloon="{{PostsParentCtrl.thread.locked ? 'Unlock Thread' : 'Lock Thread'}}"> -->
-              <a href="" id="lockThread" v-if="canLock()" :class="{'clicked' : postData.data.thread.locked }" @click.prevent="updateThreadLock(postData.data.thread.id, postData.data.thread.locked)" class="badgeContents">
+              <a href="" id="lockThread" v-if="canLock()" :class="{'clicked' : postData.data.thread.locked }" @click.prevent="updateThreadLock(postData.data.thread)" class="badgeContents">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                   <title></title>
                   <path
@@ -343,7 +343,7 @@
           <!-- data-balloon="{{PostsParentCtrl.thread.locked ? 'Unlock Thread' : 'Lock Thread'}}" -->
           <div class="control" v-if="canLock()">
             <a href="#" id="lockThread" :class="{'clicked' : postData.data?.thread.locked }"
-              @click.prevent="updateThreadLock(postData.data.thread.id, postData.data.thread.locked)">
+              @click.prevent="updateThreadLock(postData.data.thread)">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <title></title>
                 <path
@@ -528,9 +528,9 @@ export default {
       return true
     }
     const openEditThread = () => console.log('openEditThread')
-    const updateThreadLock = (threadId, locked) => {
-      const promise = locked ? threadsApi.unlock(threadId) : threadsApi.lock(threadId)
-      promise.then(() => v.postData.data.thread.locked = !locked)
+    const updateThreadLock = (thread) => {
+      const promise = thread.locked ? threadsApi.unlock(thread.id) : threadsApi.lock(thread.id)
+      promise.then(() => thread.locked = !thread.locked)
     }
     const updateThreadSticky = (thread) => {
       const promise = thread.sticky ? threadsApi.unsticky(thread.id) : threadsApi.sticky(thread.id)
