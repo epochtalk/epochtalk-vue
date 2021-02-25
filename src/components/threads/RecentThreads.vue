@@ -37,7 +37,7 @@
             </div>
           </div>
           <div class="title">
-            <a :class="{bold: thread.latest}" class="thread-title" href="#" onclick="event.stopPropagation()">{{thread.title}}</a>
+            <router-link :class="{bold: thread.latest}" class="thread-title" :title="decode(thread.title)" :to="{ name: 'Posts', params: { threadSlug: thread.slug, threadId: thread.id } }" onclick="event.stopPropagation()">{{decode(thread.title)}}</router-link>
           </div>
           <div class="user">
             in
