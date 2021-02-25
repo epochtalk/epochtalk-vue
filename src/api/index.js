@@ -55,6 +55,8 @@ export const threadsApi = {
 }
 
 export const postsApi = {
+  lock: (postId) => $http(`/api/posts/${postId}/lock`, { method: 'POST'}),
+  unlock: (postId) => $http(`/api/posts/${postId}/lock`, { method: 'POST'}),
   byThread: params => $http('/api/posts', { params }),
   slugToPostId: slug => $http(`/api/posts/${slug}/id`)
 }
