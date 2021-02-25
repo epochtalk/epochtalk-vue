@@ -48,6 +48,8 @@ export const boardsApi = {
 }
 
 export const threadsApi = {
+  lock: (threadId) => $http(`/api/threads/${threadId}/lock`, { data: { status: true }, method: 'POST'}),
+  unlock: (threadId) => $http(`/api/threads/${threadId}/lock`, { data: { status: false }, method: 'POST'}),
   byBoard: params => $http('/api/threads', { params }),
   slugToThreadId: slug => $http(`/api/threads/${slug}/id`)
 }
