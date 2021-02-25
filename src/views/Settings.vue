@@ -40,10 +40,10 @@
       <br />
 
       <div class="action-bar-panel">
-        <button class="outline" ng-click="SettingsCtrl.resetTimezoneOffset()">
+        <button class="outline" @click.prevent="resetTimezoneOffset()">
           Reset
         </button>
-        <button ng-click="SettingsCtrl.saveTimezoneOffset()" ng-disabled="!SettingsCtrl.timezoneOffsetValid()">
+        <button @click="saveTimezoneOffset()" :disabled="!timezoneOffsetValid()">
           Save
         </button>
       </div>
@@ -62,6 +62,9 @@ export default {
     /* View Methods */
     const resetPrefrences = () => console.log('resetPrefrences')
     const savePreferences = () => console.log('savePreferences')
+    const resetTimezoneOffset = () => console.log('resetTimezoneOffset')
+    const saveTimezoneOffset = () => console.log('saveTimezoneOffset')
+    const timezoneOffsetValid = () => true
 
     /* Internal Data */
     // const $auth = inject(AuthStore)
@@ -103,7 +106,7 @@ export default {
         { value: '45', label: '45' }
       ],
     })
-    return { ...toRefs(v), resetPrefrences, savePreferences }
+    return { ...toRefs(v), resetPrefrences, savePreferences, resetTimezoneOffset, saveTimezoneOffset, timezoneOffsetValid }
   }
 }
 </script>
