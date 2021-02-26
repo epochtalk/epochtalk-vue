@@ -447,11 +447,12 @@ import { inject, reactive, watch, toRefs } from 'vue'
 import { postsApi, threadsApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore, localStoragePrefs } from '@/composables/stores/prefs'
+import DeleteModal from '@/components/modals/posts/Delete.vue'
 
 export default {
   name: 'Posts',
   props: ['threadSlug', 'threadId'],
-  components: { Pagination },
+  components: { Pagination, DeleteModal },
   beforeRouteEnter(to, from, next) {
     const params = {
       limit: localStoragePrefs().data.posts_per_page,
