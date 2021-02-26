@@ -184,7 +184,7 @@
               <li v-if="canDelete(post) && post.position !== 1 && !post.deleted">
                 <!-- TODO(boka): add data-balloon plugin -->
                 <!-- data-balloon="Hide"  -->
-                <a href="" class="post-action-icon" @click.prevent="openDeleteModal(i, post.locked)">
+                <a href="" class="post-action-icon" @click.prevent="openDeleteModal(post)">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                     <title></title>
                     <path
