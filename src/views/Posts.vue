@@ -436,6 +436,7 @@
   <!--     show-switch="PostsParentCtrl.showEditor"> -->
   <!--   </epochtalk-editor> -->
   <!-- </div> -->
+  <posts-delete-modal :postId="selectedPost.id" :show="showDeletePostModal" @close="showDeletePostModal = false"/>
 </template>
 
 <script>
@@ -544,7 +545,9 @@ export default {
       return true
     }
     const openPurgeModal = (i) => console.log(i, 'openPurgeModal')
-    const openDeleteModal = (i, postLocked) => console.log(i, postLocked, 'openDeleteModal')
+    const openDeleteModal = (post) => {
+      v.selectedPost = post
+    }
     const openUndeleteModal = (i) => console.log(i, 'openUndeleteModal')
     const openReportModal = (post) => console.log(post, 'openReportModal')
     const lockPost = (post) => {
@@ -568,6 +571,7 @@ export default {
 
     /* View Data */
     const v = reactive({
+      selectedPostId: null,
       prefs: $prefs.data,
       loggedIn: $auth.loggedIn,
       postData: {data: {}},
@@ -582,6 +586,7 @@ export default {
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
       disableSignature: false,
+      showDeletePostModal: false,
       showPurgeThreadModal: true,
       showMoveThreadModal: true
     })
