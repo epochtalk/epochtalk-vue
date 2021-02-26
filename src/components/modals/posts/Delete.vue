@@ -22,8 +22,7 @@
 
 <script>
 import Modal from '@/components/layout/Modal.vue'
-import { cloneDeep } from 'lodash'
-import { reactive, toRefs, inject } from 'vue'
+import { reactive, toRefs } from 'vue'
 import { postsApi } from '@/api'
 
 export default {
@@ -34,12 +33,11 @@ export default {
   setup(props, { emit }) {
     /* Template Methods */
     const close = () => {
-      v.user = cloneDeep(initUser)
+      v.deleteAndLock = false
       emit('close')
     }
 
     /* Template Data */
-    const initUser = { username: '', password: '', rememberMe: false }
     const canPostLockQuick = deletePostIndex => {
       console.log('canPostLockQuick')
       return true
@@ -54,6 +52,8 @@ export default {
       deletePostLocked: false,
       focusInput: null
     })
+
+    return { ...toRefs(v), deletePost, close }
   }
 }
 </script>
