@@ -212,13 +212,12 @@
         <i class="icon-epoch-watch"></i>Set Moderators
       </a>
     </div>
-    <pagination v-if="threadData.data" :page="threadData.data.page" :limit="threadData.data.limit" :count="threadData.data.board.thread_count"></pagination>
+    <pagination v-if="threadData.data?.board" :page="threadData.data.page" :limit="threadData.data.limit" :count="threadData.data.board.thread_count"></pagination>
   </div>
   <set-moderators-modal v-if="threadData.data?.board" :board="threadData.data.board" :show="showSetModerators" @close="showSetModerators = false"></set-moderators-modal>
 </template>
 
 <script>
-import useSWRV from 'swrv'
 import { useRoute, useRouter } from 'vue-router'
 import Pagination from '@/components/layout/Pagination.vue'
 import SetModeratorsModal from '@/components/modals/threads/SetModerators.vue'
@@ -226,15 +225,44 @@ import humanDate from '@/composables/filters/humanDate'
 import decode from '@/composables/filters/decode'
 import truncate from '@/composables/filters/truncate'
 import { inject, reactive, watch, toRefs } from 'vue'
-import { threadsApi, watchlistApi } from '@/api'
+import { boardsApi, threadsApi, watchlistApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
-import { PreferencesStore } from '@/composables/stores/prefs'
+import { PreferencesStore, localStoragePrefs } from '@/composables/stores/prefs'
 import { countTotals, getLastPost, filterIgnoredBoards } from '@/composables/utils/boardUtils'
 
 export default {
   name: 'Threads',
   props: ['boardSlug', 'boardId'],
   components: { Pagination, SetModeratorsModal },
+  beforeRouteEnter(to, from, next) {
+    const params = {
+      limit: localStoragePrefs().data.threads_per_page,
+      page: to.query.page || 1,
+      field: to.query.field,
+      desc: to.query.desc
+    }
+    boardsApi.slugToBoardId(to.params.boardSlug).then(b => b.id)
+    .then(boardId => {
+      params.board_id = boardId
+      return threadsApi.byBoard(params).then(d => next(vm => vm.threadData.data = d))
+    })
+  },
+  beforeRouteUpdate(to, from, next) {
+    const params = {
+      limit: localStoragePrefs().data.threads_per_page,
+      page: to.query.page || 1,
+      field: to.query.field,
+      desc: to.query.desc
+    }
+    boardsApi.slugToBoardId(to.params.boardSlug).then(b => b.id)
+    .then(boardId => {
+      params.board_id = boardId
+      return threadsApi.byBoard(params).then(d => {
+        this.threadData.data = d
+        next()
+      })
+    })
+  },
   setup(props) {
     /* Internal Methods */
     const processThreads = () => {
@@ -327,7 +355,6 @@ export default {
     }
 
     /* Internal Data */
-    const $swrvCache = inject('$swrvCache')
     const $route = useRoute()
     const $router = useRouter()
     const $prefs = inject(PreferencesStore)
@@ -336,12 +363,7 @@ export default {
 
     /* View Data */
     const v = reactive({
-      threadData: useSWRV(() => {
-        let params = new URLSearchParams($route.query)
-        let queryStr = params.toString()
-        let urlPath = queryStr ? `${props.boardSlug}?${queryStr}` : `${props.boardSlug}`
-        return `/boards/${urlPath}`
-      }, processThreads, { cache: $swrvCache, dedupingInterval: 100, ttl: 500 }),
+      threadData: { data: {} },
       prefs: $prefs.data,
       loggedIn: $auth.loggedIn,
       permissionUtils: $auth.permissionUtils,
@@ -370,8 +392,7 @@ export default {
     })
 
     /* Watched Data */
-    watch(() => v.loggedIn, () => v.threadData.mutate(processThreads)) // Update threads on login
-    watch(() => $route.query, () => v.threadData.mutate(processThreads)) // Update on query change
+    watch(() => v.loggedIn, () => processThreads().then(d => v.threadData.data = d)) // Update threads on login
 
     return { ...toRefs(v), canCreate, canSetModerator, loadEditor, watchBoard, setSortField, getSortClass, humanDate, decode, truncate }
   }
