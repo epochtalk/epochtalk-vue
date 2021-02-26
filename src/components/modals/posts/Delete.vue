@@ -42,9 +42,12 @@ export default {
       console.log('canPostLockQuick', deletePostIndex)
       return true
     }
-    const deletePost = (postId) => {
-      postsApi.delete(postId, v.deleteAndLock)
-      console.log('deletePost', postId)
+    const deletePost = post => {
+      postsApi.delete(post.id, v.deleteAndLock)
+        .then(() => {
+          post.deleted = true
+          if (v.deleteAndLock) post.locked = true
+        })
     }
 
     const v = reactive({
