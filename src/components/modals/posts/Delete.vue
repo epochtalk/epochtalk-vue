@@ -38,8 +38,8 @@ export default {
     }
 
     /* Template Data */
-    const canPostLockQuick = deletePostIndex => {
-      console.log('canPostLockQuick', deletePostIndex)
+    const canPostLockQuick = post => {
+      console.log('canPostLockQuick', post)
       return true
     }
     const deletePost = post => {
