@@ -42,7 +42,7 @@ export default {
       console.log('canPostLockQuick', deletePostIndex)
       return true
     }
-    const deletePost(postId) => {
+    const deletePost = (postId) => {
       postsApi.delete(postId, v.deleteAndLock)
       console.log('deletePost', postId)
     }
