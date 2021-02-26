@@ -6,12 +6,12 @@
       <form action="." class="css-form">
         <h3 class="thin-underline">Hide Post</h3>
         <p>Are you sure you want to hide this post?</p>
-        <label v-if="canPostLockQuick(deletePostIndex) && deletePostLocked === false" class="checkbox-container">
+        <label v-if="canPostLockQuick(selectedPost) && deletePostLocked === false" class="checkbox-container">
           <input type="checkbox" id="lock-post" v-model="deleteAndLock" ref="focusInput" />
           Lock Post (poster cannot hide/edit this post)?
         </label>
         <div class="clear">
-          <button id="login-btn" class="fill-row" @click.prevent="deletePost(postId)" type="submit">
+          <button id="login-btn" class="fill-row" @click.prevent="deletePost(selectedPost)" type="submit">
             Hide Post
           </button>
         </div>
@@ -27,7 +27,7 @@ import { postsApi } from '@/api'
 
 export default {
   name: 'posts-delete-modal',
-  props: ['show', 'postId'],
+  props: ['show', 'selectedPost'],
   emits: ['close'],
   components: { Modal },
   setup(props, { emit }) {
@@ -48,6 +48,7 @@ export default {
     }
 
     const v = reactive({
+      selectedPost: props.selectedPost,
       deleteAndLock: false,
       deletePostLocked: false,
       focusInput: null

@@ -436,7 +436,7 @@
   <!--     show-switch="PostsParentCtrl.showEditor"> -->
   <!--   </epochtalk-editor> -->
   <!-- </div> -->
-  <posts-delete-modal :postId="selectedPost?.id" :show="showPostsDeleteModal" @close="showPostsDeleteModal = false; selectedPost = null"/>
+  <posts-delete-modal :selectedPost="selectedPost" :show="showPostsDeleteModal" @close="showPostsDeleteModal = false; selectedPost = null"/>
 </template>
 
 <script>
