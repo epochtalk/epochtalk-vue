@@ -57,6 +57,7 @@ export const threadsApi = {
 }
 
 export const postsApi = {
+  delete: (postId, locked) => $http(`/api/posts/${postId}`, { method: 'DELETE', params: { locked }}),
   lock: (postId) => $http(`/api/posts/${postId}/lock`, { method: 'POST'}),
   unlock: (postId) => $http(`/api/posts/${postId}/unlock`, { method: 'POST'}),
   byThread: params => $http('/api/posts', { params }),
