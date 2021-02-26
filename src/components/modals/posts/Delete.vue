@@ -19,3 +19,41 @@
     </template>
   </modal>
 </template>
+
+<script>
+import Modal from '@/components/layout/Modal.vue'
+import { cloneDeep } from 'lodash'
+import { reactive, toRefs, inject } from 'vue'
+import { postsApi } from '@/api'
+
+export default {
+  name: 'posts-delete-modal',
+  props: ['show', 'post'],
+  emits: ['close'],
+  components: { Modal },
+  setup(props, { emit }) {
+    /* Template Methods */
+    const close = () => {
+      v.user = cloneDeep(initUser)
+      emit('close')
+    }
+
+    /* Template Data */
+    const initUser = { username: '', password: '', rememberMe: false }
+    const canPostLockQuick = deletePostIndex => {
+      console.log('canPostLockQuick')
+      return true
+    }
+    const deletePost(post) => {
+      postsApi.delete(post.id, post.locked)
+      console.log('deletePost', post)
+    }
+
+    const v = reactive({
+      deleteAndLock: false,
+      deletePostLocked: false,
+      focusInput: null
+    })
+  }
+}
+</script>
