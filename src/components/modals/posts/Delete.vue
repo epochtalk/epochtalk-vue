@@ -27,7 +27,7 @@ import { postsApi } from '@/api'
 
 export default {
   name: 'posts-delete-modal',
-  props: ['show', 'post'],
+  props: ['show', 'postId'],
   emits: ['close'],
   components: { Modal },
   setup(props, { emit }) {
