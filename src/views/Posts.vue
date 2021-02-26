@@ -436,7 +436,7 @@
   <!--     show-switch="PostsParentCtrl.showEditor"> -->
   <!--   </epochtalk-editor> -->
   <!-- </div> -->
-  <posts-delete-modal :postId="selectedPost.id" :show="showDeletePostModal" @close="showDeletePostModal = false"/>
+  <delete-modal :postId="selectedPost?.id" :show="showDeletePostModal" @close="showDeletePostModal = false"/>
 </template>
 
 <script>
@@ -571,7 +571,7 @@ export default {
 
     /* View Data */
     const v = reactive({
-      selectedPostId: null,
+      selectedPost: null,
       prefs: $prefs.data,
       loggedIn: $auth.loggedIn,
       postData: {data: {}},
