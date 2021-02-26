@@ -11,7 +11,7 @@
           Lock Post (poster cannot hide/edit this post)?
         </label>
         <div class="clear">
-          <button id="login-btn" class="fill-row" @click.prevent="deletePost(post)" type="submit">
+          <button id="login-btn" class="fill-row" @click.prevent="deletePost(postId)" type="submit">
             Hide Post
           </button>
         </div>
@@ -42,8 +42,8 @@ export default {
       console.log('canPostLockQuick')
       return true
     }
-    const deletePost(post) => {
-      postsApi.delete(post.id, post.locked)
+    const deletePost(postId) => {
+      postsApi.delete(postId, v.deleteAndLock)
       console.log('deletePost', post)
     }
 
