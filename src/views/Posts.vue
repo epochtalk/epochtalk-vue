@@ -184,7 +184,7 @@
               <li v-if="canDelete(post) && post.position !== 1 && !post.deleted">
                 <!-- TODO(boka): add data-balloon plugin -->
                 <!-- data-balloon="Hide"  -->
-                <a href="" class="post-action-icon" @click.prevent="openDeleteModal(post)">
+                <a href="" class="post-action-icon" @click.prevent="openPostsDeleteModal(post)">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                     <title></title>
                     <path
@@ -436,7 +436,7 @@
   <!--     show-switch="PostsParentCtrl.showEditor"> -->
   <!--   </epochtalk-editor> -->
   <!-- </div> -->
-  <delete-modal :postId="selectedPost?.id" :show="showDeletePostModal" @close="showDeletePostModal = false"/>
+  <posts-delete-modal :postId="selectedPost?.id" :show="showDeletePostModal" @close="showDeletePostModal = false; selectedPost = null"/>
 </template>
 
 <script>
@@ -448,12 +448,12 @@ import { inject, reactive, watch, toRefs } from 'vue'
 import { postsApi, threadsApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore, localStoragePrefs } from '@/composables/stores/prefs'
-import DeleteModal from '@/components/modals/posts/Delete.vue'
+import PostsDeleteModal from '@/components/modals/posts/Delete.vue'
 
 export default {
   name: 'Posts',
   props: ['threadSlug', 'threadId'],
-  components: { Pagination, DeleteModal },
+  components: { Pagination, PostsDeleteModal },
   beforeRouteEnter(to, from, next) {
     const params = {
       limit: localStoragePrefs().data.posts_per_page,
@@ -545,7 +545,7 @@ export default {
       return true
     }
     const openPurgeModal = (i) => console.log(i, 'openPurgeModal')
-    const openDeleteModal = (post) => {
+    const openPostsDeleteModal = (post) => {
       v.selectedPost = post
     }
     const openUndeleteModal = (i) => console.log(i, 'openUndeleteModal')
@@ -619,7 +619,7 @@ export default {
       userRoleHighlight,
       showEditDate,
       openPurgeModal,
-      openDeleteModal,
+      openPostsDeleteModal,
       openUndeleteModal,
       openReportModal,
       lockPost,
