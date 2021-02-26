@@ -53,7 +53,7 @@ export default {
       focusInput: null
     })
 
-    return { ...toRefs(v), deletePost, close }
+    return { ...toRefs(v), canPostLockQuick, deletePost, close }
   }
 }
 </script>
