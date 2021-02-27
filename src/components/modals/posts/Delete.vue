@@ -46,6 +46,7 @@ export default {
       postsApi.delete(post.id, v.deleteAndLock)
         .then(() => {
           post.deleted = true
+          post.hidden = true
           if (v.deleteAndLock) post.locked = true
         })
     }
