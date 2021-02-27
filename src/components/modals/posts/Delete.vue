@@ -33,7 +33,7 @@ export default {
   setup(props, { emit }) {
     /* Template Methods */
     const close = () => {
-      v.deleteAndLock = false
+      v.deleteAndLock = true
       emit('close')
     }
 
@@ -52,7 +52,7 @@ export default {
 
     const v = reactive({
       selectedPost: props.selectedPost,
-      deleteAndLock: false,
+      deleteAndLock: true,
       deletePostLocked: false,
       focusInput: null
     })
