@@ -228,7 +228,7 @@ import { inject, reactive, watch, toRefs } from 'vue'
 import { boardsApi, threadsApi, watchlistApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore, localStoragePrefs } from '@/composables/stores/prefs'
-import { countTotals, getLastPost, filterIgnoredBoards } from '@/composables/utils/boardUtils'
+import { processThreads } from '@/composables/utils/boardUtils'
 
 export default {
   name: 'Threads',
@@ -244,7 +244,8 @@ export default {
     boardsApi.slugToBoardId(to.params.boardSlug).then(b => b.id)
     .then(boardId => {
       params.board_id = boardId
-      return threadsApi.byBoard(params).then(d => next(vm => vm.threadData.data = d))
+      return threadsApi.byBoard(params)
+      .then(d => next(vm => vm.threadData.data = processThreads(d)))
     })
   },
   beforeRouteUpdate(to, from, next) {
@@ -258,14 +259,14 @@ export default {
     .then(boardId => {
       params.board_id = boardId
       return threadsApi.byBoard(params).then(d => {
-        this.threadData.data = d
+        this.threadData.data = processThreads(d)
         next()
       })
     })
   },
   setup(props) {
     /* Internal Methods */
-    const processThreads = () => {
+    const getThreads = () => {
       return Promise.resolve(props.boardId)
       .then(boardId => {
         const params = {
@@ -276,23 +277,7 @@ export default {
           desc: $route.query.desc
         }
         return threadsApi.byBoard(params)
-        .then(tData => {
-          // always supply moderators array so property remains reactive even when passed to children
-          tData.board.moderators = tData.board.moderators || []
-
-          // filter out ignored child boards
-          tData.board.children = filterIgnoredBoards(tData.board.children, v.prefs.ignored_boards)
-
-          // set total_thread_count and total_post_count for all child board
-          tData.board.children.map(childBoard => {
-            let children = countTotals(childBoard.children)
-            let lastPost = getLastPost([childBoard])
-            childBoard.total_thread_count = children.thread_count + childBoard.thread_count
-            childBoard.total_post_count = children.post_count + childBoard.post_count
-            return Object.assign(childBoard, lastPost)
-          })
-          return tData
-        })
+        .then(processThreads)
       })
     }
 
@@ -392,7 +377,7 @@ export default {
     })
 
     /* Watched Data */
-    watch(() => v.loggedIn, () => processThreads().then(d => v.threadData.data = d)) // Update threads on login
+    watch(() => v.loggedIn, () => getThreads().then(d => v.threadData.data = d)) // Update threads on login
 
     return { ...toRefs(v), canCreate, canSetModerator, loadEditor, watchBoard, setSortField, getSortClass, humanDate, decode, truncate }
   }

@@ -88,6 +88,7 @@
 
 <script>
 import useSWRV from 'swrv'
+import { mutate } from 'swrv'
 import humanDate from '@/composables/filters/humanDate'
 import RecentThreads from '@/components/threads/RecentThreads.vue'
 import LoginModal from '@/components/modals/auth/Login.vue'
@@ -96,7 +97,7 @@ import { inject, reactive, toRefs, watch } from 'vue'
 import { boardsApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
-import { countTotals, getLastPost, filterIgnoredBoards } from '@/composables/utils/boardUtils'
+import { processBoards } from '@/composables/utils/boardUtils'
 
 export default {
   name: 'Boards',
@@ -105,31 +106,19 @@ export default {
     LoginModal,
     RegisterModal
   },
+  beforeRouteEnter(to, from, next) {
+    next(() => mutate('/boards', boardsApi.getBoards().then(processBoards)))
+  },
+  beforeRouteUpdate(to, from, next) {
+    mutate('/boards', boardsApi.getBoards().then(processBoards))
+    next()
+  },
   setup() {
     /* Internal View Methods */
-    const processBoards = () => boardsApi.getBoards()
-      .then(data => {
-        data.boards.map(category => {
-          // filter out ignored boards
-          category.boards = filterIgnoredBoards(category.boards, v.ignoredBoards)
-
-          // set total_thread_count and total_post_count for all boards
-          category.boards.map(board => {
-            let children = countTotals([board])
-            let lastPost = getLastPost([board])
-            board.total_thread_count = children.thread_count
-            board.total_post_count = children.post_count
-            return Object.assign(board, lastPost)
-          })
-        })
-        return data
-      })
+    const getBoards = () => boardsApi.getBoards().then(processBoards)
 
     /* View Methods */
-    const generateCatId = (name, viewOrder) => {
-      let anchorId = (name + '-' + viewOrder).replace(/\s+/g, '-').toLowerCase()
-      return anchorId
-    }
+    const generateCatId = (n, i) => `${n}-${i}`.replace(/\s+/g, '-').toLowerCase()
 
     const toggleCategory = cat => {
       if (v.collapsedCats.indexOf(cat.id) > -1) {
@@ -158,11 +147,11 @@ export default {
       showRegister: false,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
-      boardData: useSWRV(() => `/api/boards`, processBoards, { cache: $swrvCache, dedupingInterval: 750 })
+      boardData: useSWRV(() => `/boards`, getBoards, { cache: $swrvCache, dedupingInterval: 750 })
     })
 
     /* Watch Data */
-    watch(() => v.loggedIn, () => v.boardData.mutate(processBoards)) // Update boards on login
+    watch(() => v.loggedIn, () => v.boardData.mutate(getBoards)) // Update boards on login
     watch(() => v.boardData.error, () => $alertStore.error(v.boardData)) // Handle errors
 
     return { ...toRefs(v), generateCatId, toggleCategory, humanDate }
