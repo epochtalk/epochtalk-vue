@@ -48,6 +48,7 @@ export default {
           post.deleted = true
           post.hidden = true
           if (v.deleteAndLock) post.locked = true
+          close()
         })
     }
 
