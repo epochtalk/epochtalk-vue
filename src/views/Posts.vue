@@ -198,7 +198,7 @@
               <li v-if="canDelete(post) && post.deleted">
                 <!-- TODO(boka): add data-balloon plugin -->
                 <!-- data-balloon="Unhide" -->
-                <a href="" class="post-action-icon selected" @click.prevent="openUndeleteModal(i)">
+                <a href="" class="post-action-icon selected" @click.prevent="openPostsUndeleteModal(post)">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                     <title></title>
                     <path
@@ -549,7 +549,10 @@ export default {
       v.selectedPost = post
       v.showPostsDeleteModal = true
     }
-    const openUndeleteModal = (i) => console.log(i, 'openUndeleteModal')
+    const openPostsUndeleteModal = (post) => {
+      v.selectedPost = post
+      v.showPostsUndeleteModal = true
+    }
     const openReportModal = (post) => console.log(post, 'openReportModal')
     const lockPost = (post) => {
       postsApi.lock(post.id).then(() => post.locked = true)
@@ -588,6 +591,7 @@ export default {
       defaultAvatarShape: window.default_avatar_shape,
       disableSignature: false,
       showPostsDeleteModal: false,
+      showPostsUndeleteModal: false,
       showPurgeThreadModal: true,
       showMoveThreadModal: true
     })
@@ -621,7 +625,7 @@ export default {
       showEditDate,
       openPurgeModal,
       openPostsDeleteModal,
-      openUndeleteModal,
+      openPostsUndeleteModal,
       openReportModal,
       lockPost,
       unlockPost,
