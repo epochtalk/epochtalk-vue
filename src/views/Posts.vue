@@ -437,6 +437,7 @@
   <!--   </epochtalk-editor> -->
   <!-- </div> -->
   <posts-delete-modal :selectedPost="selectedPost" :show="showPostsDeleteModal" @close="showPostsDeleteModal = false; selectedPost = null"/>
+  <posts-undelete-modal :selectedPost="selectedPost" :show="showPostsUndeleteModal" @close="showPostsUndeleteModal = false; selectedPost = null"/>
 </template>
 
 <script>
@@ -449,11 +450,12 @@ import { postsApi, threadsApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore, localStoragePrefs } from '@/composables/stores/prefs'
 import PostsDeleteModal from '@/components/modals/posts/Delete.vue'
+import PostsUndeleteModal from '@/components/modals/posts/Undelete.vue'
 
 export default {
   name: 'Posts',
   props: ['threadSlug', 'threadId'],
-  components: { Pagination, PostsDeleteModal },
+  components: { Pagination, PostsDeleteModal, PostsUndeleteModal },
   beforeRouteEnter(to, from, next) {
     const params = {
       limit: localStoragePrefs().data.posts_per_page,
