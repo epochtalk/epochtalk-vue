@@ -13,8 +13,8 @@
 
         <!-- Save Button -->
         <div class="action-bar-panel">
-          <button class="outline" @click.prevent="resetPrefrences()">Reset</button>
-          <button class="" @click.prevent="savePreferences()">Save</button>
+          <button class="outline" @click.prevent="resetLimitPreferences()">Reset</button>
+          <button class="" @click.prevent="saveLimitPreferences()">Save</button>
         </div>
       </form>
     </div>
@@ -60,15 +60,24 @@ export default {
   name: 'Settings',
   setup() {
     /* View Methods */
-    const resetPrefrences = () => console.log('resetPrefrences')
-    const savePreferences = () => console.log('savePreferences')
+    const resetLimitPreferences = () => console.log(v)
+    const saveLimitPreferences = () => {
+      const updatedLimits = {
+        posts_per_page: Number(v.posts_per_page),
+        threads_per_page: Number(v.threads_per_page)
+      }
+      $prefs.update(updatedLimits)
+    }
     const resetTimezoneOffset = () => console.log('resetTimezoneOffset')
     const saveTimezoneOffset = () => console.log('saveTimezoneOffset')
     const timezoneOffsetValid = () => true
 
+
     /* Internal Data */
     // const $auth = inject(AuthStore)
     const $prefs = inject(PreferencesStore)
+    // const prefsCopy = cloneDeep($prefs.readonly)
+
     const v = reactive({
       posts_per_page: $prefs.readonly.posts_per_page,
       threads_per_page: $prefs.readonly.threads_per_page,
@@ -106,7 +115,7 @@ export default {
         { value: '45', label: '45' }
       ],
     })
-    return { ...toRefs(v), resetPrefrences, savePreferences, resetTimezoneOffset, saveTimezoneOffset, timezoneOffsetValid }
+    return { ...toRefs(v), resetLimitPreferences, saveLimitPreferences, resetTimezoneOffset, saveTimezoneOffset, timezoneOffsetValid }
   }
 }
 </script>

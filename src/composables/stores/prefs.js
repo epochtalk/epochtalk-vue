@@ -58,7 +58,7 @@ export default {
       Object.assign(prefs, cloneDeep(emtpyPrefs))
     }
 
-    const update = () => {
+    const update = (specificPrefs) => {
       const $auth = $appCache.get(AUTH_KEY)
       const user = $auth ? $auth.data : undefined
       const updatedPrefs = { // spread prefs to get rid of proxy object before storing in cache
@@ -67,14 +67,14 @@ export default {
         timezone_offset: prefs.timezone_offset.sign + prefs.timezone_offset.hours + prefs.timezone_offset.minutes,
         patroller_view: prefs.patroller_view,
         collapsed_categories: [...prefs.collapsed_categories],
-        ignored_boards: [...prefs.ignored_boards]
+        ignored_boards: [...prefs.ignored_boards],
+        ...specificPrefs
       }
       if (user && user.token) { // user is logged in update cache and server
         const data = {
           username: user.username,
           ...updatedPrefs
         }
-        console.log(data)
         usersApi.update(user.id, data)
         .then(() => {
           updatedPrefs.timezone_offset = getTimezoneOffset(updatedPrefs)
