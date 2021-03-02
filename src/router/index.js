@@ -68,19 +68,19 @@ const router = createRouter({
   }
 })
 
-router.beforeEach(to => {
+router.beforeEach(() => {
   // Start progress bar
   NProgress.start()
+})
+
+router.afterEach(to => {
+  // Stop progress bar
+  NProgress.done()
 
   // Apply route.meta.bodyClass as body class if present
   const bodyClass = to.meta.bodyClass
   if (bodyClass) { document.body.className = bodyClass }
   else { document.body.className = '' }
-})
-
-router.afterEach(() => {
-  // Stop progress bar
-  NProgress.done()
 })
 
 export default router
