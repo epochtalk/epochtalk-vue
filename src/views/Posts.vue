@@ -449,6 +449,7 @@ import { postsApi, threadsApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore, localStoragePrefs } from '@/composables/stores/prefs'
 //import { countTotals, getLastPost, filterIgnoredBoards } from '@/composables/utils/boardUtils'
+import { BreadcrumbStore } from '@/composables/stores/breadcrumbs'
 
 export default {
   name: 'Posts',
@@ -531,6 +532,7 @@ export default {
     const updateThreadLock = (thread) => {
       const promise = thread.locked ? threadsApi.unlock(thread.id) : threadsApi.lock(thread.id)
       promise.then(() => thread.locked = !thread.locked)
+      .then($breadcrumbs.updateThreadLock)
     }
     const updateThreadSticky = (thread) => {
       const promise = thread.sticky ? threadsApi.unsticky(thread.id) : threadsApi.sticky(thread.id)
@@ -566,6 +568,7 @@ export default {
     const $route = useRoute()
     const $prefs = inject(PreferencesStore)
     const $auth = inject(AuthStore)
+    const $breadcrumbs = inject(BreadcrumbStore)
 
     /* View Data */
     const v = reactive({

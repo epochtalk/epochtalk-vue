@@ -110,11 +110,13 @@ export default {
     /* Provided Methods */
     const updateLabelInPlace = newLabel => breadcrumbs[breadcrumbs.length - 1].label = newLabel
 
+    const updateThreadLock = locked => breadcrumbs[breadcrumbs.length - 1].opts.locked = locked
+
     /* Route Change - Update breadcrumbs */
     $router.afterEach(() => update())
 
     /* Provide Store Data */
-    return provide(BreadcrumbStore, readonly({ breadcrumbs, updateLabelInPlace }))
+    return provide(BreadcrumbStore, readonly({ breadcrumbs, updateLabelInPlace, updateThreadLock }))
   },
   render() { return this.$slots.default() } // renderless component
 }
