@@ -13,8 +13,8 @@
 
         <!-- Save Button -->
         <div class="action-bar-panel">
-          <button class="outline" @click.prevent="resetLimitPreferences()">Reset</button>
-          <button class="" @click.prevent="saveLimitPreferences()">Save</button>
+          <button class="outline" @click.prevent="resetLimitPrefs()">Reset</button>
+          <button class="" @click.prevent="saveLimitPrefs()">Save</button>
         </div>
       </form>
     </div>
@@ -40,10 +40,10 @@
       <br />
 
       <div class="action-bar-panel">
-        <button class="outline" @click.prevent="resetTimezoneOffset()">
+        <button class="outline" @click.prevent="resetTimezonePrefs()">
           Reset
         </button>
-        <button @click="saveTimezoneOffset()" :disabled="!timezoneOffsetValid()">
+        <button @click="saveTimezonePrefs()" :disabled="!timezonePrefsValid()">
           Save
         </button>
       </div>
@@ -60,17 +60,20 @@ export default {
   name: 'Settings',
   setup() {
     /* View Methods */
-    const resetLimitPreferences = () => console.log(v)
-    const saveLimitPreferences = () => {
+    const resetLimitPrefs = () => {
+      v.posts_per_page = $prefs.readonly.posts_per_page
+      v.threads_per_page = $prefs.readonly.threads_per_page
+    }
+    const saveLimitPrefs = () => {
       const updatedLimits = {
         posts_per_page: Number(v.posts_per_page),
         threads_per_page: Number(v.threads_per_page)
       }
       $prefs.update(updatedLimits)
     }
-    const resetTimezoneOffset = () => console.log('resetTimezoneOffset')
-    const saveTimezoneOffset = () => console.log('saveTimezoneOffset')
-    const timezoneOffsetValid = () => true
+    const resetTimezonePrefs = () => console.log('resetTimezonePrefs')
+    const saveTimezonePrefs = () => console.log('saveTimezonePrefs')
+    const timezonePrefsValid = () => true
 
 
     /* Internal Data */
@@ -113,9 +116,9 @@ export default {
         { value: '15', label: '15' },
         { value: '30', label: '30' },
         { value: '45', label: '45' }
-      ],
+      ]
     })
-    return { ...toRefs(v), resetLimitPreferences, saveLimitPreferences, resetTimezoneOffset, saveTimezoneOffset, timezoneOffsetValid }
+    return { ...toRefs(v), resetLimitPrefs, saveLimitPrefs, resetTimezonePrefs, saveTimezonePrefs, timezonePrefsValid }
   }
 }
 </script>
