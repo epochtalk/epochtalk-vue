@@ -79,11 +79,13 @@ export default {
         .then(() => {
           updatedPrefs.timezone_offset = getTimezoneOffset(updatedPrefs)
           $appCache.set(PREFS_KEY, updatedPrefs)
+          Object.assign(prefs, updatedPrefs)
         })
       }
       else { // user not logged in, only update cache
         updatedPrefs.timezone_offset = getTimezoneOffset(updatedPrefs)
         $appCache.set(PREFS_KEY, updatedPrefs)
+        Object.assign(prefs, updatedPrefs)
       }
     }
 
