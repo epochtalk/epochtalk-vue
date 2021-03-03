@@ -71,8 +71,17 @@ export default {
       }
       $prefs.update(updatedLimits)
     }
-    const resetTimezonePrefs = () => console.log('resetTimezonePrefs')
-    const saveTimezonePrefs = () => console.log('saveTimezonePrefs')
+    const resetTimezonePrefs = () => {
+      v.timezone_offset_sign = $prefs.readonly.timezone_offset.sign
+      v.timezone_offset_hours = $prefs.readonly.timezone_offset.hours
+      v.timezone_offset_minutes = $prefs.readonly.timezone_offset.minutes
+    }
+    const saveTimezonePrefs = () => {
+      const updatedTimezone = {
+        timezone_offset: v.timezone_offset_sign +  v.timezone_offset_hours + v.timezone_offset_minutes
+      }
+      $prefs.update(updatedTimezone)
+    }
     const timezonePrefsValid = () => true
 
 
