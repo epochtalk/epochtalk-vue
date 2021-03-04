@@ -24,7 +24,7 @@
           <label class="desc-label" for="enable-patroller">View link to patroller page in drop down menu. Patroller page allows users to view the latest newbie posts.</label>
         </div>
         <div class="">
-          <input id="enable-patroller" class="toggle-switch" type="checkbox" ng-model="vmPatroller.patrollerDisabled" ng-click="vmPatroller.enablePatroller()">
+          <input id="enable-patroller" class="toggle-switch" type="checkbox" v-model="patroller_view" @click="togglePatroller()">
           <label for="enable-patroller"></label>
         </div>
       </div>
@@ -83,6 +83,7 @@ export default {
       }
       $prefs.update(updatedLimits)
     }
+
     const resetTimezonePrefs = () => {
       v.timezone_offset_sign = $prefs.readonly.timezone_offset.sign
       v.timezone_offset_hours = $prefs.readonly.timezone_offset.hours
@@ -96,6 +97,7 @@ export default {
     }
     const timezonePrefsValid = () => true
 
+    const togglePatroller = () => $prefs.update({ patroller_view: !v.patroller_view })
 
     /* Internal Data */
     // const $auth = inject(AuthStore)
@@ -108,6 +110,7 @@ export default {
       timezone_offset_sign: $prefs.readonly.timezone_offset.sign,
       timezone_offset_hours: $prefs.readonly.timezone_offset.hours,
       timezone_offset_minutes: $prefs.readonly.timezone_offset.minutes,
+      patroller_view: $prefs.readonly.patroller_view,
       timezone_offset_sign_options: [
         { value: '', label: '+/-' },
         { value: '+', label: '+' },
@@ -139,7 +142,7 @@ export default {
         { value: '45', label: '45' }
       ]
     })
-    return { ...toRefs(v), resetLimitPrefs, saveLimitPrefs, resetTimezonePrefs, saveTimezonePrefs, timezonePrefsValid }
+    return { ...toRefs(v), resetLimitPrefs, saveLimitPrefs, resetTimezonePrefs, saveTimezonePrefs, timezonePrefsValid, togglePatroller }
   }
 }
 </script>
