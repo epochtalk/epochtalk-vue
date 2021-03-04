@@ -438,6 +438,7 @@
   <!-- </div> -->
   <posts-delete-modal :selectedPost="selectedPost" :show="showPostsDeleteModal" @close="showPostsDeleteModal = false; selectedPost = null"/>
   <posts-undelete-modal :selectedPost="selectedPost" :show="showPostsUndeleteModal" @close="showPostsUndeleteModal = false; selectedPost = null"/>
+  <posts-purge-modal :selectedPost="selectedPost" :show="showPostsPurgeModal" @close="showPostsPurgeModal = false; selectedPost = null"/>
 </template>
 
 <script>
@@ -546,7 +547,10 @@ export default {
       console.log(post)
       return true
     }
-    const openPurgeModal = (i) => console.log(i, 'openPurgeModal')
+    const openPostsPurgeModal = (post) => {
+      v.selectedPost = post
+      v.showPostsPurgeModal = true
+    }
     const openPostsDeleteModal = (post) => {
       v.selectedPost = post
       v.showPostsDeleteModal = true
@@ -592,6 +596,7 @@ export default {
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
       disableSignature: false,
+      showPostsPurgeModal: false,
       showPostsDeleteModal: false,
       showPostsUndeleteModal: false,
       showPurgeThreadModal: true,
@@ -625,7 +630,7 @@ export default {
       humanDate,
       userRoleHighlight,
       showEditDate,
-      openPurgeModal,
+      openPostsPurgeModal,
       openPostsDeleteModal,
       openPostsUndeleteModal,
       openReportModal,
