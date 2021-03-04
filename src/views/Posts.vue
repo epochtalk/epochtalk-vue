@@ -171,7 +171,7 @@
               <li v-if="canPurge() && post.position !== 1">
                 <!-- TODO(boka): add data-balloon plugin -->
                 <!-- data-balloon="Purge" -->
-                <a href="" class="post-action-icon" @click.prevent="openPurgeModal(i)">
+                <a href="" class="post-action-icon" @click.prevent="openPostsPurgeModal(post)">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                     <title></title>
                     <path
