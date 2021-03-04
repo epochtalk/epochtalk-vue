@@ -155,12 +155,17 @@ export default {
   }
 }
 
-.settings-section { padding: 1rem 0; }
+@include break-mobile-sm {
+  .settings-section { padding: 1rem 0; }
+  .settings-section:first-child { padding-top: 0; }
+}
 
 .split-input-coulmns {
   display: grid;
   grid-template-columns: 1fr 1fr;
   column-gap: .5rem;
-  @include break-mobile-sm { grid-template-columns: 1fr; }
+  @include break-mobile-sm {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
