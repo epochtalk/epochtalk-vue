@@ -7,6 +7,7 @@ a:hover { color: $color-primary-alt; }
 .show-mobile { display: none; @include break-mobile-sm { display: inline-block; } }
 .hide-mobile { @include break-mobile-sm { display: none !important; } }
 .pointer { cursor: pointer; }
+.desc-label, .secondary-font-color-light { height: auto; padding-top: 0; color: $secondary-font-color-light; }
 
 img {
   max-width: 100%;
@@ -184,7 +185,7 @@ svg {
 .fieldgroup {
   display: grid;
   grid-template-columns: 4rem 1fr 1fr;
-  grid-gap: 0.5rem;
+  column-gap: 0.5rem;
 }
 
 /* Input Styling */
@@ -283,7 +284,7 @@ input[type="checkbox"] + label, input[type="radio"] + label {
 }
 
 label {
-  font-size: $font-size-tiny;
+  font-size: $font-size-sm;
   width: 100%;
   cursor: pointer;
   display: block;
@@ -292,7 +293,6 @@ label {
   margin-bottom: 0;
   box-sizing: border-box;
   height: 31px;
-  padding-bottom: 8px;
   padding-right: 8px;
   padding-top: 8px;
   text-align: left;
@@ -559,3 +559,16 @@ input[disabled].toggle-switch + label,
 input[disabled].toggle-switch + label:after { background-color: $secondary-font-color-light; }
 input[disabled].toggle-switch:checked + label,
 input[disabled].toggle-switch:checked + label:after { background-color: lighten($color-primary, 20%); }
+
+.toggle-switch-container {
+  display: grid;
+  grid-template-columns: 80% 20%;
+  align-items: end;
+}
+
+.column-grid-50-50 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 1.5rem;
+  @include break-mobile-sm { grid-template-columns: 1fr; }
+}

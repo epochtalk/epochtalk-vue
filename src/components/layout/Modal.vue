@@ -156,6 +156,8 @@ export default {
       text-align: center;
     }
 
+    label { font-size: $font-size-tiny; }
+
     @include break-mobile-sm {
       padding: 1rem 0 2rem;
     }
