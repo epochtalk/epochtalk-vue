@@ -18,6 +18,7 @@
 
 <script>
 import Modal from '@/components/layout/Modal.vue'
+import { useRouter } from 'vue-router'
 import { reactive, toRefs } from 'vue'
 import { postsApi } from '@/api'
 
@@ -32,11 +33,14 @@ export default {
       emit('close')
     }
 
+    /* Internal Data */
+    const $router = useRouter()
+
     /* Template Data */
     const purgePost = post => {
       postsApi.purge(post.id)
         .then(() => {
-          post = {}
+          $router.push({ name: 'Posts' })
           close()
         })
     }
