@@ -452,11 +452,12 @@ import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore, localStoragePrefs } from '@/composables/stores/prefs'
 import PostsDeleteModal from '@/components/modals/posts/Delete.vue'
 import PostsUndeleteModal from '@/components/modals/posts/Undelete.vue'
+import PostsPurgeModal from '@/components/modals/posts/Purge.vue'
 
 export default {
   name: 'Posts',
   props: ['threadSlug', 'threadId'],
-  components: { Pagination, PostsDeleteModal, PostsUndeleteModal },
+  components: { Pagination, PostsDeleteModal, PostsUndeleteModal, PostsPurgeModal },
   beforeRouteEnter(to, from, next) {
     const params = {
       limit: localStoragePrefs().data.posts_per_page,
