@@ -18,7 +18,7 @@
         </div>
       </form>
     </div>
-    <div>
+    <div id="timezone">
       <h3 class="panel-title">Timezone Offset</h3>
       <div class="fieldgroup">
         <select v-model="timezone_offset_sign">
@@ -47,6 +47,21 @@
           Save
         </button>
       </div>
+    </div>
+    <div id="patroller">
+      <h3 class="thin-underline">Patroller Settings</h3>
+
+      <div class="row">
+        <div class="two-thirds-column">
+          <label for="enable-patroller">Patroller Page Enabled</label>
+          <label class="desc-label" for="enable-patroller">View link to patroller page in drop down menu. Patroller page allows users to view the latest newbie posts.</label>
+        </div>
+        <div class="one-third-column">
+          <input id="enable-patroller" class="toggle-switch" type="checkbox" ng-model="vmPatroller.patrollerDisabled" ng-click="vmPatroller.enablePatroller()">
+          <label for="enable-patroller"></label>
+        </div>
+      </div>
+      <div class="clear"></div>
     </div>
   </div>
 </template>
