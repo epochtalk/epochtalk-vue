@@ -60,6 +60,19 @@
         </button>
       </div>
     </div>
+    <div id="ignore-boards" class="settings-section">
+      <h3 class="thin-underline">Ignore Boards</h3>
+      <div class="clear boards-check-list">
+        <div v-for="cat in boards" :key="cat.id">
+          <label class="bold">{{cat.name}}</label>
+          <ul>
+            <li v-for="board in cat.boards" :key="board.id">
+              <ignored-boards :all-boards="allBoards" :board="board" :toggle-submitted="toggleSubmitted" @toggle-ignored-board="toggleIgnoredBoard" />
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -67,9 +80,19 @@
 import { inject, reactive, toRefs } from 'vue'
 // import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
+import IgnoredBoards from '@/components/settings/IgnoredBoardsPartial.vue'
+import { boardsApi } from '@/api'
 
 export default {
   name: 'Settings',
+  components: { IgnoredBoards },
+  beforeRouteEnter(to, from, next) {
+    next(vm => boardsApi.getBoards(true).then(b => { vm.boards = b }))
+  },
+  beforeRouteUpdate(to, from, next) {
+    boardsApi.getBoards(true).then(b => { this.boards = b })
+    next()
+  },
   setup() {
     /* View Methods */
     const resetLimitPrefs = () => {
@@ -99,7 +122,6 @@ export default {
       const sign = v.timezone_offset_sign
       const hours = v.timezone_offset_hours
       const mins = v.timezone_offset_minutes
-
       return (sign && hours && mins) || (!sign && !hours && !mins) // all or none set
     }
 
@@ -111,6 +133,9 @@ export default {
     // const prefsCopy = cloneDeep($prefs.readonly)
 
     const v = reactive({
+      allBoards: {},
+      boards: {},
+      toggleSubmitted: {},
       posts_per_page: $prefs.readonly.posts_per_page,
       threads_per_page: $prefs.readonly.threads_per_page,
       timezone_offset_sign: $prefs.readonly.timezone_offset.sign,
