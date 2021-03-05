@@ -235,7 +235,7 @@
               <li v-if="loggedIn && (permissionUtils.hasPermission('reports.createPostReport') || permissionUtils.hasPermission('reports.createUserReport')) && !bannedFromBoard">
                 <!-- TODO(boka): add data-balloon plugin -->
                 <!-- data-balloon="Report" -->
-                <a href="" class="post-action-icon" @click.prevent="openReportModal(post)">
+                <a href="" class="post-action-icon" @click.prevent="openPostsReportModal(post)">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                     <title></title>
                     <path
@@ -562,7 +562,10 @@ export default {
       v.selectedPost = post
       v.showPostsUndeleteModal = true
     }
-    const openReportModal = (post) => console.log(post, 'openReportModal')
+    const openPostsReportModal = (post) => {
+      v.selectedPost = post
+      v.showPostsReportModal = true
+    }
     const lockPost = (post) => {
       postsApi.lock(post.id).then(() => post.locked = true)
     }
@@ -637,7 +640,7 @@ export default {
       openPostsPurgeModal,
       openPostsDeleteModal,
       openPostsUndeleteModal,
-      openReportModal,
+      openPostsReportModal,
       lockPost,
       unlockPost,
       loadEditor,
