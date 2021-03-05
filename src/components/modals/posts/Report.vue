@@ -7,6 +7,8 @@
       <form action="." class="css-form">
         <h3 class="thin-underline">Purge Post</h3>
         <p v-if="canReportPosts && canReportUsers && !selectedPost.reported">Which would you like to report?</p>
+        <!-- ng-disabled="PostsParentCtrl.reportSubmitted" -->
+        <input v-if="canReportUsers" type="radio" name="reportPost" v-model="offendingId" :value="selectedPost.user.id" id="reportUser" required><label v-if="canReportUsers" for="reportUser">{{selectedPost.user.username}}</label>
         <div class="clear">
           <button id="login-btn" class="fill-row" @click.prevent="reportPost(selectedPost)" type="submit">
             Submit Report
