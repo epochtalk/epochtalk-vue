@@ -202,4 +202,23 @@ export default {
     grid-template-columns: 1fr;
   }
 }
+
+.boards-check-list {
+  @include pad(0.5rem);
+  margin-top: 0.25rem;
+  margin-bottom: 1rem;
+  max-height: 18.75rem;
+  overflow-y: scroll;
+  background-color: $sub-header-color;
+  border: 1px solid $border-color;
+  li {
+    list-style: none;
+    input {
+      margin-bottom: 0;
+      & + label { margin: 0 0 0 .2rem; display: inline; padding-bottom: 0; }
+      &:disabled + label { color: $secondary-font-color; }
+    }
+    ul { margin-left: 1.25rem; }
+  }
+}
 </style>
