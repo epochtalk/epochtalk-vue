@@ -67,7 +67,7 @@
           <label class="bold">{{cat.name}}</label>
           <ul>
             <li v-for="board in cat.boards" :key="board.id">
-              <ignored-boards :all-boards="allBoards" :board="board" :toggle-submitted="toggleSubmitted" @toggle-ignored-board="toggleIgnoredBoard" />
+              <ignored-boards-partial :board="board" :all-boards="allBoards" :toggle-submitted="toggleSubmitted" />
             </li>
           </ul>
         </div>
@@ -80,17 +80,17 @@
 import { inject, reactive, toRefs } from 'vue'
 // import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
-import IgnoredBoards from '@/components/settings/IgnoredBoardsPartial.vue'
+import IgnoredBoardsPartial from '@/components/settings/IgnoredBoardsPartial.vue'
 import { boardsApi } from '@/api'
 
 export default {
   name: 'Settings',
-  components: { IgnoredBoards },
+  components: { IgnoredBoardsPartial },
   beforeRouteEnter(to, from, next) {
-    next(vm => boardsApi.getBoards(true).then(b => { vm.boards = b }))
+    next(vm => boardsApi.getBoards(true).then(d => { vm.boards = d.boards }))
   },
   beforeRouteUpdate(to, from, next) {
-    boardsApi.getBoards(true).then(b => { this.boards = b })
+    boardsApi.getBoards(true).then(d => { this.boards = d.boards })
     next()
   },
   setup() {
@@ -127,6 +127,8 @@ export default {
 
     const togglePatroller = () => $prefs.update({ patroller_view: !v.patroller_view })
 
+    const toggleIgnoredBoard = () => console.log('toggleIgnoredBoard')
+
     /* Internal Data */
     // const $auth = inject(AuthStore)
     const $prefs = inject(PreferencesStore)
@@ -134,7 +136,7 @@ export default {
 
     const v = reactive({
       allBoards: {},
-      boards: {},
+      boards: [],
       toggleSubmitted: {},
       posts_per_page: $prefs.readonly.posts_per_page,
       threads_per_page: $prefs.readonly.threads_per_page,
@@ -173,7 +175,8 @@ export default {
         { value: '45', label: '45' }
       ]
     })
-    return { ...toRefs(v), resetLimitPrefs, saveLimitPrefs, resetTimezonePrefs, saveTimezonePrefs, timezonePrefsValid, togglePatroller }
+
+    return { ...toRefs(v), resetLimitPrefs, saveLimitPrefs, resetTimezonePrefs, saveTimezonePrefs, timezonePrefsValid, togglePatroller, toggleIgnoredBoard }
   }
 }
 </script>
