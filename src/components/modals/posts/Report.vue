@@ -2,6 +2,8 @@
 
   <modal :name="$options.name" :show="show" @close="close()" :focusInput="focusInput">
     <template v-slot:header>Report User/Post</template>
+
+    <template v-slot:body>
       <form action="." class="css-form">
         <h3 class="thin-underline">Purge Post</h3>
         <p v-if="canReportPosts && canReportUsers && !selectedPost.reported">Which would you like to report?</p>
@@ -11,7 +13,6 @@
           </button>
         </div>
       </form>
-    <template v-slot:body>
     </template>
   </modal>
 </template>
