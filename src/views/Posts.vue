@@ -439,6 +439,7 @@
   <posts-delete-modal :selectedPost="selectedPost" :show="showPostsDeleteModal" @close="showPostsDeleteModal = false; selectedPost = null"/>
   <posts-undelete-modal :selectedPost="selectedPost" :show="showPostsUndeleteModal" @close="showPostsUndeleteModal = false; selectedPost = null"/>
   <posts-purge-modal :selectedPost="selectedPost" :show="showPostsPurgeModal" @close="showPostsPurgeModal = false; selectedPost = null"/>
+  <posts-report-modal :selectedPost="selectedPost" :canReportPosts="true" :canReportUsers="true" :show="showPostsReportModal" @close="showPostsReportModal = false; selectedPost = null"/>
 </template>
 
 <script>
@@ -453,11 +454,12 @@ import { PreferencesStore, localStoragePrefs } from '@/composables/stores/prefs'
 import PostsDeleteModal from '@/components/modals/posts/Delete.vue'
 import PostsUndeleteModal from '@/components/modals/posts/Undelete.vue'
 import PostsPurgeModal from '@/components/modals/posts/Purge.vue'
+import PostsReportModal from '@/components/modals/posts/Report.vue'
 
 export default {
   name: 'Posts',
   props: ['threadSlug', 'threadId'],
-  components: { Pagination, PostsDeleteModal, PostsUndeleteModal, PostsPurgeModal },
+  components: { Pagination, PostsDeleteModal, PostsUndeleteModal, PostsPurgeModal, PostsReportModal },
   beforeRouteEnter(to, from, next) {
     const params = {
       limit: localStoragePrefs().data.posts_per_page,
@@ -600,6 +602,7 @@ export default {
       showPostsPurgeModal: false,
       showPostsDeleteModal: false,
       showPostsUndeleteModal: false,
+      showPostsReportModal: false,
       showPurgeThreadModal: true,
       showMoveThreadModal: true
     })
