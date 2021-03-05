@@ -44,7 +44,7 @@ const $http = (path, opts, handleErrors) => {
 
 export const boardsApi = {
   slugToBoardId: slug => $http(`/api/boards/${slug}/id`),
-  getBoards: () => $http('/api/boards')
+  getBoards: stripped => $http(`/api/boards${stripped ? '?stripped=true' : ''}`)
 }
 
 export const threadsApi = {
