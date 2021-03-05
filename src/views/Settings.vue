@@ -95,7 +95,13 @@ export default {
       }
       $prefs.update(updatedTimezone)
     }
-    const timezonePrefsValid = () => true
+    const timezonePrefsValid = () => {
+      const sign = v.timezone_offset_sign
+      const hours = v.timezone_offset_hours
+      const mins = v.timezone_offset_minutes
+
+      return (sign && hours && mins) || (!sign && !hours && !mins) // all or none set
+    }
 
     const togglePatroller = () => $prefs.update({ patroller_view: !v.patroller_view })
 
