@@ -36,7 +36,7 @@ export default {
 
     /* Template Data */
     const reportPost = post => {
-      reportSubmitted = true
+      v.reportSubmitted = true
       console.log(post)
       close()
     }
