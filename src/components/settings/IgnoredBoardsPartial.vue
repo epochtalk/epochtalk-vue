@@ -1,5 +1,5 @@
 <template>
-  <input :id="board.id" @click="$emit('toggle-ignored-board', board.id)" :disabled="toggleSubmitted[board.id]" type="checkbox" />
+  <input :id="board.id" :checked="allBoards[board.id]" @change="$emit('toggle-ignored-board', board.id)" :disabled="toggleSubmitted[board.id]" type="checkbox" />
   <label :for="board.id">{{board.name}}</label>
   <ul>
     <li v-for="childboard in board.children" :key="childboard.id">

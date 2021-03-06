@@ -77,7 +77,7 @@
 </template>
 
 <script>
-import { inject, reactive, toRefs } from 'vue'
+import { inject, reactive, toRefs, watch } from 'vue'
 // import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
 import IgnoredBoardsPartial from '@/components/settings/IgnoredBoardsPartial.vue'
@@ -94,6 +94,22 @@ export default {
     next()
   },
   setup() {
+    /* Internal Methods */
+    const initAllBoards = (boards, allBoards) => {
+      if (!boards || !boards.length) return allBoards
+
+      for (let i = 0; i < boards.length; i++) {
+        let curBoard = boards[i]
+        allBoards = initAllBoards(curBoard.boards || [], allBoards)
+        if (curBoard.category_id) {
+          allBoards[curBoard.id] = $prefs.readonly.ignored_boards.indexOf(curBoard.id) > -1
+        }
+      }
+
+      return allBoards
+    }
+
+
     /* View Methods */
     const resetLimitPrefs = () => {
       v.posts_per_page = $prefs.readonly.posts_per_page
@@ -175,6 +191,8 @@ export default {
         { value: '45', label: '45' }
       ]
     })
+
+    watch(() => v.boards, () => v.allBoards = initAllBoards(v.boards, v.allBoards))
 
     return { ...toRefs(v), resetLimitPrefs, saveLimitPrefs, resetTimezonePrefs, saveTimezonePrefs, timezonePrefsValid, togglePatroller, toggleIgnoredBoard }
   }
