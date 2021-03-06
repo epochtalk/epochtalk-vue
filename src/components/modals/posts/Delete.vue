@@ -6,6 +6,7 @@
       <form action="." class="css-form">
         <h3 class="thin-underline">Hide Post</h3>
         <p>Are you sure you want to hide this post?</p>
+        <label>(Only moderators and admins will be able to view it)</label>
         <label v-if="canPostLockQuick(selectedPost) && deletePostLocked === false" class="checkbox-container">
           <input type="checkbox" id="lock-post" v-model="deleteAndLock" ref="focusInput" />
           Lock Post (poster cannot hide/edit this post)?
