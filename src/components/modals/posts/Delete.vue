@@ -12,7 +12,7 @@
           Lock Post (poster cannot hide/edit this post)?
         </label>
         <div class="clear">
-          <button id="login-btn" class="fill-row" @click.prevent="deletePost(selectedPost)" type="submit">
+          <button id="delete-btn" class="fill-row" @click.prevent="deletePost(selectedPost)" type="submit">
             Hide Post
           </button>
         </div>

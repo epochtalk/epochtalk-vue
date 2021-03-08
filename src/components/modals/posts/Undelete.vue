@@ -7,7 +7,7 @@
         <h3 class="thin-underline">Unhide Post</h3>
         <p>Are you sure you want to unhide this post?</p>
         <div class="clear">
-          <button id="login-btn" class="fill-row" @click.prevent="undeletePost(selectedPost)" type="submit">
+          <button id="unhide-btn" class="fill-row" @click.prevent="undeletePost(selectedPost)" type="submit">
             Unhide Post
           </button>
         </div>
