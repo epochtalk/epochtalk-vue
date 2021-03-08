@@ -75,7 +75,7 @@ export default {
           username: user.username,
           ...updatedPrefs
         }
-        usersApi.update(user.id, data)
+        return usersApi.update(user.id, data)
         .then(() => {
           updatedPrefs.timezone_offset = getTimezoneOffset(updatedPrefs)
           $appCache.set(PREFS_KEY, updatedPrefs)

@@ -140,7 +140,19 @@ export default {
 
     const togglePatroller = () => $prefs.update({ patroller_view: !v.patroller_view })
 
-    const toggleIgnoredBoard = boardId => console.log('toggleIgnoredBoard', boardId, v.allBoards)
+    const toggleIgnoredBoard = (boardId, errorHandler) => {
+      const index = $prefs.readonly.ignored_boards.indexOf(boardId)
+      let ignoredBoards = [...$prefs.readonly.ignored_boards]
+      v.toggleSubmitted[boardId] = true
+      if (index > -1) { ignoredBoards.splice(index, 1) }
+      else { ignoredBoards.push(boardId) }
+      return $prefs.update({ ignored_boards: ignoredBoards })
+      .catch(() => {
+        errorHandler()
+        // Alert.error('Preferences could not be updated')
+      })
+      .finally(() => v.toggleSubmitted[boardId] = false)
+    }
 
     /* Internal Data */
     // const $auth = inject(AuthStore)
