@@ -455,6 +455,7 @@ import PostsDeleteModal from '@/components/modals/posts/Delete.vue'
 import PostsUndeleteModal from '@/components/modals/posts/Undelete.vue'
 import PostsPurgeModal from '@/components/modals/posts/Purge.vue'
 import PostsReportModal from '@/components/modals/posts/Report.vue'
+import { BreadcrumbStore } from '@/composables/stores/breadcrumbs'
 
 export default {
   name: 'Posts',
@@ -537,6 +538,7 @@ export default {
     const updateThreadLock = (thread) => {
       const promise = thread.locked ? threadsApi.unlock(thread.id) : threadsApi.lock(thread.id)
       promise.then(() => thread.locked = !thread.locked)
+      .then($breadcrumbs.updateThreadLock)
     }
     const updateThreadSticky = (thread) => {
       const promise = thread.sticky ? threadsApi.unsticky(thread.id) : threadsApi.sticky(thread.id)
@@ -584,6 +586,7 @@ export default {
     const $route = useRoute()
     const $prefs = inject(PreferencesStore)
     const $auth = inject(AuthStore)
+    const $breadcrumbs = inject(BreadcrumbStore)
 
     /* View Data */
     const v = reactive({

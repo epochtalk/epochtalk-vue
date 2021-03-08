@@ -1,3 +1,5 @@
+import { localStoragePrefs } from '@/composables/stores/prefs'
+
 const buildLastPostData = data => {
   return {
     last_post_created_at: data.last_post_created_at,
@@ -18,7 +20,7 @@ const greater = (a, b) => {
   else { return b }
 }
 
-export const countTotals = countBoards => {
+const countTotals = countBoards => {
   let thread_count = 0
   let post_count = 0
   if (countBoards.length > 0) {
@@ -33,7 +35,7 @@ export const countTotals = countBoards => {
   return { thread_count: thread_count, post_count: post_count }
 }
 
-export const getLastPost = boards => {
+const getLastPost = boards => {
   let latestPost = {}
   if (boards.length > 0) {
     boards.forEach(board => {
@@ -47,9 +49,44 @@ export const getLastPost = boards => {
   return latestPost
 }
 
-export const filterIgnoredBoards = (boards, ignoredBoards = []) => {
+const filterIgnoredBoards = (boards, ignoredBoards = []) => {
   return boards.filter(board => {
     board.children = filterIgnoredBoards(board.children, ignoredBoards)
     return ignoredBoards.indexOf(board.id) === -1
   })
+}
+
+export const processBoards = data => {
+  data.boards.map(category => {
+    // filter out ignored boards
+    category.boards = filterIgnoredBoards(category.boards, localStoragePrefs().data.ignored_boards)
+
+    // set total_thread_count and total_post_count for all boards
+    category.boards.map(board => {
+      let children = countTotals([board])
+      let lastPost = getLastPost([board])
+      board.total_thread_count = children.thread_count
+      board.total_post_count = children.post_count
+      return Object.assign(board, lastPost)
+    })
+  })
+  return data
+}
+
+export const processThreads = data => {
+  // always supply moderators array so property remains reactive even when passed to children
+  data.board.moderators = data.board.moderators || []
+
+  // filter out ignored child boards
+  data.board.children = filterIgnoredBoards(data.board.children, localStoragePrefs().data.ignored_boards)
+
+  // set total_thread_count and total_post_count for all child board
+  data.board.children.map(childBoard => {
+    let children = countTotals(childBoard.children)
+    let lastPost = getLastPost([childBoard])
+    childBoard.total_thread_count = children.thread_count + childBoard.thread_count
+    childBoard.total_post_count = children.post_count + childBoard.post_count
+    return Object.assign(childBoard, lastPost)
+  })
+  return data
 }

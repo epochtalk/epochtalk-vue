@@ -61,26 +61,26 @@ const router = createRouter({
   scrollBehavior(to) {
     if (to.hash) {
       nextTick(() => {
-        document.querySelector(to.hash).scrollIntoView({behavior: 'smooth'})
+       setTimeout(() => document.querySelector(to.hash).scrollIntoView({behavior: 'smooth'}))
       })
     }
     else if (!to.params.saveScrollPos) document.getElementsByTagName('html')[0].scrollIntoView()
   }
 })
 
-router.beforeEach(to => {
+router.beforeEach(() => {
   // Start progress bar
-  if (!to.hash) { NProgress.start() }
+  NProgress.start()
+})
+
+router.afterEach(to => {
+  // Stop progress bar
+  NProgress.done()
 
   // Apply route.meta.bodyClass as body class if present
   const bodyClass = to.meta.bodyClass
   if (bodyClass) { document.body.className = bodyClass }
   else { document.body.className = '' }
-})
-
-router.afterEach(to => {
-  // Stop progress bar
-  if (!to.hash) { NProgress.done() }
 })
 
 export default router

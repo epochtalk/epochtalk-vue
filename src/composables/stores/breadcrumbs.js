@@ -55,10 +55,12 @@ export default {
       delete routeParams.desc
       delete routeParams.saveScrollPos
       delete routeParams.boardId
+      delete routeParams.threadId
       // Maps routeParams key to breadcrumb type
       let keyToType = {
-        boardSlug:  'board',
+        boardSlug: 'board',
         slug: 'thread',
+        threadSlug: 'thread'
       }
       // remove anchor hash from params
       let routeParamKeys = without(Object.keys(routeParams), '#')
@@ -108,11 +110,13 @@ export default {
     /* Provided Methods */
     const updateLabelInPlace = newLabel => breadcrumbs[breadcrumbs.length - 1].label = newLabel
 
+    const updateThreadLock = locked => breadcrumbs[breadcrumbs.length - 1].opts.locked = locked
+
     /* Route Change - Update breadcrumbs */
     $router.afterEach(() => update())
 
     /* Provide Store Data */
-    return provide(BreadcrumbStore, readonly({ breadcrumbs, updateLabelInPlace }))
+    return provide(BreadcrumbStore, readonly({ breadcrumbs, updateLabelInPlace, updateThreadLock }))
   },
   render() { return this.$slots.default() } // renderless component
 }
