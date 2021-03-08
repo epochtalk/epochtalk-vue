@@ -97,18 +97,15 @@ export default {
     /* Internal Methods */
     const initAllBoards = (boards, allBoards) => {
       if (!boards || !boards.length) return allBoards
-
       for (let i = 0; i < boards.length; i++) {
         let curBoard = boards[i]
-        allBoards = initAllBoards(curBoard.boards || [], allBoards)
-        if (curBoard.category_id) {
+        allBoards = initAllBoards(curBoard.boards || curBoard.children || [], allBoards)
+        if (curBoard.category_id || curBoard.parent_id) {
           allBoards[curBoard.id] = $prefs.readonly.ignored_boards.indexOf(curBoard.id) > -1
         }
       }
-
       return allBoards
     }
-
 
     /* View Methods */
     const resetLimitPrefs = () => {
@@ -143,7 +140,7 @@ export default {
 
     const togglePatroller = () => $prefs.update({ patroller_view: !v.patroller_view })
 
-    const toggleIgnoredBoard = boardId => console.log('toggleIgnoredBoard', boardId)
+    const toggleIgnoredBoard = boardId => console.log('toggleIgnoredBoard', boardId, v.allBoards)
 
     /* Internal Data */
     // const $auth = inject(AuthStore)
