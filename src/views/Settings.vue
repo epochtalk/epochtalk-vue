@@ -140,24 +140,21 @@ export default {
 
     const togglePatroller = () => $prefs.update({ patroller_view: !v.patroller_view })
 
-    const toggleIgnoredBoard = (boardId, errorHandler) => {
+    const toggleIgnoredBoard = boardId => {
       const index = $prefs.readonly.ignored_boards.indexOf(boardId)
       let ignoredBoards = [...$prefs.readonly.ignored_boards]
       v.toggleSubmitted[boardId] = true
       if (index > -1) { ignoredBoards.splice(index, 1) }
       else { ignoredBoards.push(boardId) }
       return $prefs.update({ ignored_boards: ignoredBoards })
-      .catch(() => {
-        errorHandler()
-        // Alert.error('Preferences could not be updated')
-      })
+      .catch(() => $alertStore.error('Ignored boards could not be updated, try again later.'))
       .finally(() => v.toggleSubmitted[boardId] = false)
     }
 
     /* Internal Data */
     // const $auth = inject(AuthStore)
     const $prefs = inject(PreferencesStore)
-    // const prefsCopy = cloneDeep($prefs.readonly)
+    const $alertStore = inject('$alertStore')
 
     const v = reactive({
       allBoards: {},

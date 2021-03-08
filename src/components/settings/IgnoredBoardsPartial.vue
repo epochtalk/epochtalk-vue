@@ -1,5 +1,5 @@
 <template>
-  <input :id="board.id" :checked="checked" @change="toggleIgnoredBoard(board.id)" :disabled="toggleSubmitted[board.id]" ref="input" type="checkbox" />
+  <input :id="board.id" :checked="checked" @change="toggleIgnoredBoard(board.id)" :disabled="toggleSubmitted[board.id]" type="checkbox" />
   <label :for="board.id">{{board.name}}</label>
   <ul>
     <li v-for="childboard in board.children" :key="childboard.id">
@@ -9,24 +9,18 @@
 </template>
 
 <script>
-import { toRefs, reactive, nextTick } from 'vue'
+import { ref  } from 'vue'
 
 export default {
   name: 'ignored-boards-partial',
   props: ['allBoards', 'board', 'toggleSubmitted', 'onToggle-ignored-board'],
   setup(props, { emit }) {
     /* View Methods */
-    const toggleIgnoredBoard = boardId => emit('toggle-ignored-board', boardId, v.errorHandler)
+    const toggleIgnoredBoard = boardId => emit('toggle-ignored-board', boardId)
 
-    const v = reactive({
-      errorHandler: () => nextTick(() => {
-        console.log(v.checked, document.getElementById(props.board.id), props.allBoards[props.board.id])
-        document.getElementById(props.board.id).checked = !v.checked
-      }),
-      checked: props.allBoards[props.board.id]
-    })
+    const checked = ref(props.allBoards[props.board.id])
 
-    return { toggleIgnoredBoard, ...toRefs(v) }
+    return { toggleIgnoredBoard, checked }
   }
 }
 </script>
