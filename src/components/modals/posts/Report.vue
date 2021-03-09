@@ -10,7 +10,7 @@
         <input v-if="canReportUsers" type="radio" name="reportPost" v-model="offendingId" :value="selectedPost.user.id" id="reportUser" required><label v-if="canReportUsers" for="reportUser">{{selectedPost.user.username}}</label>
         <input v-if="canReportPosts" type="radio" name="reportPost" v-model="offendingId" :value="selectedPost.id" id="reportPost" required><label v-if="canReportPosts" for="reportPost">{{selectedPost.user.username}}'s Post</label>
         <div class="clear">
-          <button id="report-btn" class="fill-row" @click.prevent="submitReport(offendingId)" type="submit">
+          <button id="report-btn" class="fill-row" @click.prevent="submitReport(offendingId)" type="submit" :disabled="!offendingId">
             Submit Report
           </button>
         </div>
@@ -32,6 +32,7 @@ export default {
   setup(props, { emit }) {
     /* Template Methods */
     const close = () => {
+      v.offendingId = null
       emit('close')
     }
 
