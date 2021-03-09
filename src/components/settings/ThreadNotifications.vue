@@ -16,18 +16,34 @@
 </template>
 
 <script>
-import { reactive, onBeforeMount, toRefs } from 'vue'
+import { reactive, inject, onBeforeMount, toRefs } from 'vue'
 import { threadsApi } from '@/api'
 
 export default {
   name: 'thread-notifications',
   setup() {
-    onBeforeMount(() => {
-      console.log('here')
-      threadsApi.notifications().then(d => v.enabled = d.notify_replied_threads)
-    })
+    onBeforeMount(() => threadsApi.notifications().then(d => v.enabled = d.notify_replied_threads))
     /* View Methods */
-    const toggleThreadNotifications = () => console.log('toggleThreadNotifications')
+    const toggleThreadNotifications = () => {
+      const payload = { enabled: !v.enabled }
+      const promise = v.enabled ? threadsApi.disableNotifications : threadsApi.enableNotifications
+
+      return promise(payload)
+      .then(() => {
+        if (v.enabled) { $alertStore.success('Successfully Enabled Thread Notifications.') }
+        else {
+          $alertStore.success('Successfully Disabled Thread Notifications.')
+          return threadsApi.removeSubscriptions()
+        }
+      })
+      .catch(() => {
+        v.enabled = !v.enabled
+        $alertStore.error('There was an error updating your thread notification settings.')
+      })
+    }
+
+    const $alertStore = inject('$alertStore')
+
     const v = reactive({ enabled: null })
 
     return { toggleThreadNotifications, ...toRefs(v) }
