@@ -438,7 +438,7 @@
   <!-- </div> -->
   <posts-delete-modal :selectedPost="selectedPost" :show="showPostsDeleteModal" @close="showPostsDeleteModal = false; selectedPost = null"/>
   <posts-undelete-modal :selectedPost="selectedPost" :show="showPostsUndeleteModal" @close="showPostsUndeleteModal = false; selectedPost = null"/>
-  <posts-purge-modal :selectedPost="selectedPost" :show="showPostsPurgeModal" @close="showPostsPurgeModal = false; selectedPost = null"/>
+  <posts-purge-modal :selectedPost="selectedPost" :posts="postData.data?.posts" :show="showPostsPurgeModal" @close="showPostsPurgeModal = false; selectedPost = null"/>
   <posts-report-modal :selectedPost="selectedPost" :canReportPosts="true" :canReportUsers="true" :show="showPostsReportModal" @close="showPostsReportModal = false; selectedPost = null"/>
 </template>
 

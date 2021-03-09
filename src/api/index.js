@@ -66,6 +66,11 @@ export const postsApi = {
   slugToPostId: slug => $http(`/api/posts/${slug}/id`)
 }
 
+export const reportsApi = {
+  reportUser: () => Promise.resolve(console.log('DEBUG: reportUser')),
+  reportPost: () => Promise.resolve(console.log('DEBUG: reportPost'))
+}
+
 export const watchlistApi = {
   watchBoard: boardId => $http(`/api/watchlist/boards/${boardId}`, { method: 'POST' }),
   unwatchBoard: boardId => $http(`/api/watchlist/boards/${boardId}`, { method: 'DELETE' })
