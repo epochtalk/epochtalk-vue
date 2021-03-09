@@ -7,8 +7,8 @@
       <form action="." class="css-form">
         <h3 class="thin-underline">Purge Post</h3>
         <p v-if="canReportPosts && canReportUsers && !selectedPost.reported">Which would you like to report?</p>
-        <input v-if="canReportUsers" type="radio" name="reportPost" v-model="offendingId" :value="selectedPost.user.id" id="reportUser" :disabled="reportSubmitted" required><label v-if="canReportUsers" for="reportUser">{{selectedPost.user.username}}</label>
-        <input v-if="canReportPosts" type="radio" name="reportPost" v-model="offendingId" :value="selectedPost.id" id="reportPost" :disabled="reportSubmitted" required><label v-if="canReportPosts" for="reportPost">{{selectedPost.user.username}}'s Post</label>
+        <input v-if="canReportUsers" type="radio" name="reportPost" v-model="offendingId" :value="selectedPost.user.id" id="reportUser" required><label v-if="canReportUsers" for="reportUser">{{selectedPost.user.username}}</label>
+        <input v-if="canReportPosts" type="radio" name="reportPost" v-model="offendingId" :value="selectedPost.id" id="reportPost" required><label v-if="canReportPosts" for="reportPost">{{selectedPost.user.username}}'s Post</label>
         <div class="clear">
           <button id="report-btn" class="fill-row" @click.prevent="submitReport(offendingId)" type="submit">
             Submit Report
@@ -40,14 +40,12 @@ export default {
       if (offendingId === props.selectedPost.id) {
         reportsApi.reportPost(props.selectedPost.id)
           .then(() => {
-            v.reportSubmitted = true
             close()
           })
       }
       else if(offendingId === props.selectedPost.user.id) {
         reportsApi.reportUser(props.selectedPost.user.id)
           .then(() => {
-            v.reportSubmitted = true
             close()
           })
       }
@@ -59,7 +57,6 @@ export default {
 
     const v = reactive({
       offendingId: null,
-      reportSubmitted: false,
       selectedPost: props.selectedPost,
       focusInput: null
     })
