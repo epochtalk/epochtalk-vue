@@ -67,8 +67,8 @@ export const postsApi = {
 }
 
 export const reportsApi = {
-  reportUser: () => Promise.resolve(console.log('DEBUG: reportUser')),
-  reportPost: () => Promise.resolve(console.log('DEBUG: reportPost'))
+  reportUser: (userId, reason) => $http('/api/reports/users', { method: 'POST', data: { offender_user_id: userId, reporter_reason: reason }}),
+  reportPost: (postId, reason) => $http('/api/reports/posts', { method: 'POST', data: { offender_post_id: postId, reporter_reason: reason }})
 }
 
 export const watchlistApi = {
