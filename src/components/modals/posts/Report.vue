@@ -9,7 +9,7 @@
         <p v-if="canReportPosts && canReportUsers && !selectedPost.reported">Which would you like to report?</p>
         <input v-if="canReportUsers" type="radio" name="reportPost" v-model="offendingId" :value="selectedPost.user.id" id="reportUser" :disabled="reportSubmitted" required><label v-if="canReportUsers" for="reportUser">{{selectedPost.user.username}}</label>
         <div class="clear">
-          <button id="report-btn" class="fill-row" @click.prevent="reportPost(selectedPost)" type="submit">
+          <button id="report-btn" class="fill-row" @click.prevent="submitReport(offendingId)" type="submit">
             Submit Report
           </button>
         </div>
@@ -21,7 +21,7 @@
 <script>
 import Modal from '@/components/layout/Modal.vue'
 import { reactive, toRefs } from 'vue'
-//import { postsApi } from '@/api'
+import { reportsApi } from '@/api'
 
 export default {
   name: 'posts-report-modal',
@@ -35,19 +35,35 @@ export default {
     }
 
     /* Template Data */
-    const reportPost = post => {
-      v.reportSubmitted = true
-      console.log(post)
-      close()
+    const submitReport = offendingId => {
+      if (offendingId === props.selectedPost.id) {
+        reportsApi.reportPost(props.selectedPost.id)
+          .then(() => {
+            v.reportSubmitted = true
+            close()
+          })
+      }
+      else if(offendingId === props.selectedPost.user.id) {
+        reportsApi.reportUser(props.selectedPost.user.id)
+          .then(() => {
+            v.reportSubmitted = true
+            close()
+          })
+      }
+      else {
+        console.log('DEBUG: No user or post id selected.  offendingId:', offendingId)
+        close()
+      }
     }
 
     const v = reactive({
+      offendingId: null,
       reportSubmitted: false,
       selectedPost: props.selectedPost,
       focusInput: null
     })
 
-    return { ...toRefs(v), reportPost, close }
+    return { ...toRefs(v), submitReport, close }
   }
 }
 </script>
