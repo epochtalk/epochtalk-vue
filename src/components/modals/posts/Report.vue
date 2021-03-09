@@ -8,6 +8,7 @@
         <h3 class="thin-underline">Purge Post</h3>
         <p v-if="canReportPosts && canReportUsers && !selectedPost.reported">Which would you like to report?</p>
         <input v-if="canReportUsers" type="radio" name="reportPost" v-model="offendingId" :value="selectedPost.user.id" id="reportUser" :disabled="reportSubmitted" required><label v-if="canReportUsers" for="reportUser">{{selectedPost.user.username}}</label>
+        <input v-if="canReportPosts" type="radio" name="reportPost" v-model="offendingId" :value="selectedPost.id" id="reportPost" :disabled="reportSubmitted" required><label v-if="canReportPosts" for="reportPost">{{selectedPost.user.username}}'s Post</label>
         <div class="clear">
           <button id="report-btn" class="fill-row" @click.prevent="submitReport(offendingId)" type="submit">
             Submit Report
