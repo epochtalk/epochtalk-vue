@@ -54,7 +54,10 @@ export const threadsApi = {
   unsticky: (threadId) => $http(`/api/threads/${threadId}/sticky`, { data: { status: false }, method: 'POST'}),
   byBoard: params => $http('/api/threads', { params }),
   slugToThreadId: slug => $http(`/api/threads/${slug}/id`),
-  notifications: () => $http('api/threadnotifications')
+  notifications: () => $http('api/threadnotifications'),
+  removeSubscriptions: () => $http('/api/threadnotifications', { method: 'DELETE' }),
+  disableNotifications: () => $http('/api/threadnotifications', { data: { enabled: false }, method: 'PUT' }),
+  enableNotifications: () => $http('/api/threadnotifications', { data: { enabled: true }, method: 'PUT' })
 }
 
 export const postsApi = {
