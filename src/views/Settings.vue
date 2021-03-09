@@ -60,6 +60,7 @@
         </button>
       </div>
     </div>
+    <thread-notifications />
     <div id="ignore-boards" class="settings-section">
       <h3 class="thin-underline">Ignore Boards</h3>
       <div class="clear boards-check-list">
@@ -81,16 +82,17 @@ import { inject, reactive, toRefs, watch } from 'vue'
 // import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
 import IgnoredBoardsPartial from '@/components/settings/IgnoredBoardsPartial.vue'
+import ThreadNotifications from '@/components/settings/ThreadNotifications.vue'
 import { boardsApi } from '@/api'
 
 export default {
   name: 'Settings',
-  components: { IgnoredBoardsPartial },
+  components: { IgnoredBoardsPartial, ThreadNotifications },
   beforeRouteEnter(to, from, next) {
-    next(vm => boardsApi.getBoards(true).then(d => { vm.boards = d.boards }))
+    next(vm => boardsApi.getBoards(true).then(d => vm.boards = d.boards))
   },
   beforeRouteUpdate(to, from, next) {
-    boardsApi.getBoards(true).then(d => { this.boards = d.boards })
+    boardsApi.getBoards(true).then(d => this.boards = d.boards)
     next()
   },
   setup() {

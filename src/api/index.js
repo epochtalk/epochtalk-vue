@@ -53,7 +53,8 @@ export const threadsApi = {
   sticky: (threadId) => $http(`/api/threads/${threadId}/sticky`, { data: { status: true}, method: 'POST'}),
   unsticky: (threadId) => $http(`/api/threads/${threadId}/sticky`, { data: { status: false }, method: 'POST'}),
   byBoard: params => $http('/api/threads', { params }),
-  slugToThreadId: slug => $http(`/api/threads/${slug}/id`)
+  slugToThreadId: slug => $http(`/api/threads/${slug}/id`),
+  notifications: () => $http('api/threadnotifications')
 }
 
 export const postsApi = {
