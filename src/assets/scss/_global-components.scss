@@ -609,3 +609,10 @@ input[disabled].toggle-switch:checked + label:after { background-color: lighten(
   column-gap: 1.5rem;
   @include break-mobile-sm { grid-template-columns: 1fr; }
 }
+
+.input-button-wrap {
+  display: grid;
+  grid-template-columns: 70% 30%;
+  column-gap: .5rem;
+  @include break-mobile-sm { grid-template-columns: 1fr; }
+}

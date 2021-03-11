@@ -2,8 +2,9 @@
   <div id="ignored-users-posts-settings" class="settings-section">
     <h3 class="thin-underline">Ignored Users Posts</h3>
 
-    <div>
+    <div class="input-button-wrap">
       <!-- <autocomplete-user-id admin="false" user-id="vmIgnoreUserPosts.userToIgnore.user_id" username="vmIgnoreUserPosts.userToIgnore.username" input-placeholder="Type username to add to ignored posts list"></autocomplete-user-id> -->
+      <Multiselect v-model="ignoredTagsInput.value" v-bind="ignoredTagsInput" />
       <button class="fill-row" @click="ignoreUser()" :disabled="!userToIgnore.user_id">Add to Ignore List</button>
     </div>
     <div class="clear"></div>
@@ -67,10 +68,12 @@
 
 <script>
 import { reactive, onBeforeMount, toRefs } from 'vue'
-// import { threadsApi } from '@/api'
+import { usersApi } from '@/api'
+import Multiselect from '@vueform/multiselect'
 
 export default {
   name: 'ignored-users-posts',
+  components: { Multiselect },
   setup() {
     onBeforeMount(() => v.ignored = [])
     /* View Methods */
@@ -83,7 +86,25 @@ export default {
       next: false,
       prev: false,
       ignored: [],
-      userToIgnore: {}
+      userToIgnore: {},
+      ignoredTagsInput: {
+        mode: 'single',
+        value: [],
+        placeholder: 'Type username of user to ignore',
+        noOptionsText: 'Enter a username to start lookup...',
+        minChars: 1,
+        resolveOnLoad: false,
+        delay: 0,
+        searchable: true,
+        maxHeight: 100,
+        options: async q => {
+          return await usersApi.search(q)
+          // filter out existing mods
+          .then(d => d.filter(u => !v.ignored.find(o => o.username === u)))
+          // convert array into array of objects
+          .then(d => d.reduce((o, k) => (o[k] = k, o), {}))
+        }
+      }
     })
 
     return { ignoreUser, unignoreUser, pullPage, ...toRefs(v) }
@@ -92,6 +113,8 @@ export default {
 </script>
 
 <style lang="scss">
+.multiselect { margin: 0; }
+.input-button-wrap { margin-top: .25rem; }
 table.striped.ignored-users {
   table-layout: fixed;
   thead th:first-child { width: 4rem; }
