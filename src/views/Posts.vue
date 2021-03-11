@@ -171,7 +171,7 @@
               <li v-if="canPurge() && post.position !== 1">
                 <!-- TODO(boka): add data-balloon plugin -->
                 <!-- data-balloon="Purge" -->
-                <a href="" class="post-action-icon" @click.prevent="openPostsPurgeModal(post)">
+                <a href="" class="post-action-icon" @click.prevent="openPostsPurgePostModal(post)">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                     <title></title>
                     <path
@@ -438,7 +438,7 @@
   <!-- </div> -->
   <posts-delete-modal :selectedPost="selectedPost" :show="showPostsDeleteModal" @close="showPostsDeleteModal = false; selectedPost = null"/>
   <posts-undelete-modal :selectedPost="selectedPost" :show="showPostsUndeleteModal" @close="showPostsUndeleteModal = false; selectedPost = null"/>
-  <posts-purge-modal :selectedPost="selectedPost" :posts="postData.data?.posts" :show="showPostsPurgeModal" @close="showPostsPurgeModal = false; selectedPost = null"/>
+  <posts-purge-post-modal :selectedPost="selectedPost" :show="showPostsPurgePostModal" @close="showPostsPurgePostModal = false; selectedPost = null"/>
   <posts-report-modal :selectedPost="selectedPost" :canReportPosts="true" :canReportUsers="true" :show="showPostsReportModal" @close="showPostsReportModal = false; selectedPost = null"/>
 </template>
 
@@ -453,14 +453,14 @@ import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore, localStoragePrefs } from '@/composables/stores/prefs'
 import PostsDeleteModal from '@/components/modals/posts/Delete.vue'
 import PostsUndeleteModal from '@/components/modals/posts/Undelete.vue'
-import PostsPurgeModal from '@/components/modals/posts/Purge.vue'
+import PostsPurgePostModal from '@/components/modals/posts/PurgePost.vue'
 import PostsReportModal from '@/components/modals/posts/Report.vue'
 import { BreadcrumbStore } from '@/composables/stores/breadcrumbs'
 
 export default {
   name: 'Posts',
   props: ['threadSlug', 'threadId'],
-  components: { Pagination, PostsDeleteModal, PostsUndeleteModal, PostsPurgeModal, PostsReportModal },
+  components: { Pagination, PostsDeleteModal, PostsUndeleteModal, PostsPurgePostModal, PostsReportModal },
   beforeRouteEnter(to, from, next) {
     const params = {
       limit: localStoragePrefs().data.posts_per_page,
@@ -552,9 +552,9 @@ export default {
       console.log(post)
       return true
     }
-    const openPostsPurgeModal = (post) => {
+    const openPostsPurgePostModal = (post) => {
       v.selectedPost = post
-      v.showPostsPurgeModal = true
+      v.showPostsPurgePostModal = true
     }
     const openPostsDeleteModal = (post) => {
       v.selectedPost = post
@@ -605,7 +605,7 @@ export default {
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
       disableSignature: false,
-      showPostsPurgeModal: false,
+      showPostsPurgePostModal: false,
       showPostsDeleteModal: false,
       showPostsUndeleteModal: false,
       showPostsReportModal: false,
@@ -640,7 +640,7 @@ export default {
       humanDate,
       userRoleHighlight,
       showEditDate,
-      openPostsPurgeModal,
+      openPostsPurgePostModal,
       openPostsDeleteModal,
       openPostsUndeleteModal,
       openPostsReportModal,

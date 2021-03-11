@@ -23,7 +23,7 @@ import { reactive, toRefs } from 'vue'
 import { postsApi } from '@/api'
 
 export default {
-  name: 'posts-purge-modal',
+  name: 'posts-purge-post-modal',
   props: ['show', 'selectedPost'],
   emits: ['close'],
   components: { Modal },
