@@ -10,6 +10,9 @@
         <!-- TODO(boka): default radio button choice -->
         <input v-if="canReportUsers" type="radio" name="reportPost" v-model="offendingId" :value="selectedPost.user.id" id="reportUser" required><label v-if="canReportUsers" for="reportUser">{{selectedPost.user.username}}</label>
         <input v-if="canReportPosts" type="radio" name="reportPost" v-model="offendingId" :value="selectedPost.id" id="reportPost" required><label v-if="canReportPosts" for="reportPost">{{selectedPost.user.username}}'s Post</label>
+        <label>Reason for Report</label>
+        <!-- TODO(boka): handle focus -->
+        <textarea name="reportReason" v-model="reportReason" placeholder="Give a brief reason for your report" rows="4" required maxlength="255"></textarea>
         <div class="clear">
           <button id="report-btn" class="fill-row" type="submit">
             Submit Report
@@ -33,6 +36,7 @@ export default {
   setup(props, { emit }) {
     /* Template Methods */
     const close = () => {
+      v.reportReason = ''
       v.offendingId = null
       emit('close')
     }
@@ -40,24 +44,25 @@ export default {
     /* Template Data */
     const submitReport = () => {
       if (v.offendingId === props.selectedPost.id) {
-        reportsApi.reportPost(props.selectedPost.id)
+        reportsApi.reportPost(props.selectedPost.id, v.reportReason)
           .then(() => {
             close()
           })
       }
       else if(v.offendingId === props.selectedPost.user.id) {
-        reportsApi.reportUser(props.selectedPost.user.id)
+        reportsApi.reportUser(props.selectedPost.user.id, v.reportReason)
           .then(() => {
             close()
           })
       }
       else {
-        console.log('DEBUG: No user or post id selected.  offendingId:', offendingId)
+        console.log('DEBUG: No user or post id selected.  offendingId:', v.offendingId, v.reportReason)
         close()
       }
     }
 
     const v = reactive({
+      reportReason: '',
       offendingId: null,
       selectedPost: props.selectedPost,
       focusInput: null
