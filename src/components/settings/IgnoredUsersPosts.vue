@@ -2,7 +2,7 @@
   <div id="ignored-users-posts-settings" class="settings-section">
     <h3 class="thin-underline">Ignored Users Posts</h3>
 
-    <div class="row">
+    <div>
       <!-- <autocomplete-user-id admin="false" user-id="vmIgnoreUserPosts.userToIgnore.user_id" username="vmIgnoreUserPosts.userToIgnore.username" input-placeholder="Type username to add to ignored posts list"></autocomplete-user-id> -->
       <button class="fill-row" @click="ignoreUser()" :disabled="!userToIgnore.user_id">Add to Ignore List</button>
     </div>
@@ -10,9 +10,11 @@
     <!-- All Users -->
     <table class="striped ignored-users" width="100%">
       <thead>
-        <th></th>
-        <th>Username</th>
-        <th>Action</th>
+        <tr>
+          <th></th>
+          <th>Username</th>
+          <th>Action</th>
+        </tr>
       </thead>
       <tbody v-if="!ignored?.length">
         <tr>
@@ -88,3 +90,40 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+table.striped.ignored-users {
+  table-layout: fixed;
+  thead th:first-child { width: 4rem; }
+  .user-avatar {
+    @include bg-cover;
+    background: no-repeat center center;
+    text-align: center;
+    &.circle {
+      img {
+        @include border-radius(100px);
+        height: 1.5rem;
+        width: 1.5rem;
+        object-fit: cover;
+      }
+    }
+    &.rect {
+     img {
+       height: 1.5rem;
+       width: 1.5rem;
+       object-fit: cover;
+     }
+    }
+  }
+  .user-username {
+    font-weight: 900;
+    color: $color-primary;
+    padding-right: 0.5rem;
+  }
+  .no-data-mobile { display: none; }
+  @include break-mobile-sm {
+    .no-data-mobile { display: table-cell; }
+    .no-data { display: none; }
+  }
+}
+</style>

@@ -27,6 +27,42 @@ table {
   thead tr th, tbody tr th, tbody tr td, tr td { display: table-cell; line-height: 1.125rem; }
 }
 
+thead tr { border-bottom: $border; }
+table thead tr th, table thead th {
+  color: $secondary-font-color;
+  font-size: $font-size-xs;
+  font-weight: 400;
+  padding: .5rem 0;
+}
+tbody tr { border-bottom: $border-alt; }
+tbody td { padding: 0.5rem 0; }
+tbody td.username { font-weight: 600; }
+
+table.striped {
+  background: $base-background-color;
+  margin-bottom: 1.25rem;
+  table-layout: auto;
+}
+
+table.striped thead tr th { padding: 0.5rem; }
+table.striped tbody tr { border: 0; }
+table.striped tbody tr:nth-of-type(even), table.striped tbody:nth-of-type(even) { background: $sub-header-color; }
+table.striped td {
+  padding: 0.5rem;
+  text-align: left;
+  vertical-align: top;
+}
+table.striped td.centered-text { text-align: center; }
+
+table.striped thead tr th, table.striped tbody tr th, table.striped tbody tr td, table.striped tr td { display: table-cell; line-height: 1.125rem; }
+
+table.striped.rulesTable {
+  table-layout: fixed;
+  tr td:first-child { width: 25%; }
+  tr td h6 { @include pad(1.5rem 0); text-align: center; }
+  tr td:nth-child(2) { word-wrap: break-word; font-family: courier; }
+}
+
 h1, h2, h3, h4, h5, h6 {
   line-height: 1.5rem;
   font-style: normal;
