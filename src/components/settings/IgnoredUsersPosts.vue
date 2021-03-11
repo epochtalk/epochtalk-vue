@@ -14,7 +14,7 @@
         <th>Username</th>
         <th>Action</th>
       </thead>
-      <tbody v-if="users.length < 1">
+      <tbody v-if="!ignored?.length">
         <tr>
           <td class="centered-text no-data" colspan="3"><h5>No User Posts Being Ignored</h5></td>
         </tr>
@@ -64,8 +64,8 @@
 </template>
 
 <script>
-import { reactive, inject, onBeforeMount, toRefs } from 'vue'
-import { threadsApi } from '@/api'
+import { reactive, onBeforeMount, toRefs } from 'vue'
+// import { threadsApi } from '@/api'
 
 export default {
   name: 'ignored-users-posts',
@@ -84,7 +84,7 @@ export default {
       userToIgnore: {}
     })
 
-    return { ignoreUser, ...toRefs(v) }
+    return { ignoreUser, unignoreUser, pullPage, ...toRefs(v) }
   }
 }
 </script>

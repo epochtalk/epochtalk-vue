@@ -74,6 +74,7 @@
         </div>
       </div>
     </div>
+    <ignored-users-posts />
   </div>
 </template>
 
@@ -82,12 +83,13 @@ import { inject, reactive, toRefs, watch } from 'vue'
 // import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
 import IgnoredBoardsPartial from '@/components/settings/IgnoredBoardsPartial.vue'
+import IgnoredUsersPosts from '@/components/settings/IgnoredUsersPosts.vue'
 import ThreadNotifications from '@/components/settings/ThreadNotifications.vue'
 import { boardsApi } from '@/api'
 
 export default {
   name: 'Settings',
-  components: { IgnoredBoardsPartial, ThreadNotifications },
+  components: { IgnoredBoardsPartial, ThreadNotifications, IgnoredUsersPosts },
   beforeRouteEnter(to, from, next) {
     next(vm => boardsApi.getBoards(true).then(d => vm.boards = d.boards))
   },
