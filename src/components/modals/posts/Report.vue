@@ -38,14 +38,14 @@ export default {
     }
 
     /* Template Data */
-    const submitReport = offendingId => {
-      if (offendingId === props.selectedPost.id) {
+    const submitReport = () => {
+      if (v.offendingId === props.selectedPost.id) {
         reportsApi.reportPost(props.selectedPost.id)
           .then(() => {
             close()
           })
       }
-      else if(offendingId === props.selectedPost.user.id) {
+      else if(v.offendingId === props.selectedPost.user.id) {
         reportsApi.reportUser(props.selectedPost.user.id)
           .then(() => {
             close()
