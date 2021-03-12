@@ -454,13 +454,14 @@ import { PreferencesStore, localStoragePrefs } from '@/composables/stores/prefs'
 import PostsDeleteModal from '@/components/modals/posts/Delete.vue'
 import PostsUndeleteModal from '@/components/modals/posts/Undelete.vue'
 import PostsPurgePostModal from '@/components/modals/posts/PurgePost.vue'
+import PostsPurgeThreadModal from '@/components/modals/posts/PurgeThread.vue'
 import PostsReportModal from '@/components/modals/posts/Report.vue'
 import { BreadcrumbStore } from '@/composables/stores/breadcrumbs'
 
 export default {
   name: 'Posts',
   props: ['threadSlug', 'threadId'],
-  components: { Pagination, PostsDeleteModal, PostsUndeleteModal, PostsPurgePostModal, PostsReportModal },
+  components: { Pagination, PostsDeleteModal, PostsUndeleteModal, PostsPurgePostModal, PostsPurgeThreadModal, PostsReportModal },
   beforeRouteEnter(to, from, next) {
     const params = {
       limit: localStoragePrefs().data.posts_per_page,
