@@ -615,7 +615,7 @@ export default {
       showPostsDeleteModal: false,
       showPostsUndeleteModal: false,
       showPostsReportModal: false,
-      showMoveThreadModal: true
+      showMoveThreadModal: false
     })
 
     /* Watched Data */
