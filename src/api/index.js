@@ -48,7 +48,7 @@ export const boardsApi = {
 }
 
 export const threadsApi = {
-  purge: (threadId) => $http(`/api/threads/${threadId}/purge`, { method: 'DELETE' }),
+  purge: (threadId) => $http(`/api/threads/${threadId}`, { method: 'DELETE' }),
   lock: (threadId) => $http(`/api/threads/${threadId}/lock`, { data: { status: true }, method: 'POST'}),
   unlock: (threadId) => $http(`/api/threads/${threadId}/lock`, { data: { status: false }, method: 'POST'}),
   sticky: (threadId) => $http(`/api/threads/${threadId}/sticky`, { data: { status: true}, method: 'POST'}),
