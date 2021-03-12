@@ -370,8 +370,8 @@
           <!-- TODO(boka): add data-balloon plugin -->
           <!-- data-balloon="Purge Thread" -->
           <div class="control" v-if="canPurge()">
-            <a href="#" id="purgeThread" :class="{'clicked' : showPurgeThreadModal}"
-              @click.prevent="showPurgeThreadModal = true">
+            <a href="#" id="purgeThread" :class="{'clicked' : showPostsPurgeThreadModal}"
+              @click.prevent="openPostsPurgeThreadModal()">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <title></title>
                 <path
@@ -439,6 +439,7 @@
   <posts-delete-modal :selectedPost="selectedPost" :show="showPostsDeleteModal" @close="showPostsDeleteModal = false; selectedPost = null"/>
   <posts-undelete-modal :selectedPost="selectedPost" :show="showPostsUndeleteModal" @close="showPostsUndeleteModal = false; selectedPost = null"/>
   <posts-purge-post-modal :selectedPost="selectedPost" :show="showPostsPurgePostModal" @close="showPostsPurgePostModal = false; selectedPost = null"/>
+  <posts-purge-thread-modal :threadId="postData.data.thread?.id" :show="showPostsPurgeThreadModal" @close="showPostsPurgeThreadModal = false"/>
   <posts-report-modal :selectedPost="selectedPost" :canReportPosts="true" :canReportUsers="true" :show="showPostsReportModal" @close="showPostsReportModal = false; selectedPost = null"/>
 </template>
 
@@ -557,6 +558,9 @@ export default {
       v.selectedPost = post
       v.showPostsPurgePostModal = true
     }
+    const openPostsPurgeThreadModal = () => {
+      v.showPostsPurgeThreadModal = true
+    }
     const openPostsDeleteModal = (post) => {
       v.selectedPost = post
       v.showPostsDeleteModal = true
@@ -607,10 +611,10 @@ export default {
       defaultAvatarShape: window.default_avatar_shape,
       disableSignature: false,
       showPostsPurgePostModal: false,
+      showPostsPurgeThreadModal: false,
       showPostsDeleteModal: false,
       showPostsUndeleteModal: false,
       showPostsReportModal: false,
-      showPurgeThreadModal: true,
       showMoveThreadModal: true
     })
 
@@ -642,6 +646,7 @@ export default {
       userRoleHighlight,
       showEditDate,
       openPostsPurgePostModal,
+      openPostsPurgeThreadModal,
       openPostsDeleteModal,
       openPostsUndeleteModal,
       openPostsReportModal,
