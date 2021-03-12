@@ -3,12 +3,10 @@
     <h3 class="thin-underline">Ignored Users Posts</h3>
 
     <div class="input-button-wrap">
-      <!-- <autocomplete-user-id admin="false" user-id="vmIgnoreUserPosts.userToIgnore.user_id" username="vmIgnoreUserPosts.userToIgnore.username" input-placeholder="Type username to add to ignored posts list"></autocomplete-user-id> -->
       <Multiselect v-model="ignoredTagsInput.value" v-bind="ignoredTagsInput" />
-      <button class="fill-row" @click="ignoreUser()" :disabled="!userToIgnore.user_id">Add to Ignore List</button>
+      <button class="fill-row" @click="ignoreUser()" :disabled="!userToIgnore.user_id">Ignore</button>
     </div>
     <div class="clear"></div>
-    <!-- All Users -->
     <table class="striped ignored-users" width="100%">
       <thead>
         <tr>
@@ -51,18 +49,9 @@
     </table>
 
     <div class="pagination-simple">
-      <a v-show="prev" @click="pullPage(-1)">
-        &#10094; Previous
-      </a>
-      <span v-show="!prev">&#10094; Previous</span>
-      &nbsp;&nbsp;&nbsp;
-      <a v-show="next" @click="pullPage(1)">
-         Next &#10095;
-      </a>
-      <span v-show="!next">Next &#10095;</span>
+      <button @click="pullPage(-1)" :disabled="!ignored?.prev">&#10094; Prev</button>
+      <button @click="pullPage(1)" :disabled="!ignored?.next">Next &#10095;</button>
     </div>
-
-
   </div>
 </template>
 
