@@ -48,10 +48,10 @@ export const boardsApi = {
 }
 
 export const threadsApi = {
-  lock: (threadId) => $http(`/api/threads/${threadId}/lock`, { data: { status: true }, method: 'POST'}),
-  unlock: (threadId) => $http(`/api/threads/${threadId}/lock`, { data: { status: false }, method: 'POST'}),
-  sticky: (threadId) => $http(`/api/threads/${threadId}/sticky`, { data: { status: true}, method: 'POST'}),
-  unsticky: (threadId) => $http(`/api/threads/${threadId}/sticky`, { data: { status: false }, method: 'POST'}),
+  lock: threadId => $http(`/api/threads/${threadId}/lock`, { data: { status: true }, method: 'POST'}),
+  unlock: threadId => $http(`/api/threads/${threadId}/lock`, { data: { status: false }, method: 'POST'}),
+  sticky: threadId => $http(`/api/threads/${threadId}/sticky`, { data: { status: true}, method: 'POST'}),
+  unsticky: threadId => $http(`/api/threads/${threadId}/sticky`, { data: { status: false }, method: 'POST'}),
   byBoard: params => $http('/api/threads', { params }),
   slugToThreadId: slug => $http(`/api/threads/${slug}/id`),
   notifications: () => $http('api/threadnotifications'),
@@ -61,8 +61,8 @@ export const threadsApi = {
 }
 
 export const postsApi = {
-  lock: (postId) => $http(`/api/posts/${postId}/lock`, { method: 'POST'}),
-  unlock: (postId) => $http(`/api/posts/${postId}/unlock`, { method: 'POST'}),
+  lock: postId => $http(`/api/posts/${postId}/lock`, { method: 'POST'}),
+  unlock: postId => $http(`/api/posts/${postId}/unlock`, { method: 'POST'}),
   byThread: params => $http('/api/posts', { params }),
   slugToPostId: slug => $http(`/api/posts/${slug}/id`)
 }
@@ -95,7 +95,8 @@ export const authApi = {
 export const usersApi = {
   search: username => $http('/api/users/search', { params: { username } }),
   update: (userId, data) => $http(`/api/users/${userId}`, { method: 'PUT', data }),
-  preferences: () => $http('/api/users/preferences')
+  preferences: () => $http('/api/users/preferences'),
+  pageIgnoredUsers: params => $http('/api/ignoreUsers/ignored', { params })
 }
 
 export const breadcrumbsApi = {
