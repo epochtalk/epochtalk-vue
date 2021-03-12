@@ -15,14 +15,15 @@
           <th>Action</th>
         </tr>
       </thead>
-      <tbody v-if="!ignored?.length">
+      <tbody v-if="!ignored?.data?.length">
         <tr>
           <td class="centered-text no-data" colspan="3"><h5>No User Posts Being Ignored</h5></td>
         </tr>
       </tbody>
-      <tbody v-for="user in ignored" :key="user.id">
+      <tbody v-for="user in ignored?.data" :key="user.id">
         <tr>
           <td>
+            <img class="avatar-small" :class="defaultAvatarShape" :src="user.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
 <!--             <div class="user-avatar {{$webConfigs.default_avatar_shape}}">
               <a href="">
                 <img :src="{{::user.avatar || $webConfigs.default_avatar}}">
@@ -64,18 +65,20 @@ export default {
   name: 'ignored-users-posts',
   components: { Multiselect },
   setup() {
-    onBeforeMount(() => v.ignored = [])
+    onBeforeMount(() => pullPage(1))
     /* View Methods */
     const ignoreUser = () => console.log('Ignore Users Posts')
     const unignoreUser = () => console.log('Unignore Users Posts')
-    const pullPage = page => console.log('Pull page', page)
+    const pullPage = inc => usersApi.pageIgnoredUsers({
+      page: v.ignored?.page ? v.ignored.page + inc : 1
+    }).then(d => v.ignored = d)
     // const $alertStore = inject('$alertStore')
 
     const v = reactive({
-      next: false,
-      prev: false,
-      ignored: [],
+      ignored: {},
       userToIgnore: {},
+      defaultAvatar: window.default_avatar,
+      defaultAvatarShape: window.default_avatar_shape,
       ignoredTagsInput: {
         mode: 'single',
         value: [],
