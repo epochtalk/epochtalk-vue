@@ -94,9 +94,12 @@ export const authApi = {
 
 export const usersApi = {
   search: username => $http('/api/users/search', { params: { username } }),
+  lookup: (username, params) => $http(`/api/users/lookup/${username}`, { params }),
   update: (userId, data) => $http(`/api/users/${userId}`, { method: 'PUT', data }),
   preferences: () => $http('/api/users/preferences'),
-  pageIgnoredUsers: params => $http('/api/ignoreUsers/ignored', { params })
+  pageIgnoredUsers: params => $http('/api/ignoreUsers/ignored', { params }),
+  ignoreUser: id => $http(`/api/ignoreUsers/ignore/${id}`, { method: 'POST' }),
+  unignoreUser: id => $http(`/api/ignoreUsers/unignore/${id}`, { method: 'POST' })
 }
 
 export const breadcrumbsApi = {
