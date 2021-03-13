@@ -3,8 +3,8 @@
     <h3 class="thin-underline">Ignored Users Posts</h3>
 
     <div class="input-button-wrap">
-      <Multiselect v-model="ignoredTagsInput.value" v-bind="ignoredTagsInput" />
-      <button class="fill-row" @click="ignoreUser()" :disabled="!userToIgnore.user_id">Ignore</button>
+      <Multiselect v-model="ignoredTagsInput.value" ref="ignoredInput" v-bind="ignoredTagsInput" />
+      <button class="fill-row" @click="ignoreUser({ id: ignoredTagsInput.value })" :disabled="!ignoredTagsInput.value">Ignore</button>
     </div>
     <div class="clear"></div>
     <table class="striped ignored-users" width="100%">
@@ -24,11 +24,6 @@
         <tr>
           <td>
             <img class="avatar-small" :class="defaultAvatarShape" :src="user.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
-<!--             <div class="user-avatar {{$webConfigs.default_avatar_shape}}">
-              <a href="">
-                <img :src="{{::user.avatar || $webConfigs.default_avatar}}">
-              </a>
-            </div> -->
           </td>
           <td>
             <a class="user-username" href="">{{user.username}}</a>
@@ -40,7 +35,7 @@
             </a>
           </td>
           <td v-if="!user.ignored">
-            <a @click="ignoreUser(user)">
+            <a @click="ignoreUser(user, true)">
               <i class="fa fa-user-times"></i>&nbsp;&nbsp;
               Ignore<span class="hide-mobile"> User's Posts</span>
             </a>
@@ -57,7 +52,7 @@
 </template>
 
 <script>
-import { reactive, onBeforeMount, toRefs } from 'vue'
+import { reactive, inject, onBeforeMount, toRefs } from 'vue'
 import { usersApi } from '@/api'
 import Multiselect from '@vueform/multiselect'
 
@@ -67,34 +62,46 @@ export default {
   setup() {
     onBeforeMount(() => pullPage(1))
     /* View Methods */
-    const ignoreUser = () => console.log('Ignore Users Posts')
-    const unignoreUser = () => console.log('Unignore Users Posts')
+    const ignoreUser = (user, noPull) => usersApi.ignoreUser(user.id)
+    .then(() => {
+      user.ignored = !user.ignored
+      v.ignoredInput.clear()
+      if (!noPull) pullPage(0)
+    })
+    .catch(() => {
+      v.ignoredInput.clear()
+      $alertStore.warn('This user is already being ignored.')
+    })
+
+    const unignoreUser = user => usersApi.unignoreUser(user.id).then(() => user.ignored = !user.ignored)
+
     const pullPage = inc => usersApi.pageIgnoredUsers({
-      page: v.ignored?.page ? v.ignored.page + inc : 1
+      page: v.ignored?.page ? v.ignored.page + inc : 1,
+      limit: 10
     }).then(d => v.ignored = d)
-    // const $alertStore = inject('$alertStore')
+    const $alertStore = inject('$alertStore')
 
     const v = reactive({
+      ignoredInput: null,
       ignored: {},
-      userToIgnore: {},
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
       ignoredTagsInput: {
         mode: 'single',
-        value: [],
         placeholder: 'Type username of user to ignore',
         noOptionsText: 'Enter a username to start lookup...',
         minChars: 1,
         resolveOnLoad: false,
+        clearOnSearch: true,
+        clearonSelect: true,
         delay: 0,
+        value: null,
         searchable: true,
         maxHeight: 100,
         options: async q => {
-          return await usersApi.search(q)
-          // filter out existing mods
-          .then(d => d.filter(u => !v.ignored.find(o => o.username === u)))
+          return await usersApi.lookup(q, { restricted: true })
           // convert array into array of objects
-          .then(d => d.reduce((o, k) => (o[k] = k, o), {}))
+          .then(d => d.map(u =>{ return { label: u.username, value: u.id } }))
         }
       }
     })
