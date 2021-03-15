@@ -60,6 +60,7 @@
         </button>
       </div>
     </div>
+    <thread-notifications />
     <div id="ignore-boards" class="settings-section">
       <h3 class="thin-underline">Ignore Boards</h3>
       <div class="clear boards-check-list">
@@ -73,6 +74,7 @@
         </div>
       </div>
     </div>
+    <ignored-users-posts />
   </div>
 </template>
 
@@ -81,16 +83,18 @@ import { inject, reactive, toRefs, watch } from 'vue'
 // import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
 import IgnoredBoardsPartial from '@/components/settings/IgnoredBoardsPartial.vue'
+import IgnoredUsersPosts from '@/components/settings/IgnoredUsersPosts.vue'
+import ThreadNotifications from '@/components/settings/ThreadNotifications.vue'
 import { boardsApi } from '@/api'
 
 export default {
   name: 'Settings',
-  components: { IgnoredBoardsPartial },
+  components: { IgnoredBoardsPartial, ThreadNotifications, IgnoredUsersPosts },
   beforeRouteEnter(to, from, next) {
-    next(vm => boardsApi.getBoards(true).then(d => { vm.boards = d.boards }))
+    next(vm => boardsApi.getBoards(true).then(d => vm.boards = d.boards))
   },
   beforeRouteUpdate(to, from, next) {
-    boardsApi.getBoards(true).then(d => { this.boards = d.boards })
+    boardsApi.getBoards(true).then(d => this.boards = d.boards)
     next()
   },
   setup() {
@@ -140,12 +144,21 @@ export default {
 
     const togglePatroller = () => $prefs.update({ patroller_view: !v.patroller_view })
 
-    const toggleIgnoredBoard = boardId => console.log('toggleIgnoredBoard', boardId, v.allBoards)
+    const toggleIgnoredBoard = boardId => {
+      const index = $prefs.readonly.ignored_boards.indexOf(boardId)
+      let ignoredBoards = [...$prefs.readonly.ignored_boards]
+      v.toggleSubmitted[boardId] = true
+      if (index > -1) { ignoredBoards.splice(index, 1) }
+      else { ignoredBoards.push(boardId) }
+      return $prefs.update({ ignored_boards: ignoredBoards })
+      .catch(() => $alertStore.error('Ignored boards could not be updated, try again later.'))
+      .finally(() => v.toggleSubmitted[boardId] = false)
+    }
 
     /* Internal Data */
     // const $auth = inject(AuthStore)
     const $prefs = inject(PreferencesStore)
-    // const prefsCopy = cloneDeep($prefs.readonly)
+    const $alertStore = inject('$alertStore')
 
     const v = reactive({
       allBoards: {},

@@ -1,5 +1,5 @@
 <template>
-  <input :id="board.id" :checked="allBoards[board.id]" @change="$emit('toggle-ignored-board', board.id)" :disabled="toggleSubmitted[board.id]" type="checkbox" />
+  <input :id="board.id" :checked="checked" @change="toggleIgnoredBoard(board.id)" :disabled="toggleSubmitted[board.id]" type="checkbox" />
   <label :for="board.id">{{board.name}}</label>
   <ul>
     <li v-for="childboard in board.children" :key="childboard.id">
@@ -9,6 +9,7 @@
 </template>
 
 <script>
+import { ref  } from 'vue'
 
 export default {
   name: 'ignored-boards-partial',
@@ -16,7 +17,10 @@ export default {
   setup(props, { emit }) {
     /* View Methods */
     const toggleIgnoredBoard = boardId => emit('toggle-ignored-board', boardId)
-    return { toggleIgnoredBoard }
+
+    const checked = ref(props.allBoards[props.board.id])
+
+    return { toggleIgnoredBoard, checked }
   }
 }
 </script>

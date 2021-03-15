@@ -49,20 +49,24 @@ export const boardsApi = {
 
 export const threadsApi = {
   purge: (threadId) => $http(`/api/threads/${threadId}`, { method: 'DELETE' }),
-  lock: (threadId) => $http(`/api/threads/${threadId}/lock`, { data: { status: true }, method: 'POST'}),
-  unlock: (threadId) => $http(`/api/threads/${threadId}/lock`, { data: { status: false }, method: 'POST'}),
-  sticky: (threadId) => $http(`/api/threads/${threadId}/sticky`, { data: { status: true}, method: 'POST'}),
-  unsticky: (threadId) => $http(`/api/threads/${threadId}/sticky`, { data: { status: false }, method: 'POST'}),
+  lock: threadId => $http(`/api/threads/${threadId}/lock`, { data: { status: true }, method: 'POST'}),
+  unlock: threadId => $http(`/api/threads/${threadId}/lock`, { data: { status: false }, method: 'POST'}),
+  sticky: threadId => $http(`/api/threads/${threadId}/sticky`, { data: { status: true}, method: 'POST'}),
+  unsticky: threadId => $http(`/api/threads/${threadId}/sticky`, { data: { status: false }, method: 'POST'}),
   byBoard: params => $http('/api/threads', { params }),
-  slugToThreadId: slug => $http(`/api/threads/${slug}/id`)
+  slugToThreadId: slug => $http(`/api/threads/${slug}/id`),
+  notifications: () => $http('api/threadnotifications'),
+  removeSubscriptions: () => $http('/api/threadnotifications', { method: 'DELETE' }),
+  disableNotifications: () => $http('/api/threadnotifications', { data: { enabled: false }, method: 'PUT' }),
+  enableNotifications: () => $http('/api/threadnotifications', { data: { enabled: true }, method: 'PUT' })
 }
 
 export const postsApi = {
   delete: (postId, lock) => $http(`/api/posts/${postId}`, { method: 'DELETE', params: { locked: lock }}),
   undelete: (postId) => $http(`/api/posts/${postId}/undelete`, { method: 'POST' }),
   purge: (postId) => $http(`/api/posts/${postId}/purge`, { method: 'DELETE' }),
-  lock: (postId) => $http(`/api/posts/${postId}/lock`, { method: 'POST'}),
-  unlock: (postId) => $http(`/api/posts/${postId}/unlock`, { method: 'POST'}),
+  lock: postId => $http(`/api/posts/${postId}/lock`, { method: 'POST'}),
+  unlock: postId => $http(`/api/posts/${postId}/unlock`, { method: 'POST'}),
   byThread: params => $http('/api/posts', { params }),
   slugToPostId: slug => $http(`/api/posts/${slug}/id`)
 }
@@ -99,8 +103,12 @@ export const authApi = {
 
 export const usersApi = {
   search: username => $http('/api/users/search', { params: { username } }),
+  lookup: (username, params) => $http(`/api/users/lookup/${username}`, { params }),
   update: (userId, data) => $http(`/api/users/${userId}`, { method: 'PUT', data }),
-  preferences: () => $http('/api/users/preferences')
+  preferences: () => $http('/api/users/preferences'),
+  pageIgnoredUsers: params => $http('/api/ignoreUsers/ignored', { params }),
+  ignoreUser: id => $http(`/api/ignoreUsers/ignore/${id}`, { method: 'POST' }),
+  unignoreUser: id => $http(`/api/ignoreUsers/unignore/${id}`, { method: 'POST' })
 }
 
 export const breadcrumbsApi = {
