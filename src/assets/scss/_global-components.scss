@@ -52,6 +52,7 @@ table.striped td {
   text-align: left;
   vertical-align: top;
 }
+table.striped td a { cursor: pointer; }
 table.striped td.centered-text { text-align: center; }
 
 table.striped thead tr th, table.striped tbody tr th, table.striped tbody tr td, table.striped tr td { display: table-cell; line-height: 1.125rem; }
@@ -612,7 +613,7 @@ input[disabled].toggle-switch:checked + label:after { background-color: lighten(
 
 .input-button-wrap {
   display: grid;
-  grid-template-columns: 70% 30%;
+  grid-template-columns: 1fr .49fr;
   column-gap: .5rem;
   @include break-mobile-sm { grid-template-columns: 1fr; }
 }
