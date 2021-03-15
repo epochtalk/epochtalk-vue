@@ -23,7 +23,7 @@ import { threadsApi } from '@/api'
 
 export default {
   name: 'posts-purge-thread-modal',
-  props: ['show', 'threadId'],
+  props: ['show', 'threadId', 'boardId', 'boardSlug'],
   emits: ['close'],
   components: { Modal },
   setup(props, { emit }) {
@@ -37,10 +37,9 @@ export default {
 
     /* Template Data */
     const purgeThread = () => {
-      console.log('purgeThread', props.threadId)
       threadsApi.purge(props.threadId)
         .then(() => {
-          $router.push({ name: 'Threads' })
+          $router.push({ name: 'Threads', params: { boardId: props.boardId, boardSlug: props.boardSlug}})
           close()
         })
     }
