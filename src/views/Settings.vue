@@ -127,6 +127,7 @@ export default {
     const resetLimitPrefs = () => {
       v.posts_per_page = $prefs.readonly.posts_per_page
       v.threads_per_page = $prefs.readonly.threads_per_page
+      $alertStore.info('Reset limit preferences.')
     }
     const saveLimitPrefs = () => {
       const updatedLimits = {
@@ -134,18 +135,21 @@ export default {
         threads_per_page: Number(v.threads_per_page)
       }
       $prefs.update(updatedLimits)
+      .then(() => $alertStore.success('Successfully updated limit preferences.'))
     }
 
     const resetTimezonePrefs = () => {
       v.timezone_offset_sign = $prefs.readonly.timezone_offset.sign
       v.timezone_offset_hours = $prefs.readonly.timezone_offset.hours
       v.timezone_offset_minutes = $prefs.readonly.timezone_offset.minutes
+      $alertStore.info('Reset timezone preferences.')
     }
     const saveTimezonePrefs = () => {
       const updatedTimezone = {
         timezone_offset: v.timezone_offset_sign +  v.timezone_offset_hours + v.timezone_offset_minutes
       }
       $prefs.update(updatedTimezone)
+      .then(() => $alertStore.success('Successfully updated timezone preferences.'))
     }
     const timezonePrefsValid = () => {
       const sign = v.timezone_offset_sign
@@ -155,6 +159,7 @@ export default {
     }
 
     const togglePatroller = () => $prefs.update({ patroller_view: !v.patroller_view })
+      .then(() => $alertStore.success('Successfully updated patroller view preferences.'))
 
     const toggleIgnoredBoard = boardId => {
       const index = $prefs.readonly.ignored_boards.indexOf(boardId)
