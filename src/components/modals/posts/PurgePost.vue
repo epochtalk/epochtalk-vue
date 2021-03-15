@@ -7,7 +7,7 @@
         <h3 class="thin-underline">Purge Post</h3>
         <p>Are you sure you want to permanently delete this post?</p>
         <div class="clear">
-          <button id="purge-btn" class="fill-row" @click.prevent="purgePost(selectedPost)" type="submit">
+          <button id="purge-btn" class="fill-row" @click.prevent="purgePost()" type="submit">
             Purge Post
           </button>
         </div>
@@ -37,8 +37,8 @@ export default {
     const $router = useRouter()
 
     /* Template Data */
-    const purgePost = post => {
-      postsApi.purge(post.id)
+    const purgePost = () => {
+      postsApi.purge(props.selectedPost.id)
         .then(() => {
           $router.push({ name: 'Posts' })
           close()
