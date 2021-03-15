@@ -74,7 +74,19 @@
         </div>
       </div>
     </div>
-    <ignored-users-posts />
+    <div id="ignored-users-posts-settings">
+      <h3 class="thin-underline">Ignored User</h3>
+      <div class="tabs">
+        <a class="button" :class="{ 'selected': selectedTab === 'posts' }" @click.prevent="selectedTab = 'posts'">Posts</a>
+        <a class="button" :class="{ 'selected': selectedTab === 'messages' }" @click.prevent="selectedTab = 'messages'">Messages</a>
+        <a class="button" :class="{ 'selected': selectedTab === 'mentions' }" @click.prevent="selectedTab = 'mentions'">Mentions</a>
+      </div>
+      <div class="tabs-content">
+        <ignored-users-posts v-if="selectedTab === 'posts'" />
+        <ignored-users-posts v-if="selectedTab === 'messages'" />
+        <ignored-users-posts v-if="selectedTab === 'mentions'" />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -161,6 +173,7 @@ export default {
     const $alertStore = inject('$alertStore')
 
     const v = reactive({
+      selectedTab: 'posts',
       allBoards: {},
       boards: [],
       toggleSubmitted: {},
@@ -233,6 +246,33 @@ export default {
     grid-template-columns: 1fr;
   }
 }
+
+
+.tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  column-gap: .5rem;
+  margin-top: .4rem;
+  margin-bottom: .5rem;
+  a.button {
+    display: inline-block;
+    background-color: #fff;
+    color: #222236;
+    height: 2.5rem;
+    padding: 0 1rem;
+    line-height: 2.5rem;
+    font-size: 1rem;
+    &.selected {
+      border: 1px solid #ff6400;
+      border-radius: 3px;
+      color: #ff6400;
+    }
+  }
+  @include break-mobile-sm {
+    grid-template-columns: 1fr;
+  }
+}
+.tabs-content { min-height: 29rem }
 
 .boards-check-list {
   @include pad(0.5rem);

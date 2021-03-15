@@ -1,6 +1,5 @@
 <template>
-  <div id="ignored-users-posts-settings" class="settings-section">
-    <h3 class="thin-underline">Ignored Users Posts</h3>
+  <div class="settings-section">
 
     <div class="input-button-wrap">
       <Multiselect v-model="ignoredTagsInput.value" ref="ignoredInput" v-bind="ignoredTagsInput" />
@@ -79,6 +78,7 @@ export default {
       page: v.ignored?.page ? v.ignored.page + inc : 1,
       limit: 10
     }).then(d => v.ignored = d)
+
     const $alertStore = inject('$alertStore')
 
     const v = reactive({
