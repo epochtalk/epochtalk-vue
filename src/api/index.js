@@ -48,7 +48,7 @@ export const boardsApi = {
 }
 
 export const threadsApi = {
-  purge: (threadId) => $http(`/api/threads/${threadId}`, { method: 'DELETE' }),
+  purge: threadId => $http(`/api/threads/${threadId}`, { method: 'DELETE' }),
   lock: threadId => $http(`/api/threads/${threadId}/lock`, { data: { status: true }, method: 'POST'}),
   unlock: threadId => $http(`/api/threads/${threadId}/lock`, { data: { status: false }, method: 'POST'}),
   sticky: threadId => $http(`/api/threads/${threadId}/sticky`, { data: { status: true}, method: 'POST'}),
@@ -63,8 +63,8 @@ export const threadsApi = {
 
 export const postsApi = {
   delete: (postId, lock) => $http(`/api/posts/${postId}`, { method: 'DELETE', params: { locked: lock }}),
-  undelete: (postId) => $http(`/api/posts/${postId}/undelete`, { method: 'POST' }),
-  purge: (postId) => $http(`/api/posts/${postId}/purge`, { method: 'DELETE' }),
+  undelete: postId => $http(`/api/posts/${postId}/undelete`, { method: 'POST' }),
+  purge: postId => $http(`/api/posts/${postId}/purge`, { method: 'DELETE' }),
   lock: postId => $http(`/api/posts/${postId}/lock`, { method: 'POST'}),
   unlock: postId => $http(`/api/posts/${postId}/unlock`, { method: 'POST'}),
   byThread: params => $http('/api/posts', { params }),
