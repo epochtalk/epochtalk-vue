@@ -57,11 +57,12 @@ import Multiselect from '@vueform/multiselect'
 
 export default {
   name: 'ignored-users-posts',
+  props: ['ignoreApi', 'unignoreApi', 'listApi'],
   components: { Multiselect },
-  setup() {
+  setup(props) {
     onBeforeMount(() => pullPage(1))
     /* View Methods */
-    const ignoreUser = (user, noPull) => usersApi.ignoreUser(user.id)
+    const ignoreUser = (user, noPull) => props.ignoreApi(user.id)
     .then(() => {
       user.ignored = !user.ignored
       v.ignoredInput.clear()
@@ -72,9 +73,9 @@ export default {
       $alertStore.warn('This user is already being ignored.')
     })
 
-    const unignoreUser = user => usersApi.unignoreUser(user.id).then(() => user.ignored = !user.ignored)
+    const unignoreUser = user => props.unignoreApi(user.id).then(() => user.ignored = !user.ignored)
 
-    const pullPage = inc => usersApi.pageIgnoredUsers({
+    const pullPage = inc => props.listApi({
       page: v.ignored?.page ? v.ignored.page + inc : 1,
       limit: 10
     }).then(d => v.ignored = d)

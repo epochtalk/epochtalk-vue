@@ -82,9 +82,9 @@
         <a class="button" :class="{ 'selected': selectedTab === 'mentions' }" @click.prevent="selectedTab = 'mentions'">Mentions</a>
       </div>
       <div class="tabs-content">
-        <ignored-users-posts v-if="selectedTab === 'posts'" />
-        <ignored-users-posts v-if="selectedTab === 'messages'" />
-        <ignored-users-posts v-if="selectedTab === 'mentions'" />
+        <ignored-users-posts :ignore-api="usersApi.ignoreUser" :unignore-api="usersApi.unignoreUser" :list-api="usersApi.pageIgnoredUsers" v-if="selectedTab === 'posts'" />
+        <ignored-users-posts :ignore-api="usersApi.ignoreUser" :unignore-api="usersApi.unignoreUser" :list-api="usersApi.pageIgnoredUsers" v-if="selectedTab === 'messages'" />
+        <ignored-users-posts :ignore-api="usersApi.ignoreUser" :unignore-api="usersApi.unignoreUser" :list-api="usersApi.pageIgnoredUsers" v-if="selectedTab === 'mentions'" />
       </div>
     </div>
   </div>
@@ -97,7 +97,7 @@ import { PreferencesStore } from '@/composables/stores/prefs'
 import IgnoredBoardsPartial from '@/components/settings/IgnoredBoardsPartial.vue'
 import IgnoredUsersPosts from '@/components/settings/IgnoredUsersPosts.vue'
 import ThreadNotifications from '@/components/settings/ThreadNotifications.vue'
-import { boardsApi } from '@/api'
+import { usersApi, boardsApi } from '@/api'
 
 export default {
   name: 'Settings',
@@ -222,7 +222,7 @@ export default {
 
     watch(() => v.boards, () => v.allBoards = initAllBoards(v.boards, v.allBoards))
 
-    return { ...toRefs(v), resetLimitPrefs, saveLimitPrefs, resetTimezonePrefs, saveTimezonePrefs, timezonePrefsValid, togglePatroller, toggleIgnoredBoard }
+    return { ...toRefs(v), resetLimitPrefs, saveLimitPrefs, resetTimezonePrefs, saveTimezonePrefs, timezonePrefsValid, togglePatroller, toggleIgnoredBoard, usersApi }
   }
 }
 </script>
