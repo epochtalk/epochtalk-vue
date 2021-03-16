@@ -3,7 +3,7 @@
 
     <div class="input-button-wrap">
       <Multiselect v-model="ignoredTagsInput.value" ref="ignoredInput" v-bind="ignoredTagsInput" />
-      <button class="fill-row" @click="ignoreUser({ id: ignoredTagsInput.value })" :disabled="!ignoredTagsInput.value">Ignore</button>
+      <button class="fill-row" @click="ignoreUser({ username: ignoredInput.internalValue.label, id: ignoredInput.internalValue.value })" :disabled="!ignoredTagsInput.value">Ignore</button>
     </div>
     <div class="clear"></div>
     <table class="striped ignored-users" width="100%">
@@ -30,13 +30,13 @@
           <td v-if="user.ignored">
             <a @click="unignoreUser(user)">
               <i class="fa fa-user"></i>&nbsp;&nbsp;
-              Stop Ignoring<span class="hide-mobile"> User's Posts</span>
+              Stop Ignoring
             </a>
           </td>
           <td v-if="!user.ignored">
             <a @click="ignoreUser(user, true)">
               <i class="fa fa-user-times"></i>&nbsp;&nbsp;
-              Ignore<span class="hide-mobile"> User's Posts</span>
+              Ignore
             </a>
           </td>
         </tr>
@@ -62,7 +62,7 @@ export default {
   setup(props) {
     onBeforeMount(() => pullPage(1))
     /* View Methods */
-    const ignoreUser = (user, noPull) => props.ignoreApi(user.id)
+    const ignoreUser = (user, noPull) => props.ignoreApi(user)
     .then(() => {
       user.ignored = !user.ignored
       v.ignoredInput.clear()
@@ -73,7 +73,7 @@ export default {
       $alertStore.warn('This user is already being ignored.')
     })
 
-    const unignoreUser = user => props.unignoreApi(user.id).then(() => user.ignored = !user.ignored)
+    const unignoreUser = user => props.unignoreApi(user).then(() => user.ignored = !user.ignored)
 
     const pullPage = inc => props.listApi({
       page: v.ignored?.page ? v.ignored.page + inc : 1,

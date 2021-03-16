@@ -82,9 +82,9 @@
         <a class="button" :class="{ 'selected': selectedTab === 'mentions' }" @click.prevent="selectedTab = 'mentions'">Mentions</a>
       </div>
       <div class="tabs-content">
-        <ignored-settings-partial :ignore-api="usersApi.ignoreUser" :unignore-api="usersApi.unignoreUser" :list-api="usersApi.pageIgnoredUsers" v-show="selectedTab === 'posts'" />
-        <ignored-settings-partial :ignore-api="usersApi.ignoreUser" :unignore-api="usersApi.unignoreUser" :list-api="usersApi.pageIgnoredUsers" v-show="selectedTab === 'messages'" />
-        <ignored-settings-partial :ignore-api="usersApi.ignoreUser" :unignore-api="usersApi.unignoreUser" :list-api="usersApi.pageIgnoredUsers" v-show="selectedTab === 'mentions'" />
+        <ignored-settings-partial :ignore-api="usersApi.ignore" :unignore-api="usersApi.unignore" :list-api="usersApi.pageIgnored" v-show="selectedTab === 'posts'" />
+        <ignored-settings-partial :ignore-api="messagesApi.ignore" :unignore-api="messagesApi.unignore" :list-api="messagesApi.pageIgnored" v-show="selectedTab === 'messages'" />
+        <ignored-settings-partial :ignore-api="mentionsApi.ignore" :unignore-api="mentionsApi.unignore" :list-api="mentionsApi.pageIgnored" v-show="selectedTab === 'mentions'" />
       </div>
     </div>
   </div>
@@ -97,7 +97,7 @@ import { PreferencesStore } from '@/composables/stores/prefs'
 import IgnoredBoardsPartial from '@/components/settings/IgnoredBoardsPartial.vue'
 import IgnoredSettingsPartial from '@/components/settings/IgnoredSettingsPartial.vue'
 import ThreadNotifications from '@/components/settings/ThreadNotifications.vue'
-import { usersApi, boardsApi } from '@/api'
+import { usersApi, messagesApi, mentionsApi, boardsApi } from '@/api'
 
 export default {
   name: 'Settings',
@@ -222,7 +222,7 @@ export default {
 
     watch(() => v.boards, () => v.allBoards = initAllBoards(v.boards, v.allBoards))
 
-    return { ...toRefs(v), resetLimitPrefs, saveLimitPrefs, resetTimezonePrefs, saveTimezonePrefs, timezonePrefsValid, togglePatroller, toggleIgnoredBoard, usersApi }
+    return { ...toRefs(v), resetLimitPrefs, saveLimitPrefs, resetTimezonePrefs, saveTimezonePrefs, timezonePrefsValid, togglePatroller, toggleIgnoredBoard, usersApi, messagesApi, mentionsApi }
   }
 }
 </script>
