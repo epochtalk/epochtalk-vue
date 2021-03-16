@@ -56,7 +56,7 @@ import { usersApi } from '@/api'
 import Multiselect from '@vueform/multiselect'
 
 export default {
-  name: 'ignored-users-posts',
+  name: 'ignored-settings-partial',
   props: ['ignoreApi', 'unignoreApi', 'listApi'],
   components: { Multiselect },
   setup(props) {

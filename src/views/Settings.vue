@@ -82,9 +82,9 @@
         <a class="button" :class="{ 'selected': selectedTab === 'mentions' }" @click.prevent="selectedTab = 'mentions'">Mentions</a>
       </div>
       <div class="tabs-content">
-        <ignored-users-posts :ignore-api="usersApi.ignoreUser" :unignore-api="usersApi.unignoreUser" :list-api="usersApi.pageIgnoredUsers" v-if="selectedTab === 'posts'" />
-        <ignored-users-posts :ignore-api="usersApi.ignoreUser" :unignore-api="usersApi.unignoreUser" :list-api="usersApi.pageIgnoredUsers" v-if="selectedTab === 'messages'" />
-        <ignored-users-posts :ignore-api="usersApi.ignoreUser" :unignore-api="usersApi.unignoreUser" :list-api="usersApi.pageIgnoredUsers" v-if="selectedTab === 'mentions'" />
+        <ignored-settings-partial :ignore-api="usersApi.ignoreUser" :unignore-api="usersApi.unignoreUser" :list-api="usersApi.pageIgnoredUsers" v-show="selectedTab === 'posts'" />
+        <ignored-settings-partial :ignore-api="usersApi.ignoreUser" :unignore-api="usersApi.unignoreUser" :list-api="usersApi.pageIgnoredUsers" v-show="selectedTab === 'messages'" />
+        <ignored-settings-partial :ignore-api="usersApi.ignoreUser" :unignore-api="usersApi.unignoreUser" :list-api="usersApi.pageIgnoredUsers" v-show="selectedTab === 'mentions'" />
       </div>
     </div>
   </div>
@@ -95,13 +95,13 @@ import { inject, reactive, toRefs, watch } from 'vue'
 // import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
 import IgnoredBoardsPartial from '@/components/settings/IgnoredBoardsPartial.vue'
-import IgnoredUsersPosts from '@/components/settings/IgnoredUsersPosts.vue'
+import IgnoredSettingsPartial from '@/components/settings/IgnoredSettingsPartial.vue'
 import ThreadNotifications from '@/components/settings/ThreadNotifications.vue'
 import { usersApi, boardsApi } from '@/api'
 
 export default {
   name: 'Settings',
-  components: { IgnoredBoardsPartial, ThreadNotifications, IgnoredUsersPosts },
+  components: { IgnoredBoardsPartial, ThreadNotifications, IgnoredSettingsPartial },
   beforeRouteEnter(to, from, next) {
     next(vm => boardsApi.getBoards(true).then(d => vm.boards = d.boards))
   },
