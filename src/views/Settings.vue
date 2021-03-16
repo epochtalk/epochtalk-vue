@@ -74,19 +74,7 @@
         </div>
       </div>
     </div>
-    <div id="ignored-users-posts-settings">
-      <h3 class="thin-underline">Ignored User</h3>
-      <div class="tabs">
-        <a class="button" :class="{ 'selected': selectedTab === 'posts' }" @click.prevent="selectedTab = 'posts'">Posts</a>
-        <a class="button" :class="{ 'selected': selectedTab === 'messages' }" @click.prevent="selectedTab = 'messages'">Messages</a>
-        <a class="button" :class="{ 'selected': selectedTab === 'mentions' }" @click.prevent="selectedTab = 'mentions'">Mentions</a>
-      </div>
-      <div class="tabs-content">
-        <ignored-settings-partial :ignore-api="usersApi.ignore" :unignore-api="usersApi.unignore" :list-api="usersApi.pageIgnored" v-show="selectedTab === 'posts'" />
-        <ignored-settings-partial :ignore-api="messagesApi.ignore" :unignore-api="messagesApi.unignore" :list-api="messagesApi.pageIgnored" v-show="selectedTab === 'messages'" />
-        <ignored-settings-partial :ignore-api="mentionsApi.ignore" :unignore-api="mentionsApi.unignore" :list-api="mentionsApi.pageIgnored" v-show="selectedTab === 'mentions'" />
-      </div>
-    </div>
+    <ignored-settings />
   </div>
 </template>
 
@@ -95,13 +83,13 @@ import { inject, reactive, toRefs, watch } from 'vue'
 // import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
 import IgnoredBoardsPartial from '@/components/settings/IgnoredBoardsPartial.vue'
-import IgnoredSettingsPartial from '@/components/settings/IgnoredSettingsPartial.vue'
+import IgnoredSettings from '@/components/settings/IgnoredSettings.vue'
 import ThreadNotifications from '@/components/settings/ThreadNotifications.vue'
 import { usersApi, messagesApi, mentionsApi, boardsApi } from '@/api'
 
 export default {
   name: 'Settings',
-  components: { IgnoredBoardsPartial, ThreadNotifications, IgnoredSettingsPartial },
+  components: { IgnoredBoardsPartial, ThreadNotifications, IgnoredSettings },
   beforeRouteEnter(to, from, next) {
     next(vm => boardsApi.getBoards(true).then(d => vm.boards = d.boards))
   },
@@ -178,7 +166,6 @@ export default {
     const $alertStore = inject('$alertStore')
 
     const v = reactive({
-      selectedTab: 'posts',
       allBoards: {},
       boards: [],
       toggleSubmitted: {},
