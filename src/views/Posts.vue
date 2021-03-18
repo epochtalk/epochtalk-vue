@@ -467,8 +467,7 @@ export default {
     const params = {
       limit: localStoragePrefs().data.posts_per_page,
       page: to.query.page || 1,
-      field: to.query.field,
-      desc: to.query.desc
+      start: to.query.start
     }
     threadsApi.slugToThreadId(to.params.threadSlug).then(t => t.id)
       .then(threadId => {
@@ -480,8 +479,7 @@ export default {
     const params = {
       limit: localStoragePrefs().data.posts_per_page,
       page: to.query.page || 1,
-      field: to.query.field,
-      desc: to.query.desc
+      start: to.query.start
     }
     threadsApi.slugToThreadId(to.params.threadSlug).then(t => t.id)
       .then(threadId => {
@@ -501,8 +499,7 @@ export default {
           thread_id: threadId,
           limit: v.prefs.posts_per_page,
           page: $route.query.page || 1,
-          field: $route.query.field,
-          desc: $route.query.desc
+          start: $route.query.start
         }
         return postsApi.byThread(params)
       })
