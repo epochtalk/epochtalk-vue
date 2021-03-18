@@ -298,6 +298,7 @@
       </div>
     </div>
   </div>
+  <span id="last"></span>
 
   <!-- Sidebar -->
   <div class="sidebar">
