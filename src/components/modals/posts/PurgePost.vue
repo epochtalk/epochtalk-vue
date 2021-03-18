@@ -40,18 +40,30 @@ export default {
     const purgePost = () => {
       postsApi.purge(props.selectedPost.id)
         .then(() => {
-          // if post is the last on a page
-          if (props.posts.length === 1 && props.selectedPostIndex === 0) {
+          // if current post is the only one on the page
+          if (props.posts.length === 1) {
             // redirect to previous page
-            console.log('DEBUG(postspurge): redirect to previous page')
-            $router.push({ name: 'Posts', query: { page: props.page - 1, limit: props.limit } })
+            $router.push({ name: 'Posts', query: { page: props.page - 1, limit: props.limit }, hash: '#last' })
+          }
+          // else if current post is the first post on the page
+          else if (props.selectedPostIndex === 0) {
+            // set next post and delete post
+            const nextPost = props.posts[props.selectedPostIndex + 1]
+            const posts = props.posts
+            posts.splice(props.selectedPostIndex, 1)
+
+            // redirect to next post
+            $router.push({ name: 'Posts', query: { page: props.page, limit: props.limit }, hash: `#${nextPost.id}` })
           }
           // otherwise
           else {
-            // redirect to previous post
+            // set previous post and delete post
             const previousPost = props.posts[props.selectedPostIndex - 1]
-            console.log('DEBUG(postspurge): redirect to previous post', previousPost.body, previousPost.id)
-            $router.push({ name: 'Posts', query: { page: props.page, limit: props.limit }, hash: `#${previousPost.id}`})
+            const posts = props.posts
+            posts.splice(props.selectedPostIndex, 1)
+
+            // redirect to previous post
+            $router.push({ name: 'Posts', query: { page: props.page, limit: props.limit }, hash: `#${previousPost.id}` })
           }
           close()
         })
