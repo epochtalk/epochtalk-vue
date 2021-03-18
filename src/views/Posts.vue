@@ -620,7 +620,6 @@ export default {
 
     /* Watched Data */
     watch(() => v.loggedIn, () => processPosts().then(data => v.postData.data = data)) // Update on login
-    watch(() => $route.query, () => processPosts().then(data => v.postData.data = data)) // Update on query params change
 
     return {
       ...toRefs(v),
