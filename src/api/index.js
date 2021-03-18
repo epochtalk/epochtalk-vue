@@ -104,14 +104,19 @@ export const usersApi = {
 
 export const messagesApi = {
   pageIgnored: params => $http('/api/messages/ignored', { params }),
-  ignore: data => $http(`/api/messages/ignore`, { method: 'POST', data }),
-  unignore: data => $http(`/api/messages/unignore`, { method: 'POST', data })
+  ignore: data => $http('/api/messages/ignore', { method: 'POST', data }),
+  unignore: data => $http('/api/messages/unignore', { method: 'POST', data }),
+  settings: () => $http('/api/messages/settings'),
+  emailNotifications: enabled => $http('/api/messages/settings', { method: 'PUT', data:{enabled}}),
+  ignoreNewbies: enabled => $http('/api/messages/settings/newbie', { method: 'PUT', data:{enabled}})
 }
 
 export const mentionsApi = {
   pageIgnored: params => $http('/api/mentions/ignored', { params }),
   ignore: data => $http(`/api/mentions/ignore`, { method: 'POST', data }),
-  unignore: data => $http(`/api/mentions/unignore`, { method: 'POST', data })
+  unignore: data => $http(`/api/mentions/unignore`, { method: 'POST', data }),
+  settings: () => $http('/api/mentions/settings'),
+  emailNotifications: enabled => $http('/api/mentions/settings', { method: 'PUT', data:{enabled}}),
 }
 
 export const breadcrumbsApi = {

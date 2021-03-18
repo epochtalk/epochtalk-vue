@@ -17,7 +17,7 @@
             <label class="desc-label" for="enable-message-emails">Receive an email when users message you</label>
           </div>
           <div>
-            <input id="enable-message-emails" class="toggle-switch" type="checkbox" v-model="messageEmailsDisabled" @click="enableMessageEmails()">
+            <input id="enable-message-emails" class="toggle-switch" type="checkbox" v-model="emailMessages" @click="enableMessageEmails()">
             <label for="enable-message-emails"></label>
           </div>
         </div>
@@ -41,7 +41,7 @@
             <label class="desc-label" for="enable-mention-emails">Receive an email when there are thread replies which mention you</label>
           </div>
           <div>
-            <input id="enable-mention-emails" class="toggle-switch" type="checkbox" v-model="mentionEmailsDisabled" @click="enableMentionEmails()">
+            <input id="enable-mention-emails" class="toggle-switch" type="checkbox" v-model="emailMentions" @click="enableMentionEmails()">
             <label for="enable-mention-emails"></label>
           </div>
         </div>
@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import { reactive, toRefs } from 'vue'
+import { reactive, toRefs, inject, onBeforeMount } from 'vue'
 import { usersApi, messagesApi, mentionsApi } from '@/api'
 import IgnoredSettingsPartial from '@/components/settings/IgnoredSettingsPartial.vue'
 
@@ -61,15 +61,43 @@ export default {
   name: 'ignored-settings',
   components: { IgnoredSettingsPartial },
   setup() {
-    const enableMessageEmails = () => console.log('Enable Messages Email')
-    const enableNewbieMessages = () => console.log('Enable Newbie Messages')
-    const enableMentionEmails = () => console.log('Enable Mention Emails')
+    onBeforeMount(() => {
+      mentionsApi.settings().then(s => v.emailMentions = s.email_mentions)
+      messagesApi.settings()
+      .then(s => {
+        v.emailMessages = s.email_messages
+        v.ignoreNewbies = s.ignore_newbies
+      })
+    })
+
+    const enableMessageEmails = () => messagesApi.emailNotifications(!v.emailMessages)
+      .then(() => $alertStore.success('Successfully updated message notification settings.'))
+      .catch(() => {
+        v.emailMessages = !v.emailMessages
+        $alertStore.error('There was an error updating your message notification settings.')
+      })
+
+    const enableNewbieMessages = () => messagesApi.ignoreNewbies(!v.ignoreNewbies)
+      .then(() => $alertStore.success('Successfully updated newbie message settings.'))
+      .catch(() => {
+        v.ignoreNewbies = !v.ignoreNewbies
+        $alertStore.error('There was an error updating your newbie message settings.')
+      })
+
+    const enableMentionEmails = () => mentionsApi.emailNotifications(!v.emailMentions)
+      .then(() => $alertStore.success('Successfully updated mention notification settings.'))
+      .catch(() => {
+        v.emailMentions = !v.emailMentions
+        $alertStore.error('There was an error updating your mention notification settings.')
+      })
+
+    const $alertStore = inject('$alertStore')
 
     const v = reactive({
       selectedTab: 'posts',
-      messageEmailsDisabled: false,
-      mentionEmailsDisabled: false,
-      ignoreNewbies: false
+      emailMentions: null,
+      emailMessages: null,
+      ignoreNewbies: null
     })
     return { ...toRefs(v), enableMessageEmails, enableNewbieMessages, enableMentionEmails, usersApi, messagesApi, mentionsApi }
   }
