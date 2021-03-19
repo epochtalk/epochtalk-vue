@@ -80,7 +80,6 @@
 
 <script>
 import { inject, reactive, toRefs, watch } from 'vue'
-// import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
 import IgnoredBoardsPartial from '@/components/settings/IgnoredBoardsPartial.vue'
 import IgnoredSettings from '@/components/settings/IgnoredSettings.vue'

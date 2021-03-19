@@ -5,7 +5,8 @@ import Threads from '@/views/Threads.vue'
 import Posts from '@/views/Posts.vue'
 import About from '@/views/About.vue'
 import Settings from '@/views/Settings.vue'
-import NotFound from '@/views/NotFound.vue'
+import NotFound from '@/views/layout/NotFound.vue'
+import Login from '@/views/layout/Login.vue'
 import NProgress from 'nprogress'
 import { nextTick } from 'vue'
 
@@ -15,6 +16,12 @@ const routes = [
     name: 'Boards',
     component: Boards,
     meta: { requiresAuth: false, bodyClass: 'boards' }
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: Login,
+    meta: { requiresAuth: false, bodyClass: 'login' }
   },
   {
     path: '/boards/:boardSlug',
