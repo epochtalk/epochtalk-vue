@@ -1,10 +1,9 @@
 <template>
-  <div id="ignored-users-posts-settings" class="settings-section">
-    <h3 class="thin-underline">Ignored Users Posts</h3>
+  <div class="settings-section">
 
     <div class="input-button-wrap">
       <Multiselect v-model="ignoredTagsInput.value" ref="ignoredInput" v-bind="ignoredTagsInput" />
-      <button class="fill-row" @click="ignoreUser({ id: ignoredTagsInput.value })" :disabled="!ignoredTagsInput.value">Ignore</button>
+      <button class="fill-row" @click="ignoreUser({ username: ignoredInput.internalValue.label, id: ignoredInput.internalValue.value })" :disabled="!ignoredTagsInput.value">Ignore</button>
     </div>
     <div class="clear"></div>
     <table class="striped ignored-users" width="100%">
@@ -31,13 +30,13 @@
           <td v-if="user.ignored">
             <a @click="unignoreUser(user)">
               <i class="fa fa-user"></i>&nbsp;&nbsp;
-              Stop Ignoring<span class="hide-mobile"> User's Posts</span>
+              Stop Ignoring
             </a>
           </td>
           <td v-if="!user.ignored">
             <a @click="ignoreUser(user, true)">
               <i class="fa fa-user-times"></i>&nbsp;&nbsp;
-              Ignore<span class="hide-mobile"> User's Posts</span>
+              Ignore
             </a>
           </td>
         </tr>
@@ -57,12 +56,13 @@ import { usersApi } from '@/api'
 import Multiselect from '@vueform/multiselect'
 
 export default {
-  name: 'ignored-users-posts',
+  name: 'ignored-settings-partial',
+  props: ['api'],
   components: { Multiselect },
-  setup() {
+  setup(props) {
     onBeforeMount(() => pullPage(1))
     /* View Methods */
-    const ignoreUser = (user, noPull) => usersApi.ignoreUser(user.id)
+    const ignoreUser = (user, noPull) => props.api.ignore(user)
     .then(() => {
       user.ignored = !user.ignored
       v.ignoredInput.clear()
@@ -73,12 +73,13 @@ export default {
       $alertStore.warn('This user is already being ignored.')
     })
 
-    const unignoreUser = user => usersApi.unignoreUser(user.id).then(() => user.ignored = !user.ignored)
+    const unignoreUser = user => props.api.unignore(user).then(() => user.ignored = !user.ignored)
 
-    const pullPage = inc => usersApi.pageIgnoredUsers({
+    const pullPage = inc => props.api.pageIgnored({
       page: v.ignored?.page ? v.ignored.page + inc : 1,
       limit: 10
     }).then(d => v.ignored = d)
+
     const $alertStore = inject('$alertStore')
 
     const v = reactive({

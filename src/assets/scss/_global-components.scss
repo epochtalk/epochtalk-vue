@@ -52,6 +52,7 @@ table.striped td {
   text-align: left;
   vertical-align: top;
 }
+table.striped td a { cursor: pointer; }
 table.striped td.centered-text { text-align: center; }
 
 table.striped thead tr th, table.striped tbody tr th, table.striped tbody tr td, table.striped tr td { display: table-cell; line-height: 1.125rem; }
@@ -207,6 +208,25 @@ svg {
   &:hover {
     fill: $color-primary;
   }
+}
+
+// View Title
+.view-title {
+  color: $base-font-color;
+  font-size: $font-size-lg;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-transform: none;
+}
+
+// Section Header
+.section-header {
+  color: $secondary-font-color;
+  display: block;
+  font-size: $font-size-sm;
+  font-weight: 400;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
 }
 
 .action-bar-panel {
@@ -456,50 +476,6 @@ label {
   grid-gap: 1rem;
 }
 
-
-.login-view {
-  max-width: 600px;
-  width: calc(100vw - 2rem);
-}
-
-.login-form-actions {
-  margin-top: 2rem;
-
-  button {
-    width: 100%
-  }
-}
-
-.login-form-actions-sso-google {
-  text-align: center;
-
-  button {
-    background: #fff;
-    border: $border;
-    color: rgba(0, 0, 0, 0.54);
-    display: flex;
-
-    svg {
-      margin-right: 1.5rem;
-    }
-  }
-
-  .separator-text {
-    color: $secondary-font-color;
-    display: block;
-    font-size: $font-size-sm;
-    padding: 1rem 0;
-  }
-}
-
-.login-form-dialog-secondary-actions {
-  // border-top: $border;
-  font-size: $font-size-sm;
-  margin: 0 -1rem -1rem;
-  padding: 1rem;
-  text-align: center;
-}
-
 /*-- Toggle Switch --*/
 .switch-block label { float: none; }
 .toggle-switch { position: absolute; margin-left: -9999px; visibility: hidden; }
@@ -612,7 +588,7 @@ input[disabled].toggle-switch:checked + label:after { background-color: lighten(
 
 .input-button-wrap {
   display: grid;
-  grid-template-columns: 70% 30%;
+  grid-template-columns: 1fr .49fr;
   column-gap: .5rem;
   @include break-mobile-sm { grid-template-columns: 1fr; }
 }

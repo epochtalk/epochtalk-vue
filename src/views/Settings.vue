@@ -74,22 +74,21 @@
         </div>
       </div>
     </div>
-    <ignored-users-posts />
+    <ignored-settings />
   </div>
 </template>
 
 <script>
 import { inject, reactive, toRefs, watch } from 'vue'
-// import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
 import IgnoredBoardsPartial from '@/components/settings/IgnoredBoardsPartial.vue'
-import IgnoredUsersPosts from '@/components/settings/IgnoredUsersPosts.vue'
+import IgnoredSettings from '@/components/settings/IgnoredSettings.vue'
 import ThreadNotifications from '@/components/settings/ThreadNotifications.vue'
-import { boardsApi } from '@/api'
+import { usersApi, messagesApi, mentionsApi, boardsApi } from '@/api'
 
 export default {
   name: 'Settings',
-  components: { IgnoredBoardsPartial, ThreadNotifications, IgnoredUsersPosts },
+  components: { IgnoredBoardsPartial, ThreadNotifications, IgnoredSettings },
   beforeRouteEnter(to, from, next) {
     next(vm => boardsApi.getBoards(true).then(d => vm.boards = d.boards))
   },
@@ -115,6 +114,7 @@ export default {
     const resetLimitPrefs = () => {
       v.posts_per_page = $prefs.readonly.posts_per_page
       v.threads_per_page = $prefs.readonly.threads_per_page
+      $alertStore.info('Reset limit preferences.')
     }
     const saveLimitPrefs = () => {
       const updatedLimits = {
@@ -122,18 +122,21 @@ export default {
         threads_per_page: Number(v.threads_per_page)
       }
       $prefs.update(updatedLimits)
+      .then(() => $alertStore.success('Successfully updated limit preferences.'))
     }
 
     const resetTimezonePrefs = () => {
       v.timezone_offset_sign = $prefs.readonly.timezone_offset.sign
       v.timezone_offset_hours = $prefs.readonly.timezone_offset.hours
       v.timezone_offset_minutes = $prefs.readonly.timezone_offset.minutes
+      $alertStore.info('Reset timezone preferences.')
     }
     const saveTimezonePrefs = () => {
       const updatedTimezone = {
         timezone_offset: v.timezone_offset_sign +  v.timezone_offset_hours + v.timezone_offset_minutes
       }
       $prefs.update(updatedTimezone)
+      .then(() => $alertStore.success('Successfully updated timezone preferences.'))
     }
     const timezonePrefsValid = () => {
       const sign = v.timezone_offset_sign
@@ -143,6 +146,7 @@ export default {
     }
 
     const togglePatroller = () => $prefs.update({ patroller_view: !v.patroller_view })
+      .then(() => $alertStore.success('Successfully updated patroller view preferences.'))
 
     const toggleIgnoredBoard = boardId => {
       const index = $prefs.readonly.ignored_boards.indexOf(boardId)
@@ -204,7 +208,7 @@ export default {
 
     watch(() => v.boards, () => v.allBoards = initAllBoards(v.boards, v.allBoards))
 
-    return { ...toRefs(v), resetLimitPrefs, saveLimitPrefs, resetTimezonePrefs, saveTimezonePrefs, timezonePrefsValid, togglePatroller, toggleIgnoredBoard }
+    return { ...toRefs(v), resetLimitPrefs, saveLimitPrefs, resetTimezonePrefs, saveTimezonePrefs, timezonePrefsValid, togglePatroller, toggleIgnoredBoard, usersApi, messagesApi, mentionsApi }
   }
 }
 </script>

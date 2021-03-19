@@ -106,9 +106,26 @@ export const usersApi = {
   lookup: (username, params) => $http(`/api/users/lookup/${username}`, { params }),
   update: (userId, data) => $http(`/api/users/${userId}`, { method: 'PUT', data }),
   preferences: () => $http('/api/users/preferences'),
-  pageIgnoredUsers: params => $http('/api/ignoreUsers/ignored', { params }),
-  ignoreUser: id => $http(`/api/ignoreUsers/ignore/${id}`, { method: 'POST' }),
-  unignoreUser: id => $http(`/api/ignoreUsers/unignore/${id}`, { method: 'POST' })
+  pageIgnored: params => $http('/api/ignoreUsers/ignored', { params }),
+  ignore: user => $http(`/api/ignoreUsers/ignore/${user.id}`, { method: 'POST' }),
+  unignore: user => $http(`/api/ignoreUsers/unignore/${user.id}`, { method: 'POST' })
+}
+
+export const messagesApi = {
+  pageIgnored: params => $http('/api/messages/ignored', { params }),
+  ignore: data => $http('/api/messages/ignore', { method: 'POST', data }),
+  unignore: data => $http('/api/messages/unignore', { method: 'POST', data }),
+  settings: () => $http('/api/messages/settings'),
+  emailNotifications: enabled => $http('/api/messages/settings', { method: 'PUT', data:{enabled}}),
+  ignoreNewbies: enabled => $http('/api/messages/settings/newbie', { method: 'PUT', data:{enabled}})
+}
+
+export const mentionsApi = {
+  pageIgnored: params => $http('/api/mentions/ignored', { params }),
+  ignore: data => $http(`/api/mentions/ignore`, { method: 'POST', data }),
+  unignore: data => $http(`/api/mentions/unignore`, { method: 'POST', data }),
+  settings: () => $http('/api/mentions/settings'),
+  emailNotifications: enabled => $http('/api/mentions/settings', { method: 'PUT', data:{enabled}}),
 }
 
 export const breadcrumbsApi = {
