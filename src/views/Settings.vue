@@ -238,33 +238,6 @@ export default {
   }
 }
 
-
-.tabs {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  column-gap: .5rem;
-  margin-top: .4rem;
-  margin-bottom: .5rem;
-  a.button {
-    display: inline-block;
-    background-color: #fff;
-    color: #222236;
-    height: 2.5rem;
-    padding: 0 1rem;
-    line-height: 2.5rem;
-    font-size: 1rem;
-    &.selected {
-      border: 1px solid #ff6400;
-      border-radius: 3px;
-      color: #ff6400;
-    }
-  }
-  @include break-mobile-sm {
-    grid-template-columns: 1fr;
-  }
-}
-.tabs-content { min-height: 29rem }
-
 .boards-check-list {
   @include pad(0.5rem);
   margin-top: 0.25rem;

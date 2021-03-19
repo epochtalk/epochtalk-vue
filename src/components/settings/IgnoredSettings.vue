@@ -103,3 +103,33 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+.tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  column-gap: .5rem;
+  margin-top: .4rem;
+  margin-bottom: .5rem;
+  a.button {
+    display: inline-block;
+    background-color: transparent;
+    color: $secondary-font-color;
+    height: 2.5rem;
+    padding: 0 1rem;
+    line-height: 2.5rem;
+    font-size: 1rem;
+    &.selected {
+      border: 1px solid $color-primary;
+      border-radius: 3px;
+      color: $color-primary;
+      &:hover { background-color: transparent; }
+    }
+    &:hover { background-color: transparent; }
+  }
+  @include break-mobile-sm {
+    grid-template-columns: 1fr;
+  }
+}
+.tabs-content { min-height: 29rem }
+</style>
