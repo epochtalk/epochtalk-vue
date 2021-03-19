@@ -9,6 +9,7 @@ import NotFound from '@/views/layout/NotFound.vue'
 import Login from '@/views/layout/Login.vue'
 import NProgress from 'nprogress'
 import { nextTick } from 'vue'
+import { localStorageAuth } from '@/composables/stores/auth'
 
 const routes = [
   {
@@ -21,6 +22,7 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: Login,
+    props: true,
     meta: { requiresAuth: false, bodyClass: 'login' }
   },
   {
@@ -75,9 +77,13 @@ const router = createRouter({
   }
 })
 
-router.beforeEach(() => {
+router.beforeEach((to) => {
   // Start progress bar
   NProgress.start()
+
+  if (to.meta.requiresAuth && !localStorageAuth().data.token) {
+    router.push({ name: 'Login', params: { redirectTo: to.name || 'Boards' } })
+  }
 })
 
 router.afterEach(to => {

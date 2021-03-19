@@ -38,14 +38,19 @@
 <script>
 import { reactive, inject, toRefs, nextTick } from 'vue'
 import { AuthStore } from '@/composables/stores/auth'
+import { useRouter } from 'vue-router'
 
 export default {
   name: 'Login',
-  setup() {
+  props: ['redirectTo'],
+  setup(props) {
     nextTick(() => v.focusInput.focus())
     /* Template Methods */
     const login = () => {
       $auth.login(v.user.username, v.user.password, v.user.rememberMe)
+      .then(() => {
+        $router.push( { name: props.redirectTo })
+      })
     }
 
     const signInWithGoogle = () => console.log('Sign in with Google!')
@@ -53,6 +58,7 @@ export default {
 
     /* Internal Data */
     const $auth = inject(AuthStore)
+    const $router = useRouter()
 
     /* Template Data */
     const v = reactive({
