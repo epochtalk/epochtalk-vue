@@ -81,8 +81,17 @@ router.beforeEach((to) => {
   // Start progress bar
   NProgress.start()
 
+  // Redirect to login page if route has meta.requiresAuth set
   if (to.meta.requiresAuth && !localStorageAuth().data.token) {
-    router.push({ name: 'Login', params: { redirectTo: to.name || 'Boards' } })
+    router.push({
+      name: 'Login',
+      params: {
+        redirectName: to.name || 'Boards',
+        redirectParams: JSON.stringify(to.params), // Cannot pass object, gets converted to string
+        redirectQuery: JSON.stringify(to.query),
+      },
+      query: { redirect: to.fullPath }
+    })
   }
 })
 

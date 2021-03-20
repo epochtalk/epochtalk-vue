@@ -38,18 +38,27 @@
 <script>
 import { reactive, inject, toRefs, nextTick } from 'vue'
 import { AuthStore } from '@/composables/stores/auth'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
 export default {
   name: 'Login',
-  props: ['redirectTo'],
+  props: ['redirectName', 'redirectParams', 'redirectQuery'],
   setup(props) {
     nextTick(() => v.focusInput.focus())
+
     /* Template Methods */
     const login = () => {
       $auth.login(v.user.username, v.user.password, v.user.rememberMe)
       .then(() => {
-        $router.push( { name: props.redirectTo })
+        if (props.redirectName) { // props are present, router redirect
+          $router.push({
+            name: props.redirectName,
+            params: JSON.parse(props.redirectParams), // Cannot pass as obj, gets converted to str
+            query: JSON.parse(props.redirectQuery)
+          })
+        }
+        // props not present use redirect query or redirect home
+        else $router.push($route.query.redirect || '/')
       })
     }
 
@@ -59,6 +68,7 @@ export default {
     /* Internal Data */
     const $auth = inject(AuthStore)
     const $router = useRouter()
+    const $route = useRoute()
 
     /* Template Data */
     const v = reactive({
