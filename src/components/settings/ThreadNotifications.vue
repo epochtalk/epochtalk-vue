@@ -22,7 +22,9 @@ import { threadsApi } from '@/api'
 export default {
   name: 'thread-notifications',
   setup() {
-    onBeforeMount(() => threadsApi.notifications().then(d => v.enabled = d.notify_replied_threads))
+    onBeforeMount(() =>
+      threadsApi.notifications().then(d => v.enabled = d.notify_replied_threads).catch(() => {})
+    )
     /* View Methods */
     const toggleThreadNotifications = () => {
       const payload = { enabled: !v.enabled }

@@ -74,11 +74,12 @@ export default {
     })
 
     const unignoreUser = user => props.api.unignore(user).then(() => user.ignored = !user.ignored)
+      .catch(() => $alertStore.error('Error unignoring user.'))
 
     const pullPage = inc => props.api.pageIgnored({
       page: v.ignored?.page ? v.ignored.page + inc : 1,
       limit: 10
-    }).then(d => v.ignored = d)
+    }).then(d => v.ignored = d).catch(() => {})
 
     const $alertStore = inject('$alertStore')
 
@@ -103,6 +104,7 @@ export default {
           return await usersApi.lookup(q, { restricted: true })
           // convert array into array of objects
           .then(d => d.map(u =>{ return { label: u.username, value: u.id } }))
+          .catch(() => { return [] })
         }
       }
     })

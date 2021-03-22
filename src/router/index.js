@@ -1,11 +1,13 @@
 import { createWebHistory, createRouter } from 'vue-router'
-import { boardsApi, threadsApi } from '@/api'
+import { boardsApi, threadsApi, $axios } from '@/api'
 import Boards from '@/views/Boards.vue'
 import Threads from '@/views/Threads.vue'
 import Posts from '@/views/Posts.vue'
 import About from '@/views/About.vue'
 import Settings from '@/views/Settings.vue'
+import Forbidden from '@/views/layout/Forbidden.vue'
 import NotFound from '@/views/layout/NotFound.vue'
+import ServiceUnavailable from '@/views/layout/ServiceUnavailable.vue'
 import Login from '@/views/layout/Login.vue'
 import NProgress from 'nprogress'
 import { nextTick } from 'vue'
@@ -59,8 +61,27 @@ const routes = [
   },
   {
     path: '/:catchAll(.*)',
+    name: 'NotFound',
     component: NotFound,
-    meta: { requiresAuth: false }
+    meta: { requiresAuth: false, bodyClass: 'not-found' }
+  },
+  {
+    path: '/404',
+    name: 'NotFound',
+    component: NotFound,
+    meta: { requiresAuth: false, bodyClass: 'not-found' }
+  },
+  {
+    path: '/403',
+    name: 'Forbidden',
+    component: Forbidden,
+    meta: { requiresAuth: false, bodyClass: 'forbidden' }
+  },
+  {
+    path: '/503',
+    name: 'ServiceUnavailable',
+    component: ServiceUnavailable,
+    meta: { requiresAuth: false, bodyClass: 'service-unavailable' }
   }
 ]
 
@@ -77,7 +98,7 @@ const router = createRouter({
   }
 })
 
-router.beforeEach((to) => {
+router.beforeEach(to => {
   // Start progress bar
   NProgress.start()
 
@@ -103,6 +124,28 @@ router.afterEach(to => {
   const bodyClass = to.meta.bodyClass
   if (bodyClass) { document.body.className = bodyClass }
   else { document.body.className = '' }
+})
+
+$axios.interceptors.response.use(res => res, err => {
+  if(err.response) { // Server still responding, just getting errors from api calls
+    switch (err.response.status) {
+      case 401:
+        router.push({ name: 'Login'})
+        break
+      case 403:
+        if (err.response.statusText === 'Forbidden' || err.response.data.error === 'Forbidden') {
+          router.push({ name: 'Forbidden'})
+        }
+        break
+      case 404:
+        router.push({ name: 'NotFound'})
+        break
+      default:
+        break
+    }
+  }
+  else router.push({ name: 'ServiceUnavailable'}) // API is down, 503
+  return Promise.reject(err)
 })
 
 export default router

@@ -3,11 +3,12 @@ import { get } from 'lodash'
 import localStorageCache from '@/composables/utils/localStorageCache'
 import alertStore from '@/composables/stores/alert'
 
-const $axios = axios.create({
+export const $axios = axios.create({
   baseURL: 'http://localhost:8080',
   timeout: 3000,
   crossDomain: true
 })
+
 const $auth = localStorageCache(0, 'app').get('auth')
 const initUser = $auth ? $auth.data : undefined
 if (initUser) { $axios.defaults.headers.common['Authorization'] = `BEARER ${initUser.token}` }

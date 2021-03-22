@@ -90,10 +90,10 @@ export default {
   name: 'Settings',
   components: { IgnoredBoardsPartial, ThreadNotifications, IgnoredSettings },
   beforeRouteEnter(to, from, next) {
-    next(vm => boardsApi.getBoards(true).then(d => vm.boards = d.boards))
+    next(vm => boardsApi.getBoards(true).then(d => vm.boards = d.boards).catch(() => {}))
   },
   beforeRouteUpdate(to, from, next) {
-    boardsApi.getBoards(true).then(d => this.boards = d.boards)
+    boardsApi.getBoards(true).then(d => this.boards = d.boards).catch(() => {})
     next()
   },
   setup() {
