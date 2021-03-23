@@ -81,4 +81,21 @@ import { threadsApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore, localStoragePrefs } from '@/composables/stores/prefs'
 import { BreadcrumbStore } from '@/composables/stores/breadcrumbs'
+
+export default {
+  name: 'Posts',
+  props: ['threadSlug', 'threadId'],
+  setup(props) {
+    /* Internal Methods */
+    /* View Methods */
+    /* Internal Data */
+    /* View Data */
+    const v = reactive({
+      threads: []
+    })
+    return {
+      ...toRefs(v)
+    }
+  }
+}
 </script>
