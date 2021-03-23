@@ -12,7 +12,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr class="threads-data" v-for="thread in PostedCtrl.threads track by thread.id">
+      <tr class="threads-data" v-for="thread in threadData.data.threads" :key="thread.id">
         <td class="subject">
           <div class="title">
             <div class="thread-state">
