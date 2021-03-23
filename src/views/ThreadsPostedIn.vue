@@ -23,8 +23,7 @@
                 </g>
               </svg>
             </div>
-            <a ng-class="{bold: thread.has_new_post}" class="thread-title" ui-sref="posts.data({ slug: thread.slug })"
-              ng-bind-html="thread.title"></a>
+            <a :class="{bold: thread.has_new_post}" class="thread-title" ui-sref="posts.data({ slug: thread.slug })">{{thread.title}}</a>
               <div class="thread-state-secondary">
               <span class="thread-state-locked" v-if="thread.locked">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -43,9 +42,8 @@
           <div class="started-by">
             Started by
             <span v-if="thread.user.deleted">deleted</span>
-            <a ng-if="!thread.user.deleted" ui-sref="profile.posts({ username: thread.user.username })"
-              ng-bind-html="thread.user.username"></a>
-            <span ng-bind="'on ' + (thread.created_at | humanDate)"></span>
+            <a v-if="!thread.user.deleted" ui-sref="profile.posts({ username: thread.user.username })">{{thread.user.username}}</a>
+            <span>{{' on ' + humanDate(thread.created_at)}}</span>
           </div>
         </td>
 
