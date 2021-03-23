@@ -69,22 +69,24 @@
       </tr>
     </tbody>
   </table>
+  <pagination v-if="threadData.data?.threads" :page="threadData.data.page" :limit="threadData.data.limit" :count="threadData.data.threads.count"></pagination>
 </template>
 
 <script>
-import { useRoute } from 'vue-router'
+// import { useRoute } from 'vue-router'
 import Pagination from '@/components/layout/Pagination.vue'
-import humanDate from '@/composables/filters/humanDate'
-import truncate from '@/composables/filters/truncate'
+// import humanDate from '@/composables/filters/humanDate'
+// import truncate from '@/composables/filters/truncate'
 // import { inject, reactive, watch, toRefs } from 'vue'
 import { threadsApi } from '@/api'
-import { AuthStore } from '@/composables/stores/auth'
-import { PreferencesStore, localStoragePrefs } from '@/composables/stores/prefs'
-import { BreadcrumbStore } from '@/composables/stores/breadcrumbs'
+// import { AuthStore } from '@/composables/stores/auth'
+import { localStoragePrefs } from '@/composables/stores/prefs'
+// import { BreadcrumbStore } from '@/composables/stores/breadcrumbs'
 
 export default {
   name: 'Posts',
   props: ['threadSlug', 'threadId'],
+  components: { Pagination },
   beforeRouteEnter(to, from, next) {
     const params = {
       limit: localStoragePrefs().data.threads_per_page,
