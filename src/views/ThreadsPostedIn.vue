@@ -23,7 +23,7 @@
                 </g>
               </svg>
             </div>
-            <a :class="{bold: thread.has_new_post}" class="thread-title" ui-sref="posts.data({ slug: thread.slug })">{{thread.title}}</a>
+            <router-link :to="{ name: 'Posts', params: { threadSlug: thread.slug, threadId: thread.id }}" :class="{bold: thread.has_new_post}" class="thread-title">{{thread.title}}</router-link>
               <div class="thread-state-secondary">
               <span class="thread-state-locked" v-if="thread.locked">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
