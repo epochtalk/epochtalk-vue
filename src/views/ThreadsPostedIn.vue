@@ -48,8 +48,8 @@
         </td>
 
         <td class="views-replies">
-          <span class="replies" ng-bind="(thread.post_count - 1 | number:0) || 0"></span>
-          <span class="views" ng-bind="(thread.view_count | number:0) || 0"></span>
+          <span class="replies">{{thread.post_count - 1 || 0}}</span>
+          <span class="views">{{thread.view_count || 0}}</span>
         </td>
 
         <td class="last-post">
