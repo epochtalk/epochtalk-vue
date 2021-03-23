@@ -58,7 +58,7 @@
           <img :src="thread.last_post_avatar || defaultAvatar" v-if="!thread.last_deleted" :class="`avatar-small ${defaultAvatarShape}`"/>
           <!-- TODO(boka): profile.posts({ username: thread.last_post_username }) -->
           <a v-if="!thread.last_deleted" ui-sref="#">{{thread.last_post_username}}</a> posted on
-          <a ui-sref="posts.data({ slug: thread.slug, start: thread.last_post_position, '#': thread.last_post_id })"><span ng-bind="thread.last_post_created_at | humanDate"></span>.</a>
+          <a ui-sref="posts.data({ slug: thread.slug, start: thread.last_post_position, '#': thread.last_post_id })"><span ng-bind="">{{humanDate(thread.last_post_created_at)}}</span>.</a>
           <span v-if="thread.has_new_post">
             <a
               ui-sref="posts.data({ slug: thread.slug, start: thread.latest_unread_position, '#': thread.latest_unread_post_id })">(Last unread post)</a>
