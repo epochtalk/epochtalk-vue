@@ -54,8 +54,7 @@
 
         <td class="last-post">
           <span v-if="thread.last_deleted">deleted</span>
-          <img v-if="!thread.last_deleted" class="avatar-small {{$webConfigs.default_avatar_shape}}"
-            ng-src="{{thread.last_post_avatar || $webConfigs.default_avatar}}" />
+          <img :src="thread.last_post_avatar || defaultAvatar" v-if="!thread.last_deleted" :class="`avatar-small ${defaultAvatarShape}`"/>
           <a v-if="!thread.last_deleted" ui-sref="profile.posts({ username: thread.last_post_username })"
             ng-bind="thread.last_post_username"></a> posted on
           <a ui-sref="posts.data({ slug: thread.slug, start: thread.last_post_position, '#': thread.last_post_id })"><span ng-bind="thread.last_post_created_at | humanDate"></span>.</a>
@@ -97,6 +96,8 @@ export default {
     /* Internal Data */
     /* View Data */
     const v = reactive({
+      defaultAvatar: window.default_avatar,
+      defaultAvatarShape: window.default_avatar_shape,
       threadData: { data: {} }
     })
     return {
