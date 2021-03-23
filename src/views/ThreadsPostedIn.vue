@@ -60,8 +60,7 @@
           <a v-if="!thread.last_deleted" ui-sref="#">{{thread.last_post_username}}</a> posted on
           <router-link :to="{ name: 'Posts', params: { threadSlug: thread.slug, threadId: thread.id, start: thread.last_post_position }, hash: '#' + thread.last_post_id }"><span>{{humanDate(thread.last_post_created_at)}}</span>.</router-link>
           <span v-if="thread.has_new_post">
-            <a
-              ui-sref="posts.data({ slug: thread.slug, start: thread.latest_unread_position, '#': thread.latest_unread_post_id })">(Last unread post)</a>
+            <router-link :to="{ name: 'Posts', params: { threadSlug: thread.slug, threadId: thread.id, start: thread.latest_unread_position}, hash: '#' + thread.latest_unread_post_id }">(Last unread post)</router-link>
           </span>
         </td>
       </tr>
