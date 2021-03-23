@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { computed, reactive, toRefs, nextTick } from 'vue'
+import { computed, reactive, toRefs, nextTick, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 export default {
@@ -53,6 +53,7 @@ export default {
 
     /* Next Tick - waits for dom to load so refs are populated */
     nextTick(() => updatePageDisplay(v.rangeInput, v.currentPage)) // set init pos of page disp
+    watch(() => props.page, () => v.currentPage = props.page )
 
     return { ...toRefs(v), smoothThumbDrag, updatePageDisplay }
   }
