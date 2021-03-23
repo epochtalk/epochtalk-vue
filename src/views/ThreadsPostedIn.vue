@@ -73,7 +73,7 @@
 <script>
 // import { useRoute } from 'vue-router'
 import Pagination from '@/components/layout/Pagination.vue'
-// import humanDate from '@/composables/filters/humanDate'
+import humanDate from '@/composables/filters/humanDate'
 // import truncate from '@/composables/filters/truncate'
 import { reactive, toRefs } from 'vue'
 import { threadsApi } from '@/api'
@@ -100,7 +100,8 @@ export default {
       threadData: { data: {} }
     })
     return {
-      ...toRefs(v)
+      ...toRefs(v),
+      humanDate
     }
   }
 }
