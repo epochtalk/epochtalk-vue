@@ -42,6 +42,7 @@
           <div class="started-by">
             Started by
             <span v-if="thread.user.deleted">deleted</span>
+            <!-- TODO(boka): profile.posts({ username: thread.user.username }) -->
             <a v-if="!thread.user.deleted" ui-sref="#">{{thread.user.username}}</a>
             <span>{{' on ' + humanDate(thread.created_at)}}</span>
           </div>
@@ -55,6 +56,7 @@
         <td class="last-post">
           <span v-if="thread.last_deleted">deleted</span>
           <img :src="thread.last_post_avatar || defaultAvatar" v-if="!thread.last_deleted" :class="`avatar-small ${defaultAvatarShape}`"/>
+          <!-- TODO(boka): profile.posts({ username: thread.last_post_username }) -->
           <a v-if="!thread.last_deleted" ui-sref="#">{{thread.last_post_username}}</a> posted on
           <a ui-sref="posts.data({ slug: thread.slug, start: thread.last_post_position, '#': thread.last_post_id })"><span ng-bind="thread.last_post_created_at | humanDate"></span>.</a>
           <span v-if="thread.has_new_post">
