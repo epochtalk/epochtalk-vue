@@ -85,13 +85,20 @@ import { BreadcrumbStore } from '@/composables/stores/breadcrumbs'
 export default {
   name: 'Posts',
   props: ['threadSlug', 'threadId'],
+  beforeRouteEnter(to, from, next) {
+    const params = {
+      limit: localStoragePrefs().data.threads_per_page,
+      page: to.query.page || 1
+    }
+    threadsApi.postedIn(params).then(data => next(vm => vm.threadData.data = data))
+  },
   setup(props) {
     /* Internal Methods */
     /* View Methods */
     /* Internal Data */
     /* View Data */
     const v = reactive({
-      threads: []
+      threadData: { data: {} }
     })
     return {
       ...toRefs(v)
