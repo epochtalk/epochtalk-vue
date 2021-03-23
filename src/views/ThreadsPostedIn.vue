@@ -66,7 +66,7 @@
       </tr>
     </tbody>
   </table>
-  <pagination v-if="threadData.data?.threads" :page="threadData.data.page" :limit="threadData.data.limit" :count="threadData.data.threads.count"></pagination>
+  <pagination v-if="threadData.data?.threads" :page="threadData.data.page" :limit="threadData.data.limit" :count="threadData.data.count"></pagination>
 </template>
 
 <script>
