@@ -2,6 +2,7 @@ import { createWebHistory, createRouter } from 'vue-router'
 import { boardsApi, threadsApi, $axios } from '@/api'
 import Boards from '@/views/Boards.vue'
 import Threads from '@/views/Threads.vue'
+import ThreadsPostedIn from '@/views/ThreadsPostedIn.vue'
 import Posts from '@/views/Posts.vue'
 import About from '@/views/About.vue'
 import Settings from '@/views/Settings.vue'
@@ -46,6 +47,12 @@ const routes = [
       threadId: threadsApi.slugToThreadId(route.params.threadSlug).then(t => t.id)
     }),
     meta: { requiresAuth: false, bodyClass: 'posts' }
+  },
+  {
+    path: '/threads/posted',
+    name: 'ThreadsPostedIn',
+    component: ThreadsPostedIn,
+    meta: { requiresAuth: true, bodyClass: 'threadspostedin' }
   },
   {
     path: '/settings',
