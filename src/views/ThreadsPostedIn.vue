@@ -85,7 +85,6 @@ import { localStoragePrefs } from '@/composables/stores/prefs'
 
 export default {
   name: 'Posts',
-  props: ['threadSlug', 'threadId'],
   components: { Pagination },
   beforeRouteEnter(to, from, next) {
     const params = {
@@ -94,7 +93,7 @@ export default {
     }
     threadsApi.postedIn(params).then(data => next(vm => vm.threadData.data = data))
   },
-  setup(props) {
+  setup() {
     /* Internal Methods */
     /* View Methods */
     /* Internal Data */
