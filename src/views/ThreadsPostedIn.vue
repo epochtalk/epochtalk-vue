@@ -69,7 +69,7 @@
       </tr>
     </tbody>
   </table>
-<template>
+</template>
 
 <script>
 import { useRoute } from 'vue-router'
