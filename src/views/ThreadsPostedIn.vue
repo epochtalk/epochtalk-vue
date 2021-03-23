@@ -77,7 +77,7 @@
 import Pagination from '@/components/layout/Pagination.vue'
 // import humanDate from '@/composables/filters/humanDate'
 // import truncate from '@/composables/filters/truncate'
-// import { inject, reactive, watch, toRefs } from 'vue'
+import { reactive, toRefs } from 'vue'
 import { threadsApi } from '@/api'
 // import { AuthStore } from '@/composables/stores/auth'
 import { localStoragePrefs } from '@/composables/stores/prefs'
