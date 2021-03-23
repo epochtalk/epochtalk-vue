@@ -61,7 +61,7 @@ const routes = [
   },
   {
     path: '/:catchAll(.*)',
-    name: 'NotFound',
+    name: 'NotFoundCatchAll',
     component: NotFound,
     meta: { requiresAuth: false, bodyClass: 'not-found' }
   },
