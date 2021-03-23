@@ -42,7 +42,7 @@
           <div class="started-by">
             Started by
             <span v-if="thread.user.deleted">deleted</span>
-            <a v-if="!thread.user.deleted" ui-sref="profile.posts({ username: thread.user.username })">{{thread.user.username}}</a>
+            <a v-if="!thread.user.deleted" ui-sref="#">{{thread.user.username}}</a>
             <span>{{' on ' + humanDate(thread.created_at)}}</span>
           </div>
         </td>
