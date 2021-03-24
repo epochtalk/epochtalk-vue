@@ -9,6 +9,7 @@ a:hover { color: $color-primary-alt; }
 .pointer { cursor: pointer; }
 .desc-label, .secondary-font-color-light { height: auto; padding-top: 0; color: $secondary-font-color-light; }
 .bold { font-weight: bold }
+.right { float: right; }
 
 img {
   max-width: 100%;

@@ -171,8 +171,9 @@
       <!-- <motd></motd> -->
 
       <!-- Auth Modals -->
-      <login-modal :show="showLogin" @close="showLogin = false"></login-modal>
-      <register-modal :show="showRegister" @close="showRegister = false"></register-modal>
+      <login-modal :show="showLogin" @close="showLogin = false" />
+      <invite-modal :show="showInvite" @close="showInvite = false" />
+      <register-modal :show="showRegister" @close="showRegister = false" />
     </div>
   </header>
 </template>
@@ -181,6 +182,7 @@
 
 import Alert from '@/components/layout/Alert.vue'
 import LoginModal from '@/components/modals/auth/Login.vue'
+import InviteModal from '@/components/modals/auth/Invite.vue'
 import RegisterModal from '@/components/modals/auth/Register.vue'
 import Breadcrumbs from '@/components/layout/Breadcrumbs.vue'
 import decode from '@/composables/filters/decode'
@@ -190,7 +192,7 @@ import { reactive, toRefs, onMounted, onUnmounted, inject } from 'vue'
 import { debounce } from 'lodash'
 
 export default {
-  components: { Breadcrumbs, LoginModal, RegisterModal, Alert },
+  components: { Breadcrumbs, LoginModal, InviteModal, RegisterModal, Alert },
   setup() {
     /* Internal Methods */
     const scrollHeader = () => {
