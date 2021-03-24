@@ -90,7 +90,8 @@ export const authApi = {
     return user
   }),
   emailAvailable: email => $http(`/api/register/email/${email}`),
-  usernameAvailable: username => $http(`/api/register/username/${username}`)
+  usernameAvailable: username => $http(`/api/register/username/${username}`),
+  inviteExists: email => $http(`/api/invites/exists?email=${email}`)
 }
 
 export const usersApi = {
