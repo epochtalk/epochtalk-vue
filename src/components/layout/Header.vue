@@ -145,7 +145,7 @@
                   <a href="#">Watchlist</a>
                 </li>
                 <li> <!--v-if="canInvite()">-->
-                  <a @click="showInvite = true">
+                  <a href="#" @click.prevent="showInvite = true">
                     Invite User
                   </a>
                 </li>
