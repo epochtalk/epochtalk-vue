@@ -70,15 +70,11 @@
 </template>
 
 <script>
-// import { useRoute } from 'vue-router'
 import Pagination from '@/components/layout/Pagination.vue'
 import humanDate from '@/composables/filters/humanDate'
-// import truncate from '@/composables/filters/truncate'
 import { reactive, toRefs } from 'vue'
 import { threadsApi } from '@/api'
-// import { AuthStore } from '@/composables/stores/auth'
 import { localStoragePrefs } from '@/composables/stores/prefs'
-// import { BreadcrumbStore } from '@/composables/stores/breadcrumbs'
 
 export default {
   name: 'Posts',
@@ -91,9 +87,6 @@ export default {
     threadsApi.postedIn(params).then(data => next(vm => vm.threadData.data = data))
   },
   setup() {
-    /* Internal Methods */
-    /* View Methods */
-    /* Internal Data */
     /* View Data */
     const v = reactive({
       defaultAvatar: window.default_avatar,
