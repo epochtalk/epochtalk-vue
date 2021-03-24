@@ -91,7 +91,8 @@ export const authApi = {
   }),
   emailAvailable: email => $http(`/api/register/email/${email}`),
   usernameAvailable: username => $http(`/api/register/username/${username}`),
-  inviteExists: email => $http(`/api/invites/exists?email=${email}`)
+  inviteExists: email => $http(`/api/invites/exists?email=${email}`),
+  invite: email => $http('/api/invites', { method: 'POST', data: { email }})
 }
 
 export const usersApi = {
@@ -118,7 +119,7 @@ export const mentionsApi = {
   ignore: data => $http(`/api/mentions/ignore`, { method: 'POST', data }),
   unignore: data => $http(`/api/mentions/unignore`, { method: 'POST', data }),
   settings: () => $http('/api/mentions/settings'),
-  emailNotifications: enabled => $http('/api/mentions/settings', { method: 'PUT', data:{enabled}}),
+  emailNotifications: enabled => $http('/api/mentions/settings', { method: 'PUT', data:{enabled}})
 }
 
 export const breadcrumbsApi = {

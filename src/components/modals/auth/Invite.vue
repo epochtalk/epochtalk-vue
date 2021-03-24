@@ -41,8 +41,7 @@
 
 <script>
 import Modal from '@/components/layout/Modal.vue'
-import { reactive, toRefs, watch } from 'vue'
-// import { AuthStore } from '@/composables/stores/auth'
+import { reactive, toRefs, watch, inject } from 'vue'
 import { authApi } from '@/api'
 import { debounce } from 'lodash'
 
@@ -54,9 +53,12 @@ export default {
   setup(props, { emit }) {
     /* Template Methods */
     const invite = () => {
-      //$auth.login(v.user.username, v.user.password, v.user.rememberMe)
-      console.log('Invite User', v.email)
-      close()
+      authApi.invite(v.email)
+      .then(() => {
+        $alertStore.success(`Successfully sent invitation to ${v.email}!`)
+        close()
+      })
+      .catch(() => $alertStore.error(`Error sending invitation to ${v.email}!`))
     }
 
     const close = () => {
@@ -65,7 +67,7 @@ export default {
     }
 
     /* Internal Data */
-    // const $auth = inject(AuthStore)
+    const $alertStore = inject('$alertStore')
 
     /* Template Data */
     const v = reactive({
