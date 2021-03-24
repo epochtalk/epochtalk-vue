@@ -1,7 +1,5 @@
 <template>
-
   <h1 class="view-title">Threads Posted In</h1>
-
   <div class="board-data" ui-view="data">
     <table class="threads-list">
       <caption>Threads</caption>
@@ -42,7 +40,6 @@
                 </span>
               </div>
             </div>
-
             <div class="started-by">
               Started by
               <span v-if="thread.user.deleted">deleted</span>
@@ -51,12 +48,10 @@
               <span>{{' on ' + humanDate(thread.created_at)}}</span>
             </div>
           </td>
-
           <td class="views-replies">
             <span class="replies">{{thread.post_count - 1 || 0}}</span>
             <span class="views">{{thread.view_count || 0}}</span>
           </td>
-
           <td class="last-post">
             <span v-if="thread.last_deleted">deleted</span>
             <img :src="thread.last_post_avatar || defaultAvatar" v-if="!thread.last_deleted" :class="`avatar-small ${defaultAvatarShape}`"/>
