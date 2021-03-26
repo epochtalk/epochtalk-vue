@@ -88,11 +88,11 @@
         </div>
       </div>
     </div>
-  
+
     <!-- Poll Results -->
     <div class="poll-answer" ng-repeat="answer in poll.answers">
       <div :class="{ 'poll-answer-row':showPollResults(), 'selected-answer':answer.selected }">
-
+        <label class="poll-select" ng-class="{ 'active':pollAnswers.indexOf(answer.id) > -1, 'default-cursor voted':!canVote() }">
           <span v-if="answer.selected" class="selected-answer-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
               <title></title>
