@@ -7,7 +7,7 @@
     </span>
     <div class="poll-controls">
         <!-- Poll Controls -->
-        <div class="poll-control" v-if="canLock()" ng-class="{'is__locked' : poll.locked}" data-balloon="Lock Poll" data-balloon-pos="down">
+        <div class="poll-control" v-if="canLock()" :class="{'is__locked' : poll.locked}" data-balloon="Lock Poll" data-balloon-pos="down">
           <input id="lockPoll" class="icon" type="checkbox" ng-model="poll.locked">
           <label for="lockPoll"  ng-click="updateLockPoll()">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -79,10 +79,10 @@
         <div class="poll-details">
           <span class="poll-info" v-if="poll.display_mode === 'always'">Results Always Shown. </span>
           <span class="poll-info" v-if="poll.display_mode === 'voted'">Results After Voting. </span>
-          <span class="poll-info" ng-class="{'highlight':!poll.expired && !canVote() }" v-if="poll.display_mode === 'expired'">Results After Expiration. </span>
-          <span class="poll-info" ng-class="{'highlight':poll.expired}">
+          <span class="poll-info" :class="{'highlight':!poll.expired && !canVote() }" v-if="poll.display_mode === 'expired'">Results After Expiration. </span>
+          <span class="poll-info" :class="{'highlight':poll.expired}">
           {{ poll.expiration ? 'Exp: ' + (poll.expiration | date : 'short') : 'No Expiration. '}}</span>
-          <span class="poll-info" ng-class="{'highlight':pollAnswers.length===poll.max_answers}">{{poll.max_answers + ' choice. ' + (poll.max_answers > 1 ? 's':'')}}</span>
+          <span class="poll-info" :class="{'highlight':pollAnswers.length===poll.max_answers}">{{poll.max_answers + ' choice. ' + (poll.max_answers > 1 ? 's':'')}}</span>
           <span class="poll-info" v-if="!poll.change_vote">Votes are Permanent. </span>
           <span class="poll-info" v-if="poll.change_vote">Votes can be changed. </span>
         </div>
@@ -91,8 +91,8 @@
   
     <!-- Poll Results -->
     <div class="poll-answer" ng-repeat="answer in poll.answers">
-      <div ng-class="{ 'poll-answer-row':showPollResults(), 'selected-answer':answer.selected }">
-        <label class="poll-select" ng-class="{ 'active':pollAnswers.indexOf(answer.id) > -1, 'default-cursor voted':!canVote() }">
+      <div :class="{ 'poll-answer-row':showPollResults(), 'selected-answer':answer.selected }">
+
           <span v-if="answer.selected" class="selected-answer-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
               <title></title>
