@@ -9,7 +9,7 @@
         <!-- Poll Controls -->
         <div class="poll-control" v-if="canLock()" :class="{'is__locked' : poll.locked}" data-balloon="Lock Poll" data-balloon-pos="down">
           <input id="lockPoll" class="icon" type="checkbox" ng-model="poll.locked">
-          <label for="lockPoll"  ng-click="updateLockPoll()">
+          <label for="lockPoll"  @click="updateLockPoll()">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
               <title></title>
               <path
@@ -19,7 +19,7 @@
         </div>
         <div class="poll-control" v-if="canEdit()" data-balloon="Edit Poll" data-balloon-pos="down">
           <input id="editPoll" class="icon" type="checkbox" ng-model="switches.editPoll" >
-          <label for="editPoll" ng-click="scrollPollView()">
+          <label for="editPoll" @click="scrollPollView()">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
               <title></title>
               <path d="M7.38,33.74h0L4,44l10.26-3.39h0L41.74,13.14,34.86,6.26Zm31-21.15.54.55L14.26,37.79l-.54-.54" />
@@ -63,8 +63,8 @@
           </div>
         </div>
         <div class="actions__pollEdit">
-          <button class="secondary cancel small" ng-click="switches.editPoll = false">Cancel</button>
-          <button class="small" ng-disabled="!pollValid()" ng-click="saveOptions()">Save Changes</button>
+          <button class="secondary cancel small" @click="switches.editPoll = false">Cancel</button>
+          <button class="small" ng-disabled="!pollValid()" @click="saveOptions()">Save Changes</button>
         </div>
       </div>
     </div>
@@ -99,8 +99,8 @@
               <path d="M24,2A22,22,0,1,0,46,24,22,22,0,0,0,24,2ZM21,34.22l-10-10,2.82-2.83L21,28.56l14-14,2.82,2.83Z" />
             </svg>
           </span>
-          <input v-if="poll.max_answers === 1 && canVote()" ng-click="pollAnswers.pop(); toggleAnswer(answer.id);" name="pollanswer" type="radio">
-          <input type="checkbox" ng-click="toggleAnswer(answer.id)" ng-disabled="pollAnswers.length >= poll.max_answers && pollAnswers.indexOf(answer.id) === -1" ng-checked="pollAnswers.indexOf(answer.id) > -1" v-if="poll.max_answers > 1 && canVote()"/>
+          <input v-if="poll.max_answers === 1 && canVote()" @click="pollAnswers.pop(); toggleAnswer(answer.id);" name="pollanswer" type="radio">
+          <input type="checkbox" @click="toggleAnswer(answer.id)" ng-disabled="pollAnswers.length >= poll.max_answers && pollAnswers.indexOf(answer.id) === -1" ng-checked="pollAnswers.indexOf(answer.id) > -1" v-if="poll.max_answers > 1 && canVote()"/>
           <span ng-bind="answer.answer"></span>
         </label>
         <div v-if="showPollResults()" class="poll-results">
@@ -118,7 +118,7 @@
     </div>
   </div>
   <div class="actionsBar">
-    <button ng-click="vote()" ng-disabled="pollAnswers.length === 0" v-if="canVote()">Vote</button>
-    <button v-if="canRemoveVote()" ng-click="removeVote()" class="secondary">Remove Vote</button>
+    <button @click="vote()" ng-disabled="pollAnswers.length === 0" v-if="canVote()">Vote</button>
+    <button v-if="canRemoveVote()" @click="removeVote()" class="secondary">Remove Vote</button>
   </div>
 </div>
