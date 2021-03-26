@@ -57,14 +57,14 @@
               After voting
             </label>
             <label for="displayExpired">
-              <input type="radio" id="displayExpired" ng-model="options.display_mode" value="expired" ng-disabled="!options.expiration">
+              <input type="radio" id="displayExpired" ng-model="options.display_mode" value="expired" :disabled="!options.expiration">
               After expiration
             </label>
           </div>
         </div>
         <div class="actions__pollEdit">
           <button class="secondary cancel small" @click="switches.editPoll = false">Cancel</button>
-          <button class="small" ng-disabled="!pollValid()" @click="saveOptions()">Save Changes</button>
+          <button class="small" :disabled="!pollValid()" @click="saveOptions()">Save Changes</button>
         </div>
       </div>
     </div>
@@ -100,7 +100,7 @@
             </svg>
           </span>
           <input v-if="poll.max_answers === 1 && canVote()" @click="pollAnswers.pop(); toggleAnswer(answer.id);" name="pollanswer" type="radio">
-          <input type="checkbox" @click="toggleAnswer(answer.id)" ng-disabled="pollAnswers.length >= poll.max_answers && pollAnswers.indexOf(answer.id) === -1" ng-checked="pollAnswers.indexOf(answer.id) > -1" v-if="poll.max_answers > 1 && canVote()"/>
+          <input type="checkbox" @click="toggleAnswer(answer.id)" :disabled="pollAnswers.length >= poll.max_answers && pollAnswers.indexOf(answer.id) === -1" ng-checked="pollAnswers.indexOf(answer.id) > -1" v-if="poll.max_answers > 1 && canVote()"/>
           <span ng-bind="answer.answer"></span>
         </label>
         <div v-if="showPollResults()" class="poll-results">
@@ -118,7 +118,7 @@
     </div>
   </div>
   <div class="actionsBar">
-    <button @click="vote()" ng-disabled="pollAnswers.length === 0" v-if="canVote()">Vote</button>
+    <button @click="vote()" :disabled="pollAnswers.length === 0" v-if="canVote()">Vote</button>
     <button v-if="canRemoveVote()" @click="removeVote()" class="secondary">Remove Vote</button>
   </div>
 </div>
