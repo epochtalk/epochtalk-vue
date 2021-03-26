@@ -1,13 +1,13 @@
-<div class="polls" id="poll-view" ng-if="poll">
+<div class="polls" id="poll-view" v-if="poll">
   <!-- Poll Header -->
   <div class="poll-title">
     <span class="poll-title-text">
       Poll
-      <span class="is__locked" ng-if="poll.locked">(Locked)</span>
+      <span class="is__locked" v-if="poll.locked">(Locked)</span>
     </span>
     <div class="poll-controls">
         <!-- Poll Controls -->
-        <div class="poll-control" ng-if="canLock()" ng-class="{'is__locked' : poll.locked}" data-balloon="Lock Poll" data-balloon-pos="down">
+        <div class="poll-control" v-if="canLock()" ng-class="{'is__locked' : poll.locked}" data-balloon="Lock Poll" data-balloon-pos="down">
           <input id="lockPoll" class="icon" type="checkbox" ng-model="poll.locked">
           <label for="lockPoll"  ng-click="updateLockPoll()">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -17,7 +17,7 @@
             </svg>
           </label>
         </div>
-        <div class="poll-control" ng-if="canEdit()" data-balloon="Edit Poll" data-balloon-pos="down">
+        <div class="poll-control" v-if="canEdit()" data-balloon="Edit Poll" data-balloon-pos="down">
           <input id="editPoll" class="icon" type="checkbox" ng-model="switches.editPoll" >
           <label for="editPoll" ng-click="scrollPollView()">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -31,7 +31,7 @@
   </div>
 
   <!-- Poll Edit -->
-  <div class="poll-edit" slide-toggle="switches.editPoll" initial-state="closed" ng-if="canEdit()">
+  <div class="poll-edit" slide-toggle="switches.editPoll" initial-state="closed" v-if="canEdit()">
     <div class="slide-wrapper">
       <div class="poll-edit-container">
         <h5 class="panelTitle">Edit Poll Options:</h5>
@@ -77,14 +77,14 @@
         <!-- Poll Question -->
         <h1 class="poll-question" ng-bind="poll.question"></h1>
         <div class="poll-details">
-          <span class="poll-info" ng-if="poll.display_mode === 'always'">Results Always Shown. </span>
-          <span class="poll-info" ng-if="poll.display_mode === 'voted'">Results After Voting. </span>
-          <span class="poll-info" ng-class="{'highlight':!poll.expired && !canVote() }" ng-if="poll.display_mode === 'expired'">Results After Expiration. </span>
+          <span class="poll-info" v-if="poll.display_mode === 'always'">Results Always Shown. </span>
+          <span class="poll-info" v-if="poll.display_mode === 'voted'">Results After Voting. </span>
+          <span class="poll-info" ng-class="{'highlight':!poll.expired && !canVote() }" v-if="poll.display_mode === 'expired'">Results After Expiration. </span>
           <span class="poll-info" ng-class="{'highlight':poll.expired}">
           {{ poll.expiration ? 'Exp: ' + (poll.expiration | date : 'short') : 'No Expiration. '}}</span>
           <span class="poll-info" ng-class="{'highlight':pollAnswers.length===poll.max_answers}">{{poll.max_answers + ' choice. ' + (poll.max_answers > 1 ? 's':'')}}</span>
-          <span class="poll-info" ng-if="!poll.change_vote">Votes are Permanent. </span>
-          <span class="poll-info" ng-if="poll.change_vote">Votes can be changed. </span>
+          <span class="poll-info" v-if="!poll.change_vote">Votes are Permanent. </span>
+          <span class="poll-info" v-if="poll.change_vote">Votes can be changed. </span>
         </div>
       </div>
     </div>
@@ -93,17 +93,17 @@
     <div class="poll-answer" ng-repeat="answer in poll.answers">
       <div ng-class="{ 'poll-answer-row':showPollResults(), 'selected-answer':answer.selected }">
         <label class="poll-select" ng-class="{ 'active':pollAnswers.indexOf(answer.id) > -1, 'default-cursor voted':!canVote() }">
-          <span ng-if="answer.selected" class="selected-answer-icon">
+          <span v-if="answer.selected" class="selected-answer-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
               <title></title>
               <path d="M24,2A22,22,0,1,0,46,24,22,22,0,0,0,24,2ZM21,34.22l-10-10,2.82-2.83L21,28.56l14-14,2.82,2.83Z" />
             </svg>
           </span>
-          <input ng-if="poll.max_answers === 1 && canVote()" ng-click="pollAnswers.pop(); toggleAnswer(answer.id);" name="pollanswer" type="radio">
-          <input type="checkbox" ng-click="toggleAnswer(answer.id)" ng-disabled="pollAnswers.length >= poll.max_answers && pollAnswers.indexOf(answer.id) === -1" ng-checked="pollAnswers.indexOf(answer.id) > -1" ng-if="poll.max_answers > 1 && canVote()"/>
+          <input v-if="poll.max_answers === 1 && canVote()" ng-click="pollAnswers.pop(); toggleAnswer(answer.id);" name="pollanswer" type="radio">
+          <input type="checkbox" ng-click="toggleAnswer(answer.id)" ng-disabled="pollAnswers.length >= poll.max_answers && pollAnswers.indexOf(answer.id) === -1" ng-checked="pollAnswers.indexOf(answer.id) > -1" v-if="poll.max_answers > 1 && canVote()"/>
           <span ng-bind="answer.answer"></span>
         </label>
-        <div ng-if="showPollResults()" class="poll-results">
+        <div v-if="showPollResults()" class="poll-results">
           <div class="poll-results-data">
             <span class="poll-results-value"
               ng-bind="answer.percentage + '% '"></span>
@@ -118,7 +118,7 @@
     </div>
   </div>
   <div class="actionsBar">
-    <button ng-click="vote()" ng-disabled="pollAnswers.length === 0" ng-if="canVote()">Vote</button>
-    <button ng-if="canRemoveVote()" ng-click="removeVote()" class="secondary">Remove Vote</button>
+    <button ng-click="vote()" ng-disabled="pollAnswers.length === 0" v-if="canVote()">Vote</button>
+    <button v-if="canRemoveVote()" ng-click="removeVote()" class="secondary">Remove Vote</button>
   </div>
 </div>
