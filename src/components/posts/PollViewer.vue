@@ -47,7 +47,7 @@
         <div class="pollEdit__answers">
           <label for="pollMaxVote">Maximum answers per vote:</label>
           <input type="number" id="pollMaxVote" min="1" max="{{poll.answers.length}}" value="1" ng-model="options.max_answers">
-          <div class="pollGroup__header">Show poll results: </label>
+          <label class="pollGroup__header">Show poll results: </label>
             <label for="displayAlways">
               <input type="radio" id="displayAlways" ng-model="options.display_mode" value="always">
               Always shown
