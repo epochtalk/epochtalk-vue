@@ -6,6 +6,7 @@ import ThreadsPostedIn from '@/views/ThreadsPostedIn.vue'
 import Posts from '@/views/Posts.vue'
 import About from '@/views/About.vue'
 import Settings from '@/views/Settings.vue'
+import Profile from '@/views/Profile.vue'
 import Forbidden from '@/views/layout/Forbidden.vue'
 import NotFound from '@/views/layout/NotFound.vue'
 import ServiceUnavailable from '@/views/layout/ServiceUnavailable.vue'
@@ -53,6 +54,12 @@ const routes = [
     name: 'ThreadsPostedIn',
     component: ThreadsPostedIn,
     meta: { requiresAuth: true, bodyClass: 'threadspostedin' }
+  },
+  {
+    path: '/profile/:username',
+    name: 'Profile',
+    component: Profile,
+    meta: { requiresAuth: true, bodyClass: 'profile' }
   },
   {
     path: '/settings',
