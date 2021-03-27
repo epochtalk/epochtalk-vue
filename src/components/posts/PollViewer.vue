@@ -1,124 +1,126 @@
-<div class="polls" id="poll-view" v-if="poll">
-  <!-- Poll Header -->
-  <div class="poll-title">
-    <span class="poll-title-text">
-      Poll
-      <span class="is__locked" v-if="poll.locked">(Locked)</span>
-    </span>
-    <div class="poll-controls">
-      <!-- Poll Controls -->
-      <div class="poll-control" v-if="canLock()" :class="{'is__locked' : poll.locked}" data-balloon="Lock Poll" data-balloon-pos="down">
-        <input id="lockPoll" class="icon" type="checkbox" ng-model="poll.locked">
-        <label for="lockPoll"  @click="updateLockPoll()">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-            <title></title>
-            <path
-              d="M40,21H37.5V16.48a13.5,13.5,0,0,0-27,0V21H8a2,2,0,0,0-2,2V43a2,2,0,0,0,2,2H40a2,2,0,0,0,2-2V23A2,2,0,0,0,40,21ZM15.5,16.48a8.5,8.5,0,0,1,17,0V21h-17Z" />
-          </svg>
-        </label>
-      </div>
-      <div class="poll-control" v-if="canEdit()" data-balloon="Edit Poll" data-balloon-pos="down">
-        <input id="editPoll" class="icon" type="checkbox" ng-model="switches.editPoll" >
-        <label for="editPoll" @click="scrollPollView()">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-            <title></title>
-            <path d="M7.38,33.74h0L4,44l10.26-3.39h0L41.74,13.14,34.86,6.26Zm31-21.15.54.55L14.26,37.79l-.54-.54" />
-            <path d="M45.48,6.89,41.11,2.52a1.78,1.78,0,0,0-2.5,0L36.11,5,43,11.89l2.5-2.5A1.76,1.76,0,0,0,45.48,6.89Z" />
-          </svg>
-        </label>
-      </div>
-    </div>
-  </div>
-
-  <!-- Poll Edit -->
-  <div class="poll-edit" slide-toggle="switches.editPoll" initial-state="closed" v-if="canEdit()">
-    <div class="slide-wrapper">
-      <div class="poll-edit-container">
-        <h5 class="panelTitle">Edit Poll Options:</h5>
-        <label for="pollVote">
-          <input type="checkbox" id="pollVote" ng-model="options.change_vote">
-          Allow user to change vote
-        </label>
-        <div class="pollEdit__expiration">
-          <label for="pollVoteExpiration">Poll expires on {{(options.expiration|humanDate) || '(No Expiration)'}}</label>
-          <input id="pollVoteExpiration" type="date" ng-model="options.expiration_date" ng-change="calcExpiration()">
-          <input type="time" ng-model="options.expiration_time" ng-change="calcExpiration()">
-        </div>
-        <div class="pollEdit__answers">
-          <label for="pollMaxVote">Maximum answers per vote:</label>
-          <input type="number" id="pollMaxVote" min="1" max="{{poll.answers.length}}" value="1" ng-model="options.max_answers">
-          <div class="pollGroup__header"><label>Show poll results: </label>
-            <label for="displayAlways">
-              <input type="radio" id="displayAlways" ng-model="options.display_mode" value="always">
-              Always shown
-            </label>
-            <label for="displayVoted">
-              <input type="radio" id="displayVoted" ng-model="options.display_mode" value="voted">
-              After voting
-            </label>
-            <label for="displayExpired">
-              <input type="radio" id="displayExpired" ng-model="options.display_mode" value="expired" :disabled="!options.expiration">
-              After expiration
-            </label>
-          </div>
-        </div>
-        <div class="actions__pollEdit">
-          <button class="secondary cancel small" @click="switches.editPoll = false">Cancel</button>
-          <button class="small" :disabled="!pollValid()" @click="saveOptions()">Save Changes</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="poll-body">
-    <div class="poll-header">
-      <!-- Poll Details -->
-      <div class="poll-header-main">
-        <!-- Poll Question -->
-        <h1 class="poll-question" ng-bind="poll.question"></h1>
-        <div class="poll-details">
-          <span class="poll-info" v-if="poll.display_mode === 'always'">Results Always Shown. </span>
-          <span class="poll-info" v-if="poll.display_mode === 'voted'">Results After Voting. </span>
-          <span class="poll-info" :class="{'highlight':!poll.expired && !canVote() }" v-if="poll.display_mode === 'expired'">Results After Expiration. </span>
-          <span class="poll-info" :class="{'highlight':poll.expired}">
-          {{ poll.expiration ? 'Exp: ' + (poll.expiration | date : 'short') : 'No Expiration. '}}</span>
-          <span class="poll-info" :class="{'highlight':pollAnswers.length===poll.max_answers}">{{poll.max_answers + ' choice. ' + (poll.max_answers > 1 ? 's':'')}}</span>
-          <span class="poll-info" v-if="!poll.change_vote">Votes are Permanent. </span>
-          <span class="poll-info" v-if="poll.change_vote">Votes can be changed. </span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Poll Results -->
-    <div class="poll-answer" ng-repeat="answer in poll.answers">
-      <div :class="{ 'poll-answer-row':showPollResults(), 'selected-answer':answer.selected }">
-        <label class="poll-select" ng-class="{ 'active':pollAnswers.indexOf(answer.id) > -1, 'default-cursor voted':!canVote() }">
-          <span v-if="answer.selected" class="selected-answer-icon">
+<template>
+  <div class="polls" id="poll-view" v-if="poll">
+    <!-- Poll Header -->
+    <div class="poll-title">
+      <span class="poll-title-text">
+        Poll
+        <span class="is__locked" v-if="poll.locked">(Locked)</span>
+      </span>
+      <div class="poll-controls">
+        <!-- Poll Controls -->
+        <div class="poll-control" v-if="canLock()" :class="{'is__locked' : poll.locked}" data-balloon="Lock Poll" data-balloon-pos="down">
+          <input id="lockPoll" class="icon" type="checkbox" ng-model="poll.locked">
+          <label for="lockPoll"  @click="updateLockPoll()">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
               <title></title>
-              <path d="M24,2A22,22,0,1,0,46,24,22,22,0,0,0,24,2ZM21,34.22l-10-10,2.82-2.83L21,28.56l14-14,2.82,2.83Z" />
+              <path
+                d="M40,21H37.5V16.48a13.5,13.5,0,0,0-27,0V21H8a2,2,0,0,0-2,2V43a2,2,0,0,0,2,2H40a2,2,0,0,0,2-2V23A2,2,0,0,0,40,21ZM15.5,16.48a8.5,8.5,0,0,1,17,0V21h-17Z" />
             </svg>
-          </span>
-          <input v-if="poll.max_answers === 1 && canVote()" @click="pollAnswers.pop(); toggleAnswer(answer.id);" name="pollanswer" type="radio">
-          <input type="checkbox" @click="toggleAnswer(answer.id)" :disabled="pollAnswers.length >= poll.max_answers && pollAnswers.indexOf(answer.id) === -1" ng-checked="pollAnswers.indexOf(answer.id) > -1" v-if="poll.max_answers > 1 && canVote()"/>
-          <span ng-bind="answer.answer"></span>
-        </label>
-        <div v-if="showPollResults()" class="poll-results">
-          <div class="poll-results-data">
-            <span class="poll-results-value"
-              ng-bind="answer.percentage + '% '"></span>
-            <span class="poll-results-label"
-              ng-bind="'(' + answer.votes + (answer.votes > 1 || answer.votes === 0 ? ' votes)' : ' vote)')"></span>
+          </label>
+        </div>
+        <div class="poll-control" v-if="canEdit()" data-balloon="Edit Poll" data-balloon-pos="down">
+          <input id="editPoll" class="icon" type="checkbox" ng-model="switches.editPoll" >
+          <label for="editPoll" @click="scrollPollView()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+              <title></title>
+              <path d="M7.38,33.74h0L4,44l10.26-3.39h0L41.74,13.14,34.86,6.26Zm31-21.15.54.55L14.26,37.79l-.54-.54" />
+              <path d="M45.48,6.89,41.11,2.52a1.78,1.78,0,0,0-2.5,0L36.11,5,43,11.89l2.5-2.5A1.76,1.76,0,0,0,45.48,6.89Z" />
+            </svg>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Poll Edit -->
+    <div class="poll-edit" slide-toggle="switches.editPoll" initial-state="closed" v-if="canEdit()">
+      <div class="slide-wrapper">
+        <div class="poll-edit-container">
+          <h5 class="panelTitle">Edit Poll Options:</h5>
+          <label for="pollVote">
+            <input type="checkbox" id="pollVote" ng-model="options.change_vote">
+            Allow user to change vote
+          </label>
+          <div class="pollEdit__expiration">
+            <label for="pollVoteExpiration">Poll expires on {{(options.expiration|humanDate) || '(No Expiration)'}}</label>
+            <input id="pollVoteExpiration" type="date" ng-model="options.expiration_date" ng-change="calcExpiration()">
+            <input type="time" ng-model="options.expiration_time" ng-change="calcExpiration()">
           </div>
-          <div class="poll-bar">
-            <section ng-style="answer.style"></section>
+          <div class="pollEdit__answers">
+            <label for="pollMaxVote">Maximum answers per vote:</label>
+            <input type="number" id="pollMaxVote" min="1" max="{{poll.answers.length}}" value="1" ng-model="options.max_answers">
+            <div class="pollGroup__header"><label>Show poll results: </label>
+              <label for="displayAlways">
+                <input type="radio" id="displayAlways" ng-model="options.display_mode" value="always">
+                Always shown
+              </label>
+              <label for="displayVoted">
+                <input type="radio" id="displayVoted" ng-model="options.display_mode" value="voted">
+                After voting
+              </label>
+              <label for="displayExpired">
+                <input type="radio" id="displayExpired" ng-model="options.display_mode" value="expired" :disabled="!options.expiration">
+                After expiration
+              </label>
+            </div>
+          </div>
+          <div class="actions__pollEdit">
+            <button class="secondary cancel small" @click="switches.editPoll = false">Cancel</button>
+            <button class="small" :disabled="!pollValid()" @click="saveOptions()">Save Changes</button>
           </div>
         </div>
       </div>
     </div>
+
+    <div class="poll-body">
+      <div class="poll-header">
+        <!-- Poll Details -->
+        <div class="poll-header-main">
+          <!-- Poll Question -->
+          <h1 class="poll-question" ng-bind="poll.question"></h1>
+          <div class="poll-details">
+            <span class="poll-info" v-if="poll.display_mode === 'always'">Results Always Shown. </span>
+            <span class="poll-info" v-if="poll.display_mode === 'voted'">Results After Voting. </span>
+            <span class="poll-info" :class="{'highlight':!poll.expired && !canVote() }" v-if="poll.display_mode === 'expired'">Results After Expiration. </span>
+            <span class="poll-info" :class="{'highlight':poll.expired}">
+            {{ poll.expiration ? 'Exp: ' + (poll.expiration | date : 'short') : 'No Expiration. '}}</span>
+            <span class="poll-info" :class="{'highlight':pollAnswers.length===poll.max_answers}">{{poll.max_answers + ' choice. ' + (poll.max_answers > 1 ? 's':'')}}</span>
+            <span class="poll-info" v-if="!poll.change_vote">Votes are Permanent. </span>
+            <span class="poll-info" v-if="poll.change_vote">Votes can be changed. </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Poll Results -->
+      <div class="poll-answer" ng-repeat="answer in poll.answers">
+        <div :class="{ 'poll-answer-row':showPollResults(), 'selected-answer':answer.selected }">
+          <label class="poll-select" ng-class="{ 'active':pollAnswers.indexOf(answer.id) > -1, 'default-cursor voted':!canVote() }">
+            <span v-if="answer.selected" class="selected-answer-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                <title></title>
+                <path d="M24,2A22,22,0,1,0,46,24,22,22,0,0,0,24,2ZM21,34.22l-10-10,2.82-2.83L21,28.56l14-14,2.82,2.83Z" />
+              </svg>
+            </span>
+            <input v-if="poll.max_answers === 1 && canVote()" @click="pollAnswers.pop(); toggleAnswer(answer.id);" name="pollanswer" type="radio">
+            <input type="checkbox" @click="toggleAnswer(answer.id)" :disabled="pollAnswers.length >= poll.max_answers && pollAnswers.indexOf(answer.id) === -1" ng-checked="pollAnswers.indexOf(answer.id) > -1" v-if="poll.max_answers > 1 && canVote()"/>
+            <span ng-bind="answer.answer"></span>
+          </label>
+          <div v-if="showPollResults()" class="poll-results">
+            <div class="poll-results-data">
+              <span class="poll-results-value"
+                ng-bind="answer.percentage + '% '"></span>
+              <span class="poll-results-label"
+                ng-bind="'(' + answer.votes + (answer.votes > 1 || answer.votes === 0 ? ' votes)' : ' vote)')"></span>
+            </div>
+            <div class="poll-bar">
+              <section ng-style="answer.style"></section>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="actionsBar">
+      <button @click="vote()" :disabled="pollAnswers.length === 0" v-if="canVote()">Vote</button>
+      <button v-if="canRemoveVote()" @click="removeVote()" class="secondary">Remove Vote</button>
+    </div>
   </div>
-  <div class="actionsBar">
-    <button @click="vote()" :disabled="pollAnswers.length === 0" v-if="canVote()">Vote</button>
-    <button v-if="canRemoveVote()" @click="removeVote()" class="secondary">Remove Vote</button>
-  </div>
-</div>
+</template>
