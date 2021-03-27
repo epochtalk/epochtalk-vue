@@ -6,28 +6,28 @@
       <span class="is__locked" v-if="poll.locked">(Locked)</span>
     </span>
     <div class="poll-controls">
-        <!-- Poll Controls -->
-        <div class="poll-control" v-if="canLock()" :class="{'is__locked' : poll.locked}" data-balloon="Lock Poll" data-balloon-pos="down">
-          <input id="lockPoll" class="icon" type="checkbox" ng-model="poll.locked">
-          <label for="lockPoll"  @click="updateLockPoll()">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-              <title></title>
-              <path
-                d="M40,21H37.5V16.48a13.5,13.5,0,0,0-27,0V21H8a2,2,0,0,0-2,2V43a2,2,0,0,0,2,2H40a2,2,0,0,0,2-2V23A2,2,0,0,0,40,21ZM15.5,16.48a8.5,8.5,0,0,1,17,0V21h-17Z" />
-            </svg>
-          </label>
-        </div>
-        <div class="poll-control" v-if="canEdit()" data-balloon="Edit Poll" data-balloon-pos="down">
-          <input id="editPoll" class="icon" type="checkbox" ng-model="switches.editPoll" >
-          <label for="editPoll" @click="scrollPollView()">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-              <title></title>
-              <path d="M7.38,33.74h0L4,44l10.26-3.39h0L41.74,13.14,34.86,6.26Zm31-21.15.54.55L14.26,37.79l-.54-.54" />
-              <path d="M45.48,6.89,41.11,2.52a1.78,1.78,0,0,0-2.5,0L36.11,5,43,11.89l2.5-2.5A1.76,1.76,0,0,0,45.48,6.89Z" />
-            </svg>
-          </label>
-        </div>
+      <!-- Poll Controls -->
+      <div class="poll-control" v-if="canLock()" :class="{'is__locked' : poll.locked}" data-balloon="Lock Poll" data-balloon-pos="down">
+        <input id="lockPoll" class="icon" type="checkbox" ng-model="poll.locked">
+        <label for="lockPoll"  @click="updateLockPoll()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+            <title></title>
+            <path
+              d="M40,21H37.5V16.48a13.5,13.5,0,0,0-27,0V21H8a2,2,0,0,0-2,2V43a2,2,0,0,0,2,2H40a2,2,0,0,0,2-2V23A2,2,0,0,0,40,21ZM15.5,16.48a8.5,8.5,0,0,1,17,0V21h-17Z" />
+          </svg>
+        </label>
       </div>
+      <div class="poll-control" v-if="canEdit()" data-balloon="Edit Poll" data-balloon-pos="down">
+        <input id="editPoll" class="icon" type="checkbox" ng-model="switches.editPoll" >
+        <label for="editPoll" @click="scrollPollView()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+            <title></title>
+            <path d="M7.38,33.74h0L4,44l10.26-3.39h0L41.74,13.14,34.86,6.26Zm31-21.15.54.55L14.26,37.79l-.54-.54" />
+            <path d="M45.48,6.89,41.11,2.52a1.78,1.78,0,0,0-2.5,0L36.11,5,43,11.89l2.5-2.5A1.76,1.76,0,0,0,45.48,6.89Z" />
+          </svg>
+        </label>
+      </div>
+    </div>
   </div>
 
   <!-- Poll Edit -->
