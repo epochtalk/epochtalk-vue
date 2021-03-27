@@ -130,10 +130,11 @@ import humanDate from '@/composables/filters/humanDate'
 import { reactive, toRefs } from 'vue'
 
 export default {
-  name: 'Posts',
-  setup() {
+  name: 'PollViewer',
+  props: ['poll', 'thread', 'userPriority', 'reset'],
+  setup(props) {
     const v = reactive({
-      polls: {}
+      poll: props.poll
     })
     return {
       ...toRefs(v),
