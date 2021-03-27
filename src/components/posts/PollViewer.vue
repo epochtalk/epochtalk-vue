@@ -41,7 +41,7 @@
             Allow user to change vote
           </label>
           <div class="pollEdit__expiration">
-            <label for="pollVoteExpiration">Poll expires on {{(options.expiration|humanDate) || '(No Expiration)'}}</label>
+            <label for="pollVoteExpiration">Poll expires on {{humanDate(options.expiration) || '(No Expiration)'}}</label>
             <input id="pollVoteExpiration" type="date" ng-model="options.expiration_date" ng-change="calcExpiration()">
             <input type="time" ng-model="options.expiration_time" ng-change="calcExpiration()">
           </div>
@@ -82,7 +82,8 @@
             <span class="poll-info" v-if="poll.display_mode === 'voted'">Results After Voting. </span>
             <span class="poll-info" :class="{'highlight':!poll.expired && !canVote() }" v-if="poll.display_mode === 'expired'">Results After Expiration. </span>
             <span class="poll-info" :class="{'highlight':poll.expired}">
-            {{ poll.expiration ? 'Exp: ' + (poll.expiration | date : 'short') : 'No Expiration. '}}</span>
+            <!-- {{ poll.expiration ? 'Exp: ' + (poll.expiration | date : 'short') : 'No Expiration. '}}</span> -->
+            {{ poll.expiration ? 'Exp: ' + humanDate(poll.expiration) : 'No Expiration. '}}</span>
             <span class="poll-info" :class="{'highlight':pollAnswers.length===poll.max_answers}">{{poll.max_answers + ' choice. ' + (poll.max_answers > 1 ? 's':'')}}</span>
             <span class="poll-info" v-if="!poll.change_vote">Votes are Permanent. </span>
             <span class="poll-info" v-if="poll.change_vote">Votes can be changed. </span>
@@ -124,3 +125,20 @@
     </div>
   </div>
 </template>
+<script>
+import humanDate from '@/composables/filters/humanDate'
+import { reactive, toRefs } from 'vue'
+
+export default {
+  name: 'Posts',
+  setup() {
+    const v = reactive({
+      polls: {}
+    })
+    return {
+      ...toRefs(v),
+      humanDate
+    }
+  }
+}
+</script>
