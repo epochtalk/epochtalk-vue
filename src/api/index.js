@@ -65,6 +65,7 @@ export const postsApi = {
   lock: postId => $http(`/api/posts/${postId}/lock`, { method: 'POST'}),
   unlock: postId => $http(`/api/posts/${postId}/unlock`, { method: 'POST'}),
   byThread: params => $http('/api/posts', { params }),
+  byUser: params => $http(`/api/posts/user/${params.username}`, { params }),
   slugToPostId: slug => $http(`/api/posts/${slug}/id`)
 }
 
@@ -99,6 +100,7 @@ export const usersApi = {
   search: username => $http('/api/users/search', { params: { username } }),
   lookup: (username, params) => $http(`/api/users/lookup/${username}`, { params }),
   update: (userId, data) => $http(`/api/users/${userId}`, { method: 'PUT', data }),
+  find: username => $http(`/api/users/${username}`),
   preferences: () => $http('/api/users/preferences'),
   pageIgnored: params => $http('/api/ignoreUsers/ignored', { params }),
   ignore: user => $http(`/api/ignoreUsers/ignore/${user.id}`, { method: 'POST' }),

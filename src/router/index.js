@@ -9,6 +9,7 @@ import Profile from '@/views/Profile.vue'
 import Forbidden from '@/views/layout/Forbidden.vue'
 import NotFound from '@/views/layout/NotFound.vue'
 import ServiceUnavailable from '@/views/layout/ServiceUnavailable.vue'
+import UserPosts from '@/components/users/UserPosts.vue'
 import Login from '@/views/layout/Login.vue'
 import NProgress from 'nprogress'
 import { nextTick } from 'vue'
@@ -52,7 +53,15 @@ const routes = [
     path: '/profile/:username',
     name: 'Profile',
     component: Profile,
+    props: true,
     meta: { requiresAuth: true, bodyClass: 'profile' }
+  },
+  {
+    path: '/profile/:username/posts',
+    name: 'UserPosts',
+    component: UserPosts,
+    props: true,
+    meta: { requiresAuth: false, bodyClass: 'user-posts' }
   },
   {
     path: '/settings',

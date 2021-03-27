@@ -2,11 +2,11 @@
   <div class="user-profile-posts">
     <div class="table-actions">
       <button @click="toggleThreads(true)" :class="{'active': threadsMode}">
-        <strong>Threads&nbsp;</strong> <span class="username">by {{user.username}}</span>
+        <strong>Threads&nbsp;</strong> <span class="username">by {{username}}</span>
       </button>
 
       <button @click="toggleThreads(false)" :class="{'active': !threadsMode}">
-        <strong>Posts&nbsp;</strong> <span class="username">by {{user.username}}</span>
+        <strong>Posts&nbsp;</strong> <span class="username">by {{username}}</span>
       </button>
     </div>
 
@@ -78,7 +78,7 @@
           </thead>
 
           <tbody>
-            <tr v-for="post in postData?.data" :key="post.id">
+            <tr v-for="post in postData?.posts" :key="post.id">
               <!-- TODO(akinsey): <td data-balloon="{{post.thread_title}}" data-balloon-pos="top"> -->
               <td>
                 <div class="truncate-title">
@@ -102,17 +102,56 @@
 
 <script>
 import humanDate from '@/composables/filters/humanDate'
-import { reactive, toRefs } from 'vue'
+import { reactive, toRefs, onBeforeMount, inject } from 'vue'
+import { postsApi } from '@/api'
+import { PreferencesStore, localStoragePrefs } from '@/composables/stores/prefs'
+import { useRoute } from 'vue-router'
 
 export default {
   name: 'UserPosts',
+  props: [ 'username' ],
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      const params = {
+        username: vm.username,
+        limit: localStoragePrefs().data.posts_per_page,
+        page: to.query.page || 1,
+        field: to.query.field,
+        desc: to.query.desc
+      }
+      postsApi.byUser(params).then(d => vm.postData = d)
+    })
+  },
+  beforeRouteUpdate(to, from, next) {
+    const params = {
+      username: this.username,
+      limit: localStoragePrefs().data.posts_per_page,
+      page: to.query.page || 1,
+      field: to.query.field,
+      desc: to.query.desc
+    }
+    postsApi.byUser(params).then(d => this.postData = d)
+    next()
+  },
   setup() {
+    onBeforeMount(() => {
+      if (!v.postData) {
+        const params = {
+          username: $route.params.username,
+          limit: v.prefs.posts_per_page,
+          page: $route.query.page || 1,
+          field: $route.query.field,
+          desc: $route.query.desc
+        }
+        postsApi.byUser(params).then(d => v.postData = d)
+      }
+    })
     const toggleThreads = () => console.log('toggle threads')
     const setDesc = () => console.log('set desc')
     const getSortClass = field => {
       let sortClass = 'fa '
-      const desc = v.threadData.data.desc
-      const curField = v.threadData.data.field
+      const desc = v.postData.desc
+      const curField = v.postData.field
       const defaultField = field === 'updated_at' && !curField
       if ((defaultField || curField === field) && desc) sortClass += 'fa-sort-down'
       else if ((defaultField || curField === field) && !desc) sortClass += 'fa-sort-up'
@@ -120,10 +159,13 @@ export default {
       return sortClass
     }
 
+    const $route = useRoute()
+    const $prefs = inject(PreferencesStore)
+
     const v = reactive({
+      prefs: $prefs.data,
       threadsMode: false,
-      postData: {},
-      user: {}
+      postData: null
     })
     return { ...toRefs(v), toggleThreads, setDesc, getSortClass, humanDate }
   }
@@ -131,5 +173,80 @@ export default {
 </script>
 
 <style lang="scss">
+.profile-posts-table {
+  table-layout: fixed;
+  thead th {
+    text-align: left;
+    border-bottom: 1px solid $border-color;
+  }
+  tr {
+    td {
+      font-size: $base-font-size;
+      line-height: 1.3;
+      padding: 0.5rem 0;
+      vertical-align: top;
+    }
+  }
 
+  .timestamp {
+    color: $text-gray-med;
+    min-width: 150px;
+    padding-left: 1rem;
+    width: 25%;
+  }
+
+  .truncate-title {
+    width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  .thread-title { font-weight: 600; }
+
+  .post {
+    cursor: pointer;
+    padding: 0 0.25rem;
+    transition: all ease-in-out 200ms;
+    &:hover { background-color: darken($base-background-color, 5%); }
+  }
+
+  .post-body {
+    white-space: pre-wrap;
+    &.open { background-color: darken($base-background-color, 5%); }
+    ul { white-space: normal }
+    &.closed {
+      width: 100%;
+      max-height: 18px;
+      white-space: pre-wrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .no-table-contents {
+    color: $text-gray-med;
+    font-size: $font-size-med;
+    font-weight: 400;
+  }
+
+  @include break-mobile-med {
+    display: grid;
+    grid-template-columns: 1fr;
+
+    thead, th, tbody, tr { display: contents; }
+    thead { display: none; }
+    tr {
+      display: flex;
+      flex-direction: column;
+      padding: 0.5rem 0;
+      width: calc(100vw - 2rem);
+      td { padding: 0; }
+    }
+
+    .timestamp {
+      font-size: $font-size-sm;
+      padding: 0;
+      order: -1;
+      width: 100%;
+    }
+  }
+}
 </style>

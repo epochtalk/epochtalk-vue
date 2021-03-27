@@ -32,9 +32,9 @@
       <div class="profile-user-details">
         <div class="profile-user-name-role">
           <h1>{{user?.username}}</h1>
-          <span class="username-screen">{{user?.name}}</span>
+          <span class="username-screen" v-html="user?.name"></span>
           <!--  TODO(akinsey): no style in vue <span class="user-role" style="background-color: {{vmProfile.user.role_highlight_color ? vmProfile.user.role_highlight_color : 'grey'}}" ng-bind-html="vmProfile.user.role_name"></span> -->
-          <span class="user-role">{{user?.role_name}}</span>
+          <span class="user-role" v-html="user?.role_name"></span>
          <!-- TODO(akinsey): <span class="user-rank">
               <rank-display ranks="vmProfile.user.metadata.ranks" maps="vmProfile.user.metadata.rank_metric_maps" user="vmProfile.user"></rank-display>
           </span> -->
@@ -46,12 +46,12 @@
         </div> -->
 
         <div class="user-profile-position">
-          <span>{{user?.position}}</span>
-          <span>{{user?.status}}</span>
+          <span v-html="user?.position"></span>
+          <span v-html="user?.status"></span>
         </div>
 
         <div class="signature-block">
-          <div class="signature">{{user?.signature || user?.raw_signature}}
+          <div class="signature" v-html="user?.signature || user?.raw_signature">
           </div>
           <!-- TODO(akinsey): data-balloon="Edit your signature" -->
           <a href="#" @click.prevent="showEditSignature = true" v-if="canUpdate()" class="signature-edit">
@@ -81,7 +81,7 @@
     </div>
 
     <div class="profile-threads-posts">
-      <user-posts />
+      <user-posts :username="user?.username" />
     </div>
 
     <div class="profile-sidebar">
@@ -92,16 +92,16 @@
           <a href="{{ user.website.indexOf('://') > -1 ? user.website : '//' + user.website }}" target="_blank">{{user?.website}}</a>
         </div>
         <div v-if="user?.gender">
-          Gender:&nbsp;&nbsp;<span>{{user?.gender}}</span>
+          Gender:&nbsp;&nbsp;<span v-html="user?.gender"></span>
         </div>
         <div v-if="user?.dob">
           Age:&nbsp;&nbsp;<span>{{userAge(user?.dob)}}</span>
         </div>
         <div v-if="user?.location">
-          Location:&nbsp;&nbsp;<span>{{user?.location}}</span>
+          Location:&nbsp;&nbsp;<span v-html="user?.location"></span>
         </div>
         <div v-if="user?.language">
-          Language:&nbsp;&nbsp;<span>{{user?.language}}</span>
+          Language:&nbsp;&nbsp;<span v-html="user?.language"></span>
         </div>
       </div>
 
@@ -160,12 +160,20 @@
 import { reactive, toRefs } from 'vue'
 import UserPosts from '@/components/users/UserPosts.vue'
 import humanDate from '@/composables/filters/humanDate'
+import { usersApi } from '@/api'
 
 export default {
   name: 'Profile',
   components: { UserPosts },
-  props: [ 'user' ],
-  setup(props) {
+  props: [ 'username' ],
+  beforeRouteEnter(to, from, next) {
+    next(vm => usersApi.find(vm.username).then(u => vm.user = u))
+  },
+  beforeRouteUpdate(to, from, next) {
+    usersApi.find(this.username).then(u => this.user = u)
+    next()
+  },
+  setup() {
     const canUpdate = () => true
     const canMessage = () => true
     const userAge = dob => dob
@@ -177,12 +185,11 @@ export default {
     const canReactivate = () => true
     const canDelete = () => true
     const showManageBans = user => console.log('Show Manage Ban', user)
-
     const v = reactive({
       banExpiration: null,
       isOnline: true,
       userLocalTime: null,
-      user: props.user || {},
+      user: null,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
       showEditAvatar: false,
@@ -384,9 +391,7 @@ export default {
       width: 100%;
     }
 
-    .signature-edit {
-      flex: 0 0 20px;
-    }
+    .signature-edit { flex: 0 0 20px; }
   }
 
   .profile-user-stats {
@@ -407,15 +412,11 @@ export default {
       width: 100px;
       max-width: 120px;
 
-      .label {
-        font-size: $font-size-xs;
-      }
-
+      .label { font-size: $font-size-xs; }
       .stat-text {
         font-size: 2rem;
         font-weight: 600;
         margin-bottom: 0.25rem;
-
         &-sm {
           font-size: 21px;
           font-weight: 600;
@@ -427,17 +428,14 @@ export default {
   @include break-mobile-med {
     align-items: center;
     flex-direction: column;
-
     .profile-avatar {
       margin-bottom: 1rem;
       margin-right: 0;
     }
-
     .imageContainer {
       width: 60px;
       height: 60px;
     }
-
     .profile-user-details {
       .profile-user-name-role {
         flex-direction: column;
@@ -450,22 +448,12 @@ export default {
         }
       }
     }
-
-    .profile-user-activity {
-      text-align: center;
-    }
-
-    trust-profile {
-      .trust-link {
-        white-space: nowrap;
-      }
-    }
+    .profile-user-activity { text-align: center; }
+    .trust-profile { .trust-link { white-space: nowrap; } }
   }
 }
 
-.profile-threads-posts {
-  grid-area: main;
-}
+.profile-threads-posts { grid-area: main; }
 
 .table-actions {
   display: flex;
@@ -497,21 +485,14 @@ export default {
   @include break-mobile-med {
     margin-bottom: 1rem;
     margin-top: 2rem;
-
-    button {
-      font-size: $font-size-sm;
-    }
-
-    .username {
-      display: none;
-    }
+    button { font-size: $font-size-sm; }
+    .username { display: none; }
   }
 }
 
 .profile-sidebar {
   color: $text-gray-dark;
   grid-area: sidebar;
-
   .actions-panel {
     border-bottom: $border;
     line-height: 1.5;
@@ -534,19 +515,15 @@ export default {
 
   .profile-left {
     word-wrap: break-word;
-
     .profile-avatar-container {
       width: 100%;
       height: 100%;
-
       .imageContainer.loaded { background: none; }
       .imageContainer { background: url('/static/img/loading.gif') no-repeat center; display: inline;}
-
       .profile-avatar-image {
         display: block;
         position: relative;
       }
-
       .profile-user-status {
         position: absolute;
         right: -1rem;
@@ -585,10 +562,7 @@ export default {
       }
     }
   }
-  .profile-right {
-    word-wrap: break-word;
-
-  }
+  .profile-right { word-wrap: break-word; }
 }
 .profile-posts {
   .profile-row {
@@ -601,120 +575,13 @@ export default {
 }
 
 .more-posts { margin-bottom: 2rem; }
+.profile-posts { button { margin-bottom: 0; } }
+.pagination-simple { margin-bottom: 0; }
 
-
-.profile-posts {
-  button {
-    margin-bottom: 0;
-  }
-}
-
-.pagination-simple {
-  margin-bottom: 0;
-}
-
-.profile-posts-table {
-  table-layout: fixed;
-
-  tr {
-    td {
-      font-size: $base-font-size;
-      line-height: 1.3;
-      padding: 0.5rem 0;
-      vertical-align: top;
-    }
-  }
-
-  .timestamp {
-    color: $text-gray-med;
-    min-width: 150px;
-    padding-left: 1rem;
-    width: 25%;
-  }
-
-  .truncate-title {
-    width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-
-  .thread-title {
-    font-weight: 600;
-  }
-
-  .post {
-    cursor: pointer;
-    padding: 0 0.25rem;
-    transition: all ease-in-out 200ms;
-
-    &:hover {
-      background-color: darken($base-background-color, 5%);
-    }
-  }
-
-  .post-body {
-    white-space: pre-wrap;
-
-    &.open {
-      background-color: darken($base-background-color, 5%);
-    }
-
-    ul {
-      white-space: normal
-    }
-
-    &.closed {
-      width: 100%;
-      max-height: 18px;
-      white-space: pre-wrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-  }
-
-  .no-table-contents {
-    color: $text-gray-med;
-    font-size: $font-size-med;
-    font-weight: 400;
-  }
-
-  @include break-mobile-med {
-    display: grid;
-    grid-template-columns: 1fr;
-
-    thead,
-    th,
-    tbody,
-    tr {
-      display: contents;
-    }
-
-    thead {
-      display: none;
-    }
-
-    tr {
-      display: flex;
-      flex-direction: column;
-      padding: 0.5rem 0;
-      width: calc(100vw - 2rem);
-
-      td {
-        padding: 0;
-      }
-    }
-
-    .timestamp {
-      font-size: $font-size-sm;
-      padding: 0;
-      order: -1;
-      width: 100%;
-    }
-  }
-}
-
-image-uploader {
-  display: block;
-  margin-top: 1rem;
-}
+// image-uploader {
+//   display: block;
+//   margin-top: 1rem;
+// }
 
 @include break-mobile-med {
   .pagination-wrap {
