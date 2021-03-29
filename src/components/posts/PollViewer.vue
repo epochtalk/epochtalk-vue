@@ -92,7 +92,7 @@
       </div>
 
       <!-- Poll Results -->
-      <div class="poll-answer" ng-repeat="answer in poll.answers">
+      <div class="poll-answer" v-for="(answer) in poll.answers" :key="answer.id">
         <div :class="{ 'poll-answer-row':showPollResults(), 'selected-answer':answer.selected }">
           <label class="poll-select" ng-class="{ 'active':pollAnswers.indexOf(answer.id) > -1, 'default-cursor voted':!canVote() }">
             <span v-if="answer.selected" class="selected-answer-icon">
