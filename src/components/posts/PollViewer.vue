@@ -156,6 +156,12 @@ export default {
       console.log('PollViewer showPollResults')
       return true
     }
+    const vote = () => {
+      console.log('PollViewer vote')
+    }
+    const removeVote = () => {
+      console.log('PollViewer removeVote')
+    }
     const v = reactive({
       options: {},
       pollAnswers: props.poll.answers,
@@ -169,6 +175,8 @@ export default {
       canRemoveVote,
       pollValid,
       showPollResults,
+      vote,
+      removeVote,
       humanDate
     }
   }
