@@ -132,11 +132,41 @@ import { reactive, toRefs } from 'vue'
 export default {
   props: ['poll', 'thread', 'userPriority', 'reset'],
   setup(props) {
+    const canLock = () => {
+      console.log('PollViewer canLock')
+      return true
+    }
+    const canEdit = () => {
+      console.log('PollViewer canEdit')
+      return true
+    }
+    const canVote = () => {
+      console.log('PollViewer canVote')
+      return true
+    }
+    const canRemoveVote = () => {
+      console.log('PollViewer canRemoveVote')
+      return true
+    }
+    const pollValid = () => {
+      console.log('PollViewer pollValid')
+      return true
+    }
+    const showPollResults = () => {
+      console.log('PollViewer showPollResults')
+      return true
+    }
     const v = reactive({
       poll: props.poll
     })
     return {
       ...toRefs(v),
+      canLock,
+      canEdit,
+      canVote,
+      canRemoveVote,
+      pollValid,
+      showPollResults,
       humanDate
     }
   }
