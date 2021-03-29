@@ -157,6 +157,8 @@ export default {
       return true
     }
     const v = reactive({
+      options: {},
+      pollAnswers: props.poll.answers,
       poll: props.poll
     })
     return {
