@@ -165,7 +165,12 @@ export default {
       console.log('PollViewer removeVote')
     }
     const v = reactive({
-      options: {},
+      options: {
+        expiration: props.poll.expiration || undefined,
+        change_vote: props.poll.change_vote,
+        max_answers: props.poll.max_answers,
+        display_mode: props.poll.display_mode
+      },
       editPoll: false,
       pollAnswers: props.poll.answers,
       pollLocked: props.poll.locked,
