@@ -4,13 +4,13 @@
     <div class="poll-title">
       <span class="poll-title-text">
         Poll
-        <span class="is__locked" v-if="poll.locked">(Locked)</span>
+        <span class="is__locked" v-if="pollLocked">(Locked)</span>
       </span>
       <div class="poll-controls">
         <!-- Poll Controls -->
         <!-- TODO(boka): data-balloon="Lock Poll" data-balloon-pos="down" -->
-        <div class="poll-control" v-if="canLock()" :class="{'is__locked' : poll.locked}">
-          <input id="lockPoll" class="icon" type="checkbox" v-model="poll.locked">
+        <div class="poll-control" v-if="canLock()" :class="{'is__locked' : pollLocked}">
+          <input id="lockPoll" class="icon" type="checkbox" v-model="pollLocked">
           <label for="lockPoll"  @click="updateLockPoll()">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
               <title></title>
@@ -167,6 +167,7 @@ export default {
     const v = reactive({
       options: {},
       pollAnswers: props.poll.answers,
+      pollLocked: props.poll.locked,
       poll: props.poll
     })
     return {
