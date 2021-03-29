@@ -455,41 +455,6 @@ export default {
 
 .profile-threads-posts { grid-area: main; }
 
-.table-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-
-  button {
-    background: transparent;
-    border-bottom: 1px solid rgba(0,0,0,0);
-    border-radius: 0;
-    color: $text-gray-dark;
-    margin-right: 2rem;
-    padding: 0.5rem 0;
-
-    &:hover {
-      background: inherit;
-      border-color: rgba($color-primary, .8);
-      color: rgba($color-primary, .8);
-      box-shadow: none;
-      transform: initial;
-    }
-
-    &.active {
-      color: $color-primary;
-      border-color: $color-primary;
-    }
-  }
-
-  @include break-mobile-med {
-    margin-bottom: 1rem;
-    margin-top: 2rem;
-    button { font-size: $font-size-sm; }
-    .username { display: none; }
-  }
-}
-
 .profile-sidebar {
   color: $text-gray-dark;
   grid-area: sidebar;
