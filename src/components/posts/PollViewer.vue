@@ -21,7 +21,7 @@
         </div>
         <!-- TODO(boka):  data-balloon="Edit Poll" data-balloon-pos="down" -->
         <div class="poll-control" v-if="canEdit()">
-          <input id="editPoll" class="icon" type="checkbox" v-model="switches.editPoll">
+          <input id="editPoll" class="icon" type="checkbox" v-model="editPoll">
           <label for="editPoll" @click="scrollPollView()">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
               <title></title>
@@ -34,7 +34,7 @@
     </div>
 
     <!-- Poll Edit -->
-    <div class="poll-edit" slide-toggle="switches.editPoll" initial-state="closed" v-if="canEdit()">
+    <div class="poll-edit" slide-toggle="editPoll" initial-state="closed" v-if="canEdit()">
       <div class="slide-wrapper">
         <div class="poll-edit-container">
           <h5 class="panelTitle">Edit Poll Options:</h5>
@@ -66,7 +66,7 @@
             </div>
           </div>
           <div class="actions__pollEdit">
-            <button class="secondary cancel small" @click="switches.editPoll = false">Cancel</button>
+            <button class="secondary cancel small" @click="editPoll = false">Cancel</button>
             <button class="small" :disabled="!pollValid()" @click="saveOptions()">Save Changes</button>
           </div>
         </div>
@@ -166,6 +166,7 @@ export default {
     }
     const v = reactive({
       options: {},
+      editPoll: false,
       pollAnswers: props.poll.answers,
       pollLocked: props.poll.locked,
       poll: props.poll
