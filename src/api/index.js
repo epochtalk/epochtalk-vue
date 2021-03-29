@@ -66,6 +66,7 @@ export const postsApi = {
   unlock: postId => $http(`/api/posts/${postId}/unlock`, { method: 'POST'}),
   byThread: params => $http('/api/posts', { params }),
   byUser: params => $http(`/api/posts/user/${params.username}`, { params }),
+  startedByUser: params => $http(`/api/posts/user/${params.username}/started`, { params }),
   slugToPostId: slug => $http(`/api/posts/${slug}/id`)
 }
 
