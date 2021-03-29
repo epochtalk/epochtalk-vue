@@ -1,11 +1,11 @@
 <template>
   <div class="user-profile-posts">
     <div class="table-actions">
-      <button @click="toggleThreads(true)" :class="{'active': threadsMode}">
+      <button @click="threadsMode = true" :class="{'active': threadsMode}">
         <strong>Threads&nbsp;</strong> <span class="username">by {{username}}</span>
       </button>
 
-      <button @click="toggleThreads(false)" :class="{'active': !threadsMode}">
+      <button @click="threadsMode = false" :class="{'active': !threadsMode}">
         <strong>Posts&nbsp;</strong> <span class="username">by {{username}}</span>
       </button>
     </div>
@@ -67,10 +67,10 @@
           </div>
         </div> -->
 
-      <div class="no-table-contents" v-if="!postData?.posts.length">
+      <div class="no-table-contents" v-if="!threadData?.posts.length">
         <h4>This user has no threads to display</h4>
       </div>
-      <div v-if="postData?.posts.length">
+      <div v-if="threadData?.posts.length">
         <table class="profile-posts-table" width="100%">
           <thead>
             <th class="thread">Thread</th>
@@ -78,7 +78,7 @@
           </thead>
 
           <tbody>
-            <tr v-for="post in postData?.posts" :key="post.id">
+            <tr v-for="post in threadData?.posts" :key="post.id">
               <!-- TODO(akinsey): <td data-balloon="{{post.thread_title}}" data-balloon-pos="top"> -->
               <td>
                 <div class="truncate-title">
@@ -120,6 +120,7 @@ export default {
         desc: to.query.desc
       }
       postsApi.byUser(params).then(d => vm.postData = d)
+      postsApi.startedByUser({ ...params, page: 1 }).then(d => vm.threadData = d)
     })
   },
   beforeRouteUpdate(to, from, next) {
@@ -131,6 +132,7 @@ export default {
       desc: to.query.desc
     }
     postsApi.byUser(params).then(d => this.postData = d)
+    postsApi.startedByUser({ ...params, page: 1 }).then(d => this.threadData = d)
     next()
   },
   setup() {
@@ -144,9 +146,10 @@ export default {
           desc: $route.query.desc
         }
         postsApi.byUser(params).then(d => v.postData = d)
+        postsApi.startedByUser({ ...params, page: 1 }).then(d => v.threadData = d)
       }
     })
-    const toggleThreads = () => console.log('toggle threads')
+
     const setDesc = () => console.log('set desc')
     const getSortClass = field => {
       let sortClass = 'fa '
@@ -165,9 +168,10 @@ export default {
     const v = reactive({
       prefs: $prefs.data,
       threadsMode: false,
-      postData: null
+      postData: null,
+      threadData: null
     })
-    return { ...toRefs(v), toggleThreads, setDesc, getSortClass, humanDate }
+    return { ...toRefs(v), setDesc, getSortClass, humanDate }
   }
 }
 </script>
