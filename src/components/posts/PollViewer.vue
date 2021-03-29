@@ -8,8 +8,9 @@
       </span>
       <div class="poll-controls">
         <!-- Poll Controls -->
-        <div class="poll-control" v-if="canLock()" :class="{'is__locked' : poll.locked}" data-balloon="Lock Poll" data-balloon-pos="down">
-          <input id="lockPoll" class="icon" type="checkbox" ng-model="poll.locked">
+        <!-- TODO(boka): data-balloon="Lock Poll" data-balloon-pos="down" -->
+        <div class="poll-control" v-if="canLock()" :class="{'is__locked' : poll.locked}">
+          <input id="lockPoll" class="icon" type="checkbox" v-model="poll.locked">
           <label for="lockPoll"  @click="updateLockPoll()">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
               <title></title>
@@ -18,8 +19,9 @@
             </svg>
           </label>
         </div>
-        <div class="poll-control" v-if="canEdit()" data-balloon="Edit Poll" data-balloon-pos="down">
-          <input id="editPoll" class="icon" type="checkbox" ng-model="switches.editPoll" >
+        <!-- TODO(boka):  data-balloon="Edit Poll" data-balloon-pos="down" -->
+        <div class="poll-control" v-if="canEdit()">
+          <input id="editPoll" class="icon" type="checkbox" v-model="switches.editPoll">
           <label for="editPoll" @click="scrollPollView()">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
               <title></title>
@@ -37,7 +39,7 @@
         <div class="poll-edit-container">
           <h5 class="panelTitle">Edit Poll Options:</h5>
           <label for="pollVote">
-            <input type="checkbox" id="pollVote" ng-model="options.change_vote">
+            <input type="checkbox" id="pollVote" v-model="options.change_vote">
             Allow user to change vote
           </label>
           <div class="pollEdit__expiration">
