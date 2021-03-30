@@ -44,23 +44,27 @@
           </label>
           <div class="pollEdit__expiration">
             <label for="pollVoteExpiration">Poll expires on {{humanDate(options.expiration) || '(No Expiration)'}}</label>
-            <input id="pollVoteExpiration" type="date" ng-model="options.expiration_date" @change="calcExpiration()">
-            <input type="time" ng-model="options.expiration_time" @change="calcExpiration()">
+            <input id="pollVoteExpiration" type="date" v-model="options.expiration_date" @change="calcExpiration()">
+            <input type="time" v-model="options.expiration_time" @change="calcExpiration()">
           </div>
           <div class="pollEdit__answers">
             <label for="pollMaxVote">Maximum answers per vote:</label>
-            <input type="number" id="pollMaxVote" min="1" max="{{poll.answers.length}}" value="1" ng-model="options.max_answers">
+            <!-- TODO(boka): value="1" -->
+            <input type="number" id="pollMaxVote" min="1" max="{{poll.answers.length}}" v-model="options.max_answers">
             <div class="pollGroup__header"><label>Show poll results: </label>
               <label for="displayAlways">
-                <input type="radio" id="displayAlways" ng-model="options.display_mode" value="always">
+                <!-- TODO(boka): value="always" -->
+                <input type="radio" id="displayAlways" v-model="options.display_mode">
                 Always shown
               </label>
               <label for="displayVoted">
-                <input type="radio" id="displayVoted" ng-model="options.display_mode" value="voted">
+                <!-- TODO(boka): value="voted" -->
+                <input type="radio" id="displayVoted" v-model="options.display_mode">
                 After voting
               </label>
               <label for="displayExpired">
-                <input type="radio" id="displayExpired" ng-model="options.display_mode" value="expired" :disabled="!options.expiration">
+                <!-- TODO(boka): value="expired" -->
+                <input type="radio" id="displayExpired" v-model="options.display_mode" :disabled="!options.expiration">
                 After expiration
               </label>
             </div>
