@@ -44,8 +44,8 @@
           </label>
           <div class="pollEdit__expiration">
             <label for="pollVoteExpiration">Poll expires on {{humanDate(options.expiration) || '(No Expiration)'}}</label>
-            <input id="pollVoteExpiration" type="date" ng-model="options.expiration_date" ng-change="calcExpiration()">
-            <input type="time" ng-model="options.expiration_time" ng-change="calcExpiration()">
+            <input id="pollVoteExpiration" type="date" ng-model="options.expiration_date" @change="calcExpiration()">
+            <input type="time" ng-model="options.expiration_time" @change="calcExpiration()">
           </div>
           <div class="pollEdit__answers">
             <label for="pollMaxVote">Maximum answers per vote:</label>
