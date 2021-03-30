@@ -12,11 +12,14 @@
 
     <!-- User's Paged Posts -->
     <div v-if="!threadsMode">
-  <!--     <div>
-        <div class="pagination-wrap" v-if="posts.pageCount > 0">
-          <pagination page-count="ProfilePostsCtrl.pageCount" page="ProfilePostsCtrl.page" query-params="ProfilePostsCtrl.queryParams"></pagination>
-        </div>
-      </div> -->
+      <div class="pagination-wrap" v-if="postData?.posts?.length > 0">
+        <!-- <pagination page-count="ProfilePostsCtrl.pageCount" page="ProfilePostsCtrl.page" query-params="ProfilePostsCtrl.queryParams"></pagination> -->
+        <simple-pagination
+          :pages="10"
+          :range-size="1"
+          active-color="#DCEDFF"
+        />
+      </div>
 
       <div class="no-table-contents" v-if="!postData?.posts?.length">
         <h4>This user has no posts to display</h4>
@@ -53,19 +56,19 @@
     <div v-if="threadsMode">
       <!-- User's Paged Threads -->
 
-  <!--       <div class="pagination-wrap" ng-if="ProfilePostsCtrl.usersPosts.length > 0">
+        <div class="pagination-wrap" v-if="threadData.posts.length > 0">
           <div class="pagination-simple">
-            <a ng-show="ProfilePostsCtrl.prev" ui-sref=".({ threads: ProfilePostsCtrl.threads, page: ProfilePostsCtrl.prev, limit: ProfilePostsCtrl.limit, desc: ProfilePostsCtrl.desc })">
+            <a v-show="threadData.prev">
               &#10094; Previous
             </a>
-            <span ng-hide="ProfilePostsCtrl.prev">&#10094; Previous</span>
+            <span v-show="!threadData.prev">&#10094; Previous</span>
             &nbsp;&nbsp;&nbsp;
-            <a ng-show="ProfilePostsCtrl.next" ui-sref=".({ threads: ProfilePostsCtrl.threads, page: ProfilePostsCtrl.next, limit: ProfilePostsCtrl.limit, desc: ProfilePostsCtrl.desc })">
+            <a v-show="threadData.next">
                Next &#10095;
             </a>
-            <span ng-hide="ProfilePostsCtrl.next">Next &#10095;</span>
+            <span v-show="!threadData.next">Next &#10095;</span>
           </div>
-        </div> -->
+        </div>
 
       <div class="no-table-contents" v-if="!threadData?.posts.length">
         <h4>This user has no threads to display</h4>
@@ -106,9 +109,11 @@ import { reactive, toRefs, onBeforeMount, inject } from 'vue'
 import { postsApi } from '@/api'
 import { PreferencesStore, localStoragePrefs } from '@/composables/stores/prefs'
 import { useRoute } from 'vue-router'
+import SimplePagination from '@/components/layout/SimplePagination.vue'
 
 export default {
   name: 'UserPosts',
+  components: { SimplePagination },
   props: [ 'username' ],
   beforeRouteEnter(to, from, next) {
     next(vm => {
@@ -166,10 +171,12 @@ export default {
     const $prefs = inject(PreferencesStore)
 
     const v = reactive({
+      page: 1,
       prefs: $prefs.data,
       threadsMode: false,
       postData: null,
-      threadData: null
+      threadData: null,
+      test: () => {}
     })
     return { ...toRefs(v), setDesc, getSortClass, humanDate }
   }
@@ -291,5 +298,9 @@ export default {
     button { font-size: $font-size-sm; }
     .username { display: none; }
   }
+}
+
+.pagination-wrap {
+  grid-area: sidebar;
 }
 </style>
