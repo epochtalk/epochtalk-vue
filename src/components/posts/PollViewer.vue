@@ -180,6 +180,17 @@ export default {
       pollLocked: props.poll.locked,
       poll: props.poll
     })
+    // poll expiration
+    if (v.poll.expiration) {
+      // set poll expired
+      var expiry = new Date(v.poll.expiration)
+      v.poll.expired = expiry < Date.now()
+
+      // set options expiration
+      var datetime = new Date(v.poll.expiration)
+      v.options.expiration_date = datetime
+      v.options.expiration_time = datetime
+    }
     return {
       ...toRefs(v),
       canLock,
