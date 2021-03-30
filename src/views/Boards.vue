@@ -8,7 +8,7 @@
     </div>
     <div v-if="loggedIn" class="dashboard-actions">
       <a class="button" href="#">Watchlist</a>
-      <a class="button" href="#">Threads Posted In</a>
+      <router-link :to="{ name: 'ThreadsPostedIn' }" class="button">Threads Posted In</router-link>
     </div>
 
     <div v-if="boardData.data">
