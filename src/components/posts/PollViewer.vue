@@ -34,7 +34,8 @@
     </div>
 
     <!-- Poll Edit -->
-    <div class="poll-edit" slide-toggle="editPoll" initial-state="closed" v-if="canEdit()">
+    <!-- TODO(boka): slide-toggle="editPoll" initial-state="closed" -->
+    <div class="poll-edit" :hidden="!editPoll" v-if="canEdit()">
       <div class="slide-wrapper">
         <div class="poll-edit-container">
           <h5 class="panelTitle">Edit Poll Options:</h5>
