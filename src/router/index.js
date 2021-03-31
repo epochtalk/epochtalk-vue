@@ -61,7 +61,12 @@ const routes = [
     name: 'Profile',
     component: Profile,
     props: true,
-    meta: { requiresAuth: true, bodyClass: 'profile' }
+    meta: { requiresAuth: true, bodyClass: 'profile' },
+    children: [{
+      path: '',
+      component: UserPosts,
+      props: true
+    }]
   },
   {
     path: '/profile/:username/posts',

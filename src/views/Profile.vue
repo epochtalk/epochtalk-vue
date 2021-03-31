@@ -81,7 +81,7 @@
     </div>
 
     <div class="profile-threads-posts">
-      <user-posts :username="user?.username" />
+      <router-view></router-view>
     </div>
 
     <div class="profile-sidebar">
@@ -158,13 +158,11 @@
 
 <script>
 import { reactive, toRefs } from 'vue'
-import UserPosts from '@/components/users/UserPosts.vue'
 import humanDate from '@/composables/filters/humanDate'
 import { usersApi } from '@/api'
 
 export default {
   name: 'Profile',
-  components: { UserPosts },
   props: [ 'username' ],
   beforeRouteEnter(to, from, next) {
     next(vm => usersApi.find(vm.username).then(u => vm.user = u))

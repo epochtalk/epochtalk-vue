@@ -1,23 +1,25 @@
 <template>
   <div class="user-profile-posts">
     <div class="table-actions">
-      <button @click="threadsMode = true" :class="{'active': threadsMode}">
+      <button @click="toggleThreads(true)" :class="{'active': threads}">
         <strong>Threads&nbsp;</strong> <span class="username">by {{username}}</span>
       </button>
 
-      <button @click="threadsMode = false" :class="{'active': !threadsMode}">
+      <button @click="toggleThreads(false)" :class="{'active': !threads}">
         <strong>Posts&nbsp;</strong> <span class="username">by {{username}}</span>
       </button>
     </div>
 
     <!-- User's Paged Posts -->
-    <div v-if="!threadsMode">
-      <div class="pagination-wrap" v-if="postData?.posts?.length > 0">
+    <div v-if="!threads && postData">
+      <div class="pagination-wrap" v-if="postData?.count > postData?.limit">
         <!-- <pagination page-count="ProfilePostsCtrl.pageCount" page="ProfilePostsCtrl.page" query-params="ProfilePostsCtrl.queryParams"></pagination> -->
         <simple-pagination
-          :pages="10"
+          v-model="currentPage"
+          :pages="pages"
           :range-size="1"
           active-color="#DCEDFF"
+          @update:modelValue="pagePosts"
         />
       </div>
 
@@ -25,7 +27,7 @@
         <h4>This user has no posts to display</h4>
       </div>
 
-      <div v-if="postData?.posts?.length">
+      <div v-if="postData && postData?.posts?.length">
         <table class="profile-posts-table" width="100%">
           <thead>
             <th class="thread">Thread</th>
@@ -53,27 +55,27 @@
       </div>
     </div>
 
-    <div v-if="threadsMode">
+    <div v-if="threads && postData">
       <!-- User's Paged Threads -->
 
-        <div class="pagination-wrap" v-if="threadData.posts.length > 0">
+        <div class="pagination-wrap" v-if="postData.posts.length > 0">
           <div class="pagination-simple">
-            <a v-show="threadData.prev">
+            <a v-show="postData.prev">
               &#10094; Previous
             </a>
-            <span v-show="!threadData.prev">&#10094; Previous</span>
+            <span v-show="!postData.prev">&#10094; Previous</span>
             &nbsp;&nbsp;&nbsp;
-            <a v-show="threadData.next">
+            <a v-show="postData.next">
                Next &#10095;
             </a>
-            <span v-show="!threadData.next">Next &#10095;</span>
+            <span v-show="!postData.next">Next &#10095;</span>
           </div>
         </div>
 
-      <div class="no-table-contents" v-if="!threadData?.posts.length">
+      <div class="no-table-contents" v-if="!postData?.posts.length">
         <h4>This user has no threads to display</h4>
       </div>
-      <div v-if="threadData?.posts.length">
+      <div v-if="postData?.posts.length">
         <table class="profile-posts-table" width="100%">
           <thead>
             <th class="thread">Thread</th>
@@ -81,7 +83,7 @@
           </thead>
 
           <tbody>
-            <tr v-for="post in threadData?.posts" :key="post.id">
+            <tr v-for="post in postData?.posts" :key="post.id">
               <!-- TODO(akinsey): <td data-balloon="{{post.thread_title}}" data-balloon-pos="top"> -->
               <td>
                 <div class="truncate-title">
@@ -105,10 +107,10 @@
 
 <script>
 import humanDate from '@/composables/filters/humanDate'
-import { reactive, toRefs, onBeforeMount, inject } from 'vue'
+import { reactive, toRefs, computed, inject } from 'vue'
 import { postsApi } from '@/api'
 import { PreferencesStore, localStoragePrefs } from '@/composables/stores/prefs'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import SimplePagination from '@/components/layout/SimplePagination.vue'
 
 export default {
@@ -124,8 +126,12 @@ export default {
         field: to.query.field,
         desc: to.query.desc
       }
-      postsApi.byUser(params).then(d => vm.postData = d)
-      postsApi.startedByUser({ ...params, page: 1 }).then(d => vm.threadData = d)
+      if (vm.threads) postsApi.startedByUser(params).then(d => vm.postData = d)
+      else postsApi.byUser(params)
+        .then(d => {
+          vm.postData = d
+          vm.currentPage = d.page
+        })
     })
   },
   beforeRouteUpdate(to, from, next) {
@@ -136,30 +142,35 @@ export default {
       field: to.query.field,
       desc: to.query.desc
     }
-    postsApi.byUser(params).then(d => this.postData = d)
-    postsApi.startedByUser({ ...params, page: 1 }).then(d => this.threadData = d)
+    if (this.threads) postsApi.startedByUser(params).then(d => this.postData = d)
+    else postsApi.byUser(params)
+      .then(d => {
+        this.postData = d
+        this.currentPage = d.page
+      })
     next()
   },
   setup() {
-    onBeforeMount(() => {
-      if (!v.postData) {
-        const params = {
-          username: $route.params.username,
-          limit: v.prefs.posts_per_page,
-          page: $route.query.page || 1,
-          field: $route.query.field,
-          desc: $route.query.desc
-        }
-        postsApi.byUser(params).then(d => v.postData = d)
-        postsApi.startedByUser({ ...params, page: 1 }).then(d => v.threadData = d)
-      }
-    })
+    const pagePosts = () => {
+      const params = { ...$route.params, saveScrollPos: true }
+      let query = { ...$route.query, page: v.currentPage }
+      if (query.page === 1 || !query.page) delete query.page
+      if ($route.query.page !== v.currentPage)
+        $router.replace({ name: $route.name, params: params, query: query })
+    }
+
+    const toggleThreads = threads => {
+      const params = { ...$route.params, saveScrollPos: true }
+      if (threads) $router.replace({ name: $route.name, params: params, query: { threads }})
+      else $router.replace({ name: $route.name, params: params })
+      v.threads = threads
+    }
 
     const setDesc = () => console.log('set desc')
     const getSortClass = field => {
       let sortClass = 'fa '
-      const desc = v.postData.desc
-      const curField = v.postData.field
+      const desc = v.postData?.desc
+      const curField = v.postData?.field
       const defaultField = field === 'updated_at' && !curField
       if ((defaultField || curField === field) && desc) sortClass += 'fa-sort-down'
       else if ((defaultField || curField === field) && !desc) sortClass += 'fa-sort-up'
@@ -168,17 +179,17 @@ export default {
     }
 
     const $route = useRoute()
+    const $router = useRouter()
     const $prefs = inject(PreferencesStore)
 
     const v = reactive({
-      page: 1,
+      currentPage: Number($route.query.page) || 1,
+      pages: computed(() => Math.ceil(v.postData?.count  / v.postData?.limit)),
       prefs: $prefs.data,
-      threadsMode: false,
-      postData: null,
-      threadData: null,
-      test: () => {}
+      threads: !!$route.query.threads,
+      postData: null
     })
-    return { ...toRefs(v), setDesc, getSortClass, humanDate }
+    return { ...toRefs(v), pagePosts, toggleThreads, setDesc, getSortClass, humanDate }
   }
 }
 </script>
@@ -301,6 +312,6 @@ export default {
 }
 
 .pagination-wrap {
-  grid-area: sidebar;
+  float: right;
 }
 </style>
