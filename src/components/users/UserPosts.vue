@@ -57,19 +57,12 @@
     <div v-if="threads && postData">
       <!-- User's Paged Threads -->
 
-        <div class="pagination-wrap" v-if="postData.posts.length > 0">
-          <div class="pagination-simple">
-            <a v-show="postData.prev">
-              &#10094; Previous
-            </a>
-            <span v-show="!postData.prev">&#10094; Previous</span>
-            &nbsp;&nbsp;&nbsp;
-            <a v-show="postData.next">
-               Next &#10095;
-            </a>
-            <span v-show="!postData.next">Next &#10095;</span>
-          </div>
+      <div class="pagination-wrap" v-if="postData.posts.length > 0">
+        <div class="pagination-simple">
+          <button @click="pagePosts(-1)" :disabled="!postData?.prev">&#10094; Prev</button>
+          <button @click="pagePosts(1)" :disabled="!postData?.next">Next &#10095;</button>
         </div>
+      </div>
 
       <div class="no-table-contents" v-if="!postData?.posts.length">
         <h4>This user has no threads to display</h4>
@@ -150,9 +143,11 @@ export default {
     next()
   },
   setup() {
-    const pagePosts = () => {
+    const pagePosts = inc => {
       const params = { ...$route.params, saveScrollPos: true }
-      let query = { ...$route.query, page: v.currentPage }
+      // Handle different pagination controls (threads) prev/next vs (posts) actual pagination
+      const newPage = v.threads && inc ? v.postData.page + inc : v.currentPage
+      let query = { ...$route.query, page: newPage }
       if (query.page === 1 || !query.page) delete query.page
       if ($route.query.page !== v.currentPage)
         $router.replace({ name: $route.name, params: params, query: query })
