@@ -18,7 +18,6 @@
           v-model="currentPage"
           :pages="pages"
           :range-size="1"
-          active-color="#DCEDFF"
           @update:modelValue="pagePosts"
         />
       </div>

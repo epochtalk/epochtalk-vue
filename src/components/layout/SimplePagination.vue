@@ -15,7 +15,6 @@
       :key="`pagination-page-${page}`"
       :page="page"
       :current="modelValue"
-      :active-color="activeColor"
       @update="updatePageHandler"
     />
     <li class="pagination-control">
@@ -50,10 +49,6 @@ export default {
     modelValue: {
       type: Number,
       default: 0,
-    },
-    activeColor: {
-      type: String,
-      default: '#DCEDFF',
     },
     hideFirstButton: {
       type: Boolean,
@@ -103,8 +98,6 @@ export default {
 
     const updatePageHandler = params => emit('update:modelValue', params)
 
-
-    // controls
     const isPrevControlsActive = computed(() => props.modelValue > 1)
 
     const isNextControlsActive = computed(() => props.modelValue < props.pages)
@@ -123,8 +116,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import './src/assets/styles/_settings.scss';
-
 .pagination {
   display: flex;
   flex-flow: row;
@@ -146,15 +137,15 @@ export default {
   width: 18px;
   height: 18px;
   margin: 0 2px;
-  fill: $grey_01;
-
+  fill: $border-color;
+  &:hover { fill: $border-color; }
   &-active {
-    fill: $black_01;
+    fill: $base-font-color;
     cursor: pointer;
     transition: fill 0.2s ease-in-out;
 
     &:hover {
-      fill: $black_00;
+      fill: $color-primary;
       transition: fill 0.2s ease-in-out;
     }
   }
