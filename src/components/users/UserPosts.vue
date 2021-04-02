@@ -160,7 +160,12 @@ export default {
       v.threads = threads
     }
 
-    const setDesc = () => console.log('set desc')
+    const setDesc = () => {
+      const params = { ...$route.params, saveScrollPos: true }
+      let query = { ...$route.query, desc: !v.postData.desc }
+      if (query.desc) delete query.desc
+      $router.replace({ name: $route.name, params, query })
+    }
     const getSortClass = field => {
       let sortClass = 'fa '
       const desc = v.postData?.desc
