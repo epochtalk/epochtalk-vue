@@ -249,7 +249,7 @@ export default {
   }
 }
 </script>
-<style>
+<style lang="scss">
 poll-creator {
   display: flex;
   flex-direction: column;
