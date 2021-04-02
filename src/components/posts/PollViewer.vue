@@ -132,11 +132,21 @@
 </template>
 <script>
 import humanDate from '@/composables/filters/humanDate'
-import { reactive, toRefs } from 'vue'
+import { reactive, toRefs, watch } from 'vue'
 
 export default {
   props: ['poll', 'thread', 'userPriority', 'reset'],
   setup(props) {
+    const calculatePollPercentage = () => {
+      v.poll.totalVotes = 0
+      v.poll.answers.forEach(answer => { v.poll.totalVotes += answer.votes })
+      v.pollAnswers.map(answer => {
+        var percentage = (answer.votes/v.poll.totalVotes) * 100 || 0
+        percentage = +percentage.toFixed(1)
+        answer.style = { width: percentage + '%' }
+        answer.percentage = percentage
+      });
+    }
     const canLock = () => {
       console.log('PollViewer canLock')
       return true
@@ -216,6 +226,12 @@ export default {
       v.options.expiration_date = datetime
       v.options.expiration_time = datetime
     }
+    // poll percentages
+    calculatePollPercentage()
+
+    /* Watched Data */
+    watch(() => v.pollAnswers, () => calculatePollPercentage())
+
     return {
       ...toRefs(v),
       canLock,
