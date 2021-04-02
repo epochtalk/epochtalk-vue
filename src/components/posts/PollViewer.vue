@@ -215,6 +215,7 @@ export default {
       pollLocked: props.poll.locked,
       poll: props.poll
     })
+    /* Data Initialization */
     // poll expiration
     if (v.poll.expiration) {
       // set poll expired
