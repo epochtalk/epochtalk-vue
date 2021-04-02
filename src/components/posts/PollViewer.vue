@@ -101,7 +101,7 @@
       <!-- Poll Results -->
       <div class="poll-answer" v-for="(answer) in poll.answers" :key="answer.id">
         <div :class="{ 'poll-answer-row':showPollResults(), 'selected-answer':answer.selected }">
-          <label class="poll-select" ng-class="{ 'active':pollAnswers.indexOf(answer.id) > -1, 'default-cursor voted':!canVote() }">
+          <label class="poll-select" :class="{ 'active':pollAnswers.indexOf(answer.id) > -1, 'default-cursor voted':!canVote() }">
             <span v-if="answer.selected" class="selected-answer-icon">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <title></title>
@@ -109,7 +109,7 @@
               </svg>
             </span>
             <input v-if="poll.max_answers === 1 && canVote()" @click="pollAnswers.pop(); toggleAnswer(answer.id);" name="pollanswer" type="radio">
-            <input type="checkbox" @click="toggleAnswer(answer.id)" :disabled="pollAnswers.length >= poll.max_answers && pollAnswers.indexOf(answer.id) === -1" ng-checked="pollAnswers.indexOf(answer.id) > -1" v-if="poll.max_answers > 1 && canVote()"/>
+            <input type="checkbox" @click="toggleAnswer(answer.id)" :disabled="pollAnswers.length >= poll.max_answers && pollAnswers.indexOf(answer.id) === -1" :checked="pollAnswers.indexOf(answer.id) > -1" v-if="poll.max_answers > 1 && canVote()"/>
             <span>{{answer.answer}}</span>
           </label>
           <div v-if="showPollResults()" class="poll-results">
@@ -118,7 +118,7 @@
               <span class="poll-results-label">{{'(' + answer.votes + (answer.votes > 1 || answer.votes === 0 ? ' votes)' : ' vote)')}}</span>
             </div>
             <div class="poll-bar">
-              <section ng-style="answer.style"></section>
+              <section :style="answer.style"></section>
             </div>
           </div>
         </div>
