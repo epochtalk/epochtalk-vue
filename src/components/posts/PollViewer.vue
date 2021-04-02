@@ -83,7 +83,7 @@
         <!-- Poll Details -->
         <div class="poll-header-main">
           <!-- Poll Question -->
-          <h1 class="poll-question" ng-bind="poll.question"></h1>
+          <h1 class="poll-question">{{poll.question}}</h1>
           <div class="poll-details">
             <span class="poll-info" v-if="poll.display_mode === 'always'">Results Always Shown. </span>
             <span class="poll-info" v-if="poll.display_mode === 'voted'">Results After Voting. </span>
@@ -110,14 +110,12 @@
             </span>
             <input v-if="poll.max_answers === 1 && canVote()" @click="pollAnswers.pop(); toggleAnswer(answer.id);" name="pollanswer" type="radio">
             <input type="checkbox" @click="toggleAnswer(answer.id)" :disabled="pollAnswers.length >= poll.max_answers && pollAnswers.indexOf(answer.id) === -1" ng-checked="pollAnswers.indexOf(answer.id) > -1" v-if="poll.max_answers > 1 && canVote()"/>
-            <span ng-bind="answer.answer"></span>
+            <span>{{answer.answer}}</span>
           </label>
           <div v-if="showPollResults()" class="poll-results">
             <div class="poll-results-data">
-              <span class="poll-results-value"
-                ng-bind="answer.percentage + '% '"></span>
-              <span class="poll-results-label"
-                ng-bind="'(' + answer.votes + (answer.votes > 1 || answer.votes === 0 ? ' votes)' : ' vote)')"></span>
+              <span class="poll-results-value">{{answer.percentage + '% '}}</span>
+              <span class="poll-results-label">{{'(' + answer.votes + (answer.votes > 1 || answer.votes === 0 ? ' votes)' : ' vote)')}}</span>
             </div>
             <div class="poll-bar">
               <section ng-style="answer.style"></section>
