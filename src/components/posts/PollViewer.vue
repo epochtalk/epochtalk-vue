@@ -329,7 +329,6 @@ poll-creator {
     }
 
     .answer-row {
-      @include row;
       margin-bottom: 0.625rem;
       &:last-of-type { margin-bottom: 1rem; }
 
@@ -592,7 +591,7 @@ poll-creator {
     bottom: 0;
   }
 
-  @include media($mobile) {
+  @include break-mobile-sm {
     .poll-info .fourth-columns { margin-bottom: 0.5rem; }
     .poll-answer .poll-bar .poll-answer-fill { max-width: 30%; }
     .poll-answer .poll-select.active { background-color: transparent; }
