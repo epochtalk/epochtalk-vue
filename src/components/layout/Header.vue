@@ -24,10 +24,14 @@
           <a href="#"><i class="fa fa-binoculars" aria-hidden="true"></i>Patrol</a>
         </li>
         <li @click="showMobileMenu = false" >
-          <a href="#"><i class="fa fa-user" aria-hidden="true"></i>Profile</a>
+          <router-link :to="{ path: '/profile/' + currentUser.username }">
+            <i class="fa fa-user" aria-hidden="true"></i>Profile
+          </router-link>
         </li>
         <li @click="showMobileMenu = false" >
-          <a href="#"><i class="fa fa-wrench" aria-hidden="true"></i>Settings</a>
+          <router-link :to="{ name: 'Settings' }">
+            <i class="fa fa-wrench" aria-hidden="true"></i>Settings
+          </router-link>
         </li>
         <li @click="showMobileMenu = false" >
           <a href="#"><i class="fa fa-users" aria-hidden="true"></i>Member Search</a>
@@ -115,12 +119,12 @@
             </li>
             <li id="user-dropdown-wrap" class="hide-mobile">
               <div>
-                <a href="#">
+                <router-link :to="{ path: '/profile/' + currentUser.username }">
                   <div class="avatar-wrap">
                     <img :src="currentUser.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" class="avatar" :class="defaultAvatarShape">
                   </div>
                   <span>{{currentUser.username}}</span>
-                </a>
+                </router-link>
               </div>
               <ul id="user-dropdown">
                 <li v-if="permissionUtils.hasPermission('adminAccess')">
@@ -133,7 +137,9 @@
                   <a href="#">Patrol</a>
                 </li>
                 <li>
-                  <a href="#">Profile</a>
+                  <router-link :to="{ path: '/profile/' + currentUser.username }">
+                    Profile
+                  </router-link>
                 </li>
                 <li>
                   <router-link :to="{ name: 'Settings' }">Settings</router-link>

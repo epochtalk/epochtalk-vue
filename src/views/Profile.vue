@@ -1,5 +1,5 @@
 <template>
-  <div class="profile-wrap">
+  <div class="profile-wrap" v-if="user">
     <div class="message-banned" v-if="banExpiration">
       {{ user.username }}
       <span v-if="banExpiration !== 'Permanent'">
@@ -10,11 +10,11 @@
        </span>
     </div>
 
-    <div class="profile-header">
+    <div class="profile-header" v-if="user">
       <div class="profile-avatar">
         <div class="profile-avatar-container" :class="defaultAvatarShape">
           <a href="#" v-if="canUpdate()" @click.prevent="showEditAvatar = true" class="profile-avatar-image">
-            <img :src="user?.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
+            <img :src="user.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
             <!-- TODO(akinsey): <span class="profile-user-status" data-balloon="{{vmProfile.user.username}} is online" ng-if="vmProfile.isOnline"> -->
             <span class="profile-user-status" v-if="isOnline">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -22,7 +22,7 @@
               </svg>
             </span>
           </a>
-          <img v-if="!canUpdate()" :src="user?.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
+          <img v-if="!canUpdate()" :src="user.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
           <a href="#" class="edit-avatar" v-if="canUpdate()" @click.prevent="showEditAvatar = true">
             <div>Change Avatar</div>
           </a>
@@ -31,10 +31,10 @@
 
       <div class="profile-user-details">
         <div class="profile-user-name-role">
-          <h1>{{user?.username}}</h1>
-          <span class="username-screen" v-html="user?.name"></span>
+          <h1>{{user.username}}</h1>
+          <span class="username-screen" v-html="user.name"></span>
           <!--  TODO(akinsey): no style in vue <span class="user-role" style="background-color: {{vmProfile.user.role_highlight_color ? vmProfile.user.role_highlight_color : 'grey'}}" ng-bind-html="vmProfile.user.role_name"></span> -->
-          <span class="user-role" v-html="user?.role_name"></span>
+          <span class="user-role" v-html="user.role_name"></span>
          <!-- TODO(akinsey): <span class="user-rank">
               <rank-display ranks="vmProfile.user.metadata.ranks" maps="vmProfile.user.metadata.rank_metric_maps" user="vmProfile.user"></rank-display>
           </span> -->
@@ -46,12 +46,12 @@
         </div> -->
 
         <div class="user-profile-position">
-          <span v-html="user?.position"></span>
-          <span v-html="user?.status"></span>
+          <span v-html="user.position"></span>
+          <span v-html="user.status"></span>
         </div>
 
         <div class="signature-block">
-          <div class="signature" v-html="user?.signature || user?.raw_signature">
+          <div class="signature" v-html="user.signature || user.raw_signature">
           </div>
           <!-- TODO(akinsey): data-balloon="Edit your signature" -->
           <a href="#" @click.prevent="showEditSignature = true" v-if="canUpdate()" class="signature-edit">
@@ -65,42 +65,42 @@
 
         <div class="profile-user-stats">
           <div class="stats">
-            <span class="stat-text">{{ user?.post_count || 0 }}</span>
+            <span class="stat-text">{{ user.post_count || 0 }}</span>
             <span class="label">Posts</span>
           </div>
           <div class="stats">
             <span class="label">Last Seen </span>
-            <span class="stat-text-sm">{{ humanDate(user?.last_active) }}</span>
+            <span class="stat-text-sm">{{ humanDate(user.last_active) }}</span>
           </div>
           <div class="stats">
             <span class="label">Created </span>
-            <span class="stat-text-sm">{{ humanDate(user?.created_at) }}</span>
+            <span class="stat-text-sm">{{ humanDate(user.created_at) }}</span>
           </div>
         </div>
       </div>
     </div>
 
     <div class="profile-threads-posts">
-      <router-view></router-view>
+      <router-view v-if="user"></router-view>
     </div>
 
     <div class="profile-sidebar">
-      <div class="actions-user-profile actions-panel" v-if="user?.email || user?.gender || user?.dob || user?.location || user?.language || userLocalTime">
-        <a href="{{`mailto:${user?.email}`}}" target="_blank">{{user?.email}}</a>
+      <div class="actions-user-profile actions-panel" v-if="user && user.email || user.gender || user.dob || user.location || user.language || userLocalTime">
+        <a :href="`mailto:${user?.email}`" target="_blank">{{user?.email}}</a>
         <div><span>{{user.btc_address}}</span></div>
         <div>
-          <a href="{{ user.website.indexOf('://') > -1 ? user.website : '//' + user.website }}" target="_blank">{{user?.website}}</a>
+          <a v-if="user?.website" :href="user.website.indexOf('://') > -1 ? user.website : '//' + user.website" target="_blank">{{user.website}}</a>
         </div>
-        <div v-if="user?.gender">
+        <div v-if="user.gender">
           Gender:&nbsp;&nbsp;<span v-html="user?.gender"></span>
         </div>
-        <div v-if="user?.dob">
+        <div v-if="user.dob">
           Age:&nbsp;&nbsp;<span>{{userAge(user?.dob)}}</span>
         </div>
-        <div v-if="user?.location">
+        <div v-if="user.location">
           Location:&nbsp;&nbsp;<span v-html="user?.location"></span>
         </div>
-        <div v-if="user?.language">
+        <div v-if="user.language">
           Language:&nbsp;&nbsp;<span v-html="user?.language"></span>
         </div>
       </div>

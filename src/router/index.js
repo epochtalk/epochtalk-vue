@@ -73,7 +73,7 @@ const routes = [
     name: 'UserPosts',
     component: UserPosts,
     props: true,
-    meta: { requiresAuth: false, bodyClass: 'user-posts' }
+    meta: { requiresAuth: true, bodyClass: 'user-posts' }
   },
   {
     path: '/settings',
