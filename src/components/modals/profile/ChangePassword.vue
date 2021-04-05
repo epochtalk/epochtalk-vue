@@ -1,35 +1,78 @@
 <template>
   <modal :name="$options.name" :show="show" @close="close()" :focusInput="focusInput">
-    <template v-slot:header>Invite User</template>
+    <template v-slot:header>Change Password</template>
 
     <template v-slot:body>
       <form action="." class="css-form">
-        <!-- Email Input -->
         <div>
+          <!-- Old Password -->
           <div class="input-section">
-            <label for="email">
-                Enter an email:
-              <div v-if="!validating && email !== null && email === ''" class="invalid right">
-                Email is required
+            <label for="old-password">
+              New Password
+              <div v-if="form.oldPassword.val && form.oldPassword.val.length > 0 && form.oldPassword.val.length < 8 && !form.oldPassword.valid" class="invalid input-validation-message">
+                Password must be at least 8 characters
               </div>
-              <div v-if="!validating && email !== null && emailInvalid && email !== ''" class="invalid right">
-                Email is invalid
-              </div>
-              <div v-if="!validating && email !== null && emailRegistered" class="invalid right">
-                Email is already registered
-              </div>
-              <div v-if="!validating && email !== null && emailInvited" class="invalid right">
-                Email has already been invited
+              <div v-if="form.oldPassword.val && form.oldPassword.val.length > 72 && !form.oldPassword.valid" class="invalid input-validation-message">
+                Password must be at less than 72 characters
               </div>
             </label>
-            <input @input="validating = true" type="email" ref="focusInput" id="email" class="icon-padding" name="email" maxlength="255" v-model="email" placeholder="Email" :class="{ 'invalid': !validating && emailInvalid || emailRegistered || emailInvited || email === '' }" />
-            <i v-if="!validating && (email !== null && email !== '' && !emailInvalid && !emailRegistered && !emailInvited)" class="fa fa-check input-icon valid"></i>
-            <i v-if="!validating && (email !== null && (emailInvalid || email === '' || emailRegistered || emailInvited))" class="fa fa-times input-icon invalid"></i>
+
+            <input type="password" :class="{'invalid-mismatch': form.oldPassword.val && !form.oldPassword.valid }" class="icon-padding" id="old-password" name="old-password" v-model="form.oldPassword.val" ref="focusInput" placeholder="Enter current password" required />
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" v-if="form.oldPassword.val && form.oldPassword.valid" class="input-icon valid">
+              <title></title>
+              <polygon class="cls-1" points="19.69 37.19 7.23 24.73 10.77 21.2 19.69 30.12 37.23 12.58 40.77 16.11 19.69 37.19"/>
+            </svg>
+            <svg enable-background="new 0 0 16 16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" v-if="form.oldPassword.val && !form.oldPassword.valid" class="input-icon invalid">
+              <path clip-rule="evenodd" d="m12.7 5.2-1.2-1.2-3.1 3.2-3.2-3.2-1.2 1.2 3.2 3.2-3.2 3.1 1.2 1.2 3.2-3.2 3.1 3.2 1.2-1.2-3.2-3.1z" fill-rule="evenodd"/>
+            </svg>
+          </div>
+
+          <!-- New Password -->
+          <div class="input-section">
+            <label for="password">
+              New Password
+              <div v-if="form.password.val && form.password.val.length > 0 && form.password.val.length < 8 && !form.password.valid" class="invalid input-validation-message">
+                New Password must be at least 8 characters
+              </div>
+              <div v-if="form.password.val && form.password.val.length >= 8 && form.confirmation.val && form.confirmation.val.length >= 8 && (!form.password.valid || !form.confirmation.valid)" class="invalid input-validation-message">
+                New Password and confirmation do not match
+              </div>
+            </label>
+
+            <input type="password" :class="{'invalid-mismatch': form.password.val && (form.password.val !== form.confirmation.val || !form.password.valid) }" class="icon-padding" id="password" name="password" v-model="form.password.val" placeholder="Enter a password" required />
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" v-if="(form.password.val && form.password.val.length > -1 && !(form.confirmation.val && form.confirmation.val.length > -1) && form.password.valid) || (form.password.val && form.password.val.length > -1 && form.confirmation.val && form.confirmation.val.length > -1 && form.password.val === form.confirmation.val && form.password.valid)" class="input-icon valid">
+              <title></title>
+              <polygon class="cls-1" points="19.69 37.19 7.23 24.73 10.77 21.2 19.69 30.12 37.23 12.58 40.77 16.11 19.69 37.19"/>
+            </svg>
+            <svg enable-background="new 0 0 16 16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" v-if="(form.password.val && form.password.val.length > -1 && !form.password.valid) || (form.password.val && form.password.val.length > -1 && form.confirmation.val && form.confirmation.val.length > -1 && form.password.val !== form.confirmation.val)" class="input-icon invalid">
+              <path clip-rule="evenodd" d="m12.7 5.2-1.2-1.2-3.1 3.2-3.2-3.2-1.2 1.2 3.2 3.2-3.2 3.1 1.2 1.2 3.2-3.2 3.1 3.2 1.2-1.2-3.2-3.1z" fill-rule="evenodd"/>
+            </svg>
+          </div>
+
+          <div class="input-section">
+            <label for="confirmation">
+              Confirm New Password
+              <div v-if="form.confirmation.val && form.confirmation.val.length > 0 && form.confirmation.val.length < 8 && !form.confirmation.valid" class="invalid input-validation-message">
+                Confirmation must be at least 8 characters
+              </div>
+              <div v-if="form.password.val && form.password.val.length >= 8 && form.confirmation.val && form.confirmation.val.length >= 8 && (!form.password.valid || !form.confirmation.valid)" class="invalid input-validation-message">
+                New Password and confirmation do not match
+              </div>
+            </label>
+
+            <input type="password" :class="{'invalid-mismatch': form.confirmation.val && (form.password.val !== form.confirmation.val || !form.confirmation.valid) }" class="icon-padding" name="confirmation" id="confirmation" v-model="form.confirmation.val" placeholder="Enter your password again" required />
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" v-if="(form.confirmation.val && form.confirmation.val.length > -1 && !(form.password.val && form.password.val.length > -1) && form.confirmation.valid) || (form.password.val && form.password.val.length > -1 && form.confirmation.val && form.confirmation.val.length > -1 && form.password.val === form.confirmation.val && form.confirmation.valid)" class="input-icon valid">
+              <title></title>
+              <polygon class="cls-1" points="19.69 37.19 7.23 24.73 10.77 21.2 19.69 30.12 37.23 12.58 40.77 16.11 19.69 37.19"/>
+            </svg>
+            <svg enable-background="new 0 0 16 16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" v-if="(form.confirmation.val && form.confirmation.val.length > -1 && !form.confirmation.valid) || (form.password.val && form.password.val.length > -1 && form.confirmation.val && form.confirmation.val.length > -1 && form.password.val !== form.confirmation.val)" class="input-icon invalid">
+              <path clip-rule="evenodd" d="m12.7 5.2-1.2-1.2-3.1 3.2-3.2-3.2-1.2 1.2 3.2 3.2-3.2 3.1 1.2 1.2 3.2-3.2 3.1 3.2 1.2-1.2-3.2-3.1z" fill-rule="evenodd"/>
+            </svg>
           </div>
           <!-- Save Button -->
           <div class="modal-actions">
-            <button class="" @click.prevent="invite()" :disabled="validating || emailInvalid || emailRegistered || emailInvited">
-              Send Email
+            <button @click.prevent="updatePassword()" :disabled="!form.valid">
+              Confirm
             </button>
           </div>
           <div v-if="errorMessage" class="red centered padding-top">{{errorMessage}}</div>
@@ -41,64 +84,82 @@
 
 <script>
 import Modal from '@/components/layout/Modal.vue'
-import { reactive, toRefs, watch, inject } from 'vue'
-import { authApi } from '@/api'
-import { debounce } from 'lodash'
+import { reactive, toRefs, watch } from 'vue'
+// import { authApi } from '@/api'
+import {  cloneDeep } from 'lodash'
 
 export default {
-  name: 'invite-modal',
+  name: 'change-password-modal',
   props: ['show'],
   emits: ['close'],
   components: { Modal },
   setup(props, { emit }) {
+    /* Internal Methods */
+    const checkFormValid = () => {
+      v.form.valid =  v.form.password.valid && v.form.confirmation.valid
+    }
+
     /* Template Methods */
-    const invite = () => {
-      authApi.invite(v.email)
-      .then(() => {
-        $alertStore.success(`Successfully sent invitation to ${v.email}!`)
-        close()
-      })
-      .catch(() => $alertStore.error(`Error sending invitation to ${v.email}!`))
+    const updatePassword = () => {
+      console.log('Update Password', JSON.stringify(v.form,null,2))
+      close()
     }
 
     const close = () => {
-      v.email = null
+      v.form = cloneDeep(initForm)
       emit('close')
     }
 
     /* Internal Data */
-    const $alertStore = inject('$alertStore')
+    // const $alertStore = inject('$alertStore')
+    // const $auth = inject(AuthStore)
 
     /* Template Data */
+    const initForm = {
+      valid: false,
+      oldPassword: { val: undefined, valid: false },
+      password: { val: undefined, valid: false },
+      confirmation:{ val: undefined, valid: false }
+    }
+
     const v = reactive({
-      email: null,
-      emailInvited: false,
-      emailRegistered: false,
-      emailInvalid: false,
-      validating: true,
-      errorMessage: null,
-      focusInput: null
+      form: cloneDeep(initForm),
+      focusInput: null,
+      errorMessage: ''
     })
 
-    watch(() => v.email, debounce(async (val) => {
-      v.emailInvalid = !(val && val.length >= 3 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val))
-      v.emailRegisted = false
-      v.emailInvited = false
-      if (!v.emailInvalid) {
-        await authApi.emailAvailable(val)
-        .then(d => v.emailRegistered = d.found)
-        .then(() => authApi.inviteExists(val))
-        .then(d => v.emailInvited = d.found)
-        .catch(() => {
-          v.emailInvalid = true
-          v.emailRegisted = false
-          v.emailInvited = false
-        })
-      }
-      v.validating = false
-    }, 500))
+    watch(() => v.form.oldPassword.val, val => {
+      v.form.oldPassword.valid = val && val.length >= 8 && val.length <= 72
+      checkFormValid()
+    })
 
-    return { ...toRefs(v), invite, close }
+    watch(() => v.form.password.val, val => {
+      v.form.password.valid = val && val.length >= 8 && val.length <= 72
+      if (v.form.password.valid && v.form.password.val && v.form.confirmation.val && v.form.password.val !== v.form.confirmation.val) {
+        v.form.password.valid = false
+        v.form.confirmation.valid = false
+      }
+      else if (v.form.password.valid  && v.form.password.val && v.form.confirmation.val && v.form.password.val === v.form.confirmation.val) {
+        v.form.password.valid = true
+        v.form.confirmation.valid = true
+      }
+      checkFormValid()
+    })
+
+    watch(() => v.form.confirmation.val, val => {
+      v.form.confirmation.valid = val && val.length >= 8 && val.length <= 72
+      if (v.form.confirmation.valid && v.form.password.val && v.form.confirmation.val && v.form.password.val !== v.form.confirmation.val) {
+        v.form.password.valid = false
+        v.form.confirmation.valid = false
+      }
+      else if (v.form.confirmation.valid  && v.form.password.val && v.form.confirmation.val && v.form.password.val === v.form.confirmation.val) {
+        v.form.password.valid = true
+        v.form.confirmation.valid = true
+      }
+      checkFormValid()
+    })
+
+    return { ...toRefs(v), updatePassword, close }
   }
 }
 </script>
