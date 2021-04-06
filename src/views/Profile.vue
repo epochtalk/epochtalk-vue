@@ -166,7 +166,7 @@ import { usersApi } from '@/api'
 
 export default {
   name: 'Profile',
-  props: [ 'username' ],
+  props: [ 'username', 'saveScrollPos' ],
   components: { ChangePasswordModal },
   beforeRouteEnter(to, from, next) {
     next(vm => usersApi.find(vm.username).then(u => vm.user = u))
