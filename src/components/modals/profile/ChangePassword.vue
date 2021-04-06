@@ -75,7 +75,7 @@
               Confirm
             </button>
           </div>
-          <div v-if="errorMessage" class="red centered padding-top">{{errorMessage}}</div>
+          <label v-if="errorMessage" class="red centered-text">{{errorMessage}}</label>
         </div>
       </form>
     </template>
@@ -84,35 +84,42 @@
 
 <script>
 import Modal from '@/components/layout/Modal.vue'
-import { reactive, toRefs, watch } from 'vue'
-// import { authApi } from '@/api'
-import {  cloneDeep } from 'lodash'
+import { reactive, toRefs, watch, inject } from 'vue'
+import { usersApi } from '@/api'
+import { cloneDeep } from 'lodash'
 
 export default {
   name: 'change-password-modal',
-  props: ['show'],
+  props: ['show', 'user'],
   emits: ['close'],
   components: { Modal },
   setup(props, { emit }) {
     /* Internal Methods */
-    const checkFormValid = () => {
-      v.form.valid =  v.form.password.valid && v.form.confirmation.valid
-    }
+    const checkFormValid = () => v.form.valid = v.form.oldPassword.valid && v.form.password.valid && v.form.confirmation.valid
 
     /* Template Methods */
     const updatePassword = () => {
-      console.log('Update Password', JSON.stringify(v.form,null,2))
-      close()
+      v.errorMessage = null
+      const params = {
+        username: props.user.username,
+        old_password: v.form.oldPassword.val,
+        password: v.form.password.val,
+        confirmation: v.form.confirmation.val
+      }
+      usersApi.update(props.user.id, params)
+      .then(() => $alertStore.success(`Successfully updated password for user ${params.username}`))
+      .catch(() => v.errorMessage = 'There was an error changing passwords, please enure the current password is correctly entered.')
+      .finally(() => v.errorMessage ? null : close())
     }
 
     const close = () => {
       v.form = cloneDeep(initForm)
+      v.errorMessage = null
       emit('close')
     }
 
     /* Internal Data */
-    // const $alertStore = inject('$alertStore')
-    // const $auth = inject(AuthStore)
+    const $alertStore = inject('$alertStore')
 
     /* Template Data */
     const initForm = {

@@ -10,6 +10,8 @@ a:hover { color: $color-primary-alt; }
 .desc-label, .secondary-font-color-light { height: auto; padding-top: 0; color: $secondary-font-color-light; }
 .bold { font-weight: bold }
 .right { float: right; }
+.red { color: red; }
+.centered-text { text-align: center; }
 
 img {
   max-width: 100%;

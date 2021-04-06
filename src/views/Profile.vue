@@ -155,7 +155,7 @@
     </div>
   </div>
 
-  <change-password-modal v-if="user" :show="showChangePassword" @close="showChangePassword = false"></change-password-modal>
+  <change-password-modal v-if="user" :user="user" :show="showChangePassword" @close="showChangePassword = false"></change-password-modal>
 </template>
 
 <script>
