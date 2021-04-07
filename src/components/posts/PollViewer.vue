@@ -4,12 +4,12 @@
     <div class="poll-title">
       <span class="poll-title-text">
         Poll
-        <span class="is__locked" v-if="pollLocked">(Locked)</span>
+        <span class="is_locked" v-if="pollLocked">(Locked)</span>
       </span>
       <div class="poll-controls">
         <!-- Poll Controls -->
         <!-- TODO(boka): data-balloon="Lock Poll" data-balloon-pos="down" -->
-        <div class="poll-control" v-if="canLock()" :class="{'is__locked' : pollLocked}">
+        <div class="poll-control" v-if="canLock()" :class="{'is_locked' : pollLocked}">
           <input id="lockPoll" class="icon" type="checkbox" v-model="pollLocked">
           <label for="lockPoll"  @click="updateLockPoll()">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -419,7 +419,7 @@ poll-creator {
         width: 0.875rem;
       }
 
-      &.is__locked {
+      &.is_locked {
         svg {
           fill: $color-primary;
         }
