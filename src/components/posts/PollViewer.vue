@@ -133,6 +133,7 @@
 <script>
 import humanDate from '@/composables/filters/humanDate'
 import { reactive, toRefs, watch } from 'vue'
+import { pollsApi } from '@/api'
 
 export default {
   props: ['poll', 'thread', 'userPriority', 'reset'],
@@ -176,6 +177,14 @@ export default {
     }
     const removeVote = () => {
       console.log('PollViewer removeVote')
+    }
+    const updateLockPoll = () => {
+      if(v.pollLocked) {
+        pollsApi.unlock(props.thread.id, props.poll.id)
+      }
+      else {
+        pollsApi.lock(props.thread.id, props.poll.id)
+      }
     }
     const calcExpiration = () => {
       var month, day, year, hour, minutes, valid = false;
@@ -243,6 +252,7 @@ export default {
       showPollResults,
       vote,
       removeVote,
+      updateLockPoll,
       calcExpiration,
       humanDate
     }
