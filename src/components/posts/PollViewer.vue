@@ -35,7 +35,7 @@
 
     <!-- Poll Edit -->
     <!-- TODO(boka): slide-toggle="editPoll" initial-state="closed" -->
-    <div class="poll-edit" :hidden="!editPoll" v-if="canEdit()">
+    <div class="poll-edit" v-if="canEdit()" :class="{'showing': editPoll, 'hidden': !editPoll}">
       <div class="slide-wrapper">
         <div class="poll-edit-container">
           <h5 class="panelTitle">Edit Poll Options:</h5>
@@ -622,5 +622,17 @@ poll-creator {
       margin-top: 1rem;
     }
   }
+}
+
+.poll-edit {
+ overflow: hidden;
+ height: auto;
+ transition: max-height 0.5s;
+ &.showing {
+  max-height: 35rem;
+ }
+ &.hidden {
+  max-height: 0rem;
+ }
 }
 </style>
