@@ -122,7 +122,7 @@
           <a href="#" @click.prevent="showChangePassword = true">Edit Password</a>
         </div>
         <div class="profile-action" v-if="canUpdatePrivate()">
-          <a href="#" @click.prevent="showEditEmail = true">Edit Email</a>
+          <a href="#" @click.prevent="showChangeEmail = true">Edit Email</a>
         </div>
         <div class="profile-action" v-if="pageOwner()">
           <router-link :to="{ name: 'Settings' }">Edit Forum Settings</router-link>
@@ -155,19 +155,21 @@
     </div>
   </div>
 
-  <change-password-modal v-if="user" :user="user" :show="showChangePassword" @close="showChangePassword = false"></change-password-modal>
+  <change-email-modal v-if="user" :user="user" :show="showChangeEmail" @close="showChangeEmail = false" />
+  <change-password-modal v-if="user" :user="user" :show="showChangePassword" @close="showChangePassword = false" />
 </template>
 
 <script>
 import { reactive, toRefs } from 'vue'
 import humanDate from '@/composables/filters/humanDate'
 import ChangePasswordModal from '@/components/modals/profile/ChangePassword.vue'
+import ChangeEmailModal from '@/components/modals/profile/ChangeEmail.vue'
 import { usersApi } from '@/api'
 
 export default {
   name: 'Profile',
   props: [ 'username', 'saveScrollPos' ],
-  components: { ChangePasswordModal },
+  components: { ChangePasswordModal, ChangeEmailModal },
   beforeRouteEnter(to, from, next) {
     next(vm => usersApi.find(vm.username).then(u => vm.user = u))
   },
@@ -198,7 +200,7 @@ export default {
       showEditSignature: false,
       showQuickMessage: false,
       showChangePassword: false,
-      showEditEmail: false,
+      showChangeEmail: false,
       showModNotes: false,
       showDeactivate: false,
       showReactivate: false,
