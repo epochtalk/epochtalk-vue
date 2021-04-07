@@ -67,6 +67,10 @@ export const postsApi = {
   byThread: params => $http('/api/posts', { params }),
   slugToPostId: slug => $http(`/api/posts/${slug}/id`)
 }
+export const pollsApi = {
+  lock: (threadId, pollId) => $http(`/api/threads/${threadId}/polls/${pollId}/lock`, { method: 'POST', data: { locked: true }}),
+  unlock: (threadId, pollId) => $http(`/api/threads/${threadId}/polls/${pollId}/lock`, { method: 'POST', data: { locked: false }})
+}
 
 export const watchlistApi = {
   watchBoard: boardId => $http(`/api/watchlist/boards/${boardId}`, { method: 'POST' }),
