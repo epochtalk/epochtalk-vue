@@ -99,7 +99,7 @@
 
 <script>
 import humanDate from '@/composables/filters/humanDate'
-import { reactive, toRefs, computed, inject } from 'vue'
+import { reactive, toRefs, computed, inject, watch } from 'vue'
 import { postsApi } from '@/api'
 import { PreferencesStore, localStoragePrefs } from '@/composables/stores/prefs'
 import { useRoute, useRouter } from 'vue-router'
@@ -108,7 +108,7 @@ import SimplePagination from '@/components/layout/SimplePagination.vue'
 export default {
   name: 'UserPosts',
   components: { SimplePagination },
-  props: [ 'username' ],
+  props: [ 'user', 'username' ],
   beforeRouteEnter(to, from, next) {
     next(vm => {
       const params = {
@@ -142,7 +142,7 @@ export default {
       })
     next()
   },
-  setup() {
+  setup(props) {
     const pagePosts = inc => {
       const params = { ...$route.params, saveScrollPos: true }
       // Handle different pagination controls (threads) prev/next vs (posts) actual pagination
@@ -151,6 +151,18 @@ export default {
       if (query.page === 1 || !query.page) delete query.page
       if ($route.query.page !== v.currentPage)
         $router.replace({ name: $route.name, params: params, query: query })
+    }
+
+    const refresh = () => {
+      const params = {
+        username: props.username,
+        limit: v.prefs.posts_per_page,
+        page: $route.query.page || 1,
+        field: $route.query.field,
+        desc: $route.query.desc
+      }
+      if (v.threads) postsApi.startedByUser(params).then(d => v.postData = d)
+      else postsApi.byUser(params).then(d => v.postData = d)
     }
 
     const toggleThreads = threads => {
@@ -188,6 +200,10 @@ export default {
       threads: !!$route.query.threads,
       postData: null
     })
+
+    // Refresh posts if user is updated, account may be deactivated
+    watch(() => props.user, () => refresh())
+
     return { ...toRefs(v), pagePosts, toggleThreads, setDesc, getSortClass, humanDate }
   }
 }

@@ -81,7 +81,7 @@
     </div>
 
     <div class="profile-threads-posts">
-      <router-view v-if="user"></router-view>
+      <router-view v-if="user" :user="user"></router-view>
     </div>
 
     <div class="profile-sidebar">
@@ -157,6 +157,7 @@
 
   <change-email-modal v-if="user" :user="user" :show="showChangeEmail" @close="showChangeEmail = false" />
   <change-password-modal v-if="user" :user="user" :show="showChangePassword" @close="showChangePassword = false" />
+  <deactivate-reactivate-modal v-if="user" :user="user" :deactivate="showDeactivate" :show="showDeactivate || showReactivate" @close="showDeactivate = false; showReactivate = false" @success="refreshUser()" />
 </template>
 
 <script>
@@ -164,20 +165,24 @@ import { reactive, toRefs } from 'vue'
 import humanDate from '@/composables/filters/humanDate'
 import ChangePasswordModal from '@/components/modals/profile/ChangePassword.vue'
 import ChangeEmailModal from '@/components/modals/profile/ChangeEmail.vue'
+import DeactivateReactivateModal from '@/components/modals/profile/DeactivateReactivate.vue'
 import { usersApi } from '@/api'
 
 export default {
   name: 'Profile',
   props: [ 'username', 'saveScrollPos' ],
-  components: { ChangePasswordModal, ChangeEmailModal },
+  components: { ChangePasswordModal, ChangeEmailModal, DeactivateReactivateModal },
   beforeRouteEnter(to, from, next) {
-    next(vm => usersApi.find(vm.username).then(u => vm.user = u))
+    next(vm => usersApi.find(vm.username).then(u => vm.user = u).then(() => console.log(vm.user)))
   },
   beforeRouteUpdate(to, from, next) {
-    usersApi.find(this.username).then(u => this.user = u)
+    usersApi.find(this.username).then(u => this.user = u).then(() => console.log(this.user))
     next()
   },
   setup() {
+    /* Template Methods */
+    const refreshUser = () => usersApi.find(v.user.username).then(u => v.user = u)
+
     const canUpdate = () => true
     const canMessage = () => true
     const userAge = dob => dob
@@ -185,10 +190,11 @@ export default {
     const pageOwner = () => true
     const canPageUserNotes = () => true
     const canBanUser = () => true
-    const canDeactivate = () => true
-    const canReactivate = () => true
+    const canDeactivate = () => !v.user.deleted
+    const canReactivate = () => v.user.deleted
     const canDelete = () => true
     const showManageBans = user => console.log('Show Manage Ban', user)
+
     const v = reactive({
       banExpiration: null,
       isOnline: true,
@@ -206,7 +212,7 @@ export default {
       showReactivate: false,
       showDelete: false
     })
-    return { ...toRefs(v), canUpdate, canMessage, userAge, canUpdatePrivate, pageOwner, canPageUserNotes, canBanUser, showManageBans, canReactivate, canDeactivate, canDelete, humanDate }
+    return { ...toRefs(v), refreshUser, canUpdate, canMessage, userAge, canUpdatePrivate, pageOwner, canPageUserNotes, canBanUser, showManageBans, canReactivate, canDeactivate, canDelete, humanDate }
   }
 }
 </script>
