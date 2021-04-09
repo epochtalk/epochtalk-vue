@@ -103,6 +103,7 @@ export const usersApi = {
   lookup: (username, params) => $http(`/api/users/lookup/${username}`, { params }),
   update: (userId, data) => $http(`/api/users/${userId}`, { method: 'PUT', data }),
   find: username => $http(`/api/users/${username}`),
+  delete: userId => $http(`/api/users/${userId}`, { method: 'DELETE' }),
   deactivate: userId => $http(`/api/users/${userId}/deactivate`, { method: 'POST' }),
   reactivate: userId => $http(`/api/users/${userId}/reactivate`, { method: 'POST' }),
   preferences: () => $http('/api/users/preferences'),
