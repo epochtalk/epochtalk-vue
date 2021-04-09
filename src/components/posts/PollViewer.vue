@@ -218,6 +218,8 @@ export default {
         v.options.display_mode = 'always';
       }
     }
+
+    /* View Data */
     const v = reactive({
       options: {
         expiration: props.poll.expiration || undefined,
