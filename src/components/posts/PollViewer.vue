@@ -169,8 +169,13 @@ export default {
       return true
     }
     const showPollResults = () => {
-      console.log('PollViewer showPollResults')
-      return true
+      const displayMode = v.poll.display_mode
+      const hasVoted = v.poll.has_voted
+      const expired = v.poll.expired
+      if (displayMode === 'always') { return true }
+      else if (displayMode === 'voted' && hasVoted) { return true }
+      else if (displayMode === 'expired' && expired) { return true }
+      else { return false }
     }
     const vote = () => {
       console.log('PollViewer vote')
