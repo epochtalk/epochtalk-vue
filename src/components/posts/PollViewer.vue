@@ -134,6 +134,7 @@
 import humanDate from '@/composables/filters/humanDate'
 import { reactive, toRefs, watch } from 'vue'
 import { pollsApi } from '@/api'
+import { merge } from 'lodash'
 
 export default {
   props: ['poll', 'thread', 'userPriority', 'reset'],
@@ -245,6 +246,11 @@ export default {
     calculatePollPercentage()
 
     /* Watched Data */
+    watch(() => props.poll, () => {
+      // merge when poll is updated
+      // (i.e. when user logs in, poll.has_voted gets updated)
+      merge(v.poll, props.poll)
+    })
     watch(() => v.pollAnswers, () => calculatePollPercentage())
 
     return {
