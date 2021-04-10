@@ -116,7 +116,7 @@
 
       <div class="actions-edit actions-panel" v-if="canUpdate() || canUpdatePrivate() || pageOwner() || canPageUserNotes() || canBanUser()">
         <div class="profile-action" v-if="canUpdate()">
-          <a href="#" @click.prevent="openEditProfile()">Edit Profile</a>
+          <a href="#" @click.prevent="showUpdateProfile = true">Edit Profile</a>
         </div>
         <div class="profile-action" v-if="canUpdatePrivate()">
           <a href="#" @click.prevent="showChangePassword = true">Edit Password</a>
@@ -155,6 +155,7 @@
     </div>
   </div>
 
+  <update-profile-modal v-if="user" :user="user" :show="showUpdateProfile" @close="showUpdateProfile = false" />
   <change-email-modal v-if="user" :user="user" :show="showChangeEmail" @close="showChangeEmail = false" />
   <change-password-modal v-if="user" :user="user" :show="showChangePassword" @close="showChangePassword = false" />
   <deactivate-reactivate-modal v-if="user" :user="user" :deactivate="showDeactivate" :show="showDeactivate || showReactivate" @close="showDeactivate = false; showReactivate = false" @success="refreshUser()" />
@@ -168,13 +169,14 @@ import ChangePasswordModal from '@/components/modals/profile/ChangePassword.vue'
 import ChangeEmailModal from '@/components/modals/profile/ChangeEmail.vue'
 import DeactivateReactivateModal from '@/components/modals/profile/DeactivateReactivate.vue'
 import DeleteAccountModal from '@/components/modals/profile/DeleteAccount.vue'
+import UpdateProfileModal from '@/components/modals/profile/UpdateProfile.vue'
 import { usersApi } from '@/api'
 import { useRouter } from 'vue-router'
 
 export default {
   name: 'Profile',
   props: [ 'username', 'saveScrollPos' ],
-  components: { ChangePasswordModal, ChangeEmailModal, DeleteAccountModal, DeactivateReactivateModal },
+  components: { ChangePasswordModal, ChangeEmailModal, DeleteAccountModal, DeactivateReactivateModal, UpdateProfileModal },
   beforeRouteEnter(to, from, next) {
     next(vm => usersApi.find(vm.username).then(u => vm.user = u))
   },
@@ -210,6 +212,7 @@ export default {
       user: null,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
+      showUpdateProfile: false,
       showEditAvatar: false,
       showEditSignature: false,
       showQuickMessage: false,
