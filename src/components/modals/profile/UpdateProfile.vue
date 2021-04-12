@@ -51,7 +51,7 @@
             <div class="input-section">
               <label for="dob">Date of Birth
               </label>
-              <input type="date" id="dob" placeholder="YYYY-MM-DD" v-model="userCopy.dob">
+              <input type="date" id="dob" placeholder="YYYY-MM-DD" v-model="userCopy.dob_formatted" >
             </div>
 
             <div class="input-section">
@@ -84,7 +84,8 @@
 import Modal from '@/components/layout/Modal.vue'
 import { reactive, toRefs, inject } from 'vue'
 import { usersApi } from '@/api'
-// import { debounce } from 'lodash'
+import { cloneDeep } from 'lodash'
+import moment from 'moment'
 
 export default {
   name: 'update-profile-modal',
@@ -94,6 +95,12 @@ export default {
   setup(props, { emit }) {
     /* Internal Methods */
     // const checkFormValid = () => v.form.valid = v.form.email.valid && v.form.email.unique && v.form.emailPassword.valid
+    const decodeHtml = html => {
+      let text = document.createElement('textarea')
+      text.innerHTML = html
+      return text.value
+    }
+
 
     /* Template Methods */
     const updateProfile = () => {
@@ -121,7 +128,7 @@ export default {
 
     /* Template Data */
     const v = reactive({
-      userCopy: props.user,
+      userCopy: cloneDeep(props.user), // don't want reactiveness
       formValid: false,
       usernameUnique: true,
       usernameValid: true,
@@ -130,6 +137,12 @@ export default {
       errorMessage: ''
     })
 
+    v.userCopy.dob_formatted = moment(v.userCopy.dob).format('YYYY-MM-DD')
+    v.userCopy.name = decodeHtml(v.userCopy.name)
+    v.userCopy.gender = decodeHtml(v.userCopy.gender)
+    v.userCopy.website = decodeHtml(v.userCopy.website)
+    v.userCopy.location = decodeHtml(v.userCopy.location)
+    v.userCopy.language = decodeHtml(v.userCopy.language)
     /* Watch Data */
     // watch(() => v.form.emailPassword.val, val => {
     //   v.form.emailPassword.valid = val && val.length >= 1 && val.length <= 72
