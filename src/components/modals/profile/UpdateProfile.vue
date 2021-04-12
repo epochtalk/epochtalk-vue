@@ -84,7 +84,6 @@
 import Modal from '@/components/layout/Modal.vue'
 import { reactive, toRefs, inject } from 'vue'
 import { usersApi } from '@/api'
-import { cloneDeep } from 'lodash'
 import moment from 'moment'
 
 export default {
@@ -101,17 +100,16 @@ export default {
       return text.value
     }
 
-
     /* Template Methods */
     const updateProfile = () => {
       v.errorMessage = null
-      const params = {
-        username: props.user.username,
-        email: v.form.email.val,
-        email_password: v.form.emailPassword.val
-      }
+      let params = v.userCopy
+      params.dob = moment(params.dob_formatted).toDate()
       usersApi.update(props.user.id, params)
-      .then(() => $alertStore.success(`Successfully updated email for user ${params.username}`))
+      .then(() => {
+        $alertStore.success(`Successfully updated email for user ${params.username}`)
+        Object.assign(v.userReactive, v.userCopy)
+      })
       .catch(() => v.errorMessage = 'There was an error changing email address, please enure the password is correctly entered.')
       .finally(() => v.errorMessage ? null : close())
     }
@@ -128,8 +126,18 @@ export default {
 
     /* Template Data */
     const v = reactive({
-      userCopy: cloneDeep(props.user), // don't want reactiveness
-      formValid: false,
+      userCopy: {
+        username: props.user.username,
+        name: decodeHtml(props.user.name),
+        dob_formatted: moment(props.user.dob).format('YYYY-MM-DD'),
+        btc_address: props.user.btc_address,
+        gender: decodeHtml(props.user.gender),
+        website: decodeHtml(props.user.website),
+        location: decodeHtml(props.user.location),
+        language: decodeHtml(props.user.language),
+      }, // don't want reactiveness
+      userReactive: props.user,
+      formValid: true,
       usernameUnique: true,
       usernameValid: true,
       focusInput: null,
@@ -137,12 +145,6 @@ export default {
       errorMessage: ''
     })
 
-    v.userCopy.dob_formatted = moment(v.userCopy.dob).format('YYYY-MM-DD')
-    v.userCopy.name = decodeHtml(v.userCopy.name)
-    v.userCopy.gender = decodeHtml(v.userCopy.gender)
-    v.userCopy.website = decodeHtml(v.userCopy.website)
-    v.userCopy.location = decodeHtml(v.userCopy.location)
-    v.userCopy.language = decodeHtml(v.userCopy.language)
     /* Watch Data */
     // watch(() => v.form.emailPassword.val, val => {
     //   v.form.emailPassword.valid = val && val.length >= 1 && val.length <= 72
