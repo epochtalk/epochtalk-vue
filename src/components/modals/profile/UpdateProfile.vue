@@ -162,8 +162,10 @@ export default {
           checkFormValid()
         })
       }
-      else v.usernameUnique = true
-      checkFormValid()
+      else {
+        v.usernameUnique = true
+        checkFormValid()
+      }
     }, 500))
 
     watch(() => v.userCopy.website, debounce(async val => {

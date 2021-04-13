@@ -89,7 +89,7 @@ import { usersApi } from '@/api'
 import { cloneDeep } from 'lodash'
 
 export default {
-  name: 'change-password-modal',
+  name: 'update-password-modal',
   props: ['show', 'user'],
   emits: ['close'],
   components: { Modal },

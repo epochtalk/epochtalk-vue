@@ -49,7 +49,7 @@ import { usersApi, authApi } from '@/api'
 import { debounce, cloneDeep } from 'lodash'
 
 export default {
-  name: 'change-email-modal',
+  name: 'update-email-modal',
   props: ['show', 'user'],
   emits: ['close'],
   components: { Modal },

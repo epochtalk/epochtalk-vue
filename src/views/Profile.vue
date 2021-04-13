@@ -156,8 +156,8 @@
   </div>
 
   <update-profile-modal v-if="user" :user="user" :show="showUpdateProfile" @close="showUpdateProfile = false" />
-  <change-email-modal v-if="user" :user="user" :show="showChangeEmail" @close="showChangeEmail = false" />
-  <change-password-modal v-if="user" :user="user" :show="showChangePassword" @close="showChangePassword = false" />
+  <update-email-modal v-if="user" :user="user" :show="showChangeEmail" @close="showChangeEmail = false" />
+  <update-password-modal v-if="user" :user="user" :show="showChangePassword" @close="showChangePassword = false" />
   <deactivate-reactivate-modal v-if="user" :user="user" :deactivate="showDeactivate" :show="showDeactivate || showReactivate" @close="showDeactivate = false; showReactivate = false" @success="refreshUser()" />
   <delete-account-modal v-if="user" :user="user" :show="showDelete" @close="showDelete = false" @success="redirectHome()" />
 </template>
@@ -165,8 +165,8 @@
 <script>
 import { reactive, toRefs } from 'vue'
 import humanDate from '@/composables/filters/humanDate'
-import ChangePasswordModal from '@/components/modals/profile/ChangePassword.vue'
-import ChangeEmailModal from '@/components/modals/profile/ChangeEmail.vue'
+import UpdatePasswordModal from '@/components/modals/profile/UpdatePassword.vue'
+import UpdateEmailModal from '@/components/modals/profile/UpdateEmail.vue'
 import DeactivateReactivateModal from '@/components/modals/profile/DeactivateReactivate.vue'
 import DeleteAccountModal from '@/components/modals/profile/DeleteAccount.vue'
 import UpdateProfileModal from '@/components/modals/profile/UpdateProfile.vue'
@@ -176,7 +176,7 @@ import { useRouter } from 'vue-router'
 export default {
   name: 'Profile',
   props: [ 'username', 'saveScrollPos' ],
-  components: { ChangePasswordModal, ChangeEmailModal, DeleteAccountModal, DeactivateReactivateModal, UpdateProfileModal },
+  components: { UpdatePasswordModal, UpdateEmailModal, DeleteAccountModal, DeactivateReactivateModal, UpdateProfileModal },
   beforeRouteEnter(to, from, next) {
     next(vm => usersApi.find(vm.username).then(u => vm.user = u))
   },
