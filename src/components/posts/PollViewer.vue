@@ -99,7 +99,7 @@
       </div>
 
       <!-- Poll Results -->
-      <div class="poll-answer" v-for="(answer) in pollAnswers" :key="answer.id">
+      <div class="poll-answer" v-for="(answer) in poll.answers" :key="answer.id">
         <div :class="{ 'poll-answer-row':showPollResults(), 'selected-answer':answer.selected }">
           <label class="poll-select" :class="{ 'active':pollAnswers.indexOf(answer.id) > -1, 'default-cursor voted':!canVote() }">
             <span v-if="answer.selected" class="selected-answer-icon">
