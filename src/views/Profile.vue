@@ -157,6 +157,7 @@
 
   <update-profile-modal v-if="user" :user="user" :show="showUpdateProfile" @close="showUpdateProfile = false" />
   <update-email-modal v-if="user" :user="user" :show="showChangeEmail" @close="showChangeEmail = false" />
+  <update-signature-modal v-if="user" :user="user" :show="showEditSignature" @close="showEditSignature = false" />
   <update-password-modal v-if="user" :user="user" :show="showChangePassword" @close="showChangePassword = false" />
   <deactivate-reactivate-modal v-if="user" :user="user" :deactivate="showDeactivate" :show="showDeactivate || showReactivate" @close="showDeactivate = false; showReactivate = false" @success="refreshUser()" />
   <delete-account-modal v-if="user" :user="user" :show="showDelete" @close="showDelete = false" @success="redirectHome()" />
@@ -170,13 +171,14 @@ import UpdateEmailModal from '@/components/modals/profile/UpdateEmail.vue'
 import DeactivateReactivateModal from '@/components/modals/profile/DeactivateReactivate.vue'
 import DeleteAccountModal from '@/components/modals/profile/DeleteAccount.vue'
 import UpdateProfileModal from '@/components/modals/profile/UpdateProfile.vue'
+import UpdateSignatureModal from '@/components/modals/profile/UpdateSignature.vue'
 import { usersApi } from '@/api'
 import { useRouter } from 'vue-router'
 
 export default {
   name: 'Profile',
   props: [ 'username', 'saveScrollPos' ],
-  components: { UpdatePasswordModal, UpdateEmailModal, DeleteAccountModal, DeactivateReactivateModal, UpdateProfileModal },
+  components: { UpdateSignatureModal, UpdatePasswordModal, UpdateEmailModal, DeleteAccountModal, DeactivateReactivateModal, UpdateProfileModal },
   beforeRouteEnter(to, from, next) {
     next(vm => usersApi.find(vm.username).then(u => vm.user = u))
   },
