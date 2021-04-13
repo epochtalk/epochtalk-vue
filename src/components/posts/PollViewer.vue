@@ -142,7 +142,7 @@ export default {
     const calculatePollPercentage = () => {
       v.poll.totalVotes = 0
       v.poll.answers.forEach(answer => { v.poll.totalVotes += answer.votes })
-      v.pollAnswers.map(answer => {
+      v.poll.answers.map(answer => {
         var percentage = (answer.votes/v.poll.totalVotes) * 100 || 0
         percentage = +percentage.toFixed(1)
         answer.style = { width: percentage + '%' }
@@ -228,7 +228,7 @@ export default {
         display_mode: props.poll.display_mode
       },
       editPoll: false,
-      pollAnswers: props.poll.answers,
+      pollAnswers: [],
       pollLocked: props.poll.locked,
       poll: props.poll
     })
