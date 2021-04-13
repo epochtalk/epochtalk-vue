@@ -12,14 +12,14 @@
                 <div v-if="userCopy.username.length === 0" class="right">
                   Username will not be changed
                 </div>
-                <div v-if="userCopy.username.length && !usernameUnique" class="invalid right">
+                <div v-if="!usernameUnique" class="invalid right">
                   Username already taken
                 </div>
-                <div v-if="userCopy.username.length && !usernameValid" class="invalid right">
+                <div v-if="!usernameValid" class="invalid right">
                   Usernames may only contain A-Z, 0-9, -, _ and .
                 </div>
               </label>
-              <input type="text" name="username" v-model="userCopy.username" placeholder="Username ( a-z, 0-9, -, _ and . )" maxlength="255" :disabled="!canUpdateUsername()" ref="focusInput" />
+              <input type="text" name="username" v-model="userCopy.username" placeholder="Username ( a-z, 0-9, -, _ and . )" maxlength="255" @input="formValid = false" :disabled="!canUpdateUsername()" ref="focusInput" />
             </div>
 
             <div class="input-section">
@@ -30,8 +30,11 @@
 
             <div class="input-section">
               <label for="website">Website
+                <div v-if="!websiteValid" class="invalid right">
+                  Invalid URL
+                </div>
               </label>
-              <input type="text" id="website" placeholder="Website" v-model="userCopy.website">
+              <input type="text" id="website" placeholder="Website" @input="formValid = false" v-model="userCopy.website">
             </div>
 
             <div class="input-section">
@@ -82,9 +85,11 @@
 
 <script>
 import Modal from '@/components/layout/Modal.vue'
-import { reactive, toRefs, inject } from 'vue'
-import { usersApi } from '@/api'
+import { reactive, toRefs, inject, watch } from 'vue'
+import { usersApi, authApi } from '@/api'
 import moment from 'moment'
+import { debounce } from 'lodash'
+import { websiteUrlRegex, usernameRegex } from '@/composables/utils/globalRegex'
 
 export default {
   name: 'update-profile-modal',
@@ -93,7 +98,8 @@ export default {
   components: { Modal },
   setup(props, { emit }) {
     /* Internal Methods */
-    // const checkFormValid = () => v.form.valid = v.form.email.valid && v.form.email.unique && v.form.emailPassword.valid
+    const checkFormValid = () => v.formValid = v.usernameUnique && v.usernameValid && v.websiteValid
+
     const decodeHtml = html => {
       let text = document.createElement('textarea')
       text.innerHTML = html
@@ -137,31 +143,33 @@ export default {
         language: decodeHtml(props.user.language),
       }, // don't want reactiveness
       userReactive: props.user,
+      websiteValid: props.user.website ? websiteUrlRegex.test(props.user.website) : true,
       formValid: true,
       usernameUnique: true,
       usernameValid: true,
       focusInput: null,
-      usernameRegex: /^[a-zA-Z\d-_.]+$/,
       errorMessage: ''
     })
 
     /* Watch Data */
-    // watch(() => v.form.emailPassword.val, val => {
-    //   v.form.emailPassword.valid = val && val.length >= 1 && val.length <= 72
-    //   checkFormValid()
-    // })
+    watch(() => v.userCopy.username, debounce(async val => {
+      v.usernameValid = val ? usernameRegex.test(val) : true
+      // check username unique
+      if (val && v.userReactive.username !== val) {
+        authApi.usernameAvailable(val)
+        .then(data => {
+          v.usernameUnique = !data.found
+          checkFormValid()
+        })
+      }
+      else v.usernameUnique = true
+      checkFormValid()
+    }, 500))
 
-    // watch(() => v.form.email.val, debounce(async (val) => {
-    //   v.form.email.valid = val && val.length >= 3 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)
-    //   // check email unique
-    //   if (val) {
-    //     authApi.emailAvailable(val)
-    //     .then(data => {
-    //       v.form.email.unique = !data.found
-    //       checkFormValid()
-    //     })
-    //   }
-    // }, 500))
+    watch(() => v.userCopy.website, debounce(async val => {
+      v.websiteValid = val ? websiteUrlRegex.test(val) : true
+      checkFormValid()
+    }, 500))
 
     return { ...toRefs(v), canUpdateUsername, updateProfile, close }
   }
