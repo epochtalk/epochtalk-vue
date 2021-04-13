@@ -44,6 +44,7 @@ import Modal from '@/components/layout/Modal.vue'
 import { reactive, toRefs, watch, inject } from 'vue'
 import { authApi } from '@/api'
 import { debounce } from 'lodash'
+import { emailRegex } from '@/composables/utils/globalRegex'
 
 export default {
   name: 'invite-modal',
@@ -81,7 +82,7 @@ export default {
     })
 
     watch(() => v.email, debounce(async (val) => {
-      v.emailInvalid = !(val && val.length >= 3 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val))
+      v.emailInvalid = !(val && val.length >= 3 && emailRegex.test(val))
       v.emailRegisted = false
       v.emailInvited = false
       if (!v.emailInvalid) {

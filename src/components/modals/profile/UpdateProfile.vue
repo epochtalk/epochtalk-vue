@@ -1,6 +1,6 @@
 <template>
   <modal :name="$options.name" :show="show" @close="close()" :focusInput="focusInput">
-    <template v-slot:header>Change Email</template>
+    <template v-slot:header>Update Profile</template>
 
     <template v-slot:body>
       <form v-if="userCopy" action="." class="css-form">
@@ -116,7 +116,7 @@ export default {
         $alertStore.success(`Successfully updated email for user ${params.username}`)
         Object.assign(v.userReactive, v.userCopy)
       })
-      .catch(() => v.errorMessage = 'There was an error changing email address, please enure the password is correctly entered.')
+      .catch(() => v.errorMessage = 'There was a problem updating your profile information, please ensure that the form has no errors.')
       .finally(() => v.errorMessage ? null : close())
     }
 

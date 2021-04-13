@@ -1,6 +1,6 @@
 <template>
   <modal :name="$options.name" :show="show" @close="close()" :focusInput="focusInput">
-    <template v-slot:header>Change Email</template>
+    <template v-slot:header>Update Email</template>
 
     <template v-slot:body>
       <form v-if="form" action="." class="css-form">
@@ -33,7 +33,7 @@
         <!-- Save Button -->
         <div class="modal-actions">
           <button @click.prevent="updateEmail()" :disabled="!form.valid">
-            Confirm
+            Update Email
           </button>
         </div>
         <label v-if="errorMessage" class="red centered-text">{{errorMessage}}</label>
@@ -47,6 +47,7 @@ import Modal from '@/components/layout/Modal.vue'
 import { reactive, toRefs, watch, inject } from 'vue'
 import { usersApi, authApi } from '@/api'
 import { debounce, cloneDeep } from 'lodash'
+import { emailRegex } from '@/composables/utils/globalRegex'
 
 export default {
   name: 'update-email-modal',
@@ -100,7 +101,7 @@ export default {
     })
 
     watch(() => v.form.email.val, debounce(async (val) => {
-      v.form.email.valid = val && val.length >= 3 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)
+      v.form.email.valid = val && val.length >= 3 && emailRegex.test(val)
       // check email unique
       if (val) {
         authApi.emailAvailable(val)

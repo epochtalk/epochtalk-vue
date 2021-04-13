@@ -1,6 +1,6 @@
 <template>
   <modal :name="$options.name" :show="show" @close="close()" :focusInput="focusInput">
-    <template v-slot:header>Change Password</template>
+    <template v-slot:header>Update Password</template>
 
     <template v-slot:body>
       <form action="." class="css-form">
@@ -72,7 +72,7 @@
           <!-- Save Button -->
           <div class="modal-actions">
             <button @click.prevent="updatePassword()" :disabled="!form.valid">
-              Confirm
+              Update Password
             </button>
           </div>
           <label v-if="errorMessage" class="red centered-text">{{errorMessage}}</label>
