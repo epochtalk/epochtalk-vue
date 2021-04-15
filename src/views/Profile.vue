@@ -156,6 +156,7 @@
   </div>
 
   <update-profile-modal v-if="user" :user="user" :show="showUpdateProfile" @close="showUpdateProfile = false" />
+  <update-avatar-modal v-if="user" :user="user" :show="showEditAvatar" @close="showEditAvatar = false" />
   <update-email-modal v-if="user" :user="user" :show="showChangeEmail" @close="showChangeEmail = false" />
   <update-signature-modal v-if="user" :user="user" :show="showEditSignature" @close="showEditSignature = false" />
   <update-password-modal v-if="user" :user="user" :show="showChangePassword" @close="showChangePassword = false" />
@@ -168,6 +169,7 @@ import { reactive, toRefs } from 'vue'
 import humanDate from '@/composables/filters/humanDate'
 import UpdatePasswordModal from '@/components/modals/profile/UpdatePassword.vue'
 import UpdateEmailModal from '@/components/modals/profile/UpdateEmail.vue'
+import UpdateAvatarModal from '@/components/modals/profile/UpdateAvatar.vue'
 import DeactivateReactivateModal from '@/components/modals/profile/DeactivateReactivate.vue'
 import DeleteAccountModal from '@/components/modals/profile/DeleteAccount.vue'
 import UpdateProfileModal from '@/components/modals/profile/UpdateProfile.vue'
@@ -178,7 +180,7 @@ import { useRouter } from 'vue-router'
 export default {
   name: 'Profile',
   props: [ 'username', 'saveScrollPos' ],
-  components: { UpdateSignatureModal, UpdatePasswordModal, UpdateEmailModal, DeleteAccountModal, DeactivateReactivateModal, UpdateProfileModal },
+  components: { UpdateSignatureModal, UpdatePasswordModal, UpdateAvatarModal, UpdateEmailModal, DeleteAccountModal, DeactivateReactivateModal, UpdateProfileModal },
   beforeRouteEnter(to, from, next) {
     next(vm => usersApi.find(vm.username).then(u => vm.user = u))
   },
@@ -277,16 +279,24 @@ export default {
     flex: 0 0 $avatar-width;
     margin-right: 2rem;
     position: relative;
-
+    text-align: center;
+    .profile-avatar-container {
+      &.circle img {
+        @include border-radius(100%);
+        object-fit: cover;
+        height: 100%;
+        width: 100%;
+      }
+      width: 120px;
+      height: 120px;
+    }
     .imageContainer {
       width: $avatar-width;
       height: $avatar-width;
       margin-bottom: 0.5rem;
     }
 
-    .edit-avatar {
-      font-size: $font-size-sm;
-    }
+    .edit-avatar { font-size: $font-size-sm; }
 
     .profile-user-status {
       position: absolute;
@@ -302,10 +312,7 @@ export default {
     }
 
     .rect {
-      .imageContainer {
-        height: calc(#{$avatar-width / 1.5});
-      }
-
+      .imageContainer { height: calc(#{$avatar-width / 1.5}); }
       .profile-user-status {
         top: -8px;
         right: -8px;
@@ -375,44 +382,23 @@ export default {
       margin-bottom: 1rem;
       text-transform: uppercase;
 
-      .user-activity-stat,
-      trust-profile {
-        display: inline;
-      }
+      .user-activity-stat, .trust-profile {  display: inline; }
 
-      .user-activity-stat {
-        margin-right: 1rem;
-      }
+      .user-activity-stat { margin-right: 1rem; }
 
-      .value {
-        font-weight: 600;
-      }
+      .value { font-weight: 600; }
 
-      trust-profile {
-        div {
-          display: inline;
-        }
-
-        .trust-score {
-          font-weight: 600;
-          margin-right: 1rem;
-        }
-
-        a {
-          color: $text-gray-med;
-          text-decoration: underline;
-        }
+      .trust-profile {
+        div { display: inline; }
+        .trust-score { font-weight: 600; margin-right: 1rem; }
+        a { color: $text-gray-med; text-decoration: underline; }
       }
     }
 
-    .signature-block {
-      display: flex;
-      margin-bottom: 1rem;
-    }
+    .signature-block { display: flex; margin-bottom: 1rem; }
 
     .signature {
       @include truncate-ellipsis;
-      // flex: 1 0 auto;
       font-size: $font-size-xs;
       color: $text-gray-med;
       line-height: 1.2;
@@ -448,10 +434,7 @@ export default {
         font-size: 2rem;
         font-weight: 600;
         margin-bottom: 0.25rem;
-        &-sm {
-          font-size: 21px;
-          font-weight: 600;
-        }
+        &-sm { font-size: 21px; font-weight: 600; }
       }
     }
   }
