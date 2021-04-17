@@ -50,7 +50,7 @@
           </a>
         </li>
         <li @click="showMobileMenu = false" >
-          <a href="#" @click="logout()"><i class="fa fa-sign-out" aria-hidden="true"></i>Logout</a>
+          <a @click="logout()"><i class="fa fa-sign-out" aria-hidden="true"></i>Logout</a>
         </li>
       </ul>
     </div>
@@ -159,7 +159,7 @@
                   <router-link :to="{ name: 'About' }">About</router-link>
                 </li>
                 <li>
-                  <a href="#" @click="logout()">Logout</a>
+                  <a @click="logout()">Logout</a>
                 </li>
               </ul>
             </li>

@@ -152,7 +152,7 @@ export default {
 
     /* Watch Data */
     watch(() => v.loggedIn, () => v.boardData.mutate(getBoards)) // Update boards on login
-    watch(() => v.boardData.error, () => $alertStore.error(v.boardData)) // Handle errors
+    watch(() => v.boardData.error, err => err ? $alertStore.error(err) : null) // Handle errors
 
     return { ...toRefs(v), generateCatId, toggleCategory, humanDate }
   }
