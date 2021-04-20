@@ -2,6 +2,7 @@ import { createWebHistory, createRouter } from 'vue-router'
 import { boardsApi, threadsApi, $axios } from '@/api'
 import Boards from '@/views/Boards.vue'
 import Threads from '@/views/Threads.vue'
+import ThreadsPostedIn from '@/views/ThreadsPostedIn.vue'
 import Posts from '@/views/Posts.vue'
 import About from '@/views/About.vue'
 import Settings from '@/views/Settings.vue'
@@ -9,6 +10,7 @@ import Profile from '@/views/Profile.vue'
 import Forbidden from '@/views/layout/Forbidden.vue'
 import NotFound from '@/views/layout/NotFound.vue'
 import ServiceUnavailable from '@/views/layout/ServiceUnavailable.vue'
+import UserPosts from '@/components/users/UserPosts.vue'
 import Login from '@/views/layout/Login.vue'
 import NProgress from 'nprogress'
 import { nextTick } from 'vue'
@@ -49,10 +51,29 @@ const routes = [
     meta: { requiresAuth: false, bodyClass: 'posts' }
   },
   {
+    path: '/threads/posted',
+    name: 'ThreadsPostedIn',
+    component: ThreadsPostedIn,
+    meta: { requiresAuth: true, bodyClass: 'threadspostedin' }
+  },
+  {
     path: '/profile/:username',
     name: 'Profile',
     component: Profile,
-    meta: { requiresAuth: true, bodyClass: 'profile' }
+    props: true,
+    meta: { requiresAuth: true, bodyClass: 'profile' },
+    children: [{
+      path: '',
+      component: UserPosts,
+      props: true
+    }]
+  },
+  {
+    path: '/profile/:username/posts',
+    name: 'UserPosts',
+    component: UserPosts,
+    props: true,
+    meta: { requiresAuth: true, bodyClass: 'user-posts' }
   },
   {
     path: '/settings',

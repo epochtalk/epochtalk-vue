@@ -127,6 +127,7 @@ import { debounce, cloneDeep } from 'lodash'
 import { reactive, toRefs, watch, inject } from 'vue'
 import { authApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
+import { usernameRegex, emailRegex } from '@/composables/utils/globalRegex'
 
 export default {
   name: 'register-modal',
@@ -175,7 +176,7 @@ export default {
 
     /* Watch Data */
     watch(() => v.form.email.val, debounce(async (val) => {
-      v.form.email.valid = val && val.length >= 3 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)
+      v.form.email.valid = val && val.length >= 3 && emailRegex.test(val)
       // check email unique
       if (val) {
         authApi.emailAvailable(val)
@@ -187,7 +188,7 @@ export default {
     }, 500))
 
     watch(() => v.form.username.val, debounce(async (val) => {
-      v.form.username.valid = val && val.length >= 3 && val.length <= 20 && /^[a-zA-Z\d-_.]+$/.test(val)
+      v.form.username.valid = val && val.length >= 3 && val.length <= 20 && usernameRegex.test(val)
       // check email unique
       if (val) {
         authApi.usernameAvailable(val)

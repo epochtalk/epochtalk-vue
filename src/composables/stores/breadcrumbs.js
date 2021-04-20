@@ -26,7 +26,7 @@ export default {
         label: 'Home'
       },
       profiles: {
-        label: 'Profiles'
+        label: 'profile'
       },
       reset: {
         label: 'Reset Password',
@@ -72,6 +72,7 @@ export default {
         let id = routeParams[idKey]
         let type = keyToType[idKey]
         breadcrumbs.push(...await breadcrumbsApi.find(id, type))
+
       }
       // routeParams is empty, route is static
       else if (path !== '/') {
@@ -88,8 +89,7 @@ export default {
         // Special case for extended profile pages. Allows link back to user
         // profile from breadcrumbs
         if (breadcrumbs[1].label === pathLookup.profiles.label && breadcrumbs.length > 3) {
-          breadcrumbs[2].state = '^.profile.posts'
-          breadcrumbs[2].opts = { username: breadcrumbs[2].label }
+          breadcrumbs[2].routePath =  '/profile/' + breadcrumbs[2].label
         }
       }
       if (breadcrumbs) {

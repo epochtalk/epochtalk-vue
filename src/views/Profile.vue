@@ -1,5 +1,5 @@
 <template>
-  <div class="profile-wrap">
+  <div class="profile-wrap" v-if="user">
     <div class="message-banned" v-if="banExpiration">
       {{ user.username }}
       <span v-if="banExpiration !== 'Permanent'">
@@ -10,11 +10,11 @@
        </span>
     </div>
 
-    <div class="profile-header">
+    <div class="profile-header" v-if="user">
       <div class="profile-avatar">
         <div class="profile-avatar-container" :class="defaultAvatarShape">
           <a href="#" v-if="canUpdate()" @click.prevent="showEditAvatar = true" class="profile-avatar-image">
-            <img :src="user?.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
+            <img :src="user.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
             <!-- TODO(akinsey): <span class="profile-user-status" data-balloon="{{vmProfile.user.username}} is online" ng-if="vmProfile.isOnline"> -->
             <span class="profile-user-status" v-if="isOnline">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -22,7 +22,7 @@
               </svg>
             </span>
           </a>
-          <img v-if="!canUpdate()" :src="user?.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
+          <img v-if="!canUpdate()" :src="user.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
           <a href="#" class="edit-avatar" v-if="canUpdate()" @click.prevent="showEditAvatar = true">
             <div>Change Avatar</div>
           </a>
@@ -31,10 +31,10 @@
 
       <div class="profile-user-details">
         <div class="profile-user-name-role">
-          <h1>{{user?.username}}</h1>
-          <span class="username-screen">{{user?.name}}</span>
+          <h1>{{user.username}}</h1>
+          <span class="username-screen" v-html="user.name"></span>
           <!--  TODO(akinsey): no style in vue <span class="user-role" style="background-color: {{vmProfile.user.role_highlight_color ? vmProfile.user.role_highlight_color : 'grey'}}" ng-bind-html="vmProfile.user.role_name"></span> -->
-          <span class="user-role">{{user?.role_name}}</span>
+          <span class="user-role" v-html="user.role_name"></span>
          <!-- TODO(akinsey): <span class="user-rank">
               <rank-display ranks="vmProfile.user.metadata.ranks" maps="vmProfile.user.metadata.rank_metric_maps" user="vmProfile.user"></rank-display>
           </span> -->
@@ -46,12 +46,12 @@
         </div> -->
 
         <div class="user-profile-position">
-          <span>{{user?.position}}</span>
-          <span>{{user?.status}}</span>
+          <span v-html="user.position"></span>
+          <span v-html="user.status"></span>
         </div>
 
         <div class="signature-block">
-          <div class="signature">{{user?.signature || user?.raw_signature}}
+          <div class="signature" v-html="user.signature || user.raw_signature">
           </div>
           <!-- TODO(akinsey): data-balloon="Edit your signature" -->
           <a href="#" @click.prevent="showEditSignature = true" v-if="canUpdate()" class="signature-edit">
@@ -65,43 +65,43 @@
 
         <div class="profile-user-stats">
           <div class="stats">
-            <span class="stat-text">{{ user?.post_count || 0 }}</span>
+            <span class="stat-text">{{ user.post_count || 0 }}</span>
             <span class="label">Posts</span>
           </div>
           <div class="stats">
             <span class="label">Last Seen </span>
-            <span class="stat-text-sm">{{ humanDate(user?.last_active) }}</span>
+            <span class="stat-text-sm">{{ humanDate(user.last_active) }}</span>
           </div>
           <div class="stats">
             <span class="label">Created </span>
-            <span class="stat-text-sm">{{ humanDate(user?.created_at) }}</span>
+            <span class="stat-text-sm">{{ humanDate(user.created_at) }}</span>
           </div>
         </div>
       </div>
     </div>
 
     <div class="profile-threads-posts">
-      <user-posts />
+      <router-view v-if="user" :user="user"></router-view>
     </div>
 
     <div class="profile-sidebar">
-      <div class="actions-user-profile actions-panel" v-if="user?.email || user?.gender || user?.dob || user?.location || user?.language || userLocalTime">
-        <a href="{{`mailto:${user?.email}`}}" target="_blank">{{user?.email}}</a>
+      <div class="actions-user-profile actions-panel" v-if="user && user.email || user.gender || user.dob || user.location || user.language || userLocalTime">
+        <a :href="`mailto:${user?.email}`" target="_blank">{{user?.email}}</a>
         <div><span>{{user.btc_address}}</span></div>
         <div>
-          <a href="{{ user.website.indexOf('://') > -1 ? user.website : '//' + user.website }}" target="_blank">{{user?.website}}</a>
+          <a v-if="user?.website" :href="user.website.indexOf('://') > -1 ? user.website : '//' + user.website" target="_blank">{{user.website}}</a>
         </div>
-        <div v-if="user?.gender">
-          Gender:&nbsp;&nbsp;<span>{{user?.gender}}</span>
+        <div v-if="user.gender">
+          Gender:&nbsp;&nbsp;<span v-html="user?.gender"></span>
         </div>
-        <div v-if="user?.dob">
+        <div v-if="user.dob">
           Age:&nbsp;&nbsp;<span>{{userAge(user?.dob)}}</span>
         </div>
-        <div v-if="user?.location">
-          Location:&nbsp;&nbsp;<span>{{user?.location}}</span>
+        <div v-if="user.location">
+          Location:&nbsp;&nbsp;<span v-html="user?.location"></span>
         </div>
-        <div v-if="user?.language">
-          Language:&nbsp;&nbsp;<span>{{user?.language}}</span>
+        <div v-if="user.language">
+          Language:&nbsp;&nbsp;<span v-html="user?.language"></span>
         </div>
       </div>
 
@@ -116,13 +116,13 @@
 
       <div class="actions-edit actions-panel" v-if="canUpdate() || canUpdatePrivate() || pageOwner() || canPageUserNotes() || canBanUser()">
         <div class="profile-action" v-if="canUpdate()">
-          <a href="#" @click.prevent="openEditProfile()">Edit Profile</a>
+          <a href="#" @click.prevent="showUpdateProfile = true">Edit Profile</a>
         </div>
         <div class="profile-action" v-if="canUpdatePrivate()">
-          <a href="#" @click.prevent="showEditPassword = true">Edit Password</a>
+          <a href="#" @click.prevent="showChangePassword = true">Edit Password</a>
         </div>
         <div class="profile-action" v-if="canUpdatePrivate()">
-          <a href="#" @click.prevent="showEditEmail = true">Edit Email</a>
+          <a href="#" @click.prevent="showChangeEmail = true">Edit Email</a>
         </div>
         <div class="profile-action" v-if="pageOwner()">
           <router-link :to="{ name: 'Settings' }">Edit Forum Settings</router-link>
@@ -154,48 +154,88 @@
       </div>
     </div>
   </div>
+
+  <update-profile-modal v-if="user" :user="user" :show="showUpdateProfile" @close="showUpdateProfile = false" />
+  <update-avatar-modal v-if="user" :user="user" :show="showEditAvatar" @close="showEditAvatar = false" />
+  <update-email-modal v-if="user" :user="user" :show="showChangeEmail" @close="showChangeEmail = false" />
+  <update-signature-modal v-if="user" :user="user" :show="showEditSignature" @close="showEditSignature = false" />
+  <update-password-modal v-if="user" :user="user" :show="showChangePassword" @close="showChangePassword = false" />
+  <deactivate-reactivate-modal v-if="user" :user="user" :deactivate="showDeactivate" :show="showDeactivate || showReactivate" @close="showDeactivate = false; showReactivate = false" @success="refreshUser()" />
+  <delete-account-modal v-if="user" :user="user" :show="showDelete" @close="showDelete = false" @success="redirectHome()" />
 </template>
 
 <script>
 import { reactive, toRefs } from 'vue'
-import UserPosts from '@/components/users/UserPosts.vue'
 import humanDate from '@/composables/filters/humanDate'
+import UpdatePasswordModal from '@/components/modals/profile/UpdatePassword.vue'
+import UpdateEmailModal from '@/components/modals/profile/UpdateEmail.vue'
+import UpdateAvatarModal from '@/components/modals/profile/UpdateAvatar.vue'
+import DeactivateReactivateModal from '@/components/modals/profile/DeactivateReactivate.vue'
+import DeleteAccountModal from '@/components/modals/profile/DeleteAccount.vue'
+import UpdateProfileModal from '@/components/modals/profile/UpdateProfile.vue'
+import UpdateSignatureModal from '@/components/modals/profile/UpdateSignature.vue'
+import { usersApi } from '@/api'
+import { useRouter } from 'vue-router'
 
 export default {
   name: 'Profile',
-  components: { UserPosts },
-  props: [ 'user' ],
-  setup(props) {
+  props: [ 'username', 'saveScrollPos' ],
+  components: { UpdateSignatureModal, UpdatePasswordModal, UpdateAvatarModal, UpdateEmailModal, DeleteAccountModal, DeactivateReactivateModal, UpdateProfileModal },
+  beforeRouteEnter(to, from, next) {
+    next(vm => usersApi.find(vm.username).then(u => vm.user = u))
+  },
+  beforeRouteUpdate(to, from, next) {
+    usersApi.find(this.username).then(u => this.user = u)
+    next()
+  },
+  setup() {
+    /* Template Methods */
+    const refreshUser = () => usersApi.find(v.user.username).then(u => v.user = u)
+    const redirectHome = () => $router.replace('/')
+
     const canUpdate = () => true
     const canMessage = () => true
-    const userAge = dob => dob
+    const userAge = dob => {
+      if (!dob) { return }
+      var today = new Date()
+      var birthDate = new Date(dob)
+      var age = today.getFullYear() - birthDate.getFullYear()
+      var m = today.getMonth() - birthDate.getMonth()
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) { age--; }
+      return age
+    }
     const canUpdatePrivate = () => true
     const pageOwner = () => true
     const canPageUserNotes = () => true
     const canBanUser = () => true
-    const canDeactivate = () => true
-    const canReactivate = () => true
+    const canDeactivate = () => !v.user.deleted
+    const canReactivate = () => v.user.deleted
     const canDelete = () => true
     const showManageBans = user => console.log('Show Manage Ban', user)
 
+    /* Internal Data */
+    const $router = useRouter()
+
+    /* Template Data */
     const v = reactive({
       banExpiration: null,
       isOnline: true,
       userLocalTime: null,
-      user: props.user || {},
+      user: null,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
+      showUpdateProfile: false,
       showEditAvatar: false,
       showEditSignature: false,
       showQuickMessage: false,
-      showEditPassword: false,
-      showEditEmail: false,
+      showChangePassword: false,
+      showChangeEmail: false,
       showModNotes: false,
       showDeactivate: false,
       showReactivate: false,
       showDelete: false
     })
-    return { ...toRefs(v), canUpdate, canMessage, userAge, canUpdatePrivate, pageOwner, canPageUserNotes, canBanUser, showManageBans, canReactivate, canDeactivate, canDelete, humanDate }
+    return { ...toRefs(v), refreshUser, redirectHome, canUpdate, canMessage, userAge, canUpdatePrivate, pageOwner, canPageUserNotes, canBanUser, showManageBans, canReactivate, canDeactivate, canDelete, humanDate }
   }
 }
 </script>
@@ -239,16 +279,24 @@ export default {
     flex: 0 0 $avatar-width;
     margin-right: 2rem;
     position: relative;
-
+    text-align: center;
+    .profile-avatar-container {
+      &.circle img {
+        @include border-radius(100%);
+        object-fit: cover;
+        height: 100%;
+        width: 100%;
+      }
+      width: 120px;
+      height: 120px;
+    }
     .imageContainer {
       width: $avatar-width;
       height: $avatar-width;
       margin-bottom: 0.5rem;
     }
 
-    .edit-avatar {
-      font-size: $font-size-sm;
-    }
+    .edit-avatar { font-size: $font-size-sm; }
 
     .profile-user-status {
       position: absolute;
@@ -264,10 +312,7 @@ export default {
     }
 
     .rect {
-      .imageContainer {
-        height: calc(#{$avatar-width / 1.5});
-      }
-
+      .imageContainer { height: calc(#{$avatar-width / 1.5}); }
       .profile-user-status {
         top: -8px;
         right: -8px;
@@ -337,44 +382,23 @@ export default {
       margin-bottom: 1rem;
       text-transform: uppercase;
 
-      .user-activity-stat,
-      trust-profile {
-        display: inline;
-      }
+      .user-activity-stat, .trust-profile {  display: inline; }
 
-      .user-activity-stat {
-        margin-right: 1rem;
-      }
+      .user-activity-stat { margin-right: 1rem; }
 
-      .value {
-        font-weight: 600;
-      }
+      .value { font-weight: 600; }
 
-      trust-profile {
-        div {
-          display: inline;
-        }
-
-        .trust-score {
-          font-weight: 600;
-          margin-right: 1rem;
-        }
-
-        a {
-          color: $text-gray-med;
-          text-decoration: underline;
-        }
+      .trust-profile {
+        div { display: inline; }
+        .trust-score { font-weight: 600; margin-right: 1rem; }
+        a { color: $text-gray-med; text-decoration: underline; }
       }
     }
 
-    .signature-block {
-      display: flex;
-      margin-bottom: 1rem;
-    }
+    .signature-block { display: flex; margin-bottom: 1rem; }
 
     .signature {
       @include truncate-ellipsis;
-      // flex: 1 0 auto;
       font-size: $font-size-xs;
       color: $text-gray-med;
       line-height: 1.2;
@@ -384,9 +408,7 @@ export default {
       width: 100%;
     }
 
-    .signature-edit {
-      flex: 0 0 20px;
-    }
+    .signature-edit { flex: 0 0 20px; }
   }
 
   .profile-user-stats {
@@ -407,19 +429,12 @@ export default {
       width: 100px;
       max-width: 120px;
 
-      .label {
-        font-size: $font-size-xs;
-      }
-
+      .label { font-size: $font-size-xs; }
       .stat-text {
         font-size: 2rem;
         font-weight: 600;
         margin-bottom: 0.25rem;
-
-        &-sm {
-          font-size: 21px;
-          font-weight: 600;
-        }
+        &-sm { font-size: 21px; font-weight: 600; }
       }
     }
   }
@@ -427,17 +442,14 @@ export default {
   @include break-mobile-med {
     align-items: center;
     flex-direction: column;
-
     .profile-avatar {
       margin-bottom: 1rem;
       margin-right: 0;
     }
-
     .imageContainer {
       width: 60px;
       height: 60px;
     }
-
     .profile-user-details {
       .profile-user-name-role {
         flex-direction: column;
@@ -450,68 +462,16 @@ export default {
         }
       }
     }
-
-    .profile-user-activity {
-      text-align: center;
-    }
-
-    trust-profile {
-      .trust-link {
-        white-space: nowrap;
-      }
-    }
+    .profile-user-activity { text-align: center; }
+    .trust-profile { .trust-link { white-space: nowrap; } }
   }
 }
 
-.profile-threads-posts {
-  grid-area: main;
-}
-
-.table-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-
-  button {
-    background: transparent;
-    border-bottom: 1px solid rgba(0,0,0,0);
-    border-radius: 0;
-    color: $text-gray-dark;
-    margin-right: 2rem;
-    padding: 0.5rem 0;
-
-    &:hover {
-      background: inherit;
-      border-color: rgba($color-primary, .8);
-      color: rgba($color-primary, .8);
-      box-shadow: none;
-      transform: initial;
-    }
-
-    &.active {
-      color: $color-primary;
-      border-color: $color-primary;
-    }
-  }
-
-  @include break-mobile-med {
-    margin-bottom: 1rem;
-    margin-top: 2rem;
-
-    button {
-      font-size: $font-size-sm;
-    }
-
-    .username {
-      display: none;
-    }
-  }
-}
+.profile-threads-posts { grid-area: main; }
 
 .profile-sidebar {
   color: $text-gray-dark;
   grid-area: sidebar;
-
   .actions-panel {
     border-bottom: $border;
     line-height: 1.5;
@@ -534,19 +494,15 @@ export default {
 
   .profile-left {
     word-wrap: break-word;
-
     .profile-avatar-container {
       width: 100%;
       height: 100%;
-
       .imageContainer.loaded { background: none; }
       .imageContainer { background: url('/static/img/loading.gif') no-repeat center; display: inline;}
-
       .profile-avatar-image {
         display: block;
         position: relative;
       }
-
       .profile-user-status {
         position: absolute;
         right: -1rem;
@@ -585,10 +541,7 @@ export default {
       }
     }
   }
-  .profile-right {
-    word-wrap: break-word;
-
-  }
+  .profile-right { word-wrap: break-word; }
 }
 .profile-posts {
   .profile-row {
@@ -601,120 +554,13 @@ export default {
 }
 
 .more-posts { margin-bottom: 2rem; }
+.profile-posts { button { margin-bottom: 0; } }
+.pagination-simple { margin-bottom: 0; }
 
-
-.profile-posts {
-  button {
-    margin-bottom: 0;
-  }
-}
-
-.pagination-simple {
-  margin-bottom: 0;
-}
-
-.profile-posts-table {
-  table-layout: fixed;
-
-  tr {
-    td {
-      font-size: $base-font-size;
-      line-height: 1.3;
-      padding: 0.5rem 0;
-      vertical-align: top;
-    }
-  }
-
-  .timestamp {
-    color: $text-gray-med;
-    min-width: 150px;
-    padding-left: 1rem;
-    width: 25%;
-  }
-
-  .truncate-title {
-    width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-
-  .thread-title {
-    font-weight: 600;
-  }
-
-  .post {
-    cursor: pointer;
-    padding: 0 0.25rem;
-    transition: all ease-in-out 200ms;
-
-    &:hover {
-      background-color: darken($base-background-color, 5%);
-    }
-  }
-
-  .post-body {
-    white-space: pre-wrap;
-
-    &.open {
-      background-color: darken($base-background-color, 5%);
-    }
-
-    ul {
-      white-space: normal
-    }
-
-    &.closed {
-      width: 100%;
-      max-height: 18px;
-      white-space: pre-wrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-  }
-
-  .no-table-contents {
-    color: $text-gray-med;
-    font-size: $font-size-med;
-    font-weight: 400;
-  }
-
-  @include break-mobile-med {
-    display: grid;
-    grid-template-columns: 1fr;
-
-    thead,
-    th,
-    tbody,
-    tr {
-      display: contents;
-    }
-
-    thead {
-      display: none;
-    }
-
-    tr {
-      display: flex;
-      flex-direction: column;
-      padding: 0.5rem 0;
-      width: calc(100vw - 2rem);
-
-      td {
-        padding: 0;
-      }
-    }
-
-    .timestamp {
-      font-size: $font-size-sm;
-      padding: 0;
-      order: -1;
-      width: 100%;
-    }
-  }
-}
-
-image-uploader {
-  display: block;
-  margin-top: 1rem;
-}
+// image-uploader {
+//   display: block;
+//   margin-top: 1rem;
+// }
 
 @include break-mobile-med {
   .pagination-wrap {
