@@ -12,6 +12,7 @@
           <input type="text" id="avatar" name="avatar" v-model="userCopy.avatar" ref="focusInput" />
           <div class="input-info">Hotlinked images will receive a new url</div>
 
+          <single-image-uploader />
           <!-- <image-uploader model="vmProfile.editAvatarUser.avatar" purpose="avatar"></image-uploader> -->
         </div>
 
@@ -28,6 +29,7 @@
 </template>
 
 <script>
+import SingleImageUploader from '@/components/images/SingleImageUploader.vue'
 import Modal from '@/components/layout/Modal.vue'
 import { reactive, toRefs, inject } from 'vue'
 import { usersApi } from '@/api'
@@ -37,7 +39,7 @@ export default {
   name: 'update-avatar-modal',
   props: ['show', 'user'],
   emits: ['close'],
-  components: { Modal },
+  components: { Modal, SingleImageUploader },
   setup(props, { emit }) {
     /* Template Methods */
     const updateAvatar = () => {
