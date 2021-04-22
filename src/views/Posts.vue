@@ -397,7 +397,7 @@
       </div>
 
       <!-- Poll Viewer -->
-      <poll-viewer v-if="postData.data.thread?.poll" :poll="postData.data.thread?.poll" :thread="postData.data?.thread" :user-priority="postData.data?.posts[0].user.priority" :reset="resetPoll"></poll-viewer>
+      <poll-viewer v-if="postData.data.thread?.poll" :poll="postData.data.thread.poll" :thread="postData.data.thread" :user-priority="postData.data.posts[0].user.priority" :reset="resetPoll"></poll-viewer>
 
       <!-- <div class="controls">
         <pagination page-count="PostsParentCtrl.pageCount" page="PostsParentCtrl.page"></pagination>
@@ -594,7 +594,6 @@ export default {
 
     /* Watched Data */
     watch(() => v.loggedIn, () => processPosts().then(data => v.postData.data = data)) // Update on login
-    watch(() => $route.query, () => processPosts().then(data => v.postData.data = data)) // Update on query params change
 
     return {
       ...toRefs(v),

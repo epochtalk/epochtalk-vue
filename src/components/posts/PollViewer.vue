@@ -51,7 +51,7 @@
           <div class="pollEdit__answers">
             <label for="pollMaxVote">Maximum answers per vote:</label>
             <!-- TODO(boka): value="1" -->
-            <input type="number" id="pollMaxVote" min="1" max="{{poll.answers.length}}" v-model="options.max_answers">
+            <input type="number" id="pollMaxVote" min="1" max="{{pollCopy.answers.length}}" v-model="options.max_answers">
             <div class="pollGroup__header"><label>Show poll results: </label>
               <label for="displayAlways">
                 <!-- TODO(boka): value="always" -->
@@ -83,23 +83,23 @@
         <!-- Poll Details -->
         <div class="poll-header-main">
           <!-- Poll Question -->
-          <h1 class="poll-question">{{poll.question}}</h1>
+          <h1 class="poll-question">{{pollCopy.question}}</h1>
           <div class="poll-details">
-            <span class="poll-info" v-if="poll.display_mode === 'always'">Results Always Shown. </span>
-            <span class="poll-info" v-if="poll.display_mode === 'voted'">Results After Voting. </span>
-            <span class="poll-info" :class="{'highlight':!poll.expired && !canVote() }" v-if="poll.display_mode === 'expired'">Results After Expiration. </span>
-            <span class="poll-info" :class="{'highlight':poll.expired}">
-            <!-- {{ poll.expiration ? 'Exp: ' + (poll.expiration | date : 'short') : 'No Expiration. '}}</span> -->
-            {{ poll.expiration ? 'Exp: ' + humanDate(poll.expiration) : 'No Expiration. '}}</span>
-            <span class="poll-info" :class="{'highlight':pollAnswers.length===poll.max_answers}">{{poll.max_answers + ' choice. ' + (poll.max_answers > 1 ? 's':'')}}</span>
-            <span class="poll-info" v-if="!poll.change_vote">Votes are Permanent. </span>
-            <span class="poll-info" v-if="poll.change_vote">Votes can be changed. </span>
+            <span class="poll-info" v-if="pollCopy.display_mode === 'always'">Results Always Shown. </span>
+            <span class="poll-info" v-if="pollCopy.display_mode === 'voted'">Results After Voting. </span>
+            <span class="poll-info" :class="{'highlight':!pollCopy.expired && !canVote() }" v-if="pollCopy.display_mode === 'expired'">Results After Expiration. </span>
+            <span class="poll-info" :class="{'highlight':pollCopy.expired}">
+            <!-- {{ pollCopy.expiration ? 'Exp: ' + (pollCopy.expiration | date : 'short') : 'No Expiration. '}}</span> -->
+            {{ pollCopy.expiration ? 'Exp: ' + humanDate(pollCopy.expiration) : 'No Expiration. '}}</span>
+            <span class="poll-info" :class="{'highlight':pollAnswers.length===pollCopy.max_answers}">{{pollCopy.max_answers + ' choice. ' + (pollCopy.max_answers > 1 ? 's':'')}}</span>
+            <span class="poll-info" v-if="!pollCopy.change_vote">Votes are Permanent. </span>
+            <span class="poll-info" v-if="pollCopy.change_vote">Votes can be changed. </span>
           </div>
         </div>
       </div>
 
       <!-- Poll Results -->
-      <div class="poll-answer" v-for="(answer) in pollAnswers" :key="answer.id">
+      <div class="poll-answer" v-for="(answer) in pollCopy.answers" :key="answer.id">
         <div :class="{ 'poll-answer-row':showPollResults(), 'selected-answer':answer.selected }">
           <label class="poll-select" :class="{ 'active':pollAnswers.indexOf(answer.id) > -1, 'default-cursor voted':!canVote() }">
             <span v-if="answer.selected" class="selected-answer-icon">
@@ -108,8 +108,8 @@
                 <path d="M24,2A22,22,0,1,0,46,24,22,22,0,0,0,24,2ZM21,34.22l-10-10,2.82-2.83L21,28.56l14-14,2.82,2.83Z" />
               </svg>
             </span>
-            <input v-if="poll.max_answers === 1 && canVote()" @click="pollAnswers.pop(); toggleAnswer(answer.id);" name="pollanswer" type="radio">
-            <input type="checkbox" @click="toggleAnswer(answer.id)" :disabled="pollAnswers.length >= poll.max_answers && pollAnswers.indexOf(answer.id) === -1" :checked="pollAnswers.indexOf(answer.id) > -1" v-if="poll.max_answers > 1 && canVote()"/>
+            <input v-if="pollCopy.max_answers === 1 && canVote()" @click="pollAnswers.pop(); toggleAnswer(answer.id);" name="pollanswer" type="radio">
+            <input type="checkbox" @click="toggleAnswer(answer.id)" :disabled="pollAnswers.length >= pollCopy.max_answers && pollAnswers.indexOf(answer.id) === -1" :checked="pollAnswers.indexOf(answer.id) > -1" v-if="pollCopy.max_answers > 1 && canVote()"/>
             <span>{{answer.answer}}</span>
           </label>
           <div v-if="showPollResults()" class="poll-results">
@@ -134,20 +134,20 @@
 import humanDate from '@/composables/filters/humanDate'
 import { reactive, toRefs, watch } from 'vue'
 import { pollsApi } from '@/api'
-import { merge } from 'lodash'
+import { cloneDeep } from 'lodash'
 
 export default {
   props: ['poll', 'thread', 'userPriority', 'reset'],
   setup(props) {
     const calculatePollPercentage = () => {
-      v.poll.totalVotes = 0
-      v.poll.answers.forEach(answer => { v.poll.totalVotes += answer.votes })
-      v.pollAnswers.map(answer => {
-        var percentage = (answer.votes/v.poll.totalVotes) * 100 || 0
+      v.pollCopy.totalVotes = 0
+      v.pollCopy.answers.forEach(answer => { v.pollCopy.totalVotes += answer.votes })
+      v.pollCopy.answers.map(answer => {
+        var percentage = (answer.votes/v.pollCopy.totalVotes) * 100 || 0
         percentage = +percentage.toFixed(1)
         answer.style = { width: percentage + '%' }
         answer.percentage = percentage
-      });
+      })
     }
     const canLock = () => {
       console.log('PollViewer canLock')
@@ -170,9 +170,9 @@ export default {
       return true
     }
     const showPollResults = () => {
-      const displayMode = v.poll.display_mode
-      const hasVoted = v.poll.has_voted
-      const expired = v.poll.expired
+      const displayMode = v.pollCopy.display_mode
+      const hasVoted = v.pollCopy.has_voted
+      const expired = v.pollCopy.expired
       if (displayMode === 'always') { return true }
       else if (displayMode === 'voted' && hasVoted) { return true }
       else if (displayMode === 'expired' && expired) { return true }
@@ -228,19 +228,19 @@ export default {
         display_mode: props.poll.display_mode
       },
       editPoll: false,
-      pollAnswers: props.poll.answers,
+      pollAnswers: [],
       pollLocked: props.poll.locked,
-      poll: props.poll
+      pollCopy: cloneDeep(props.poll)
     })
     /* Data Initialization */
     // poll expiration
-    if (v.poll.expiration) {
+    if (v.pollCopy.expiration) {
       // set poll expired
-      var expiry = new Date(v.poll.expiration)
-      v.poll.expired = expiry < Date.now()
+      var expiry = new Date(v.pollCopy.expiration)
+      v.pollCopy.expired = expiry < Date.now()
 
       // set options expiration
-      var datetime = new Date(v.poll.expiration)
+      var datetime = new Date(v.pollCopy.expiration)
       v.options.expiration_date = datetime
       v.options.expiration_time = datetime
     }
@@ -248,12 +248,10 @@ export default {
     calculatePollPercentage()
 
     /* Watched Data */
-    watch(() => props.poll, () => {
-      // merge when poll is updated
-      // (i.e. when user logs in, poll.has_voted gets updated)
-      merge(v.poll, props.poll)
+    watch(() => props.poll, val => {
+      v.pollCopy = cloneDeep(val)
+      calculatePollPercentage()
     })
-    watch(() => v.pollAnswers, () => calculatePollPercentage())
 
     return {
       ...toRefs(v),
