@@ -105,9 +105,12 @@
         </div>
       </div>
 
-      <div class="actions-all-users actions-panel" v-if="canMessage()">
+      <div class="actions-all-users actions-panel" v-if="loggedIn && !pageOwner()">
         <div class="profile-action">
-          <a href="#" @click="showQuickMessage = true">Quick Message</a>
+          <a href="#" v-if="canMessage()" @click="showQuickMessage = true">Quick Message</a>
+          <a href="#" @click.prevent="toggleIgnorePosts()">{{ user.ignored ? 'Uni' : 'I'}}gnore All Posts by User</a>
+          <a href="#" @click.prevent="toggleIgnoreMentions()">{{ user.ignoreMentions ? 'Uni' : 'I'}}gnore All Mentions by User</a>
+          <a href="#" @click.prevent="toggleIgnoreMessages()">{{ user.ignore_messages ? 'Uni' : 'I'}}gnore All Messages from User</a>
         </div>
   <!--       <ignore-user-profile ng-if="vmProfile.isLoggedIn()" user="vmProfile.user"></ignore-user-profile>
         <mentions-ignore-profile ng-if="vmProfile.isLoggedIn() && !vmProfile.pageOwner()" user="vmProfile.user"></mentions-ignore-profile>
@@ -165,7 +168,7 @@
 </template>
 
 <script>
-import { reactive, toRefs } from 'vue'
+import { reactive, toRefs, inject } from 'vue'
 import humanDate from '@/composables/filters/humanDate'
 import UpdatePasswordModal from '@/components/modals/profile/UpdatePassword.vue'
 import UpdateEmailModal from '@/components/modals/profile/UpdateEmail.vue'
@@ -174,8 +177,9 @@ import DeactivateReactivateModal from '@/components/modals/profile/DeactivateRea
 import DeleteAccountModal from '@/components/modals/profile/DeleteAccount.vue'
 import UpdateProfileModal from '@/components/modals/profile/UpdateProfile.vue'
 import UpdateSignatureModal from '@/components/modals/profile/UpdateSignature.vue'
-import { usersApi } from '@/api'
+import { usersApi, mentionsApi, messagesApi } from '@/api'
 import { useRouter } from 'vue-router'
+import { AuthStore } from '@/composables/stores/auth'
 
 export default {
   name: 'Profile',
@@ -188,7 +192,7 @@ export default {
     usersApi.find(this.username).then(u => this.user = u)
     next()
   },
-  setup() {
+  setup(props) {
     /* Template Methods */
     const refreshUser = () => usersApi.find(v.user.username).then(u => v.user = u)
     const redirectHome = () => $router.replace('/')
@@ -205,19 +209,37 @@ export default {
       return age
     }
     const canUpdatePrivate = () => true
-    const pageOwner = () => true
+    const pageOwner = () => props.username === $auth.user?.username
     const canPageUserNotes = () => true
     const canBanUser = () => true
     const canDeactivate = () => !v.user.deleted
     const canReactivate = () => v.user.deleted
     const canDelete = () => true
     const showManageBans = user => console.log('Show Manage Ban', user)
+    const toggleIgnorePosts = () => {
+      const promise = v.user.ignored ? usersApi.unignore : usersApi.ignore
+      promise(v.user).then(() => refreshUser())
+      .then(() => $alertStore.success(`${v.user.ignored ? 'Ignoring' : 'Unignoring' } posts by ${v.user.username}`))
+    }
+    const toggleIgnoreMentions = () => {
+      const promise = v.user.ignoreMentions ? mentionsApi.unignore : mentionsApi.ignore
+      promise(v.user).then(() => refreshUser())
+      .then(() => $alertStore.success(`${v.user.ignoreMentions ? 'Ignoring' : 'Unignoring' } mentions from ${v.user.username}`))
+    }
+    const toggleIgnoreMessages = () => {
+      const promise = v.user.ignore_messages ? messagesApi.unignore : messagesApi.ignore
+      promise(v.user).then(() => refreshUser())
+      .then(() => $alertStore.success(`${v.user.ignore_messages ? 'Ignoring' : 'Unignoring' } messages from ${v.user.username}`))
+    }
 
     /* Internal Data */
     const $router = useRouter()
+    const $auth = inject(AuthStore)
+    const $alertStore = inject('$alertStore')
 
     /* Template Data */
     const v = reactive({
+      loggedIn: $auth.loggedIn,
       banExpiration: null,
       isOnline: true,
       userLocalTime: null,
@@ -235,7 +257,7 @@ export default {
       showReactivate: false,
       showDelete: false
     })
-    return { ...toRefs(v), refreshUser, redirectHome, canUpdate, canMessage, userAge, canUpdatePrivate, pageOwner, canPageUserNotes, canBanUser, showManageBans, canReactivate, canDeactivate, canDelete, humanDate }
+    return { ...toRefs(v), refreshUser, toggleIgnorePosts, toggleIgnoreMessages, toggleIgnoreMentions, redirectHome, canUpdate, canMessage, userAge, canUpdatePrivate, pageOwner, canPageUserNotes, canBanUser, showManageBans, canReactivate, canDeactivate, canDelete, humanDate }
   }
 }
 </script>
@@ -477,6 +499,7 @@ export default {
     line-height: 1.5;
     margin-bottom: 1rem;
     padding-bottom: 1rem;
+    .profile-action a { display: block; }
   }
 }
 
@@ -590,7 +613,6 @@ export default {
       text-align: center;
     }
   }
-  // .profile-row.profile-action { text-align: center; }
   .mobile-post-time { color: $secondary-font-color; padding-bottom: 1rem; }
   .mobile-post { padding: 1rem; }
   .mobile-post:nth-child(even) { background: $sub-header-color; }
