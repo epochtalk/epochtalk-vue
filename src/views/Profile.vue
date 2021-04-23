@@ -160,6 +160,7 @@
 
   <update-profile-modal v-if="user" :user="user" :show="showUpdateProfile" @close="showUpdateProfile = false" />
   <update-avatar-modal v-if="user" :user="user" :show="showEditAvatar" @close="showEditAvatar = false" />
+  <quick-message-modal v-if="user" :user="user" :show="showQuickMessage" @close="showQuickMessage = false" />
   <update-email-modal v-if="user" :user="user" :show="showChangeEmail" @close="showChangeEmail = false" />
   <update-signature-modal v-if="user" :user="user" :show="showEditSignature" @close="showEditSignature = false" />
   <update-password-modal v-if="user" :user="user" :show="showChangePassword" @close="showChangePassword = false" />
@@ -175,6 +176,7 @@ import UpdateEmailModal from '@/components/modals/profile/UpdateEmail.vue'
 import UpdateAvatarModal from '@/components/modals/profile/UpdateAvatar.vue'
 import DeactivateReactivateModal from '@/components/modals/profile/DeactivateReactivate.vue'
 import DeleteAccountModal from '@/components/modals/profile/DeleteAccount.vue'
+import QuickMessageModal from '@/components/modals/profile/QuickMessage.vue'
 import UpdateProfileModal from '@/components/modals/profile/UpdateProfile.vue'
 import UpdateSignatureModal from '@/components/modals/profile/UpdateSignature.vue'
 import { usersApi, mentionsApi, messagesApi } from '@/api'
@@ -184,7 +186,7 @@ import { AuthStore } from '@/composables/stores/auth'
 export default {
   name: 'Profile',
   props: [ 'username', 'saveScrollPos' ],
-  components: { UpdateSignatureModal, UpdatePasswordModal, UpdateAvatarModal, UpdateEmailModal, DeleteAccountModal, DeactivateReactivateModal, UpdateProfileModal },
+  components: { UpdateSignatureModal, UpdatePasswordModal, UpdateAvatarModal, UpdateEmailModal, DeleteAccountModal, DeactivateReactivateModal, UpdateProfileModal, QuickMessageModal },
   beforeRouteEnter(to, from, next) {
     next(vm => usersApi.find(vm.username).then(u => vm.user = u))
   },
@@ -216,6 +218,7 @@ export default {
     const canReactivate = () => v.user.deleted
     const canDelete = () => true
     const showManageBans = user => console.log('Show Manage Ban', user)
+
     const toggleIgnorePosts = () => {
       const promise = v.user.ignored ? usersApi.unignore : usersApi.ignore
       promise(v.user).then(() => refreshUser())
