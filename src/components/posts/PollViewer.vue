@@ -168,6 +168,15 @@ export default {
       else if (v.pollCopy.expired) { return false }
       else { return true }
     }
+    const toggleAnswer = (answerId) => {
+      // if the answer is already selected, unselect it
+      const answerPos = v.pollAnswers.indexOf(answerId)
+      if (answerPos > -1) { v.pollAnswers.splice(answerPos, 1) }
+      else {
+        // otherwise, if total selected answers does not exceed max, select it
+        if (v.pollAnswers.length < v.pollCopy.max_answers) { v.pollAnswers.push(answerId) }
+      }
+    }
     const canRemoveVote = () => {
       console.log('PollViewer canRemoveVote')
       return true
@@ -268,6 +277,7 @@ export default {
       canLock,
       canEdit,
       canVote,
+      toggleAnswer,
       canRemoveVote,
       pollValid,
       showPollResults,
