@@ -42,7 +42,6 @@ export default {
 
     const close = () => {
       v.errorMessage = null
-      v.message = null
       emit('close')
     }
 
