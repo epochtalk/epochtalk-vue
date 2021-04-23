@@ -139,7 +139,7 @@
           </a>
         </div>
         <div class="profile-action" v-if="canBanUser()">
-          <a href="#" @click.prevent="showManageBans({ id: user.id, username: user.username, email: user.email, created_at: user.created_at, ban_expiration: user.ban_expiration })">Manage Bans</a>
+          <a href="#" @click.prevent="showManageBans = true">Manage Bans</a>
         </div>
       </div>
 
@@ -161,6 +161,7 @@
   <update-profile-modal v-if="user" :user="user" :show="showUpdateProfile" @close="showUpdateProfile = false" />
   <update-avatar-modal v-if="user" :user="user" :show="showEditAvatar" @close="showEditAvatar = false" />
   <quick-message-modal v-if="user" :user="user" :show="showQuickMessage" @close="showQuickMessage = false" />
+  <manage-bans-modal v-if="user" :user="user" :show="showManageBans" @close="showManageBans = false" />
   <moderation-notes-modal v-if="user" :user="user" :show="showModNotes" @close="showModNotes = false" />
   <update-email-modal v-if="user" :user="user" :show="showChangeEmail" @close="showChangeEmail = false" />
   <update-signature-modal v-if="user" :user="user" :show="showEditSignature" @close="showEditSignature = false" />
@@ -178,6 +179,7 @@ import UpdateAvatarModal from '@/components/modals/profile/UpdateAvatar.vue'
 import DeactivateReactivateModal from '@/components/modals/profile/DeactivateReactivate.vue'
 import DeleteAccountModal from '@/components/modals/profile/DeleteAccount.vue'
 import QuickMessageModal from '@/components/modals/profile/QuickMessage.vue'
+import ManageBansModal from '@/components/modals/profile/ManageBans.vue'
 import ModerationNotesModal from '@/components/modals/profile/ModerationNotes.vue'
 import UpdateProfileModal from '@/components/modals/profile/UpdateProfile.vue'
 import UpdateSignatureModal from '@/components/modals/profile/UpdateSignature.vue'
@@ -188,7 +190,7 @@ import { AuthStore } from '@/composables/stores/auth'
 export default {
   name: 'Profile',
   props: [ 'username', 'saveScrollPos' ],
-  components: { UpdateSignatureModal, UpdatePasswordModal, UpdateAvatarModal, UpdateEmailModal, DeleteAccountModal, DeactivateReactivateModal, UpdateProfileModal, QuickMessageModal, ModerationNotesModal },
+  components: { UpdateSignatureModal, UpdatePasswordModal, UpdateAvatarModal, UpdateEmailModal, DeleteAccountModal, DeactivateReactivateModal, UpdateProfileModal, QuickMessageModal,ManageBansModal, ModerationNotesModal },
   beforeRouteEnter(to, from, next) {
     next(vm => usersApi.find(vm.username).then(u => vm.user = u))
   },
@@ -219,7 +221,6 @@ export default {
     const canDeactivate = () => !v.user.deleted
     const canReactivate = () => v.user.deleted
     const canDelete = () => true
-    const showManageBans = user => console.log('Show Manage Ban', user)
 
     const toggleIgnorePosts = () => {
       const promise = v.user.ignored ? usersApi.unignore : usersApi.ignore
@@ -260,9 +261,10 @@ export default {
       showModNotes: false,
       showDeactivate: false,
       showReactivate: false,
-      showDelete: false
+      showDelete: false,
+      showManageBans: false
     })
-    return { ...toRefs(v), refreshUser, toggleIgnorePosts, toggleIgnoreMessages, toggleIgnoreMentions, redirectHome, canUpdate, canMessage, userAge, canUpdatePrivate, pageOwner, canPageUserNotes, canBanUser, showManageBans, canReactivate, canDeactivate, canDelete, humanDate }
+    return { ...toRefs(v), refreshUser, toggleIgnorePosts, toggleIgnoreMessages, toggleIgnoreMentions, redirectHome, canUpdate, canMessage, userAge, canUpdatePrivate, pageOwner, canPageUserNotes, canBanUser, canReactivate, canDeactivate, canDelete, humanDate }
   }
 }
 </script>
