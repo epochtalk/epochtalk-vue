@@ -161,6 +161,7 @@
   <update-profile-modal v-if="user" :user="user" :show="showUpdateProfile" @close="showUpdateProfile = false" />
   <update-avatar-modal v-if="user" :user="user" :show="showEditAvatar" @close="showEditAvatar = false" />
   <quick-message-modal v-if="user" :user="user" :show="showQuickMessage" @close="showQuickMessage = false" />
+  <moderation-notes-modal v-if="user" :user="user" :show="showModNotes" @close="showModNotes = false" />
   <update-email-modal v-if="user" :user="user" :show="showChangeEmail" @close="showChangeEmail = false" />
   <update-signature-modal v-if="user" :user="user" :show="showEditSignature" @close="showEditSignature = false" />
   <update-password-modal v-if="user" :user="user" :show="showChangePassword" @close="showChangePassword = false" />
@@ -177,6 +178,7 @@ import UpdateAvatarModal from '@/components/modals/profile/UpdateAvatar.vue'
 import DeactivateReactivateModal from '@/components/modals/profile/DeactivateReactivate.vue'
 import DeleteAccountModal from '@/components/modals/profile/DeleteAccount.vue'
 import QuickMessageModal from '@/components/modals/profile/QuickMessage.vue'
+import ModerationNotesModal from '@/components/modals/profile/ModerationNotes.vue'
 import UpdateProfileModal from '@/components/modals/profile/UpdateProfile.vue'
 import UpdateSignatureModal from '@/components/modals/profile/UpdateSignature.vue'
 import { usersApi, mentionsApi, messagesApi } from '@/api'
@@ -186,7 +188,7 @@ import { AuthStore } from '@/composables/stores/auth'
 export default {
   name: 'Profile',
   props: [ 'username', 'saveScrollPos' ],
-  components: { UpdateSignatureModal, UpdatePasswordModal, UpdateAvatarModal, UpdateEmailModal, DeleteAccountModal, DeactivateReactivateModal, UpdateProfileModal, QuickMessageModal },
+  components: { UpdateSignatureModal, UpdatePasswordModal, UpdateAvatarModal, UpdateEmailModal, DeleteAccountModal, DeactivateReactivateModal, UpdateProfileModal, QuickMessageModal, ModerationNotesModal },
   beforeRouteEnter(to, from, next) {
     next(vm => usersApi.find(vm.username).then(u => vm.user = u))
   },
