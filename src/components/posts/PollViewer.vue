@@ -4,13 +4,13 @@
     <div class="poll-title">
       <span class="poll-title-text">
         Poll
-        <span class="is_locked" v-if="pollLocked">(Locked)</span>
+        <span class="is_locked" v-if="pollCopy.locked">(Locked)</span>
       </span>
       <div class="poll-controls">
         <!-- Poll Controls -->
         <!-- TODO(boka): data-balloon="Lock Poll" data-balloon-pos="down" -->
-        <div class="poll-control" v-if="canLock()" :class="{'is_locked' : pollLocked}">
-          <input id="lockPoll" class="icon" type="checkbox" v-model="pollLocked">
+        <div class="poll-control" v-if="canLock()" :class="{'is_locked' : pollCopy.locked}">
+          <input id="lockPoll" class="icon" type="checkbox" v-model="pollCopy.locked">
           <label for="lockPoll"  @click="updateLockPoll()">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
               <title></title>
@@ -209,7 +209,7 @@ export default {
       console.log('PollViewer removeVote')
     }
     const updateLockPoll = () => {
-      if(v.pollLocked) {
+      if(v.pollCopy.locked) {
         pollsApi.unlock(props.thread.id, props.poll.id)
       }
       else {
@@ -256,7 +256,6 @@ export default {
       },
       editPoll: false,
       pollAnswers: [],
-      pollLocked: props.poll.locked,
       pollCopy: cloneDeep(props.poll)
     })
     /* Data Initialization */
