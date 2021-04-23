@@ -140,6 +140,7 @@ import { cloneDeep } from 'lodash'
 export default {
   props: ['poll', 'thread', 'userPriority', 'reset'],
   setup(props) {
+    /* Internal Methods */
     const calculatePollPercentage = () => {
       v.pollCopy.totalVotes = 0
       v.pollCopy.answers.forEach(answer => { v.pollCopy.totalVotes += answer.votes })
@@ -150,6 +151,7 @@ export default {
         answer.percentage = percentage
       })
     }
+    /* View Methods */
     const canLock = () => {
       console.log('PollViewer canLock')
       return true
