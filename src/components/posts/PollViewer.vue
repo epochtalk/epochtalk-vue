@@ -184,8 +184,11 @@ export default {
       }
     }
     const canRemoveVote = () => {
-      console.log('PollViewer canRemoveVote')
-      return true
+      // if the user is not able to vote
+      // or they have not voted yet
+      // or vote changes are not allowed
+      if (!votingEligible() || !v.pollCopy.has_voted || !v.pollCopy.change_vote) { return false }
+      else { return true }
     }
     const pollValid = () => {
       console.log('PollViewer pollValid')
