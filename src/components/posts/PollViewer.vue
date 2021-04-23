@@ -200,29 +200,29 @@ export default {
       }
     }
     const calcExpiration = () => {
-      var month, day, year, hour, minutes, valid = false;
+      var month, day, year, hour, minutes, valid = false
       if (v.options.expiration_date) {
-        var date = new Date(v.options.expiration_date);
-        valid = true;
-        month = date.getMonth();
-        day = date.getDate();
-        year = date.getFullYear();
+        var date = new Date(v.options.expiration_date)
+        valid = true
+        month = date.getMonth()
+        day = date.getDate()
+        year = date.getFullYear()
       }
 
       if (valid && v.options.expiration_time) {
-        var time = new Date(v.options.expiration_time);
-        hour = time.getHours();
-        minutes = time.getMinutes();
+        var time = new Date(v.options.expiration_time)
+        hour = time.getHours()
+        minutes = time.getMinutes()
       }
 
       if (valid) {
-        v.options.expiration = new Date(year, month, day, hour || 0, minutes || 0);
-        if (v.options.expiration < Date.now()) { v.options.expiration = undefined; }
+        v.options.expiration = new Date(year, month, day, hour || 0, minutes || 0)
+        if (v.options.expiration < Date.now()) { v.options.expiration = undefined }
       }
-      else { v.options.expiration = undefined; }
+      else { v.options.expiration = undefined }
 
       if (!v.options.expiration && v.options.display_mode === 'expired') {
-        v.options.display_mode = 'always';
+        v.options.display_mode = 'always'
       }
     }
     /* Internal Data */
