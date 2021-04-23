@@ -165,10 +165,12 @@ export default {
 
   .modal-actions {
     margin-top: 2rem;
-
-    button {
-      width: 100%
+    &.split-column {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-column-gap: 1rem;
     }
+    button { width: 100%; }
   }
 
   .modal-actions-sso-google {

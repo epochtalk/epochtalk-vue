@@ -123,7 +123,10 @@ export const messagesApi = {
   unignore: data => $http('/api/messages/unignore', { method: 'POST', data }),
   settings: () => $http('/api/messages/settings'),
   emailNotifications: enabled => $http('/api/messages/settings', { method: 'PUT', data:{enabled}}),
-  ignoreNewbies: enabled => $http('/api/messages/settings/newbie', { method: 'PUT', data:{enabled}})
+  ignoreNewbies: enabled => $http('/api/messages/settings/newbie', { method: 'PUT', data:{enabled}}),
+  convos: {
+   create: data => $http('/api/conversations', { method: 'POST', data })
+  }
 }
 
 export const mentionsApi = {
