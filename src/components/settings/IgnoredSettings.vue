@@ -62,12 +62,12 @@ export default {
   components: { IgnoredSettingsPartial },
   setup() {
     onBeforeMount(() => {
-      mentionsApi.settings().then(s => v.emailMentions = s.email_mentions)
+      mentionsApi.settings().then(s => v.emailMentions = s.email_mentions).catch(() => {})
       messagesApi.settings()
       .then(s => {
         v.emailMessages = s.email_messages
         v.ignoreNewbies = s.ignore_newbies
-      })
+      }).catch(() => {})
     })
 
     const enableMessageEmails = () => messagesApi.emailNotifications(!v.emailMessages)

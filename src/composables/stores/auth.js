@@ -4,6 +4,7 @@ import { authApi } from '@/api'
 import { PreferencesStore } from '@/composables/stores/prefs'
 import PermissionUtils from '@/composables/utils/permissions'
 import localStorageCache from '@/composables/utils/localStorageCache'
+import { useRoute, useRouter } from 'vue-router'
 
 const AUTH_KEY = 'auth'
 const appCache = localStorageCache(0, 'app')
@@ -27,7 +28,8 @@ export default {
     const $appCache = inject('$appCache')
     const $alertStore = inject('$alertStore')
     const $prefs = inject(PreferencesStore)
-
+    const $route = useRoute()
+    const $router = useRouter()
     const cachedUser = $appCache.get(AUTH_KEY)
 
     /* Provided Data */
@@ -49,8 +51,10 @@ export default {
         $appCache.delete(AUTH_KEY)
         $prefs.clear()
         $alertStore.warn(`Goodbye ${user.username}, you have successfully logged out!`)
+        // redirect to home on logout
+        if ($route.meta.requiresAuth && $route.path !== '/') $router.push({ path: '/' })
         // delay clearing reactive user to give css transitions time to complete
-        setTimeout(() => { Object.assign(user, cloneDeep(emtpyUser)) }, 500)
+        setTimeout(() => Object.assign(user, cloneDeep(emtpyUser)), 500)
       }).catch(() => {})
 
     const register = (email, username, password) => authApi.register({ email, username, password })

@@ -3,11 +3,12 @@ import { get } from 'lodash'
 import localStorageCache from '@/composables/utils/localStorageCache'
 import alertStore from '@/composables/stores/alert'
 
-const $axios = axios.create({
+export const $axios = axios.create({
   baseURL: 'http://localhost:8080',
   timeout: 3000,
   crossDomain: true
 })
+
 const $auth = localStorageCache(0, 'app').get('auth')
 const initUser = $auth ? $auth.data : undefined
 if (initUser) { $axios.defaults.headers.common['Authorization'] = `BEARER ${initUser.token}` }
@@ -54,6 +55,7 @@ export const threadsApi = {
   sticky: threadId => $http(`/api/threads/${threadId}/sticky`, { data: { status: true}, method: 'POST'}),
   unsticky: threadId => $http(`/api/threads/${threadId}/sticky`, { data: { status: false }, method: 'POST'}),
   byBoard: params => $http('/api/threads', { params }),
+  postedIn: params => $http('/api/threads/posted', { params }),
   slugToThreadId: slug => $http(`/api/threads/${slug}/id`),
   notifications: () => $http('api/threadnotifications'),
   removeSubscriptions: () => $http('/api/threadnotifications', { method: 'DELETE' }),
@@ -68,6 +70,8 @@ export const postsApi = {
   lock: postId => $http(`/api/posts/${postId}/lock`, { method: 'POST'}),
   unlock: postId => $http(`/api/posts/${postId}/unlock`, { method: 'POST'}),
   byThread: params => $http('/api/posts', { params }),
+  byUser: params => $http(`/api/posts/user/${params.username}`, { params }),
+  startedByUser: params => $http(`/api/posts/user/${params.username}/started`, { params }),
   slugToPostId: slug => $http(`/api/posts/${slug}/id`)
 }
 
@@ -98,13 +102,19 @@ export const authApi = {
     return user
   }),
   emailAvailable: email => $http(`/api/register/email/${email}`),
-  usernameAvailable: username => $http(`/api/register/username/${username}`)
+  usernameAvailable: username => $http(`/api/register/username/${username}`),
+  inviteExists: email => $http(`/api/invites/exists?email=${email}`),
+  invite: email => $http('/api/invites', { method: 'POST', data: { email }})
 }
 
 export const usersApi = {
   search: username => $http('/api/users/search', { params: { username } }),
   lookup: (username, params) => $http(`/api/users/lookup/${username}`, { params }),
   update: (userId, data) => $http(`/api/users/${userId}`, { method: 'PUT', data }),
+  find: username => $http(`/api/users/${username}`),
+  delete: userId => $http(`/api/users/${userId}`, { method: 'DELETE' }),
+  deactivate: userId => $http(`/api/users/${userId}/deactivate`, { method: 'POST' }),
+  reactivate: userId => $http(`/api/users/${userId}/reactivate`, { method: 'POST' }),
   preferences: () => $http('/api/users/preferences'),
   pageIgnored: params => $http('/api/ignoreUsers/ignored', { params }),
   ignore: user => $http(`/api/ignoreUsers/ignore/${user.id}`, { method: 'POST' }),
@@ -117,7 +127,10 @@ export const messagesApi = {
   unignore: data => $http('/api/messages/unignore', { method: 'POST', data }),
   settings: () => $http('/api/messages/settings'),
   emailNotifications: enabled => $http('/api/messages/settings', { method: 'PUT', data:{enabled}}),
-  ignoreNewbies: enabled => $http('/api/messages/settings/newbie', { method: 'PUT', data:{enabled}})
+  ignoreNewbies: enabled => $http('/api/messages/settings/newbie', { method: 'PUT', data:{enabled}}),
+  convos: {
+   create: data => $http('/api/conversations', { method: 'POST', data })
+  }
 }
 
 export const mentionsApi = {
@@ -125,7 +138,7 @@ export const mentionsApi = {
   ignore: data => $http(`/api/mentions/ignore`, { method: 'POST', data }),
   unignore: data => $http(`/api/mentions/unignore`, { method: 'POST', data }),
   settings: () => $http('/api/mentions/settings'),
-  emailNotifications: enabled => $http('/api/mentions/settings', { method: 'PUT', data:{enabled}}),
+  emailNotifications: enabled => $http('/api/mentions/settings', { method: 'PUT', data:{enabled}})
 }
 
 export const breadcrumbsApi = {

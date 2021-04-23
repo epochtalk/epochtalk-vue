@@ -8,7 +8,7 @@
     </div>
     <div v-if="loggedIn" class="dashboard-actions">
       <a class="button" href="#">Watchlist</a>
-      <a class="button" href="#">Threads Posted In</a>
+      <router-link :to="{ name: 'ThreadsPostedIn' }" class="button">Threads Posted In</router-link>
     </div>
 
     <div v-if="boardData.data">
@@ -36,7 +36,7 @@
                 <div class="moderators" v-if="board.moderators && board.moderators.length">
                   <span>Moderators: </span>
                   <span v-for="(mod, i) in board.moderators" :key="mod.username">
-                    <a href="#">{{mod.username}}</a><span v-if="(i + 1) !== board.moderators.length">, </span>
+                    <router-link :to="{ path: '/profile/' + mod.username }">{{mod.username}}</router-link><span v-if="(i + 1) !== board.moderators.length">, </span>
                   </span>
                 </div>
                 <div class="childboards" v-if="board.children.length">
@@ -65,7 +65,7 @@
                   <div v-if="board.last_post_username">
                     <span v-if="board.user_deleted || board.post_deleted">deleted</span>
                     <img v-if="!board.user_deleted && !board.post_deleted" class="avatar-small" :class="defaultAvatarShape" :src="board.last_post_avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
-                    <a v-if="!board.user_deleted && !board.post_deleted" href="#">{{board.last_post_username}}</a> posted in
+                    <router-link v-if="!board.user_deleted && !board.post_deleted" :to="{ path: '/profile/' + board.last_post_username }">{{board.last_post_username}}</router-link> posted in
                     <span v-if="board.last_thread_title">
                       <a href="#">{{board.last_thread_title }}</a> on
                     </span>
@@ -152,7 +152,7 @@ export default {
 
     /* Watch Data */
     watch(() => v.loggedIn, () => v.boardData.mutate(getBoards)) // Update boards on login
-    watch(() => v.boardData.error, () => $alertStore.error(v.boardData)) // Handle errors
+    watch(() => v.boardData.error, err => err ? $alertStore.error(err) : null) // Handle errors
 
     return { ...toRefs(v), generateCatId, toggleCategory, humanDate }
   }

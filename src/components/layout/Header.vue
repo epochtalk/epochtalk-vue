@@ -24,10 +24,14 @@
           <a href="#"><i class="fa fa-binoculars" aria-hidden="true"></i>Patrol</a>
         </li>
         <li @click="showMobileMenu = false" >
-          <a href="#"><i class="fa fa-user" aria-hidden="true"></i>Profile</a>
+          <router-link :to="{ path: '/profile/' + currentUser.username }">
+            <i class="fa fa-user" aria-hidden="true"></i>Profile
+          </router-link>
         </li>
         <li @click="showMobileMenu = false" >
-          <a href="#"><i class="fa fa-wrench" aria-hidden="true"></i>Settings</a>
+          <router-link :to="{ name: 'Settings' }">
+            <i class="fa fa-wrench" aria-hidden="true"></i>Settings
+          </router-link>
         </li>
         <li @click="showMobileMenu = false" >
           <a href="#"><i class="fa fa-users" aria-hidden="true"></i>Member Search</a>
@@ -46,7 +50,7 @@
           </a>
         </li>
         <li @click="showMobileMenu = false" >
-          <a href="#" @click="logout()"><i class="fa fa-sign-out" aria-hidden="true"></i>Logout</a>
+          <a @click="logout()"><i class="fa fa-sign-out" aria-hidden="true"></i>Logout</a>
         </li>
       </ul>
     </div>
@@ -115,12 +119,12 @@
             </li>
             <li id="user-dropdown-wrap" class="hide-mobile">
               <div>
-                <a href="#">
+                <router-link :to="{ path: '/profile/' + currentUser.username }">
                   <div class="avatar-wrap">
                     <img :src="currentUser.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" class="avatar" :class="defaultAvatarShape">
                   </div>
                   <span>{{currentUser.username}}</span>
-                </a>
+                </router-link>
               </div>
               <ul id="user-dropdown">
                 <li v-if="permissionUtils.hasPermission('adminAccess')">
@@ -133,7 +137,9 @@
                   <a href="#">Patrol</a>
                 </li>
                 <li>
-                  <a href="#">Profile</a>
+                  <router-link :to="{ path: '/profile/' + currentUser.username }">
+                    Profile
+                  </router-link>
                 </li>
                 <li>
                   <router-link :to="{ name: 'Settings' }">Settings</router-link>
@@ -145,7 +151,7 @@
                   <a href="#">Watchlist</a>
                 </li>
                 <li> <!--v-if="canInvite()">-->
-                  <a @click="showInvite = true">
+                  <a href="#" @click.prevent="showInvite = true">
                     Invite User
                   </a>
                 </li>
@@ -153,7 +159,7 @@
                   <router-link :to="{ name: 'About' }">About</router-link>
                 </li>
                 <li>
-                  <a href="#" @click="logout()">Logout</a>
+                  <a @click="logout()">Logout</a>
                 </li>
               </ul>
             </li>
@@ -171,8 +177,9 @@
       <!-- <motd></motd> -->
 
       <!-- Auth Modals -->
-      <login-modal :show="showLogin" @close="showLogin = false"></login-modal>
-      <register-modal :show="showRegister" @close="showRegister = false"></register-modal>
+      <login-modal :show="showLogin" @close="showLogin = false" />
+      <invite-modal :show="showInvite" @close="showInvite = false" />
+      <register-modal :show="showRegister" @close="showRegister = false" />
     </div>
   </header>
 </template>
@@ -181,6 +188,7 @@
 
 import Alert from '@/components/layout/Alert.vue'
 import LoginModal from '@/components/modals/auth/Login.vue'
+import InviteModal from '@/components/modals/auth/Invite.vue'
 import RegisterModal from '@/components/modals/auth/Register.vue'
 import Breadcrumbs from '@/components/layout/Breadcrumbs.vue'
 import decode from '@/composables/filters/decode'
@@ -190,7 +198,7 @@ import { reactive, toRefs, onMounted, onUnmounted, inject } from 'vue'
 import { debounce } from 'lodash'
 
 export default {
-  components: { Breadcrumbs, LoginModal, RegisterModal, Alert },
+  components: { Breadcrumbs, LoginModal, InviteModal, RegisterModal, Alert },
   setup() {
     /* Internal Methods */
     const scrollHeader = () => {
