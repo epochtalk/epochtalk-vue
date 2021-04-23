@@ -151,6 +151,15 @@ export default {
         answer.percentage = percentage
       })
     }
+    const votingEligible = () => {
+      if (!$auth.loggedIn) { return false }
+      // TODO(boka): check for banned */
+      // if ($scope.banned) { return false }
+      else if (!v.permissionUtils.hasPermission('threads.vote.allow')) { return false }
+      else if (v.pollCopy.locked) { return false }
+      else if (v.pollCopy.expired) { return false }
+      else { return true }
+    }
     /* View Methods */
     const canLock = () => {
       console.log('PollViewer canLock')
@@ -161,13 +170,8 @@ export default {
       return true
     }
     const canVote = () => {
-      if (!$auth.loggedIn) { return false }
-      // TODO(boka): check for banned */
-      // if ($scope.banned) { return false }
-      else if (!v.permissionUtils.hasPermission('threads.vote.allow')) { return false }
-      else if (v.pollCopy.has_voted) { return false }
-      else if (v.pollCopy.locked) { return false }
-      else if (v.pollCopy.expired) { return false }
+      // if the user is not able to vote or if they have voted already
+      if (!votingEligible() || v.pollCopy.has_voted) { return false }
       else { return true }
     }
     const toggleAnswer = (answerId) => {
