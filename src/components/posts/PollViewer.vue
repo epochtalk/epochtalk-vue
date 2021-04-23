@@ -200,6 +200,10 @@ export default {
       const answerIds = v.pollAnswers
 
       pollsApi.vote(threadId, pollId, answerIds)
+        .then(poll => {
+          v.pollCopy = poll
+          calculatePollPercentage()
+        })
     }
     const removeVote = () => {
       console.log('PollViewer removeVote')
