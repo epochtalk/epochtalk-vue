@@ -195,7 +195,11 @@ export default {
       else { return false }
     }
     const vote = () => {
-      console.log('PollViewer vote')
+      const threadId = props.thread.id
+      const pollId = props.thread.poll.id
+      const answerIds = v.pollAnswers
+
+      pollsApi.vote(threadId, pollId, answerIds)
     }
     const removeVote = () => {
       console.log('PollViewer removeVote')
