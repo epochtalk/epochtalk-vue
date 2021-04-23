@@ -132,7 +132,8 @@
 </template>
 <script>
 import humanDate from '@/composables/filters/humanDate'
-import { reactive, toRefs, watch } from 'vue'
+import { AuthStore } from '@/composables/stores/auth'
+import { reactive, toRefs, watch, inject } from 'vue'
 import { pollsApi } from '@/api'
 import { cloneDeep } from 'lodash'
 
@@ -158,8 +159,14 @@ export default {
       return true
     }
     const canVote = () => {
-      console.log('PollViewer canVote')
-      return true
+      if (!$auth.loggedIn) { return false }
+      // TODO(boka): check for banned */
+      // if ($scope.banned) { return false }
+      else if (!v.permissionUtils.hasPermission('threads.vote.allow')) { return false }
+      else if (v.pollCopy.has_voted) { return false }
+      else if (v.pollCopy.locked) { return false }
+      else if (v.pollCopy.expired) { return false }
+      else { return true }
     }
     const canRemoveVote = () => {
       console.log('PollViewer canRemoveVote')
@@ -218,9 +225,12 @@ export default {
         v.options.display_mode = 'always';
       }
     }
+    /* Internal Data */
+    const $auth = inject(AuthStore)
 
     /* View Data */
     const v = reactive({
+      permissionUtils: $auth.permissionUtils,
       options: {
         expiration: props.poll.expiration || undefined,
         change_vote: props.poll.change_vote,
