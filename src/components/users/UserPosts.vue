@@ -112,7 +112,7 @@ export default {
   beforeRouteEnter(to, from, next) {
     next(vm => {
       const params = {
-        username: vm.username,
+        username: to.params.username,
         limit: localStoragePrefs().data.posts_per_page,
         page: to.query.page || 1,
         field: to.query.field,
@@ -128,7 +128,7 @@ export default {
   },
   beforeRouteUpdate(to, from, next) {
     const params = {
-      username: this.username,
+      username: to.params.username,
       limit: localStoragePrefs().data.posts_per_page,
       page: to.query.page || 1,
       field: to.query.field,
@@ -155,7 +155,7 @@ export default {
 
     const refresh = () => {
       const params = {
-        username: props.username,
+        username: $route.params.username,
         limit: v.prefs.posts_per_page,
         page: $route.query.page || 1,
         field: $route.query.field,

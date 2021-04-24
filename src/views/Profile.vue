@@ -192,10 +192,10 @@ export default {
   props: [ 'username', 'saveScrollPos' ],
   components: { UpdateSignatureModal, UpdatePasswordModal, UpdateAvatarModal, UpdateEmailModal, DeleteAccountModal, DeactivateReactivateModal, UpdateProfileModal, QuickMessageModal,ManageBansModal, ModerationNotesModal },
   beforeRouteEnter(to, from, next) {
-    next(vm => usersApi.find(vm.username).then(u => vm.user = u))
+    next(vm => usersApi.find(to.params.username).then(u => vm.user = u))
   },
   beforeRouteUpdate(to, from, next) {
-    usersApi.find(this.username).then(u => this.user = u)
+    usersApi.find(to.params.username).then(u => this.user = u)
     next()
   },
   setup(props) {
