@@ -162,8 +162,16 @@ export default {
     }
     /* View Methods */
     const canLock = () => {
-      console.log('PollViewer canLock')
-      return true
+      if (!$auth.loggedIn) { return false }
+      // TODO(boka): check for banned */
+      // if ($scope.banned) { return false }
+      if (!v.permissionUtils.hasPermission('threads.lockPoll.allow')) { return false }
+
+      if (props.thread.user.id === $auth.user.id) { return true }
+      else if (v.permissionUtils.hasPermission('threads.lockPoll.bypass.owner.admin')) { return true }
+      else if (v.permissionUtils.hasPermission('threads.lockPoll.bypass.owner.priority') && v.permissionUtils.getPriority() < props.userPriority) { return true }
+      else if (v.permissionUtils.hasPermission('threads.lockPoll.bypass.owner.mod') && v.permissionUtils.moderatesBoard(props.thread.board_id)) { return true }
+      else { return false }
     }
     const canEdit = () => {
       console.log('PollViewer canEdit')
