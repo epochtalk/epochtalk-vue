@@ -9,35 +9,31 @@
             <div class="avatar" :class="defaultAvatarShape">
               <img :src="comment.author_avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" :style="avatarHighlight(comment.author_highlight_color)">
             </div>
-            <div class="content">
-              <div class="title">
-                <div class="bold inline-block" :style="usernameHighlight(comment.author_highlight_color)">{{ comment.author_name}}</div>
-                <span class="date">{{ humanDate(comment.created_at) }}</span>
-                <span v-if="comment.created_at !== comment.updated_at" class="date hide-mobile">&mdash;&nbsp;Edited {{ humanDate(comment.updated_at) }}</span>
-                <div class="right" v-if="comment.author_id === authedUser.id">
-                  <!-- TODO(akinsey): data-balloon="Delete" -->
-                  <a v-if="accessControl.delete && !comment.showConfirmDelete" class="action" @click="comment.showConfirmDelete = true">
-                    <i class="fa fa-trash"></i>
-                  </a>
-                  <a v-if="comment.showConfirmDelete" @click="deleteUserNote(comment)">&nbsp;Confirm&nbsp;</a>
-                  <a v-if="comment.showConfirmDelete" @click="comment.showConfirmDelete = false">&nbsp;Cancel&nbsp;</a>
-                  &nbsp;&nbsp;
-                  <!-- TODO(akinsey): data-balloon="Edit" -->
-                  <a v-if="accessControl.update" href="#" class="action" @click="comment.showEdit = !comment.showEdit; comment.noteEdit = ''">
-                    <i class="fa fa-edit"></i>
-                  </a>
-                </div>
-                <span v-if="comment.created_at !== comment.updated_at" class="date inline-block show-mobile">Edited {{ humanDate(comment.updated_at) }}</span>
-
+            <div class="title">
+              <div class="bold inline-block" :style="usernameHighlight(comment.author_highlight_color)">{{ comment.author_name}}</div>
+              <span class="date">{{ humanDate(comment.created_at) }}</span>
+              <span v-if="comment.created_at !== comment.updated_at" class="date">&mdash;&nbsp;Edited {{ humanDate(comment.updated_at) }}</span>
+              <div class="right" v-if="comment.author_id === authedUser.id">
+                <!-- TODO(akinsey): data-balloon="Delete" -->
+                <a v-if="accessControl.delete && !comment.showConfirmDelete" class="action pointer" @click="comment.showConfirmDelete = true">
+                  <i class="fa fa-trash"></i>
+                </a>
+                <a class="pointer" v-if="comment.showConfirmDelete" @click="deleteUserNote(comment)">&nbsp;Confirm&nbsp;</a>
+                <a class="pointer" v-if="comment.showConfirmDelete" @click="comment.showConfirmDelete = false">&nbsp;Cancel&nbsp;</a>
+                &nbsp;&nbsp;
+                <!-- TODO(akinsey): data-balloon="Edit" -->
+                <a v-if="accessControl.update" href="#" class="action pointer" @click="comment.showEdit = !comment.showEdit; comment.noteEdit = ''">
+                  <i class="fa fa-edit"></i>
+                </a>
               </div>
-              <div v-if="!comment.showEdit">{{ comment.note }}</div>
-              <div v-if="comment.showEdit">
-                <textarea v-model="comment.noteEdit"></textarea>
-                <div class="right">
-                  <span v-if="comment.noteEdit.length < 3 || comment.noteEdit === comment.note">&nbsp;Save&nbsp;</span>
-                  <a v-if="comment.noteEdit.length > 2 && comment.noteEdit !== comment.note" @click="editUserNote(comment)">&nbsp;Save&nbsp;</a>
-                  <a @click="comment.showEdit = false;">&nbsp;Cancel&nbsp;</a>
-                </div>
+            </div>
+            <div class="note" v-if="!comment.showEdit">{{ comment.note }}</div>
+            <div class="note" v-if="comment.showEdit">
+              <textarea v-model="comment.noteEdit"></textarea>
+              <div class="right">
+                <span v-if="comment.noteEdit.length < 3 || comment.noteEdit === comment.note">&nbsp;Save&nbsp;</span>
+                <a class="pointer" v-if="comment.noteEdit.length > 2 && comment.noteEdit !== comment.note" @click="editUserNote(comment)">&nbsp;Save&nbsp;</a>
+                <a class="pointer" @click="comment.showEdit = false;">&nbsp;Cancel&nbsp;</a>
               </div>
             </div>
           </div>
@@ -150,12 +146,17 @@ export default {
   margin-top: -0.625rem;
   .comment-container {
     .comment {
+    display: grid;
+    grid-template-columns: 2.5rem  1fr;
+    grid-column-gap: 1rem;
+    grid-template-areas: "avatar  title" "avatar  note";
       @include clearfix;
       padding: 1rem;
       border-bottom: 1px solid $border-color;
       &:nth-of-type(odd) { background-color: $sub-header-color; }
       &:last-child { margin-bottom: 1rem; }
       .avatar {
+        grid-area: avatar;
         &.circle {
           img {
             @include border-radius(100px);
@@ -170,16 +171,17 @@ export default {
           }
         }
       }
-      .content {
-        .title {
-          margin-bottom: 0.5rem;
-          .date { @include pad(0 0 0 0.25rem); font-size: 0.8rem; color: $secondary-font-color; }
-          .action { color: $secondary-font-color; }
-          &:hover .action { color: $secondary-font-color-dark; }
-          &:hover .action:hover { color: $color-primary;; }
-        }
-        textarea { min-height: 3.25rem; }
+      .title {
+        grid-area: title;
+        margin-bottom: 0.5rem;
+        .date { @include pad(0 0 0 0.25rem); font-size: 0.8rem; color: $secondary-font-color; }
+        .action { color: $secondary-font-color; }
+        &:hover .action { color: $secondary-font-color-dark; }
+        &:hover .action:hover { color: $color-primary;; }
       }
+      .note { grid-area: note; }
+      textarea { grid-area: note; min-height: 4.5rem; resize: vertical; }
+
     }
     .mod-notes.pagination-simple {
       margin: 1rem 0;
@@ -191,12 +193,11 @@ export default {
     @include break-mobile-sm {
       .comment {
         .avatar { display: none; }
-        .content {  }
       }
     }
   }
 }
 h5.no-comments { text-align: center; margin: 0.625rem 0; }
-.input-section.textarea textarea { height: 4.5rem; }
 .modal-container .modal-actions { margin-top: 0; }
+.input-section.textarea textarea { height: 4.5rem; resize: vertical; }
 </style>
