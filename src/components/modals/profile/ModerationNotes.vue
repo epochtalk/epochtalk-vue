@@ -6,8 +6,8 @@
       <div class="comments">
         <div class="comment-container">
           <div class="comment" v-for="comment in userNotes.data" :key="comment.id">
-            <div class="avatar circle">
-<!--               <img ng-style="usernotesvm.avatarHighlight(comment.author_highlight_color)" ng-src="{{comment.author_avatar || $webConfigs.default_avatar }}" /> -->
+            <div class="avatar" :class="defaultAvatarShape">
+              <img :src="comment.author_avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" :style="avatarHighlight(comment.author_highlight_color)">
             </div>
             <div class="content">
               <div class="title">
@@ -75,6 +75,7 @@ import Modal from '@/components/layout/Modal.vue'
 import { reactive, toRefs, inject, onBeforeMount, onBeforeUpdate } from 'vue'
 import { cloneDeep } from 'lodash'
 import humanDate from '@/composables/filters/humanDate'
+import { avatarHighlight } from '@/composables/utils/userUtils'
 import { usersApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 
@@ -131,13 +132,15 @@ export default {
       userNotes: {},
       note: '',
       errorMessage: '',
+      defaultAvatar: window.default_avatar,
+      defaultAvatarShape: window.default_avatar_shape,
       accessControl: {
         delete: true,
         update: true
       }
     })
 
-    return { ...toRefs(v), leaveNote, editUserNote, pullPage, humanDate, close }
+    return { ...toRefs(v), leaveNote, editUserNote, pullPage, avatarHighlight, humanDate, close }
   }
 }
 </script>
