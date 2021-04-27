@@ -11,7 +11,7 @@
             </div>
             <div class="content">
               <div class="title">
-                <div class="bold inline-block">{{ comment.author_name}}</div>
+                <div class="bold inline-block" :style="usernameHighlight(comment.author_highlight_color)">{{ comment.author_name}}</div>
                 <span class="date">{{ humanDate(comment.created_at) }}</span>
                 <span v-if="comment.created_at !== comment.updated_at" class="date hide-mobile">&mdash;&nbsp;Edited {{ humanDate(comment.updated_at) }}</span>
                 <div class="right" v-if="comment.author_id === authedUser.id">
@@ -75,7 +75,7 @@ import Modal from '@/components/layout/Modal.vue'
 import { reactive, toRefs, inject, onBeforeMount, onBeforeUpdate } from 'vue'
 import { cloneDeep } from 'lodash'
 import humanDate from '@/composables/filters/humanDate'
-import { avatarHighlight } from '@/composables/utils/userUtils'
+import { avatarHighlight, usernameHighlight } from '@/composables/utils/userUtils'
 import { usersApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 
@@ -140,7 +140,7 @@ export default {
       }
     })
 
-    return { ...toRefs(v), leaveNote, editUserNote, pullPage, avatarHighlight, humanDate, close }
+    return { ...toRefs(v), leaveNote, editUserNote, pullPage, avatarHighlight, usernameHighlight, humanDate, close }
   }
 }
 </script>
