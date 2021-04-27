@@ -108,6 +108,7 @@ export const usersApi = {
   reactivate: userId => $http(`/api/users/${userId}/reactivate`, { method: 'POST' }),
   preferences: () => $http('/api/users/preferences'),
   pageIgnored: params => $http('/api/ignoreUsers/ignored', { params }),
+  notes: params => $http('/api/user/notes', { params }),
   ignore: user => $http(`/api/ignoreUsers/ignore/${user.id}`, { method: 'POST' }),
   unignore: user => $http(`/api/ignoreUsers/unignore/${user.id}`, { method: 'POST' })
 }
