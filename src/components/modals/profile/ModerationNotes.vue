@@ -41,12 +41,12 @@
               </div>
             </div>
           </div>
-          <div v-if="userNotes" class="mod-notes pagination-simple">
+          <div v-if="userNotes.data.length" class="mod-notes pagination-simple">
             <button @click="pullPage(-1)" :disabled="!userNotes?.prev">&#10094; Prev</button>
             <label>Page {{userNotes.page}}</label>
             <button @click="pullPage(1)" :disabled="!userNotes?.next">Next &#10095;</button>
           </div>
-          <div v-if="!userNotes">
+          <div v-if="!userNotes.data.length">
             <h5 class="no-comments">No Moderation Notes to Display</h5>
           </div>
         </div>
@@ -72,7 +72,7 @@
 
 <script>
 import Modal from '@/components/layout/Modal.vue'
-import { reactive, toRefs, inject, onBeforeMount } from 'vue'
+import { reactive, toRefs, inject, onBeforeMount, onBeforeUpdate } from 'vue'
 import { cloneDeep } from 'lodash'
 import humanDate from '@/composables/filters/humanDate'
 import { usersApi } from '@/api'
@@ -89,6 +89,13 @@ export default {
       page: 1,
       limit: 5
     }).then(d => v.userNotes = d).catch(() => {}))
+
+    /* This handles user clicking link switching from one user's profile to another's */
+    onBeforeUpdate(() => props.user.id !== v.userNotes.user_id ? usersApi.notes({
+      user_id: props.user.id,
+      page: 1,
+      limit: 5
+    }).then(d => v.userNotes = d).catch(() => {}) : null)
 
     /* Template Methods */
     const pullPage = inc => usersApi.notes({
