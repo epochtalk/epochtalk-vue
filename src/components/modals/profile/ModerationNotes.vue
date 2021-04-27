@@ -5,7 +5,7 @@
     <template v-slot:body>
       <div class="comments">
         <div class="comment-container">
-          <div class="comment" v-for="comment in userNotes" :key="comment.id">
+          <div class="comment" v-for="comment in userNotes.data" :key="comment.id">
             <div class="avatar circle">
 <!--               <img ng-style="usernotesvm.avatarHighlight(comment.author_highlight_color)" ng-src="{{comment.author_avatar || $webConfigs.default_avatar }}" /> -->
             </div>
@@ -20,11 +20,11 @@
                     <i class="fa fa-trash"></i>
                   </a>
                   <a v-if="comment.showConfirmDelete" @click="deleteUserNote(comment)">&nbsp;Confirm&nbsp;</a>
-                  <a v-if="comment.showConfirmDelete" href="#" @click="comment.showConfirmDelete = false">&nbsp;Cancel&nbsp;</a>
+                  <a v-if="comment.showConfirmDelete" @click="comment.showConfirmDelete = false">&nbsp;Cancel&nbsp;</a>
                   &nbsp;&nbsp;
                   <!-- TODO(akinsey): data-balloon="Edit" -->
                   <a v-if="accessControl.update" href="#" class="action" @click="comment.showEdit = !comment.showEdit; comment.noteEdit = ''">
-                    <i class="fa fa-pencil"></i>
+                    <i class="fa fa-edit"></i>
                   </a>
                 </div>
                 <span v-if="comment.created_at !== comment.updated_at" class="date inline-block show-mobile">Edited {{ humanDate(comment.updated_at) }}</span>
@@ -68,9 +68,11 @@
 
 <script>
 import Modal from '@/components/layout/Modal.vue'
-import { reactive, toRefs, inject } from 'vue'
+import { reactive, toRefs, inject, onBeforeMount } from 'vue'
 import { cloneDeep } from 'lodash'
 import humanDate from '@/composables/filters/humanDate'
+import { usersApi } from '@/api'
+import { AuthStore } from '@/composables/stores/auth'
 
 export default {
   name: 'moderation-notes-modal',
@@ -78,6 +80,18 @@ export default {
   emits: ['close'],
   components: { Modal },
   setup(props, { emit }) {
+    onBeforeMount(() => {
+      const query = {
+        user_id: props.user.id,
+        page: 1,
+        limit: 5
+      }
+      usersApi.notes(query)
+      .then(data => {
+        v.userNotes = data
+      }).catch(() => {})
+    })
+
     /* Template Methods */
     const leaveNote = () => {
       v.errorMessage = null
@@ -95,14 +109,21 @@ export default {
 
     /* Internal Data */
     const $alertStore = inject('$alertStore')
+    const $auth = inject(AuthStore)
 
     /* Template Data */
     const v = reactive({
+      authedUser: $auth.user,
       userCopy: cloneDeep(props.user),
       userReactive: props.user,
       focusInput: null,
+      userNotes: {},
       note: '',
-      errorMessage: ''
+      errorMessage: '',
+      accessControl: {
+        delete: true,
+        update: true
+      }
     })
 
     return { ...toRefs(v), leaveNote, editUserNote, humanDate, close }
