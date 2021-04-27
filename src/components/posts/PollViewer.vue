@@ -231,7 +231,14 @@ export default {
         })
     }
     const removeVote = () => {
-      console.log('PollViewer removeVote')
+      const threadId = props.thread.id
+      const pollId = props.thread.poll.id
+
+      pollsApi.removeVote(threadId, pollId)
+        .then(poll => {
+          v.pollCopy = poll
+          calculatePollPercentage()
+        })
     }
     const updateLockPoll = () => {
       if(v.pollCopy.locked) {
