@@ -174,8 +174,16 @@ export default {
       else { return false }
     }
     const canEdit = () => {
-      console.log('PollViewer canEdit')
-      return true
+      if (!$auth.loggedIn) { return false }
+      // TODO(boka): check for banned */
+      // if ($scope.banned) { return false }
+      if (!v.permissionUtils.hasPermission('threads.editPoll.allow')) { return false }
+
+      if (props.thread.user.id === $auth.user.id) { return true }
+      else if (v.permissionUtils.hasPermission('threads.editPoll.bypass.owner.admin')) { return true }
+      else if (v.permissionUtils.hasPermission('threads.editPoll.bypass.owner.priority') && v.permissionUtils.getPriority() < props.userPriority) { return true }
+      else if (v.permissionUtils.hasPermission('threads.editPoll.bypass.owner.mod') && v.permissionUtils.moderatesBoard(props.thread.board_id)) { return true }
+      else { return false }
     }
     const canVote = () => {
       // if the user is not able to vote or if they have voted already
