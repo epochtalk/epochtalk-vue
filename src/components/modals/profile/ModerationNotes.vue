@@ -41,17 +41,21 @@
               </div>
             </div>
           </div>
+          <div v-if="userNotes" class="mod-notes pagination-simple">
+            <button @click="pullPage(-1)" :disabled="!userNotes?.prev">&#10094; Prev</button>
+            <label>Page {{userNotes.page}}</label>
+            <button @click="pullPage(1)" :disabled="!userNotes?.next">Next &#10095;</button>
+          </div>
           <div v-if="!userNotes">
             <h5 class="no-comments">No Moderation Notes to Display</h5>
           </div>
         </div>
       </div>
-
       <form v-if="userCopy" action="." class="css-form">
         <!-- Note -->
         <div class="input-section textarea">
           <label for="note">Note</label>
-          <textarea rows="10" id="note" :placeholder="`Leave your moderation note for ${user.username} here...`" v-model="note" ref="focusInput" maxlength="5000"></textarea>
+          <textarea rows="5" id="note" :placeholder="`Leave your moderation note for ${user.username} here...`" v-model="note" ref="focusInput" maxlength="5000"></textarea>
         </div>
 
         <!-- Save Button -->
@@ -80,19 +84,19 @@ export default {
   emits: ['close'],
   components: { Modal },
   setup(props, { emit }) {
-    onBeforeMount(() => {
-      const query = {
-        user_id: props.user.id,
-        page: 1,
-        limit: 5
-      }
-      usersApi.notes(query)
-      .then(data => {
-        v.userNotes = data
-      }).catch(() => {})
-    })
+    onBeforeMount(() => usersApi.notes({
+      user_id: props.user.id,
+      page: 1,
+      limit: 5
+    }).then(d => v.userNotes = d).catch(() => {}))
 
     /* Template Methods */
+    const pullPage = inc => usersApi.notes({
+      user_id: props.user.id,
+      page: v.userNotes?.page ? v.userNotes.page + inc : 1,
+      limit: 5
+    }).then(d => v.userNotes = d).catch(() => {})
+
     const leaveNote = () => {
       v.errorMessage = null
       $alertStore.info('TODO: Leave Note')
@@ -126,12 +130,12 @@ export default {
       }
     })
 
-    return { ...toRefs(v), leaveNote, editUserNote, humanDate, close }
+    return { ...toRefs(v), leaveNote, editUserNote, pullPage, humanDate, close }
   }
 }
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
 .comments {
   margin-top: -0.625rem;
   .comment-container {
@@ -167,6 +171,12 @@ export default {
         textarea { min-height: 3.25rem; }
       }
     }
+    .mod-notes.pagination-simple {
+      margin: 1rem 0;
+      grid-template-columns: auto auto auto;
+      label { text-align: center }
+      button:last-child { text-align: right; }
+    }
 
     @include break-mobile-sm {
       .comment {
@@ -177,5 +187,6 @@ export default {
   }
 }
 h5.no-comments { text-align: center; margin: 0.625rem 0; }
-.textarea textarea { min-height: 4.5rem; }
+.input-section.textarea textarea { height: 4.5rem; }
+.modal-container .modal-actions { margin-top: 0; }
 </style>
