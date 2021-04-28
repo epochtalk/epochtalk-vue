@@ -22,7 +22,7 @@
                 <a class="pointer" v-if="comment.showConfirmDelete" @click="comment.showConfirmDelete = false">&nbsp;Cancel&nbsp;</a>
                 &nbsp;&nbsp;
                 <!-- TODO(akinsey): data-balloon="Edit" -->
-                <a v-if="accessControl.update" class="action pointer" @click="comment.showEdit = !comment.showEdit; comment.noteEdit = ''">
+                <a v-if="accessControl.update" class="action pointer" @click="comment.showEdit = !comment.showEdit; comment.noteEdit = comment.note">
                   <i class="fa fa-edit"></i>
                 </a>
               </div>
@@ -106,9 +106,11 @@ export default {
       $alertStore.info('TODO: Leave Note')
     }
 
-    const editUserNote = comment => {
-      console.log(comment)
-    }
+    const editUserNote = comment => usersApi.updateNote({ id: comment.id, note: comment.noteEdit })
+      .then(() => v.userNotes?.data?.length  === 1 ? pullPage(-1) : pullPage(0))
+      .catch(() => {
+        v.errorMessage = 'Error: There was an issue editing this moderation note, please try again later'
+      })
 
     const deleteUserNote = comment => usersApi.deleteNote({ id: comment.id })
       .then(() => v.userNotes?.data?.length  === 1 ? pullPage(-1) : pullPage(0))
