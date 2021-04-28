@@ -22,7 +22,7 @@
                 <a class="pointer" v-if="comment.showConfirmDelete" @click="comment.showConfirmDelete = false">&nbsp;Cancel&nbsp;</a>
                 &nbsp;&nbsp;
                 <!-- TODO(akinsey): data-balloon="Edit" -->
-                <a v-if="accessControl.update" href="#" class="action pointer" @click="comment.showEdit = !comment.showEdit; comment.noteEdit = ''">
+                <a v-if="accessControl.update" class="action pointer" @click="comment.showEdit = !comment.showEdit; comment.noteEdit = ''">
                   <i class="fa fa-edit"></i>
                 </a>
               </div>
@@ -31,18 +31,18 @@
             <div class="note" v-if="comment.showEdit">
               <textarea v-model="comment.noteEdit"></textarea>
               <div class="right">
-                <span v-if="comment.noteEdit.length < 3 || comment.noteEdit === comment.note">&nbsp;Save&nbsp;</span>
-                <a class="pointer" v-if="comment.noteEdit.length > 2 && comment.noteEdit !== comment.note" @click="editUserNote(comment)">&nbsp;Save&nbsp;</a>
+                <span v-if="comment?.noteEdit?.length < 3 || comment.noteEdit === comment.note">&nbsp;Save&nbsp;</span>
+                <a class="pointer" v-if="comment?.noteEdit?.length > 2 && comment.noteEdit !== comment.note" @click="editUserNote(comment)">&nbsp;Save&nbsp;</a>
                 <a class="pointer" @click="comment.showEdit = false;">&nbsp;Cancel&nbsp;</a>
               </div>
             </div>
           </div>
-          <div v-if="userNotes.data.length" class="mod-notes pagination-simple">
+          <div v-if="userNotes?.data?.length" class="mod-notes pagination-simple">
             <button @click="pullPage(-1)" :disabled="!userNotes?.prev">&#10094; Prev</button>
             <label>Page {{userNotes.page}}</label>
             <button @click="pullPage(1)" :disabled="!userNotes?.next">Next &#10095;</button>
           </div>
-          <div v-if="!userNotes.data.length">
+          <div v-if="!userNotes?.data?.length">
             <h5 class="no-comments">No Moderation Notes to Display</h5>
           </div>
         </div>
@@ -97,7 +97,7 @@ export default {
     /* Template Methods */
     const pullPage = inc => usersApi.notes({
       user_id: props.user.id,
-      page: v.userNotes?.page ? v.userNotes.page + inc : 1,
+      page: v.userNotes.page && (v.userNotes.page + inc) >= 1 ? v.userNotes.page + inc : 1,
       limit: 5
     }).then(d => v.userNotes = d).catch(() => {})
 
@@ -106,9 +106,15 @@ export default {
       $alertStore.info('TODO: Leave Note')
     }
 
-    const editUserNote = (comment) => {
+    const editUserNote = comment => {
       console.log(comment)
     }
+
+    const deleteUserNote = comment => usersApi.deleteNote({ id: comment.id })
+      .then(() => v.userNotes?.data?.length  === 1 ? pullPage(-1) : pullPage(0))
+      .catch(() => {
+        v.errorMessage = 'Error: There was an issue deleting this moderation note, please try again later'
+      })
 
     const close = () => {
       v.errorMessage = null
@@ -136,7 +142,7 @@ export default {
       }
     })
 
-    return { ...toRefs(v), leaveNote, editUserNote, pullPage, avatarHighlight, usernameHighlight, humanDate, close }
+    return { ...toRefs(v), leaveNote, editUserNote, deleteUserNote, pullPage, avatarHighlight, usernameHighlight, humanDate, close }
   }
 }
 </script>

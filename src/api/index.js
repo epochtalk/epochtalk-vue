@@ -109,6 +109,7 @@ export const usersApi = {
   preferences: () => $http('/api/users/preferences'),
   pageIgnored: params => $http('/api/ignoreUsers/ignored', { params }),
   notes: params => $http('/api/user/notes', { params }),
+  deleteNote: params => $http('/api/user/notes', { method: 'DELETE', params }),
   ignore: user => $http(`/api/ignoreUsers/ignore/${user.id}`, { method: 'POST' }),
   unignore: user => $http(`/api/ignoreUsers/unignore/${user.id}`, { method: 'POST' })
 }
