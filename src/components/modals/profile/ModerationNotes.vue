@@ -18,8 +18,8 @@
                 <a v-if="accessControl.delete && !comment.showConfirmDelete" class="action pointer" @click="comment.showConfirmDelete = true">
                   <i class="fa fa-trash"></i>
                 </a>
-                <a class="pointer" v-if="comment.showConfirmDelete" @click="deleteUserNote(comment)">&nbsp;Confirm&nbsp;</a>
-                <a class="pointer" v-if="comment.showConfirmDelete" @click="comment.showConfirmDelete = false">&nbsp;Cancel&nbsp;</a>
+                <a class="small-text pointer" v-if="comment.showConfirmDelete" @click="deleteUserNote(comment)">&nbsp;Confirm&nbsp;</a>
+                <a class="small-text pointer" v-if="comment.showConfirmDelete" @click="comment.showConfirmDelete = false">&nbsp;Cancel&nbsp;</a>
                 &nbsp;&nbsp;
                 <!-- TODO(akinsey): data-balloon="Edit" -->
                 <a v-if="accessControl.update" class="action pointer" @click="comment.showEdit = !comment.showEdit; comment.noteEdit = comment.note">
@@ -56,7 +56,7 @@
 
         <!-- Save Button -->
         <div class="modal-actions">
-          <button @click.prevent="leaveNote()">
+          <button @click.prevent="leaveNote()" :disabled="note?.length < 3">
             Leave Note
           </button>
         </div>
@@ -101,10 +101,12 @@ export default {
       limit: 5
     }).then(d => v.userNotes = d).catch(() => {})
 
-    const leaveNote = () => {
-      v.errorMessage = null
-      $alertStore.info('TODO: Leave Note')
-    }
+    const leaveNote = () => usersApi.createNote({ author_id: v.authedUser.id, note: v.note, user_id: props.user.id })
+      .then(() => v.note = '')
+      .then(() => v.userNotes?.data?.length  === 1 ? pullPage(-1) : pullPage(0))
+      .catch(() => {
+        v.errorMessage = 'Error: There was an issue editing this moderation note, please try again later'
+      })
 
     const editUserNote = comment => usersApi.updateNote({ id: comment.id, note: comment.noteEdit })
       .then(() => v.userNotes?.data?.length  === 1 ? pullPage(-1) : pullPage(0))
@@ -124,7 +126,6 @@ export default {
     }
 
     /* Internal Data */
-    const $alertStore = inject('$alertStore')
     const $auth = inject(AuthStore)
 
     /* Template Data */
