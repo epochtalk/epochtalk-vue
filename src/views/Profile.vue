@@ -203,7 +203,17 @@ export default {
     const refreshUser = () => usersApi.find(v.user.username).then(u => v.user = u)
     const redirectHome = () => $router.replace('/')
 
-    const canUpdate = () => true
+    const canUpdate = () => {
+      if (!v.loggedIn) return false
+      if (!v.permUtils.hasPermission('users.update.allow')) return false
+      const same = v.permUtils.hasPermission('users.update.bypass.priority.admin')
+      const lower = v.permUtils.hasPermission('users.update.bypass.priority.mod')
+      if (pageOwner()) return true
+      else if (same) return v.permUtils.getPriority() <= v.user.priority
+      else if (lower) return v.permUtils.getPriority() < v.user.priority
+      else false
+    }
+
     const canMessage = () => true
     const userAge = dob => {
       if (!dob) { return }
@@ -246,6 +256,7 @@ export default {
     /* Template Data */
     const v = reactive({
       loggedIn: $auth.loggedIn,
+      permUtils: $auth.permissionUtils,
       banExpiration: null,
       isOnline: true,
       userLocalTime: null,
