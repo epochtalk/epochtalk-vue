@@ -102,7 +102,7 @@ export default {
 
     const decodeHtml = html => {
       let text = document.createElement('textarea')
-      text.innerHTML = html
+      text.innerHTML = html || ''
       return text.value
     }
 
@@ -113,7 +113,7 @@ export default {
       params.dob = moment(params.dob_formatted).toDate()
       usersApi.update(props.user.id, params)
       .then(() => {
-        $alertStore.success(`Successfully updated email for user ${params.username}`)
+        $alertStore.success(`Successfully updated profile for user ${params.username}`)
         Object.assign(v.userReactive, v.userCopy)
       })
       .catch(() => v.errorMessage = 'There was a problem updating your profile information, please ensure that the form has no errors.')
