@@ -230,7 +230,7 @@ export default {
       if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--
       return age
     }
-    const canUpdatePrivate = () => true
+    const canUpdatePrivate = () => canUpdate() && pageOwner()
     const pageOwner = () => props.username === $auth.user?.username
     const canPageUserNotes = () => v.loggedIn && v.permUtils.hasPermission('userNotes.page.allow')
     const canBanUser = () => true
