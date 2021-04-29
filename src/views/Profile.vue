@@ -162,7 +162,7 @@
   <update-avatar-modal v-if="user" :user="user" :show="showEditAvatar" @close="showEditAvatar = false" />
   <quick-message-modal v-if="user" :user="user" :show="showQuickMessage" @close="showQuickMessage = false" />
   <manage-bans-modal v-if="user" :user="user" :show="showManageBans" @close="showManageBans = false" />
-  <moderation-notes-modal v-if="user" :user="user" :show="showModNotes" @close="showModNotes = false" />
+  <moderation-notes-modal v-if="user && canPageUserNotes()" :user="user" :show="showModNotes" @close="showModNotes = false" />
   <update-email-modal v-if="user" :user="user" :show="showChangeEmail" @close="showChangeEmail = false" />
   <update-signature-modal v-if="user" :user="user" :show="showEditSignature" @close="showEditSignature = false" />
   <update-password-modal v-if="user" :user="user" :show="showChangePassword" @close="showChangePassword = false" />
@@ -232,7 +232,7 @@ export default {
     }
     const canUpdatePrivate = () => true
     const pageOwner = () => props.username === $auth.user?.username
-    const canPageUserNotes = () => true
+    const canPageUserNotes = () => v.loggedIn && v.permUtils.hasPermission('userNotes.page.allow')
     const canBanUser = () => true
     const canDeactivate = () => !v.user.deleted
     const canReactivate = () => v.user.deleted
