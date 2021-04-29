@@ -203,6 +203,16 @@ export default {
     const refreshUser = () => usersApi.find(v.user.username).then(u => v.user = u)
     const redirectHome = () => $router.replace('/')
 
+    const userAge = dob => {
+      if (!dob) return
+      var today = new Date()
+      var birthDate = new Date(dob)
+      var age = today.getFullYear() - birthDate.getFullYear()
+      var m = today.getMonth() - birthDate.getMonth()
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--
+      return age
+    }
+
     const canUpdate = () => {
       if (!v.loggedIn) return false
       if (!v.permUtils.hasPermission('users.update.allow')) return false
@@ -220,20 +230,23 @@ export default {
       return canUpdate()
     }
 
-    const canMessage = () => true
-    const userAge = dob => {
-      if (!dob) return
-      var today = new Date()
-      var birthDate = new Date(dob)
-      var age = today.getFullYear() - birthDate.getFullYear()
-      var m = today.getMonth() - birthDate.getMonth()
-      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--
-      return age
+    const canMessage = () => {
+      if (!v.loggedIn) return false
+      if (!v.permUtils.hasPermission('conversations.create.allow')) return false
+      if (!pageOwner()) return true
+      return false
     }
+
     const canUpdatePrivate = () => canUpdate() && pageOwner()
     const pageOwner = () => props.username === $auth.user?.username
     const canPageUserNotes = () => v.loggedIn && v.permUtils.hasPermission('userNotes.page.allow')
-    const canBanUser = () => true
+    const canBanUser = () => {
+      if (!v.loggedIn) return false
+      if (v.permUtils.hasPermission('bans.ban.allow')) return true
+      if (v.permUtils.hasPermission('bans.banFromBoards')) return false
+      return false
+    }
+
     const canDeactivate = () => !v.user.deleted
     const canReactivate = () => v.user.deleted
     const canDelete = () => true
