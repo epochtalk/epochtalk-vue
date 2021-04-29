@@ -158,7 +158,7 @@
     </div>
   </div>
 
-  <update-profile-modal v-if="user" :user="user" :show="showUpdateProfile" @close="showUpdateProfile = false" />
+  <update-profile-modal v-if="user" :user="user" :show="showUpdateProfile" :can-update-username="canUpdateUsername" @close="showUpdateProfile = false" />
   <update-avatar-modal v-if="user" :user="user" :show="showEditAvatar" @close="showEditAvatar = false" />
   <quick-message-modal v-if="user" :user="user" :show="showQuickMessage" @close="showQuickMessage = false" />
   <manage-bans-modal v-if="user" :user="user" :show="showManageBans" @close="showManageBans = false" />
@@ -214,14 +214,20 @@ export default {
       else false
     }
 
+    const canUpdateUsername = () => {
+      if (!v.loggedIn) return false
+      if (!v.permUtils.hasPermission('users.changeUsername.allow')) return false
+      return canUpdate()
+    }
+
     const canMessage = () => true
     const userAge = dob => {
-      if (!dob) { return }
+      if (!dob) return
       var today = new Date()
       var birthDate = new Date(dob)
       var age = today.getFullYear() - birthDate.getFullYear()
       var m = today.getMonth() - birthDate.getMonth()
-      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) { age--; }
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--
       return age
     }
     const canUpdatePrivate = () => true
@@ -275,7 +281,7 @@ export default {
       showDelete: false,
       showManageBans: false
     })
-    return { ...toRefs(v), refreshUser, toggleIgnorePosts, toggleIgnoreMessages, toggleIgnoreMentions, redirectHome, canUpdate, canMessage, userAge, canUpdatePrivate, pageOwner, canPageUserNotes, canBanUser, canReactivate, canDeactivate, canDelete, humanDate }
+    return { ...toRefs(v), refreshUser, toggleIgnorePosts, toggleIgnoreMessages, toggleIgnoreMentions, redirectHome, canUpdate, canUpdateUsername, canMessage, userAge, canUpdatePrivate, pageOwner, canPageUserNotes, canBanUser, canReactivate, canDeactivate, canDelete, humanDate }
   }
 }
 </script>

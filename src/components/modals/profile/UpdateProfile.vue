@@ -93,7 +93,7 @@ import { websiteUrlRegex, usernameRegex } from '@/composables/utils/globalRegex'
 
 export default {
   name: 'update-profile-modal',
-  props: ['show', 'user'],
+  props: ['show', 'user', 'canUpdateUsername'],
   emits: ['close'],
   components: { Modal },
   setup(props, { emit }) {
@@ -119,8 +119,6 @@ export default {
       .catch(() => v.errorMessage = 'There was a problem updating your profile information, please ensure that the form has no errors.')
       .finally(() => v.errorMessage ? null : close())
     }
-
-    const canUpdateUsername = () => true
 
     const close = () => {
       v.errorMessage = null
@@ -173,7 +171,7 @@ export default {
       checkFormValid()
     }, 500))
 
-    return { ...toRefs(v), canUpdateUsername, updateProfile, close }
+    return { ...toRefs(v), updateProfile, close }
   }
 }
 </script>
