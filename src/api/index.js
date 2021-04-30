@@ -140,6 +140,10 @@ export const breadcrumbsApi = {
   find: (id, type) => $http('/api/breadcrumbs', { params: { id, type } })
 }
 
+export const banApi = {
+  getBannedBoards: username => $http(`/api/users/${username}/bannedboards`)
+}
+
 export const adminApi = {
   moderators: {
     remove: data => $http('/api/admin/moderators/remove', { method: 'POST', data }),
