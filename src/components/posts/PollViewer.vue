@@ -209,7 +209,7 @@ export default {
       else if (v.options.expiration_date && !v.options.expiration) { return false }
       else if (v.options.expiration_time && !v.options.expiration_date) { return false }
       else if (v.options.expiration && v.options.expiration < Date.now()) { return false }
-      else if (v.options.display_mode !== 'always' && v.options.display_mode !== 'voted' && v.options.display_mode !== 'expired') { false }
+      else if (v.options.display_mode !== 'always' && v.options.display_mode !== 'voted' && v.options.display_mode !== 'expired') { return false }
       else { return true }
     }
     const showPollResults = () => {
