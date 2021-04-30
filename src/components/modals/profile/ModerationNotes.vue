@@ -81,18 +81,16 @@ export default {
   emits: ['close'],
   components: { Modal },
   setup(props, { emit }) {
-    onBeforeMount(() => usersApi.notes({
-      user_id: props.user.id,
-      page: 1,
-      limit: 5
-    }).then(d => v.userNotes = d).catch(() => {}))
+    onBeforeMount(() => fetchNotes())
 
     /* This handles user clicking link switching from one user's profile to another's */
-    onBeforeUpdate(() => props.user.id !== v.userNotes.user_id ? usersApi.notes({
+    onBeforeUpdate(() => props.user.id !== v.userNotes.user_id ? fetchNotes() : null)
+
+    const fetchNotes = () => usersApi.notes({
       user_id: props.user.id,
       page: 1,
       limit: 5
-    }).then(d => v.userNotes = d).catch(() => {}) : null)
+    }).then(d => v.userNotes = d).catch(() => {})
 
     /* Template Methods */
     const pullPage = inc => usersApi.notes({
@@ -139,10 +137,7 @@ export default {
       errorMessage: '',
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
-      accessControl: {
-        delete: true,
-        update: true
-      }
+      accessControl: $auth.permissionUtils.hasPermission('userNotes')
     })
 
     return { ...toRefs(v), leaveNote, editUserNote, deleteUserNote, pullPage, avatarHighlight, usernameHighlight, humanDate, close }
