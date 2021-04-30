@@ -221,7 +221,7 @@ export default {
       if (pageOwner()) return true
       else if (same) return v.permUtils.getPriority() <= v.user.priority
       else if (lower) return v.permUtils.getPriority() < v.user.priority
-      else false
+      return false
     }
     const canUpdateUsername = () => {
       if (!v.loggedIn) return false
@@ -257,7 +257,16 @@ export default {
       if (pageOwner()) return true
       return false
     }
-    const canDelete = () => true
+    const canDelete = () => {
+      if (!v.loggedIn) return false
+      if (!v.permUtils.hasPermission('users.delete.allow')) return false
+      const same = v.permUtils.hasPermission('users.delete.bypass.priority.admin');
+      const lower = v.permUtils.hasPermission('users.delete.bypass.priority.mod');
+      if (pageOwner()) return true
+      else if (same) return v.permUtils.getPriority() <= v.user.priority
+      else if (lower) return v.permUtils.getPriority() < v.user.priority
+      return false
+    }
 
     const toggleIgnorePosts = () => {
       const promise = v.user.ignored ? usersApi.unignore : usersApi.ignore
