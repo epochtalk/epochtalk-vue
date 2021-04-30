@@ -212,6 +212,9 @@ export default {
       else if (v.options.display_mode !== 'always' && v.options.display_mode !== 'voted' && v.options.display_mode !== 'expired') { return false }
       else { return true }
     }
+    const saveOptions = () => {
+      console.log('saveOptions')
+    }
     const showPollResults = () => {
       const displayMode = v.pollCopy.display_mode
       const hasVoted = v.pollCopy.has_voted
@@ -276,6 +279,10 @@ export default {
         v.options.display_mode = 'always'
       }
     }
+    const scrollPollView = () => {
+      console.log('scrollPollView')
+      // $('#poll-view').animate({  scrollTop: 0 }, 250)
+    }
     /* Internal Data */
     const $auth = inject(AuthStore)
 
@@ -321,11 +328,13 @@ export default {
       toggleAnswer,
       canRemoveVote,
       pollValid,
+      saveOptions,
       showPollResults,
       vote,
       removeVote,
       updateLockPoll,
       calcExpiration,
+      scrollPollView,
       humanDate
     }
   }
