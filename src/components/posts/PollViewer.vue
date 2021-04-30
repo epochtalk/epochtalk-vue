@@ -207,8 +207,13 @@ export default {
       else { return true }
     }
     const pollValid = () => {
-      console.log('PollViewer pollValid')
-      return true
+      if (!v.options.max_answers || v.options.max_answers < 1) { return false }
+      else if (v.options.max_answers > v.pollCopy.answers.length) { return false }
+      else if (v.options.expiration_date && !v.options.expiration) { return false }
+      else if (v.options.expiration_time && !v.options.expiration_date) { return false }
+      else if (v.options.expiration && v.options.expiration < Date.now()) { return false }
+      else if (v.options.display_mode !== 'always' && v.options.display_mode !== 'voted' && v.options.display_mode !== 'expired') { false }
+      else { return true }
     }
     const showPollResults = () => {
       const displayMode = v.pollCopy.display_mode
