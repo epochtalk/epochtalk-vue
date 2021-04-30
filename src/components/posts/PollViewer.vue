@@ -143,7 +143,7 @@ export default {
       v.pollCopy.totalVotes = 0
       v.pollCopy.answers.forEach(answer => { v.pollCopy.totalVotes += answer.votes })
       v.pollCopy.answers.map(answer => {
-        var percentage = (answer.votes/v.pollCopy.totalVotes) * 100 || 0
+        let percentage = (answer.votes/v.pollCopy.totalVotes) * 100 || 0
         percentage = +percentage.toFixed(1)
         answer.style = { width: percentage + '%' }
         answer.percentage = percentage
