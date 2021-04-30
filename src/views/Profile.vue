@@ -223,32 +223,40 @@ export default {
       else if (lower) return v.permUtils.getPriority() < v.user.priority
       else false
     }
-
     const canUpdateUsername = () => {
       if (!v.loggedIn) return false
       if (!v.permUtils.hasPermission('users.changeUsername.allow')) return false
       return canUpdate()
     }
-
     const canMessage = () => {
       if (!v.loggedIn) return false
       if (!v.permUtils.hasPermission('conversations.create.allow')) return false
       if (!pageOwner()) return true
       return false
     }
-
     const canUpdatePrivate = () => canUpdate() && pageOwner()
     const pageOwner = () => props.username === $auth.user?.username
     const canPageUserNotes = () => v.loggedIn && v.permUtils.hasPermission('userNotes.page.allow')
     const canBanUser = () => {
       if (!v.loggedIn) return false
       if (v.permUtils.hasPermission('bans.ban.allow')) return true
-      if (v.permUtils.hasPermission('bans.banFromBoards')) return false
+      if (v.permUtils.hasPermission('bans.banFromBoards')) return true
       return false
     }
-
-    const canDeactivate = () => !v.user.deleted
-    const canReactivate = () => v.user.deleted
+    const canDeactivate = () => {
+      if (!v.loggedIn) return false
+      if (!v.permUtils.hasPermission('users.deactivate.allow')) return false
+      if (v.user.deleted) return false
+      if (pageOwner()) return true
+      return false
+    }
+    const canReactivate = () => {
+      if (!v.loggedIn) return false
+      if (!v.permUtils.hasPermission('users.reactivate.allow')) return false
+      if (!v.user.deleted) return false
+      if (pageOwner()) return true
+      return false
+    }
     const canDelete = () => true
 
     const toggleIgnorePosts = () => {
