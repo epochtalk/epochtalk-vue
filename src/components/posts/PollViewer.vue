@@ -303,7 +303,7 @@ export default {
     const v = reactive({
       permissionUtils: $auth.permissionUtils,
       options: {
-        expiration: props.poll.expiration || undefined,
+        expiration: props.poll.expiration,
         change_vote: props.poll.change_vote,
         max_answers: props.poll.max_answers,
         display_mode: props.poll.display_mode,
