@@ -133,6 +133,7 @@ import { AuthStore } from '@/composables/stores/auth'
 import { reactive, toRefs, watch, inject } from 'vue'
 import { pollsApi } from '@/api'
 import { cloneDeep } from 'lodash'
+import moment from 'moment'
 
 export default {
   props: ['poll', 'thread', 'userPriority', 'reset'],
@@ -265,19 +266,19 @@ export default {
       }
     }
     const calcExpiration = () => {
-      var month, day, year, hour, minutes, valid = false
+      let month, day, year, hour, minutes, valid = false
       if (v.options.expiration_date) {
-        var date = new Date(v.options.expiration_date)
+        const date = moment(v.options.expiration_date)
         valid = true
-        month = date.getMonth()
-        day = date.getDate()
-        year = date.getFullYear()
+        month = date.month()
+        day = date.date()
+        year = date.year()
       }
 
       if (valid && v.options.expiration_time) {
-        var time = new Date(v.options.expiration_time)
-        hour = time.getHours()
-        minutes = time.getMinutes()
+        const time = moment.duration(v.options.expiration_time)
+        hour = time.hours()
+        minutes = time.minutes()
       }
 
       if (valid) {
