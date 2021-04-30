@@ -51,7 +51,7 @@
           <div class="pollEdit__answers">
             <label for="pollMaxVote">Maximum answers per vote:</label>
             <!-- TODO(boka): value="1" -->
-            <input type="number" id="pollMaxVote" min="1" max="pollCopy.answers.length" v-model="options.max_answers">
+            <input type="number" id="pollMaxVote" min="1" :max="pollCopy.answers.length" v-model="options.max_answers">
             <div class="pollGroup__header"><label>Show poll results: </label>
               <label for="displayAlways">
                 <!-- TODO(boka): value="always" -->
