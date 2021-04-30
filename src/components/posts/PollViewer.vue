@@ -296,6 +296,7 @@ export default {
     }
     /* Internal Data */
     const $auth = inject(AuthStore)
+    const $alertStore = inject('$alertStore')
 
     /* View Data */
     const v = reactive({
