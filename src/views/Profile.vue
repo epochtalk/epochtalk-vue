@@ -239,8 +239,11 @@ export default {
     const canPageUserNotes = () => v.loggedIn && v.permUtils.hasPermission('userNotes.page.allow')
     const canBanUser = () => {
       if (!v.loggedIn) return false
-      if (v.permUtils.hasPermission('bans.ban.allow')) return true
-      if (v.permUtils.hasPermission('bans.banFromBoards')) return true
+      if (!v.permUtils.hasPermission('bans.ban.allow') && !v.permUtils.hasPermission('bans.banFromBoards')) return false
+      const same = v.permUtils.hasPermission('users.update.bypass.priority.admin')
+      const lower = v.permUtils.hasPermission('users.update.bypass.priority.mod')
+      if (same) return v.permUtils.getPriority() <= v.user.priority
+      else if (lower) return v.permUtils.getPriority() < v.user.priority
       return false
     }
     const canDeactivate = () => {
