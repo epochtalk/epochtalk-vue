@@ -187,7 +187,7 @@ export default {
       if (!votingEligible() || v.pollCopy.has_voted) { return false }
       else { return true }
     }
-    const toggleAnswer = (answerId) => {
+    const toggleAnswer = answerId => {
       // if the answer is already selected, unselect it
       const answerPos = v.pollAnswers.indexOf(answerId)
       if (answerPos > -1) { v.pollAnswers.splice(answerPos, 1) }
