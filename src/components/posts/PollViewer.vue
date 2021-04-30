@@ -165,11 +165,14 @@ export default {
       // if ($scope.banned) { return false }
       if (!v.permissionUtils.hasPermission('threads.lockPoll.allow')) { return false }
 
-      if (props.thread.user.id === $auth.user.id) { return true }
-      else if (v.permissionUtils.hasPermission('threads.lockPoll.bypass.owner.admin')) { return true }
-      else if (v.permissionUtils.hasPermission('threads.lockPoll.bypass.owner.priority') && v.permissionUtils.getPriority() < props.userPriority) { return true }
-      else if (v.permissionUtils.hasPermission('threads.lockPoll.bypass.owner.mod') && v.permissionUtils.moderatesBoard(props.thread.board_id)) { return true }
-      else { return false }
+      const adminBypass = v.permissionUtils.hasPermission('threads.lockPoll.bypass.owner.admin')
+      const modBypass = v.permissionUtils.hasPermission('threads.lockPoll.bypass.owner.mod')
+      const priorityBypass = v.permissionUtils.hasPermission('threads.lockPoll.bypass.owner.priority')
+      if (props.thread.user.id === $auth.user.id) return true
+      else if (adminBypass) return v.permissionUtils.getPriority() <= props.userPriority
+      else if (modBypass) return v.permissionUtils.getPriority() < props.userPriority && v.permissionUtils.moderatesBoard(props.thread.board_id)
+      else if (priorityBypass) return v.permissionUtils.getPriority() < v.userPriority
+      else return false
     }
     const canEdit = () => {
       if (!$auth.loggedIn) { return false }
@@ -177,11 +180,14 @@ export default {
       // if ($scope.banned) { return false }
       if (!v.permissionUtils.hasPermission('threads.editPoll.allow')) { return false }
 
-      if (props.thread.user.id === $auth.user.id) { return true }
-      else if (v.permissionUtils.hasPermission('threads.editPoll.bypass.owner.admin')) { return true }
-      else if (v.permissionUtils.hasPermission('threads.editPoll.bypass.owner.priority') && v.permissionUtils.getPriority() < props.userPriority) { return true }
-      else if (v.permissionUtils.hasPermission('threads.editPoll.bypass.owner.mod') && v.permissionUtils.moderatesBoard(props.thread.board_id)) { return true }
-      else { return false }
+      const adminBypass = v.permissionUtils.hasPermission('threads.editPoll.bypass.owner.admin')
+      const modBypass = v.permissionUtils.hasPermission('threads.editPoll.bypass.owner.mod')
+      const priorityBypass = v.permissionUtils.hasPermission('threads.editPoll.bypass.owner.priority')
+      if (props.thread.user.id === $auth.user.id) return true
+      else if (adminBypass) return v.permissionUtils.getPriority() <= props.userPriority
+      else if (modBypass) return v.permissionUtils.getPriority() < props.userPriority && v.permissionUtils.moderatesBoard(props.thread.board_id)
+      else if (priorityBypass) return v.permissionUtils.getPriority() < v.userPriority
+      else return false
     }
     const canVote = () => {
       // if the user is not able to vote or if they have voted already
