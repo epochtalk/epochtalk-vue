@@ -306,7 +306,10 @@ export default {
         expiration: props.poll.expiration || undefined,
         change_vote: props.poll.change_vote,
         max_answers: props.poll.max_answers,
-        display_mode: props.poll.display_mode
+        display_mode: props.poll.display_mode,
+        // used in view to track date and time from input field
+        expiration_date: moment(props.poll.expiration).format('YYYY-MM-DD'),
+        expiration_time: moment(props.poll.expiration).format('HH:mm')
       },
       editPoll: false,
       pollAnswers: [],
