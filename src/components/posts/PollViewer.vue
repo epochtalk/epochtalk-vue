@@ -213,7 +213,18 @@ export default {
       else { return true }
     }
     const saveOptions = () => {
-      console.log('saveOptions')
+      pollsApi.editPoll(props.thread.id, props.poll.id, v.options)
+        .then(poll => {
+          Object.assign(v.pollCopy, poll)
+          if (v.pollCopy.expiration) {
+            v.pollCopy.expired = new Date(poll.expiration) < Date.now()
+          }
+
+          v.editPoll = false
+          v.pollAnswers = []
+          $alertStore.success('Poll changes saved')
+        })
+        .catch(() => { $alertStore.error('Could not update poll') })
     }
     const showPollResults = () => {
       const displayMode = v.pollCopy.display_mode
