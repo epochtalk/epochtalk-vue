@@ -54,18 +54,15 @@
             <input type="number" id="pollMaxVote" min="1" :max="pollCopy.answers.length" v-model="options.max_answers">
             <div class="pollGroup__header"><label>Show poll results: </label>
               <label for="displayAlways">
-                <!-- TODO(boka): value="always" -->
-                <input type="radio" name="displayType" id="displayAlways" v-model="options.display_mode">
+                <input type="radio" name="displayType" id="displayAlways" value="always" v-model="options.display_mode">
                 Always shown
               </label>
               <label for="displayVoted">
-                <!-- TODO(boka): value="voted" -->
-                <input type="radio" name="displayType" id="displayVoted" v-model="options.display_mode">
+                <input type="radio" name="displayType" id="displayVoted" value="voted" v-model="options.display_mode">
                 After voting
               </label>
               <label for="displayExpired">
-                <!-- TODO(boka): value="expired" -->
-                <input type="radio" name="displayType" id="displayExpired" v-model="options.display_mode" :disabled="!options.expiration">
+                <input type="radio" name="displayType" id="displayExpired" value="expired" v-model="options.display_mode" :disabled="!options.expiration">
                 After expiration
               </label>
             </div>
