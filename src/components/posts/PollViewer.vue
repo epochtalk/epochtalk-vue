@@ -316,17 +316,6 @@ export default {
       pollCopy: { ...cloneDeep(props.poll), expired: new Date(props.poll.expiration) < Date.now() }
     })
     /* Data Initialization */
-    // poll expiration
-    if (v.pollCopy.expiration) {
-      // set poll expired
-      var expiry = new Date(v.pollCopy.expiration)
-      v.pollCopy.expired = expiry < Date.now()
-
-      // set options expiration
-      var datetime = new Date(v.pollCopy.expiration)
-      v.options.expiration_date = datetime
-      v.options.expiration_time = datetime
-    }
     // poll percentages
     calculatePollPercentage()
 
