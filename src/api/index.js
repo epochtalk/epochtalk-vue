@@ -73,6 +73,7 @@ export const postsApi = {
 export const pollsApi = {
   vote: (threadId, pollId, answerIds) => $http(`/api/threads/${threadId}/polls/${pollId}/vote`, { method: 'POST', data: { answer_ids: answerIds }}),
   removeVote: (threadId, pollId) => $http(`/api/threads/${threadId}/polls/${pollId}/vote`, { method: 'DELETE' }),
+  editPoll: (threadId, pollId, options) => $http(`/api/threads/${threadId}/polls/${pollId}`, { method: 'PUT', data: options }),
   lock: (threadId, pollId) => $http(`/api/threads/${threadId}/polls/${pollId}/lock`, { method: 'POST', data: { locked: true }}),
   unlock: (threadId, pollId) => $http(`/api/threads/${threadId}/polls/${pollId}/lock`, { method: 'POST', data: { locked: false }})
 }
