@@ -158,11 +158,11 @@
     </div>
   </div>
 
-  <update-profile-modal v-if="user" :user="user" :show="showUpdateProfile" @close="showUpdateProfile = false" />
+  <update-profile-modal v-if="user" :user="user" :show="showUpdateProfile" :can-update-username="canUpdateUsername" @close="showUpdateProfile = false" />
   <update-avatar-modal v-if="user" :user="user" :show="showEditAvatar" @close="showEditAvatar = false" />
   <quick-message-modal v-if="user" :user="user" :show="showQuickMessage" @close="showQuickMessage = false" />
   <manage-bans-modal v-if="user" :user="user" :show="showManageBans" @close="showManageBans = false" />
-  <moderation-notes-modal v-if="user" :user="user" :show="showModNotes" @close="showModNotes = false" />
+  <moderation-notes-modal v-if="user && canPageUserNotes()" :user="user" :show="showModNotes" @close="showModNotes = false" />
   <update-email-modal v-if="user" :user="user" :show="showChangeEmail" @close="showChangeEmail = false" />
   <update-signature-modal v-if="user" :user="user" :show="showEditSignature" @close="showEditSignature = false" />
   <update-password-modal v-if="user" :user="user" :show="showChangePassword" @close="showChangePassword = false" />
@@ -192,10 +192,10 @@ export default {
   props: [ 'username', 'saveScrollPos' ],
   components: { UpdateSignatureModal, UpdatePasswordModal, UpdateAvatarModal, UpdateEmailModal, DeleteAccountModal, DeactivateReactivateModal, UpdateProfileModal, QuickMessageModal,ManageBansModal, ModerationNotesModal },
   beforeRouteEnter(to, from, next) {
-    next(vm => usersApi.find(vm.username).then(u => vm.user = u))
+    next(vm => usersApi.find(to.params.username).then(u => vm.user = u))
   },
   beforeRouteUpdate(to, from, next) {
-    usersApi.find(this.username).then(u => this.user = u)
+    usersApi.find(to.params.username).then(u => this.user = u)
     next()
   },
   setup(props) {
@@ -203,24 +203,70 @@ export default {
     const refreshUser = () => usersApi.find(v.user.username).then(u => v.user = u)
     const redirectHome = () => $router.replace('/')
 
-    const canUpdate = () => true
-    const canMessage = () => true
     const userAge = dob => {
-      if (!dob) { return }
+      if (!dob) return
       var today = new Date()
       var birthDate = new Date(dob)
       var age = today.getFullYear() - birthDate.getFullYear()
       var m = today.getMonth() - birthDate.getMonth()
-      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) { age--; }
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--
       return age
     }
-    const canUpdatePrivate = () => true
+
+    const canUpdate = () => {
+      if (!v.loggedIn) return false
+      if (!v.permUtils.hasPermission('users.update.allow')) return false
+      const same = v.permUtils.hasPermission('users.update.bypass.priority.admin')
+      const lower = v.permUtils.hasPermission('users.update.bypass.priority.mod')
+      if (pageOwner()) return true
+      else if (same) return v.permUtils.getPriority() <= v.user.priority
+      else if (lower) return v.permUtils.getPriority() < v.user.priority
+      return false
+    }
+    const canUpdateUsername = () => {
+      if (!v.loggedIn) return false
+      if (!v.permUtils.hasPermission('users.changeUsername.allow')) return false
+      return canUpdate()
+    }
+    const canMessage = () => {
+      if (!v.loggedIn) return false
+      if (!v.permUtils.hasPermission('conversations.create.allow')) return false
+      if (!pageOwner()) return true
+      return false
+    }
+    const canUpdatePrivate = () => canUpdate() && pageOwner()
     const pageOwner = () => props.username === $auth.user?.username
-    const canPageUserNotes = () => true
-    const canBanUser = () => true
-    const canDeactivate = () => !v.user.deleted
-    const canReactivate = () => v.user.deleted
-    const canDelete = () => true
+    const canPageUserNotes = () => v.loggedIn && v.permUtils.hasPermission('userNotes.page.allow')
+    const canBanUser = () => {
+      if (!v.loggedIn) return false
+      if (v.permUtils.hasPermission('bans.ban.allow')) return true
+      if (v.permUtils.hasPermission('bans.banFromBoards')) return true
+      return false
+    }
+    const canDeactivate = () => {
+      if (!v.loggedIn) return false
+      if (!v.permUtils.hasPermission('users.deactivate.allow')) return false
+      if (v.user.deleted) return false
+      if (pageOwner()) return true
+      return false
+    }
+    const canReactivate = () => {
+      if (!v.loggedIn) return false
+      if (!v.permUtils.hasPermission('users.reactivate.allow')) return false
+      if (!v.user.deleted) return false
+      if (pageOwner()) return true
+      return false
+    }
+    const canDelete = () => {
+      if (!v.loggedIn) return false
+      if (!v.permUtils.hasPermission('users.delete.allow')) return false
+      const same = v.permUtils.hasPermission('users.delete.bypass.priority.admin');
+      const lower = v.permUtils.hasPermission('users.delete.bypass.priority.mod');
+      if (pageOwner()) return true
+      else if (same) return v.permUtils.getPriority() <= v.user.priority
+      else if (lower) return v.permUtils.getPriority() < v.user.priority
+      return false
+    }
 
     const toggleIgnorePosts = () => {
       const promise = v.user.ignored ? usersApi.unignore : usersApi.ignore
@@ -246,6 +292,7 @@ export default {
     /* Template Data */
     const v = reactive({
       loggedIn: $auth.loggedIn,
+      permUtils: $auth.permissionUtils,
       banExpiration: null,
       isOnline: true,
       userLocalTime: null,
@@ -264,7 +311,7 @@ export default {
       showDelete: false,
       showManageBans: false
     })
-    return { ...toRefs(v), refreshUser, toggleIgnorePosts, toggleIgnoreMessages, toggleIgnoreMentions, redirectHome, canUpdate, canMessage, userAge, canUpdatePrivate, pageOwner, canPageUserNotes, canBanUser, canReactivate, canDeactivate, canDelete, humanDate }
+    return { ...toRefs(v), refreshUser, toggleIgnorePosts, toggleIgnoreMessages, toggleIgnoreMentions, redirectHome, canUpdate, canUpdateUsername, canMessage, userAge, canUpdatePrivate, pageOwner, canPageUserNotes, canBanUser, canReactivate, canDeactivate, canDelete, humanDate }
   }
 }
 </script>
