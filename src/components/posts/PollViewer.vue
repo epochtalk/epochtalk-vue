@@ -55,17 +55,17 @@
             <div class="pollGroup__header"><label>Show poll results: </label>
               <label for="displayAlways">
                 <!-- TODO(boka): value="always" -->
-                <input type="radio" id="displayAlways" v-model="options.display_mode">
+                <input type="radio" name="displayType" id="displayAlways" v-model="options.display_mode">
                 Always shown
               </label>
               <label for="displayVoted">
                 <!-- TODO(boka): value="voted" -->
-                <input type="radio" id="displayVoted" v-model="options.display_mode">
+                <input type="radio" name="displayType" id="displayVoted" v-model="options.display_mode">
                 After voting
               </label>
               <label for="displayExpired">
                 <!-- TODO(boka): value="expired" -->
-                <input type="radio" id="displayExpired" v-model="options.display_mode" :disabled="!options.expiration">
+                <input type="radio" name="displayType" id="displayExpired" v-model="options.display_mode" :disabled="!options.expiration">
                 After expiration
               </label>
             </div>
