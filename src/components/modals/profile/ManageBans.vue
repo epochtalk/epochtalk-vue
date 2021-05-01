@@ -5,11 +5,74 @@
     <template v-slot:body>
       <form v-if="userCopy" action="." class="css-form">
         <!-- Manage Bans -->
-        <div class="input-section textarea">
-          <label for="">User</label>
-          <pre style="padding-left: .75rem; font-size: .45rem">({{ '\n\n' + JSON.stringify(userCopy, null, 1) }}</pre>
+        <label class="bold">User Information</label>
+        <table class="striped" width="100%">
+          <tr>
+            <td>Username</td>
+            <td>{{ userCopy.username }}</td>
+          </tr>
+          <tr>
+            <td>Email</td>
+            <td>{{ userCopy.email }}</td>
+          </tr>
+          <tr>
+            <td>Register Date</td>
+            <td>{{ humanDate(userCopy.created_at) }}</td>
+          </tr>
+          <tr v-if="userCopy.ban_expiration">
+            <td>Global Ban Expiration</td>
+            <td>{{ humanDate(userCopy.ban_expiration, true) }}</td>
+          </tr>
+          <tr v-if="userCopy.banned_board_names.length">
+            <td>Banned From Boards</td>
+            <td>
+              <span v-for="(boardName, i) in userCopy.banned_board_names" :key="i">
+                {{ boardName }}<span v-if="(i + 1) !== userCopy.banned_board_names.length">, </span>
+              </span>
+            </td>
+          </tr>
+        </table>
+
+        <div v-if="canGlobalBanUser()">
+          <label for="banType">
+            <strong>Ban Globally</strong>
+            <a class="right" @click="permanentBan = undefined; banUntil = undefined;" v-if="permanentBan !== undefined">
+              <i class="fa fa-times"></i> Remove Global Ban
+            </a>
+          </label>
+          <input type="radio" name="banType" v-model="permanentBan" :value="true" id="permanent" :disabled="banSubmitted"><label for="permanent">Permanent</label>
+          <input type="radio" name="banType" v-model="permanentBan" :value="false" id="temporary" :disabled="banSubmitted"><label for="temporary">Temporary</label>
+
+          <div v-if="permanentBan === false">
+            <label for="banUntil">Enter Ban Expiration Date:</label>
+            <input type="date" v-model="banUntil" :min="minDate()" name="banUntil" :required="permanentBan === false" />
+          </div>
+
+          <div v-if="showIpBan && permanentBan === true">
+            <input type="checkbox" v-model="banUserIp" :disabled="banSubmitted" name="ipBan" id="ipBan" /><label for="ipBan">Ban all of {{userCopy.username}}'s known IP addresses</label>
+          </div>
         </div>
 
+        <div class="board-bans-list" v-if="!disableBoardBans">
+          <label>
+            <strong>Ban from my Boards</strong>
+            <div class="right">
+              <a @click="checkAll(true)"><i class="far fa-check-square"></i> Check All</a>
+              &nbsp;&nbsp;
+              <a @click="checkAll(false)"><i class="far fa-square"></i> Uncheck All</a>
+            </div>
+          </label>
+          <div class="clear boards-check-list">
+            <div v-for="cat in boards" :key="cat.id">
+              <label class="bold">{{cat.name}}</label>
+              <ul>
+                <li v-for="board in cat.boards" :key="board.id">
+                  <ignored-boards-partial @toggle-ignored-board="toggleIgnoredBoard" :board="board" :all-boards="boardBanList" />
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
         <!-- Save Button -->
         <div class="modal-actions">
           <button @click.prevent="updateBan()">
@@ -24,20 +87,79 @@
 
 <script>
 import Modal from '@/components/layout/Modal.vue'
-import { reactive, toRefs, inject } from 'vue'
+import { reactive, toRefs, inject, onBeforeMount, onBeforeUpdate } from 'vue'
 import { cloneDeep } from 'lodash'
+import { boardsApi, banApi } from '@/api'
+import humanDate from '@/composables/filters/humanDate'
+import moment from 'moment'
+import IgnoredBoardsPartial from '@/components/settings/IgnoredBoardsPartial.vue'
 
 export default {
   name: 'manage-bans-modal',
-  props: ['show', 'user'],
+  props: ['show', 'user', 'disableBoardBans'],
   emits: ['close'],
-  components: { Modal },
+  components: { Modal, IgnoredBoardsPartial },
   setup(props, { emit }) {
+    onBeforeMount(() => props.disableBoardBans ? null : initBoardData())
+    onBeforeUpdate(() => props.disableBoardBans ? null : initBoardData())
+
+    const initBoardData = () => {
+      boardsApi.getBoards(true).then(d => v.boards = d.boards).catch(() => {})
+      banApi.getBannedBoards(props.user.username)
+      .then(bannedBoards => {
+        v.boardBanList = bannedBoards.reduce((acc, b) => {
+          acc[b.id] = true
+          return acc
+        }, {})
+        v.userCopy = {
+          ...cloneDeep(props.user),
+          banned_board_names: bannedBoards.map(b => b.name),
+          banned_board_ids: [ ...bannedBoards ]
+        }
+        const maxDate = new Date(8640000000000000)
+        const banDate = new Date(props.user.ban_expiration)
+        // Preselect Global Ban Type radio button if the user is banned
+        v.permanentBan = props.user.ban_expiration ? banDate.getTime() === maxDate.getTime() : undefined
+        v.showIpBan = v.permanentBan ? false : true
+        v.banUntil = v.permanentBan ? undefined : moment(banDate).format('YYYY-MM-DD')
+        v.userCopy.permanent_ban = v.banUntil ? false : true
+      }).catch(() => {})
+    }
+
     /* Template Methods */
     const updateBan = () => {
       v.errorMessage = null
       $alertStore.info('TODO: Update Ban')
       close()
+    }
+
+    const checkAll = check => Object.assign(v.boardBanList, generateCheckedBoardsList(v.boards, {}, check))
+
+    const generateCheckedBoardsList = (boards, boardBanList, check) => {
+      if (!boards || !boards.length) return boardBanList
+      for (let i = 0; i < boards.length; i++) {
+        let curBoard = boards[i]
+        boardBanList = generateCheckedBoardsList(curBoard.boards || curBoard.children || [], boardBanList, check)
+        if (curBoard.category_id || curBoard.parent_id) boardBanList[curBoard.id] = check
+      }
+      return boardBanList
+    }
+
+    const toggleIgnoredBoard = boardId => {
+      if (v.boardBanList[boardId]) delete v.boardBanList[boardId]
+      else v.boardBanList[boardId] = true
+    }
+
+    const canGlobalBanUser = () => true
+
+    const minDate = () => {
+      var d = new Date()
+      var month = '' + (d.getMonth() + 1)
+      var day = '' + d.getDate()
+      var year = d.getFullYear()
+      if (month.length < 2) month = '0' + month
+      if (day.length < 2) day = '0' + day
+      return [year, month, day].join('-')
     }
 
     const close = () => {
@@ -50,13 +172,20 @@ export default {
 
     /* Template Data */
     const v = reactive({
-      userCopy: cloneDeep(props.user),
+      userCopy: null,
       userReactive: props.user,
       focusInput: null,
-      errorMessage: ''
+      errorMessage: '',
+      permanentBan: null,
+      showIpBan: true,
+      boards: null,
+      boardBanList: [],
+      banUserIp: null,
+      banUntil: null,
+      banSubmitted: false
     })
 
-    return { ...toRefs(v), updateBan, close }
+    return { ...toRefs(v), minDate, updateBan, canGlobalBanUser, toggleIgnoredBoard, checkAll, humanDate, close }
   }
 }
 </script>
