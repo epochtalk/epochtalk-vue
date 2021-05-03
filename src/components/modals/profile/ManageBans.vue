@@ -93,6 +93,7 @@ import { boardsApi, banApi } from '@/api'
 import humanDate from '@/composables/filters/humanDate'
 import moment from 'moment'
 import IgnoredBoardsPartial from '@/components/settings/IgnoredBoardsPartial.vue'
+import { AuthStore } from '@/composables/stores/auth'
 
 export default {
   name: 'manage-bans-modal',
@@ -150,7 +151,7 @@ export default {
       else v.boardBanList[boardId] = true
     }
 
-    const canGlobalBanUser = () => true
+    const canGlobalBanUser = () => v.permUtils.hasPermission('bans.ban.allow')
 
     const minDate = () => {
       var d = new Date()
@@ -169,11 +170,13 @@ export default {
 
     /* Internal Data */
     const $alertStore = inject('$alertStore')
+    const $auth = inject(AuthStore)
 
     /* Template Data */
     const v = reactive({
       userCopy: null,
       userReactive: props.user,
+      permUtils: $auth.permissionUtils,
       focusInput: null,
       errorMessage: '',
       permanentBan: null,
