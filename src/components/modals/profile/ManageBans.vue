@@ -105,7 +105,7 @@ export default {
     onBeforeUpdate(() => props.disableBoardBans ? null : initBoardData())
 
     const initBoardData = () => {
-      boardsApi.getBoards(true).then(d => v.boards = d.boards).catch(() => {})
+      boardsApi.getBoards(true).then(d => v.boards = d.boards).then(initDisabledBoards).catch(() => {})
       banApi.getBannedBoards(props.user.username)
       .then(bannedBoards => {
         v.boardBanList = bannedBoards.reduce((acc, b) => {
@@ -126,6 +126,10 @@ export default {
         v.userCopy.permanent_ban = v.banUntil ? false : true
       }).catch(() => {})
     }
+    const initDisabledBoards = () => {
+      if (v.permUtils.hasPermission('bans.banFromBoards.bypass.type.admin')) return
+      Object.assign(v.disabledInputs, generateCheckedBoardsList(v.boards, {}, true))
+    }
 
     /* Template Methods */
     const updateBan = () => {
@@ -135,6 +139,7 @@ export default {
     }
 
     const checkAll = check => Object.assign(v.boardBanList, generateCheckedBoardsList(v.boards, {}, check))
+
 
     const generateCheckedBoardsList = (boards, boardBanList, check) => {
       if (!boards || !boards.length) return boardBanList
@@ -174,6 +179,7 @@ export default {
 
     /* Template Data */
     const v = reactive({
+      authedUser: $auth.user,
       userCopy: null,
       userReactive: props.user,
       permUtils: $auth.permissionUtils,
@@ -183,6 +189,7 @@ export default {
       showIpBan: true,
       boards: null,
       boardBanList: [],
+      disabledInputs: {},
       banUserIp: null,
       banUntil: null,
       banSubmitted: false
