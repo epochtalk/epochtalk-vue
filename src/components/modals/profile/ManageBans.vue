@@ -67,7 +67,7 @@
               <label class="bold">{{cat.name}}</label>
               <ul>
                 <li v-for="board in cat.boards" :key="board.id">
-                  <ignored-boards-partial @toggle-ignored-board="toggleIgnoredBoard" :board="board" :all-boards="boardBanList" />
+                  <ignored-boards-partial @toggle-ignored-board="toggleIgnoredBoard" :board="board" :all-boards="boardBanList" :disabled-inputs="disabledInputs" />
                 </li>
               </ul>
             </div>

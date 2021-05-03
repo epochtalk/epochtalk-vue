@@ -68,7 +68,7 @@
           <label class="bold">{{cat.name}}</label>
           <ul>
             <li v-for="board in cat.boards" :key="board.id">
-              <ignored-boards-partial @toggle-ignored-board="toggleIgnoredBoard" :board="board" :all-boards="allBoards" :toggle-submitted="toggleSubmitted" />
+              <ignored-boards-partial @toggle-ignored-board="toggleIgnoredBoard" :board="board" :all-boards="allBoards" :disabled-inputs="disabledInputs" />
             </li>
           </ul>
         </div>
@@ -151,12 +151,12 @@ export default {
     const toggleIgnoredBoard = boardId => {
       const index = $prefs.readonly.ignored_boards.indexOf(boardId)
       let ignoredBoards = [...$prefs.readonly.ignored_boards]
-      v.toggleSubmitted[boardId] = true
+      v.disabledInputs[boardId] = true
       if (index > -1) { ignoredBoards.splice(index, 1) }
       else { ignoredBoards.push(boardId) }
       return $prefs.update({ ignored_boards: ignoredBoards })
       .catch(() => $alertStore.error('Ignored boards could not be updated, try again later.'))
-      .finally(() => v.toggleSubmitted[boardId] = false)
+      .finally(() => v.disabledInputs[boardId] = false)
     }
 
     /* Internal Data */
@@ -167,7 +167,7 @@ export default {
     const v = reactive({
       allBoards: {},
       boards: [],
-      toggleSubmitted: {},
+      disabledInputs: {},
       posts_per_page: $prefs.readonly.posts_per_page,
       threads_per_page: $prefs.readonly.threads_per_page,
       timezone_offset_sign: $prefs.readonly.timezone_offset.sign,
