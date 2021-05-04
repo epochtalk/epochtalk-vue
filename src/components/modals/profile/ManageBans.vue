@@ -64,10 +64,10 @@
           </label>
           <div class="clear boards-check-list">
             <div v-for="cat in boards" :key="cat.id">
-              <label class="bold">{{cat.name}}</label>
+              <label v-if="cat.boards.length" class="bold">{{cat.name}}</label>
               <ul>
                 <li v-for="board in cat.boards" :key="board.id">
-                  <ignored-boards-partial @toggle-ignored-board="toggleIgnoredBoard" :board="board" :all-boards="boardBanList" :disabled-inputs="disabledInputs" />
+                  <ignored-boards-partial @toggle-ignored-board="toggleIgnoredBoard" :current-board="board" :checked-inputs="checkedBoardInputs" :disabled-inputs="disabledInputs" />
                 </li>
               </ul>
             </div>
@@ -105,30 +105,40 @@ export default {
     onBeforeUpdate(() => props.disableBoardBans ? null : initBoardData())
 
     const initBoardData = () => {
-      boardsApi.getBoards(true).then(d => v.boards = d.boards).then(initDisabledBoards).catch(() => {})
+      boardsApi.getBoards(true)
+      .then(d => v.boards = d.boards)
+      .then(initDisabledBoards)
+      .catch(() => {})
       banApi.getBannedBoards(props.user.username)
-      .then(bannedBoards => {
-        v.boardBanList = bannedBoards.reduce((acc, b) => {
-          acc[b.id] = true
-          return acc
-        }, {})
-        v.userCopy = {
-          ...cloneDeep(props.user),
-          banned_board_names: bannedBoards.map(b => b.name),
-          banned_board_ids: [ ...bannedBoards ]
-        }
-        const maxDate = new Date(8640000000000000)
-        const banDate = new Date(props.user.ban_expiration)
-        // Preselect Global Ban Type radio button if the user is banned
-        v.permanentBan = props.user.ban_expiration ? banDate.getTime() === maxDate.getTime() : undefined
-        v.showIpBan = v.permanentBan ? false : true
-        v.banUntil = v.permanentBan ? undefined : moment(banDate).format('YYYY-MM-DD')
-        v.userCopy.permanent_ban = v.banUntil ? false : true
-      }).catch(() => {})
+      .then(initBanInfo).catch(() => {})
     }
+
     const initDisabledBoards = () => {
-      if (v.permUtils.hasPermission('bans.banFromBoards.bypass.type.admin')) return
-      Object.assign(v.disabledInputs, generateCheckedBoardsList(v.boards, {}, true))
+      // Admins can ban from all boards
+      if (v.authedIsAdmin) return
+      // User is not admin, disable all boards checkmarks initially
+      v.disabledInputs = genBoardsObjFromArray(v.boards, {}, true)
+      // Re-enable only the checkmarks for boards this user moderates
+      v.authedUser.moderating.forEach(bid => delete v.disabledInputs[bid])
+    }
+
+    const initBanInfo = bannedBoards => {
+      v.checkedBoardInputs = bannedBoards.reduce((acc, b) => {
+        acc[b.id] = true
+        return acc
+      }, {})
+      v.userCopy = {
+        ...cloneDeep(props.user),
+        banned_board_names: bannedBoards.map(b => b.name),
+        banned_board_ids: [ ...bannedBoards ]
+      }
+      const maxDate = new Date(8640000000000000)
+      const banDate = new Date(props.user.ban_expiration)
+      // Preselect Global Ban Type radio button if the user is banned
+      v.permanentBan = props.user.ban_expiration ? banDate.getTime() === maxDate.getTime() : undefined
+      v.showIpBan = v.permanentBan ? false : true
+      v.banUntil = v.permanentBan ? undefined : moment(banDate).format('YYYY-MM-DD')
+      v.userCopy.permanent_ban = v.banUntil ? false : true
     }
 
     /* Template Methods */
@@ -138,23 +148,20 @@ export default {
       close()
     }
 
-    const checkAll = check => Object.assign(v.boardBanList, generateCheckedBoardsList(v.boards, {}, check))
+    const checkAll = checked => v.authedIsAdmin ? v.checkedBoardInputs = genBoardsObjFromArray(v.boards, {}, checked) : v.authedUser.moderating.forEach(bid => v.checkedBoardInputs[bid] = checked)
 
 
-    const generateCheckedBoardsList = (boards, boardBanList, check) => {
-      if (!boards || !boards.length) return boardBanList
+    const genBoardsObjFromArray = (boards, checkedBoardInputs, checked) => {
+      if (!boards || !boards.length) return checkedBoardInputs
       for (let i = 0; i < boards.length; i++) {
-        let curBoard = boards[i]
-        boardBanList = generateCheckedBoardsList(curBoard.boards || curBoard.children || [], boardBanList, check)
-        if (curBoard.category_id || curBoard.parent_id) boardBanList[curBoard.id] = check
+        const curBoard = boards[i]
+        checkedBoardInputs = genBoardsObjFromArray(curBoard.boards || curBoard.children || [], checkedBoardInputs, checked)
+        if (curBoard.category_id || curBoard.parent_id) checkedBoardInputs[curBoard.id] = checked
       }
-      return boardBanList
+      return checkedBoardInputs
     }
 
-    const toggleIgnoredBoard = boardId => {
-      if (v.boardBanList[boardId]) delete v.boardBanList[boardId]
-      else v.boardBanList[boardId] = true
-    }
+    const toggleIgnoredBoard = boardId => v.checkedBoardInputs[boardId] ? delete v.checkedBoardInputs[boardId] : v.checkedBoardInputs[boardId] = true
 
     const canGlobalBanUser = () => v.permUtils.hasPermission('bans.ban.allow')
 
@@ -183,12 +190,13 @@ export default {
       userCopy: null,
       userReactive: props.user,
       permUtils: $auth.permissionUtils,
+      authedIsAdmin: $auth.permissionUtils.hasPermission('bans.banFromBoards.bypass.type.admin'),
       focusInput: null,
       errorMessage: '',
       permanentBan: null,
       showIpBan: true,
       boards: null,
-      boardBanList: [],
+      checkedBoardInputs: [],
       disabledInputs: {},
       banUserIp: null,
       banUntil: null,

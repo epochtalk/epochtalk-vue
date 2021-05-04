@@ -65,10 +65,10 @@
       <h3 class="thin-underline">Ignore Boards</h3>
       <div class="clear boards-check-list">
         <div v-for="cat in boards" :key="cat.id">
-          <label class="bold">{{cat.name}}</label>
+          <label v-if="cat.boards.length" class="bold">{{cat.name}}</label>
           <ul>
             <li v-for="board in cat.boards" :key="board.id">
-              <ignored-boards-partial @toggle-ignored-board="toggleIgnoredBoard" :board="board" :all-boards="allBoards" :disabled-inputs="disabledInputs" />
+              <ignored-boards-partial @toggle-ignored-board="toggleIgnoredBoard" :current-board="board" :checked-inputs="checkedBoardInputs" :disabled-inputs="disabledBoardInputs" />
             </li>
           </ul>
         </div>
@@ -98,16 +98,16 @@ export default {
   },
   setup() {
     /* Internal Methods */
-    const initAllBoards = (boards, allBoards) => {
-      if (!boards || !boards.length) return allBoards
+    const initCheckedBoardInputs = (boards, checkedBoardInputs) => {
+      if (!boards || !boards.length) return checkedBoardInputs
       for (let i = 0; i < boards.length; i++) {
         let curBoard = boards[i]
-        allBoards = initAllBoards(curBoard.boards || curBoard.children || [], allBoards)
+        checkedBoardInputs = initCheckedBoardInputs(curBoard.boards || curBoard.children || [], checkedBoardInputs)
         if (curBoard.category_id || curBoard.parent_id) {
-          allBoards[curBoard.id] = $prefs.readonly.ignored_boards.indexOf(curBoard.id) > -1
+          checkedBoardInputs[curBoard.id] = $prefs.readonly.ignored_boards.indexOf(curBoard.id) > -1
         }
       }
-      return allBoards
+      return checkedBoardInputs
     }
 
     /* View Methods */
@@ -151,12 +151,12 @@ export default {
     const toggleIgnoredBoard = boardId => {
       const index = $prefs.readonly.ignored_boards.indexOf(boardId)
       let ignoredBoards = [...$prefs.readonly.ignored_boards]
-      v.disabledInputs[boardId] = true
+      v.disabledBoardInputs[boardId] = true
       if (index > -1) { ignoredBoards.splice(index, 1) }
       else { ignoredBoards.push(boardId) }
       return $prefs.update({ ignored_boards: ignoredBoards })
       .catch(() => $alertStore.error('Ignored boards could not be updated, try again later.'))
-      .finally(() => v.disabledInputs[boardId] = false)
+      .finally(() => v.disabledBoardInputs[boardId] = false)
     }
 
     /* Internal Data */
@@ -165,9 +165,9 @@ export default {
     const $alertStore = inject('$alertStore')
 
     const v = reactive({
-      allBoards: {},
       boards: [],
-      disabledInputs: {},
+      checkedBoardInputs: {},
+      disabledBoardInputs: {},
       posts_per_page: $prefs.readonly.posts_per_page,
       threads_per_page: $prefs.readonly.threads_per_page,
       timezone_offset_sign: $prefs.readonly.timezone_offset.sign,
@@ -206,7 +206,7 @@ export default {
       ]
     })
 
-    watch(() => v.boards, () => v.allBoards = initAllBoards(v.boards, v.allBoards))
+    watch(() => v.boards, () => v.checkedBoardInputs = initCheckedBoardInputs(v.boards, v.checkedBoardInputs))
 
     return { ...toRefs(v), resetLimitPrefs, saveLimitPrefs, resetTimezonePrefs, saveTimezonePrefs, timezonePrefsValid, togglePatroller, toggleIgnoredBoard, usersApi, messagesApi, mentionsApi }
   }
