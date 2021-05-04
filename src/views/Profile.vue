@@ -117,7 +117,7 @@
         <messages-ignore-profile ng-if="vmProfile.isLoggedIn() && !vmProfile.pageOwner()" user="vmProfile.user"></messages-ignore-profile> -->
       </div>
 
-      <div class="actions-edit actions-panel" v-if="canUpdate() || canUpdatePrivate() || pageOwner() || canPageUserNotes() || canBanUser()">
+      <div class="actions-edit actions-panel" v-if="canUpdate() || canUpdatePrivate() || pageOwner() || canPageUserNotes() || canBanUser() || canBoardBanUser()">
         <div class="profile-action" v-if="canUpdate()">
           <a href="#" @click.prevent="showUpdateProfile = true">Edit Profile</a>
         </div>
@@ -138,7 +138,7 @@
             <i class="fa fa-comment-o" v-if="!user?.hasNotes"></i>
           </a>
         </div>
-        <div class="profile-action" v-if="canBanUser()">
+        <div class="profile-action" v-if="canBanUser() || canBoardBanUser()">
           <a href="#" @click.prevent="showManageBans = true">Manage Bans</a>
         </div>
       </div>
@@ -239,10 +239,21 @@ export default {
     const canPageUserNotes = () => v.loggedIn && v.permUtils.hasPermission('userNotes.page.allow')
     const canBanUser = () => {
       if (!v.loggedIn) return false
-      if (!v.permUtils.hasPermission('bans.ban.allow') && !v.permUtils.hasPermission('bans.banFromBoards')) return false
-      const same = v.permUtils.hasPermission('users.update.bypass.priority.admin')
-      const lower = v.permUtils.hasPermission('users.update.bypass.priority.mod')
-      if (same) return v.permUtils.getPriority() <= v.user.priority
+      if (!v.permUtils.hasPermission('bans.ban.allow')) return false
+      const same = v.permUtils.hasPermission('bans.ban.bypass.priority.same')
+      const lower = v.permUtils.hasPermission('bans.ban.bypass.priority.less')
+      if (pageOwner()) return true
+      else if (same) return v.permUtils.getPriority() <= v.user.priority
+      else if (lower) return v.permUtils.getPriority() < v.user.priority
+      return false
+    }
+    const canBoardBanUser = () => {
+      if (!v.loggedIn) return false
+      if (!v.permUtils.hasPermission('bans.banFromBoards')) return false
+      const same = v.permUtils.hasPermission('bans.banFromBoards.bypass.priority.same')
+      const lower = v.permUtils.hasPermission('bans.banFromBoards.bypass.priority.less')
+      if (pageOwner()) return true
+      else if (same) return v.permUtils.getPriority() <= v.user.priority
       else if (lower) return v.permUtils.getPriority() < v.user.priority
       return false
     }
@@ -314,7 +325,7 @@ export default {
       showDelete: false,
       showManageBans: false
     })
-    return { ...toRefs(v), refreshUser, toggleIgnorePosts, toggleIgnoreMessages, toggleIgnoreMentions, redirectHome, canUpdate, canUpdateUsername, canMessage, userAge, canUpdatePrivate, pageOwner, canPageUserNotes, canBanUser, canReactivate, canDeactivate, canDelete, humanDate }
+    return { ...toRefs(v), refreshUser, toggleIgnorePosts, toggleIgnoreMessages, toggleIgnoreMentions, redirectHome, canUpdate, canUpdateUsername, canMessage, userAge, canUpdatePrivate, pageOwner, canPageUserNotes, canBanUser, canBoardBanUser, canReactivate, canDeactivate, canDelete, humanDate }
   }
 }
 </script>
