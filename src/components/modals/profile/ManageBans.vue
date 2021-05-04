@@ -101,10 +101,10 @@ export default {
   emits: ['close'],
   components: { Modal, IgnoredBoardsPartial },
   setup(props, { emit }) {
-    onBeforeMount(() => props.disableBoardBans ? null : initBoardData())
-    onBeforeUpdate(() => props.disableBoardBans ? null : initBoardData())
+    onBeforeMount(() => props.disableBoardBans ? initGlobalBanInfo() : init())
+    onBeforeUpdate(() => props.disableBoardBans ? initGlobalBanInfo() : init())
 
-    const initBoardData = () => {
+    const init = () => {
       boardsApi.getBoards(true)
       .then(d => v.boards = d.boards)
       .then(initDisabledBoards)
@@ -122,16 +122,7 @@ export default {
       v.authedUser.moderating.forEach(bid => delete v.disabledInputs[bid])
     }
 
-    const initBanInfo = bannedBoards => {
-      v.checkedBoardInputs = bannedBoards.reduce((acc, b) => {
-        acc[b.id] = true
-        return acc
-      }, {})
-      v.userCopy = {
-        ...cloneDeep(props.user),
-        banned_board_names: bannedBoards.map(b => b.name),
-        banned_board_ids: [ ...bannedBoards ]
-      }
+    const initGlobalBanInfo = () => {
       const maxDate = new Date(8640000000000000)
       const banDate = new Date(props.user.ban_expiration)
       // Preselect Global Ban Type radio button if the user is banned
@@ -141,15 +132,18 @@ export default {
       v.userCopy.permanent_ban = v.banUntil ? false : true
     }
 
-    /* Template Methods */
-    const updateBan = () => {
-      v.errorMessage = null
-      $alertStore.info('TODO: Update Ban')
-      close()
+    const initBanInfo = bannedBoards => {
+      v.checkedBoardInputs = bannedBoards.reduce((acc, b) => {
+        acc[b.id] = true
+        return acc
+      }, {})
+      v.userCopy = {
+        ...v.userCopy,
+        banned_board_names: bannedBoards.map(b => b.name),
+        banned_board_ids: [ ...bannedBoards ]
+      }
+      initGlobalBanInfo()
     }
-
-    const checkAll = checked => v.authedIsAdmin ? v.checkedBoardInputs = genBoardsObjFromArray(v.boards, {}, checked) : v.authedUser.moderating.forEach(bid => v.checkedBoardInputs[bid] = checked)
-
 
     const genBoardsObjFromArray = (boards, checkedBoardInputs, checked) => {
       if (!boards || !boards.length) return checkedBoardInputs
@@ -161,15 +155,24 @@ export default {
       return checkedBoardInputs
     }
 
-    const toggleIgnoredBoard = boardId => v.checkedBoardInputs[boardId] ? delete v.checkedBoardInputs[boardId] : v.checkedBoardInputs[boardId] = true
-
+    /* Template Methods */
     const canGlobalBanUser = () => v.permUtils.hasPermission('bans.ban.allow')
 
+    const checkAll = checked => v.authedIsAdmin ? v.checkedBoardInputs = genBoardsObjFromArray(v.boards, {}, checked) : v.authedUser.moderating.forEach(bid => v.checkedBoardInputs[bid] = checked)
+
+    const toggleIgnoredBoard = boardId => v.checkedBoardInputs[boardId] ? delete v.checkedBoardInputs[boardId] : v.checkedBoardInputs[boardId] = true
+
+    const updateBan = () => {
+      v.errorMessage = null
+      $alertStore.info('TODO: Update Ban')
+      close()
+    }
+
     const minDate = () => {
-      var d = new Date()
-      var month = '' + (d.getMonth() + 1)
-      var day = '' + d.getDate()
-      var year = d.getFullYear()
+      const d = new Date()
+      let month = '' + (d.getMonth() + 1)
+      let day = '' + d.getDate()
+      const year = d.getFullYear()
       if (month.length < 2) month = '0' + month
       if (day.length < 2) day = '0' + day
       return [year, month, day].join('-')
@@ -187,7 +190,7 @@ export default {
     /* Template Data */
     const v = reactive({
       authedUser: $auth.user,
-      userCopy: null,
+      userCopy: cloneDeep(props.user),
       userReactive: props.user,
       permUtils: $auth.permissionUtils,
       authedIsAdmin: $auth.permissionUtils.hasPermission('bans.banFromBoards.bypass.type.admin'),
