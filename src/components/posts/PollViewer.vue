@@ -274,22 +274,16 @@ export default {
     const calcExpiration = () => {
       if (v.options.expiration_date) {
         // parse expiration date
-        const date = moment(v.options.expiration_date)
-        const month = date.month()
-        const day = date.date()
-        const year = date.year()
+        const expiration = moment(v.options.expiration_date)
 
         // parse expiration time
-        let hour = 0
-        let minutes = 0
         if (v.options.expiration_time) {
           const time = moment.duration(v.options.expiration_time)
-          hour = time.hours()
-          minutes = time.minutes()
+          expiration.add(time)
         }
 
         // set expiration from time and date
-        v.options.expiration = new Date(year, month, day, hour, minutes)
+        v.options.expiration = expiration
         if (v.options.expiration < Date.now()) { v.options.expiration = undefined }
       }
       else { v.options.expiration = undefined }
