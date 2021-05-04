@@ -141,7 +141,11 @@ export const breadcrumbsApi = {
 }
 
 export const banApi = {
-  getBannedBoards: username => $http(`/api/users/${username}/bannedboards`)
+  getBannedBoards: username => $http(`/api/users/${username}/bannedboards`),
+  ban: data => $http('/api/users/ban', { method: 'PUT', data }),
+  unban: data => $http('/api/users/unban', { method: 'PUT', data }),
+  banFromBoards: data => $http('/api/users/ban/boards', { method: 'PUT', data }),
+  unbanFromBoards: data => $http('/api/users/unban/boards', { method: 'PUT', data })
 }
 
 export const adminApi = {
