@@ -88,7 +88,7 @@
 <script>
 import Modal from '@/components/layout/Modal.vue'
 import { reactive, toRefs, inject, onBeforeMount, onBeforeUpdate } from 'vue'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, difference } from 'lodash'
 import { boardsApi, banApi } from '@/api'
 import humanDate from '@/composables/filters/humanDate'
 import moment from 'moment'
@@ -140,7 +140,7 @@ export default {
       v.userCopy = {
         ...v.userCopy,
         banned_board_names: bannedBoards.map(b => b.name),
-        banned_board_ids: [ ...bannedBoards ]
+        banned_board_ids: bannedBoards.map(b => b.id)
       }
       initGlobalBanInfo()
     }
@@ -158,7 +158,7 @@ export default {
     /* Template Methods */
     const canGlobalBanUser = () => v.permUtils.hasPermission('bans.ban.allow')
 
-    const checkAll = checked => v.authedIsAdmin ? v.checkedBoardInputs = genBoardsObjFromArray(v.boards, {}, checked) : v.authedUser.moderating.forEach(bid => v.checkedBoardInputs[bid] = checked)
+    const checkAll = checked => v.authedIsAdmin ? v.checkedBoardInputs = genBoardsObjFromArray(v.boards, {}, checked) : v.authedUser.moderating.forEach(bid => checked ? v.checkedBoardInputs[bid] = true : delete v.checkedBoardInputs[bid])
 
     const toggleIgnoredBoard = boardId => v.checkedBoardInputs[boardId] ? delete v.checkedBoardInputs[boardId] : v.checkedBoardInputs[boardId] = true
 
@@ -166,6 +166,100 @@ export default {
       v.errorMessage = null
       $alertStore.info('TODO: Update Ban')
       close()
+
+      // Used to update reports in table
+      let results = {
+        user_id: v.userCopy.id,
+        board_banned: Object.keys(v.checkedBoardInputs).length > 0
+      }
+      // Used for updating global bans
+      console.log(v.userCopy.banned_board_ids)
+      let globalBanParams = {
+        user_id: v.userCopy.id,
+        expiration: v.permanentBan ? undefined : v.banUntil,
+        ip_ban: v.permanentBan && v.banUserIp ? true : undefined
+      }
+      // Used for updating banned boards
+      let banBoardParams = {
+        user_id: v.userCopy.id,
+        board_ids: difference(Object.keys(v.checkedBoardInputs), v.userCopy.banned_board_ids)
+      }
+      // Used for updating unbanned boards
+      let unbanBoardParams = {
+        user_id: v.userCopy.id,
+        board_ids: difference(v.userCopy.banned_board_ids, Object.keys(v.checkedBoardInputs))
+      }
+
+      // Ban diffing variables
+      const newBanIsTemp = v.permanentBan === false && v.banUntil
+      const newBanIsPerm = v.permanentBan
+      const newBanIsRemoved = v.permanentBan === undefined
+      const oldBanIsTemp = v.userCopy.permanent_ban === false
+      const oldBanIsPerm = v.userCopy.permanent_ban
+      const userWasntBanned = v.userCopy.permanent_ban === undefined
+
+      // Check if user wasn't banned and is now banned, or the ban type changed
+      const userBanned = (newBanIsTemp && (oldBanIsPerm || userWasntBanned)) || (newBanIsPerm && (oldBanIsTemp || userWasntBanned))
+      // Check if user was banned previously and is now unbanned
+      const userUnbanned = newBanIsRemoved && (oldBanIsTemp || oldBanIsPerm);
+
+      let promises = []
+      // User is being banned globally either permanently or temporarily
+      if (userBanned) {
+        promises.push(banApi.ban(globalBanParams)
+          .then(banInfo => {
+            $alertStore.success(v.userCopy.username + ' has been globally banned ' + (v.permanentBan ? 'permanently' : ' until ' + humanDate(v.banUntil, true)))
+            results = banInfo
+          })
+          .catch(err => {
+            results.banError = err
+            let msg = 'There was an error globally banning ' + v.userCopy.username
+            if (err.status === 403) msg = v.userCopy.username + ' has higher permissions than you, cannot globally ban'
+            $alertStore.error(msg)
+          })
+        )
+      }
+      // User is being unbanned globally, ensure user is currently banned
+      else if (userUnbanned) {
+        promises.push(banApi.unban(globalBanParams)
+          .then(unbanInfo => {
+            $alertStore.success(v.userCopy.username + ' has been globally unbanned');
+            results = unbanInfo
+          })
+          .catch(err => {
+            results.banError = err
+            var msg = 'There was an error globally unbanning ' + v.userCopy.username
+            if (err.status === 403) msg = v.userCopy.username + ' has higher permissions, cannot globally unban'
+            $alertStore.error(msg)
+          })
+        );
+      }
+      // User is being banned from new boards
+      if (banBoardParams.board_ids.length) {
+        promises.push(banApi.banFromBoards(banBoardParams)
+          .then(() => $alertStore.success(v.userCopy.username + ' has been banned from boards'))
+          .catch(err => {
+            results.boardBanError = err
+            let msg = 'There was an error banning ' + v.userCopy.username + ' from boards'
+            if (err.status === 403) msg = v.userCopy.username + ' has higher permissions, cannot ban from boards'
+            $alertStore.error(msg)
+          })
+        );
+      }
+      // User is being unbanned from boards
+      if (unbanBoardParams.board_ids.length) {
+        promises.push(banApi.unbanFromBoards(unbanBoardParams)
+          .then(() => $alertStore.success(v.userCopy.username + ' has been unbanned from boards'))
+          .catch(err => {
+            results.boardBanError = err
+            let msg = 'There was an error unbanning ' + v.userCopy.username + ' from boards'
+            if (err.status === 403) msg = v.userCopy.username + ' has higher permissions, cannot unban from boards'
+            $alertStore.error(msg)
+          })
+        )
+      }
+      Promise.all(promises)
+      .then(() => close())
     }
 
     const minDate = () => {
