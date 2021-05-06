@@ -123,13 +123,15 @@ export default {
     }
 
     const initGlobalBanInfo = () => {
-      const maxDate = new Date(8640000000000000)
-      const banDate = new Date(props.user.ban_expiration)
-      // Preselect Global Ban Type radio button if the user is banned
-      v.permanentBan = props.user.ban_expiration ? banDate.getTime() === maxDate.getTime() : undefined
-      v.showIpBan = v.permanentBan ? false : true
-      v.banUntil = v.permanentBan ? undefined : moment(banDate).format('YYYY-MM-DD')
-      v.userCopy.permanent_ban = v.banUntil ? false : true
+      if (props.user.ban_expiration) {
+        const maxDate = new Date(8640000000000000)
+        const banDate = new Date(props.user.ban_expiration)
+        // Preselect Global Ban Type radio button if the user is banned
+        v.permanentBan = props.user.ban_expiration ? banDate.getTime() === maxDate.getTime() : undefined
+        v.showIpBan = v.permanentBan ? false : true
+        v.banUntil = v.permanentBan ? undefined : moment(banDate).format('YYYY-MM-DD')
+        v.userCopy.permanent_ban = v.banUntil ? false : true
+      }
     }
 
     const initBanInfo = bannedBoards => {
@@ -234,7 +236,7 @@ export default {
             if (err.status === 403) msg = v.userCopy.username + ' has higher permissions, cannot globally unban'
             $alertStore.error(msg)
           })
-        );
+        )
       }
       // User is being banned from new boards
       if (banBoardParams.board_ids.length) {
