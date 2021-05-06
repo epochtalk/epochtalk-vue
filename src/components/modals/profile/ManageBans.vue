@@ -150,7 +150,7 @@ export default {
       for (let i = 0; i < boards.length; i++) {
         const curBoard = boards[i]
         checkedBoardInputs = genBoardsObjFromArray(curBoard.boards || curBoard.children || [], checkedBoardInputs, checked)
-        if (curBoard.category_id || curBoard.parent_id) checkedBoardInputs[curBoard.id] = checked
+        if (checked && curBoard.category_id || curBoard.parent_id) checkedBoardInputs[curBoard.id] = true
       }
       return checkedBoardInputs
     }
@@ -158,7 +158,10 @@ export default {
     /* Template Methods */
     const canGlobalBanUser = () => v.permUtils.hasPermission('bans.ban.allow')
 
-    const checkAll = checked => v.authedIsAdmin ? v.checkedBoardInputs = genBoardsObjFromArray(v.boards, {}, checked) : v.authedUser.moderating.forEach(bid => checked ? v.checkedBoardInputs[bid] = true : delete v.checkedBoardInputs[bid])
+    const checkAll = checked => {
+      if (v.authedIsAdmin) v.checkedBoardInputs = checked ? genBoardsObjFromArray(v.boards, {}, true) : {}
+      else v.authedUser.moderating.forEach(bid => checked ? v.checkedBoardInputs[bid] = true : delete v.checkedBoardInputs[bid])
+    }
 
     const toggleIgnoredBoard = boardId => v.checkedBoardInputs[boardId] ? delete v.checkedBoardInputs[boardId] : v.checkedBoardInputs[boardId] = true
 
@@ -173,7 +176,6 @@ export default {
         board_banned: Object.keys(v.checkedBoardInputs).length > 0
       }
       // Used for updating global bans
-      console.log(v.userCopy.banned_board_ids)
       let globalBanParams = {
         user_id: v.userCopy.id,
         expiration: v.permanentBan ? undefined : v.banUntil,
