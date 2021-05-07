@@ -36,7 +36,7 @@
         <div v-if="canGlobalBanUser()">
           <label for="banType">
             <strong>Ban Globally</strong>
-            <a class="right" @click="permanentBan = undefined; banUntil = undefined;" v-if="permanentBan !== undefined">
+            <a class="right" @click="permanentBan = undefined; banUntil = undefined;" v-if="permanentBan === true || permanentBan === false">
               <i class="fa fa-times"></i> Remove Global Ban
             </a>
           </label>
@@ -132,6 +132,10 @@ export default {
         v.banUntil = v.permanentBan ? undefined : moment(banDate).format('YYYY-MM-DD')
         v.userCopy.permanent_ban = v.banUntil ? false : true
       }
+      else if (props.user.ban_expiration === null) {
+        v.permanentBan = true
+        v.userCopy.permanent_ban = true
+      }
     }
 
     const initBanInfo = bannedBoards => {
@@ -180,7 +184,7 @@ export default {
       // Used for updating global bans
       let globalBanParams = {
         user_id: v.userCopy.id,
-        expiration: v.permanentBan ? undefined : v.banUntil,
+        expiration: v.permanentBan ? undefined : new Date(v.banUntil),
         ip_ban: v.permanentBan && v.banUserIp ? true : undefined
       }
       // Used for updating banned boards
@@ -206,7 +210,6 @@ export default {
       const userBanned = (newBanIsTemp && (oldBanIsPerm || userWasntBanned)) || (newBanIsPerm && (oldBanIsTemp || userWasntBanned))
       // Check if user was banned previously and is now unbanned
       const userUnbanned = newBanIsRemoved && (oldBanIsTemp || oldBanIsPerm);
-
       let promises = []
       // User is being banned globally either permanently or temporarily
       if (userBanned) {
