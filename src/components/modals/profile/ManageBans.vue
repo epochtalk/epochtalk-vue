@@ -79,7 +79,6 @@
             Confirm
           </button>
         </div>
-        <label v-if="errorMessage" class="red centered-text">{{errorMessage}}</label>
       </form>
     </template>
   </modal>
@@ -89,7 +88,7 @@
 import Modal from '@/components/layout/Modal.vue'
 import { reactive, toRefs, inject, onBeforeMount, onBeforeUpdate } from 'vue'
 import { cloneDeep, difference } from 'lodash'
-import { boardsApi, banApi } from '@/api'
+import { boardsApi, banApi, usersApi } from '@/api'
 import humanDate from '@/composables/filters/humanDate'
 import moment from 'moment'
 import IgnoredBoardsPartial from '@/components/settings/IgnoredBoardsPartial.vue'
@@ -136,6 +135,12 @@ export default {
         v.permanentBan = true
         v.userCopy.permanent_ban = true
       }
+      else {
+        v.permanentBan = null
+        v.banUserIp = null
+        v.banUntil = null
+        v.userCopy.permanent_ban = false
+      }
     }
 
     const initBanInfo = bannedBoards => {
@@ -173,8 +178,6 @@ export default {
 
     const updateBan = () => {
       v.errorMessage = null
-      $alertStore.info('TODO: Update Ban')
-      close()
 
       // Used to update reports in table
       let results = {
@@ -266,6 +269,12 @@ export default {
         )
       }
       Promise.all(promises)
+      .then(() => usersApi.find(props.user.username))
+      .then(updatedUser => {
+        Object.assign(v.userReactive, updatedUser)
+        Object.assign(v.userCopy, updatedUser)
+        props.disableBoardBans ? initGlobalBanInfo() : init()
+      })
       .then(() => close())
     }
 
@@ -280,7 +289,6 @@ export default {
     }
 
     const close = () => {
-      v.errorMessage = null
       emit('close')
     }
 
