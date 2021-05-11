@@ -344,7 +344,7 @@ export default {
   }
 }
 </script>
-<style lang="scss">
+<style scoped lang="scss">
 poll-creator {
   display: flex;
   flex-direction: column;
@@ -361,11 +361,8 @@ poll-creator {
   min-height: 200px;
   overflow-x: hidden;
   overflow-y: auto;
-  .ng-enter { @include transition(0.3s ease-in all); opacity: 0; }
-  .ng-enter-active { opacity: 1; }
-  .ng-leave { display: none; }
   button { margin: 0.5rem 0 0; width: 100%; }
-
+  label { font-size: $font-size-xs; }
   .editor-container & {
     border-radius: 0;
     border: none;
