@@ -397,7 +397,7 @@
       </div>
 
       <!-- Poll Viewer -->
-      <!-- <poll-viewer thread="PostsParentCtrl.thread" user-priority="PostsParentCtrl.posts[0].user.priority" reset="PostsParentCtrl.resetPoll"></poll-viewer> -->
+      <poll-viewer v-if="postData.data.thread?.poll" :poll="postData.data.thread.poll" :thread="postData.data.thread" :user-priority="postData.data.posts[0].user.priority" :reset="resetPoll"></poll-viewer>
 
       <!-- <div class="controls">
         <pagination page-count="PostsParentCtrl.pageCount" page="PostsParentCtrl.page"></pagination>
@@ -441,6 +441,7 @@
 <script>
 import { useRoute } from 'vue-router'
 import Pagination from '@/components/layout/Pagination.vue'
+import PollViewer from '@/components/posts/PollViewer.vue'
 import humanDate from '@/composables/filters/humanDate'
 //import decode from '@/composables/filters/decode'
 import truncate from '@/composables/filters/truncate'
@@ -454,7 +455,7 @@ import { BreadcrumbStore } from '@/composables/stores/breadcrumbs'
 export default {
   name: 'Posts',
   props: ['threadSlug', 'threadId'],
-  components: { Pagination },
+  components: { Pagination, PollViewer },
   beforeRouteEnter(to, from, next) {
     const params = {
       limit: localStoragePrefs().data.posts_per_page,
@@ -578,6 +579,7 @@ export default {
       editThread: false,
       addPoll: false,
       pollValid: false,
+      resetPoll: false,
       posting: {
         post: {}
       },
@@ -592,7 +594,6 @@ export default {
 
     /* Watched Data */
     watch(() => v.loggedIn, () => processPosts().then(data => v.postData.data = data)) // Update on login
-    watch(() => $route.query, () => processPosts().then(data => v.postData.data = data)) // Update on query params change
 
     return {
       ...toRefs(v),
