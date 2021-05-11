@@ -360,7 +360,7 @@ poll-creator {
   max-height: calc(100vh - 16rem);
   min-height: 200px;
   overflow-x: hidden;
-  overflow-y: scroll;
+  overflow-y: auto;
   .ng-enter { @include transition(0.3s ease-in all); opacity: 0; }
   .ng-enter-active { opacity: 1; }
   .ng-leave { display: none; }
