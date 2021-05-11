@@ -23,7 +23,7 @@
             <td>Global Ban Expiration</td>
             <td>{{ humanDate(userCopy.ban_expiration, true) }}</td>
           </tr>
-          <tr v-if="userCopy.banned_board_names.length">
+          <tr v-if="userCopy?.banned_board_names?.length">
             <td>Banned From Boards</td>
             <td>
               <span v-for="(boardName, i) in userCopy.banned_board_names" :key="i">
@@ -86,7 +86,7 @@
 
 <script>
 import Modal from '@/components/layout/Modal.vue'
-import { reactive, toRefs, inject, onBeforeMount, onBeforeUpdate } from 'vue'
+import { reactive, toRefs, inject, watch } from 'vue'
 import { cloneDeep, difference } from 'lodash'
 import { boardsApi, banApi, usersApi } from '@/api'
 import humanDate from '@/composables/filters/humanDate'
@@ -100,8 +100,12 @@ export default {
   emits: ['close'],
   components: { Modal, IgnoredBoardsPartial },
   setup(props, { emit }) {
-    onBeforeMount(() => props.disableBoardBans ? initGlobalBanInfo() : init())
-    onBeforeUpdate(() => props.disableBoardBans ? initGlobalBanInfo() : init())
+    watch(() => props.show, show => {
+      if (show) {
+        initUser()
+        props.disableBoardBans ? initGlobalBanInfo() : init()
+      }
+    })
 
     const init = () => {
       boardsApi.getBoards(true)
@@ -111,6 +115,12 @@ export default {
       banApi.getBannedBoards(props.user.username)
       .then(initBanInfo).catch(() => {})
     }
+
+    const initUser = () => usersApi.find(props.user.username)
+      .then(updatedUser => {
+        Object.assign(v.userReactive, updatedUser)
+        Object.assign(v.userCopy, cloneDeep(updatedUser))
+      })
 
     const initDisabledBoards = () => {
       // Admins can ban from all boards
@@ -122,7 +132,7 @@ export default {
     }
 
     const initGlobalBanInfo = () => {
-      if (props.user.ban_expiration) {
+      if (props.user.ban_expiration) { // Init data, user has temp ban
         const maxDate = new Date(8640000000000000)
         const banDate = new Date(props.user.ban_expiration)
         // Preselect Global Ban Type radio button if the user is banned
@@ -131,15 +141,14 @@ export default {
         v.banUntil = v.permanentBan ? undefined : moment(banDate).format('YYYY-MM-DD')
         v.userCopy.permanent_ban = v.banUntil ? false : true
       }
-      else if (props.user.ban_expiration === null) {
+      else if (props.user.ban_expiration === null) { // Init data, user has perma ban
         v.permanentBan = true
         v.userCopy.permanent_ban = true
       }
-      else {
-        v.permanentBan = null
+      else { // Init data, user has no ban
+        v.permanentBan = undefined
         v.banUserIp = null
         v.banUntil = null
-        v.userCopy.permanent_ban = false
       }
     }
 
@@ -231,8 +240,14 @@ export default {
       }
       // User is being unbanned globally, ensure user is currently banned
       else if (userUnbanned) {
+        delete globalBanParams.expiration
         promises.push(banApi.unban(globalBanParams)
           .then(unbanInfo => {
+            // reset calculated data when unbanning
+            delete v.userReactive.ban_expiration
+            delete v.userCopy.ban_expiration
+            delete v.userReactive.permanent_ban
+            delete v.userCopy.permanent_ban
             $alertStore.success(v.userCopy.username + ' has been globally unbanned');
             results = unbanInfo
           })
@@ -269,12 +284,7 @@ export default {
         )
       }
       Promise.all(promises)
-      .then(() => usersApi.find(props.user.username))
-      .then(updatedUser => {
-        Object.assign(v.userReactive, updatedUser)
-        Object.assign(v.userCopy, updatedUser)
-        props.disableBoardBans ? initGlobalBanInfo() : init()
-      })
+      .then(() => initUser())
       .then(() => close())
     }
 
@@ -288,9 +298,7 @@ export default {
       return [year, month, day].join('-')
     }
 
-    const close = () => {
-      emit('close')
-    }
+    const close = () => emit('close')
 
     /* Internal Data */
     const $alertStore = inject('$alertStore')
