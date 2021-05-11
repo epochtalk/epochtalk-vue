@@ -313,7 +313,7 @@ export default {
       },
       editPoll: false,
       pollAnswers: [],
-      pollCopy: { ...cloneDeep(props.poll), expired: new Date(props.poll.expiration) < Date.now() }
+      pollCopy: { ...cloneDeep(props.poll), expired: props.poll.expiration ? new Date(props.poll.expiration) < Date.now() : false }
     })
     /* Data Initialization */
     // poll percentages
