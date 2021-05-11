@@ -85,7 +85,7 @@
             <span class="poll-info" :class="{'highlight':!pollCopy.expired && !canVote() }" v-if="pollCopy.display_mode === 'expired'">Results After Expiration. </span>
             <span class="poll-info" :class="{'highlight':pollCopy.expired}">
             <!-- {{ pollCopy.expiration ? 'Exp: ' + (pollCopy.expiration | date : 'short') : 'No Expiration. '}}</span> -->
-            {{ pollCopy.expiration ? 'Exp: ' + humanDate(pollCopy.expiration) : 'No Expiration. '}}</span>
+            {{ pollCopy.expiration ? `Exp: ${humanDate(pollCopy.expiration)} ` : 'No Expiration. '}}</span>
             <span class="poll-info" :class="{'highlight':pollAnswers.length===pollCopy.max_answers}">{{pollCopy.max_answers + ' choice' + (pollCopy.max_answers > 1 ? 's':'') + '. '}}</span>
             <span class="poll-info" v-if="!pollCopy.change_vote">Votes are Permanent. </span>
             <span class="poll-info" v-if="pollCopy.change_vote">Votes can be changed. </span>
