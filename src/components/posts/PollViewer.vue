@@ -248,6 +248,7 @@ export default {
       pollsApi.vote(threadId, pollId, answerIds)
         .then(poll => {
           v.pollCopy = poll
+          v.pollAnswers = []
           calculatePollPercentage()
         })
     }
