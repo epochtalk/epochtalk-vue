@@ -212,8 +212,8 @@ export default {
 
       // Ban diffing variables
       const newBanIsTemp = v.permanentBan === false && v.banUntil
-      const newBanIsPerm = v.permanentBan
-      const newBanIsRemoved = v.permanentBan === undefined
+      const newBanIsPerm = v.userReactive.ban_expiration !== null && v.permanentBan
+      const oldBanIsRemoved = v.permanentBan === undefined
       const oldBanIsTemp = v.userCopy.permanent_ban === false
       const oldBanIsPerm = v.userCopy.permanent_ban
       const userWasntBanned = v.userCopy.permanent_ban === undefined
@@ -221,10 +221,11 @@ export default {
       // Check if user wasn't banned and is now banned, or the ban type changed
       const userBanned = (newBanIsTemp && (oldBanIsPerm || userWasntBanned)) || (newBanIsPerm && (oldBanIsTemp || userWasntBanned))
       // Check if user was banned previously and is now unbanned
-      const userUnbanned = newBanIsRemoved && (oldBanIsTemp || oldBanIsPerm);
+      const userUnbanned = oldBanIsRemoved && (oldBanIsTemp || oldBanIsPerm)
+
       let promises = []
       // User is being banned globally either permanently or temporarily
-      if (userBanned) {
+      if (userBanned && canGlobalBanUser()) {
         promises.push(banApi.ban(globalBanParams)
           .then(banInfo => {
             $alertStore.success(v.userCopy.username + ' has been globally banned ' + (v.permanentBan ? 'permanently' : ' until ' + humanDate(v.banUntil, true)))
@@ -239,7 +240,7 @@ export default {
         )
       }
       // User is being unbanned globally, ensure user is currently banned
-      else if (userUnbanned) {
+      else if (userUnbanned && canGlobalBanUser()) {
         delete globalBanParams.expiration
         promises.push(banApi.unban(globalBanParams)
           .then(unbanInfo => {
