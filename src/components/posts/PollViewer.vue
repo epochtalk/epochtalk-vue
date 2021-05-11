@@ -597,10 +597,11 @@ poll-creator {
       font-weight: normal;
       line-height: 1.2;
       position: relative;
-
+      height: auto;
       input {
         margin-bottom: 0;
         margin-left: -1.25rem;
+        margin-right: .5rem;
       }
 
       &.voted {
