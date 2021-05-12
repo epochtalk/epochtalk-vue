@@ -186,8 +186,6 @@ export default {
     const toggleIgnoredBoard = boardId => v.checkedBoardInputs[boardId] ? delete v.checkedBoardInputs[boardId] : v.checkedBoardInputs[boardId] = true
 
     const updateBan = () => {
-      v.errorMessage = null
-
       // Used to update reports in table
       let results = {
         user_id: v.userCopy.id,
@@ -287,6 +285,7 @@ export default {
       Promise.all(promises)
       .then(() => initUser())
       .then(() => close())
+      .catch(() => close())
     }
 
     const minDate = () => {
@@ -313,7 +312,6 @@ export default {
       permUtils: $auth.permissionUtils,
       authedIsAdmin: $auth.permissionUtils.hasPermission('bans.banFromBoards.bypass.type.admin'),
       focusInput: null,
-      errorMessage: '',
       permanentBan: null,
       showIpBan: true,
       boards: null,
