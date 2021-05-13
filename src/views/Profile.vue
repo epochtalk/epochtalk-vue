@@ -35,9 +35,9 @@
           <span class="username-screen" v-html="user.name"></span>
           <!--  TODO(akinsey): no style in vue <span class="user-role" style="background-color: {{vmProfile.user.role_highlight_color ? vmProfile.user.role_highlight_color : 'grey'}}" ng-bind-html="vmProfile.user.role_name"></span> -->
           <span class="user-role" v-html="user.role_name"></span>
-         <!-- TODO(akinsey): <span class="user-rank">
-              <rank-display ranks="vmProfile.user.metadata.ranks" maps="vmProfile.user.metadata.rank_metric_maps" user="vmProfile.user"></rank-display>
-          </span> -->
+          <span class="user-rank">
+            <rank-display :user="user"></rank-display>
+          </span>
         </div>
 
         <!-- TODO(akinsey): <div class="profile-user-activity">
@@ -173,6 +173,7 @@
 <script>
 import { reactive, toRefs, inject } from 'vue'
 import humanDate from '@/composables/filters/humanDate'
+import RankDisplay from '@/components/users/RankDisplay.vue'
 import UpdatePasswordModal from '@/components/modals/profile/UpdatePassword.vue'
 import UpdateEmailModal from '@/components/modals/profile/UpdateEmail.vue'
 import UpdateAvatarModal from '@/components/modals/profile/UpdateAvatar.vue'
@@ -190,7 +191,7 @@ import { AuthStore } from '@/composables/stores/auth'
 export default {
   name: 'Profile',
   props: [ 'username', 'saveScrollPos' ],
-  components: { UpdateSignatureModal, UpdatePasswordModal, UpdateAvatarModal, UpdateEmailModal, DeleteAccountModal, DeactivateReactivateModal, UpdateProfileModal, QuickMessageModal,ManageBansModal, ModerationNotesModal },
+  components: { RankDisplay, UpdateSignatureModal, UpdatePasswordModal, UpdateAvatarModal, UpdateEmailModal, DeleteAccountModal, DeactivateReactivateModal, UpdateProfileModal, QuickMessageModal,ManageBansModal, ModerationNotesModal },
   beforeRouteEnter(to, from, next) {
     next(vm => usersApi.find(to.params.username).then(u => vm.user = u))
   },
