@@ -74,6 +74,13 @@ export const postsApi = {
   startedByUser: params => $http(`/api/posts/user/${params.username}/started`, { params }),
   slugToPostId: slug => $http(`/api/posts/${slug}/id`)
 }
+export const pollsApi = {
+  vote: (threadId, pollId, answerIds) => $http(`/api/threads/${threadId}/polls/${pollId}/vote`, { method: 'POST', data: { answer_ids: answerIds }}),
+  removeVote: (threadId, pollId) => $http(`/api/threads/${threadId}/polls/${pollId}/vote`, { method: 'DELETE' }),
+  editPoll: (threadId, pollId, options) => $http(`/api/threads/${threadId}/polls/${pollId}`, { method: 'PUT', data: options }),
+  lock: (threadId, pollId) => $http(`/api/threads/${threadId}/polls/${pollId}/lock`, { method: 'POST', data: { locked: true }}),
+  unlock: (threadId, pollId) => $http(`/api/threads/${threadId}/polls/${pollId}/lock`, { method: 'POST', data: { locked: false }})
+}
 
 export const reportsApi = {
   reportUser: (userId, reason) => $http('/api/reports/users', { method: 'POST', data: { offender_user_id: userId, reporter_reason: reason }}),
@@ -117,6 +124,10 @@ export const usersApi = {
   reactivate: userId => $http(`/api/users/${userId}/reactivate`, { method: 'POST' }),
   preferences: () => $http('/api/users/preferences'),
   pageIgnored: params => $http('/api/ignoreUsers/ignored', { params }),
+  notes: params => $http('/api/user/notes', { params }),
+  createNote: data => $http('/api/user/notes', { method: 'POST', data }),
+  deleteNote: params => $http('/api/user/notes', { method: 'DELETE', params }),
+  updateNote: data => $http('/api/user/notes', { method: 'PUT', data }),
   ignore: user => $http(`/api/ignoreUsers/ignore/${user.id}`, { method: 'POST' }),
   unignore: user => $http(`/api/ignoreUsers/unignore/${user.id}`, { method: 'POST' })
 }
@@ -143,6 +154,14 @@ export const mentionsApi = {
 
 export const breadcrumbsApi = {
   find: (id, type) => $http('/api/breadcrumbs', { params: { id, type } })
+}
+
+export const banApi = {
+  getBannedBoards: username => $http(`/api/users/${username}/bannedboards`),
+  ban: data => $http('/api/users/ban', { method: 'PUT', data }),
+  unban: data => $http('/api/users/unban', { method: 'PUT', data }),
+  banFromBoards: data => $http('/api/users/ban/boards', { method: 'PUT', data }),
+  unbanFromBoards: data => $http('/api/users/unban/boards', { method: 'PUT', data })
 }
 
 export const adminApi = {

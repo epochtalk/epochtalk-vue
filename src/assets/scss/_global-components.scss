@@ -12,6 +12,8 @@ a:hover { color: $color-primary-alt; }
 .right { float: right; }
 .red { color: red; }
 .centered-text { text-align: center; }
+.inline-block { display: inline-block; }
+.small-text { font-size: 0.75rem; }
 
 img {
   max-width: 100%;
@@ -48,8 +50,8 @@ table.striped {
 }
 
 table.striped thead tr th { padding: 0.5rem; }
-table.striped tbody tr { border: 0; }
-table.striped tbody tr:nth-of-type(even), table.striped tbody:nth-of-type(even) { background: $sub-header-color; }
+table.striped tbody tr, table.striped tr  { border: 0; }
+table.striped tbody tr:nth-of-type(even), table.striped tr:nth-of-type(even), table.striped tbody:nth-of-type(even) { background: $sub-header-color; }
 table.striped td {
   padding: 0.5rem;
   text-align: left;
@@ -336,11 +338,13 @@ textarea,
   }
 }
 
-input[type="checkbox"] { margin-bottom: 1rem; }
+input[type="checkbox"] { vertical-align: middle; }
+input[type="radio"] { vertical-align: middle; }
 input[type="checkbox"] + label, input[type="radio"] + label {
   display: inline-block;
-  margin-left: 0.5rem;
+  margin: 0 0.5rem;
   vertical-align: baseline;
+  width: auto;
 }
 
 label {

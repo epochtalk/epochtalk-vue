@@ -1,26 +1,29 @@
 <template>
-  <input :id="board.id" :checked="checked" @change="toggleIgnoredBoard(board.id)" :disabled="toggleSubmitted[board.id]" type="checkbox" />
-  <label :for="board.id">{{board.name}}</label>
+  <input :id="currentBoard.id" :checked="checked" @change="toggleIgnoredBoard(currentBoard.id)" :disabled="inputDisabled" type="checkbox" />
+  <label :for="currentBoard.id">{{currentBoard.name}}</label>
   <ul>
-    <li v-for="childboard in board.children" :key="childboard.id">
-      <ignored-boards-partial @toggle-ignored-board="toggleIgnoredBoard" :board="childboard" :all-boards="allBoards" :toggle-submitted="toggleSubmitted" />
+    <li v-for="childboard in currentBoard.children" :key="childboard.id">
+      <ignored-boards-partial @toggle-ignored-board="toggleIgnoredBoard" :current-board="childboard" :checked-inputs="checkedInputs" :disabled-inputs="disabledInputs" />
     </li>
   </ul>
 </template>
 
 <script>
-import { ref  } from 'vue'
+import { reactive, toRefs, computed } from 'vue'
 
 export default {
   name: 'ignored-boards-partial',
-  props: ['allBoards', 'board', 'toggleSubmitted', 'onToggle-ignored-board'],
+  props: ['checkedInputs', 'currentBoard', 'disabledInputs', 'onToggle-ignored-board'],
   setup(props, { emit }) {
     /* View Methods */
     const toggleIgnoredBoard = boardId => emit('toggle-ignored-board', boardId)
 
-    const checked = ref(props.allBoards[props.board.id])
+    const v = reactive({
+      checked: computed(() => props.checkedInputs[props.currentBoard.id]),
+      inputDisabled: computed(() => props.disabledInputs[props.currentBoard.id])
+    })
 
-    return { toggleIgnoredBoard, checked }
+    return { ...toRefs(v), toggleIgnoredBoard }
   }
 }
 </script>
