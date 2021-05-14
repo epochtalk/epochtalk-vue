@@ -120,7 +120,10 @@ export const usersApi = {
   deleteNote: params => $http('/api/user/notes', { method: 'DELETE', params }),
   updateNote: data => $http('/api/user/notes', { method: 'PUT', data }),
   ignore: user => $http(`/api/ignoreUsers/ignore/${user.id}`, { method: 'POST' }),
-  unignore: user => $http(`/api/ignoreUsers/unignore/${user.id}`, { method: 'POST' })
+  unignore: user => $http(`/api/ignoreUsers/unignore/${user.id}`, { method: 'POST' }),
+  trust: {
+    getTrustStats: username => $http(`/api/trust/${username}`)
+  }
 }
 
 export const messagesApi = {

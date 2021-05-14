@@ -36,14 +36,14 @@
           <!--  TODO(akinsey): no style in vue <span class="user-role" style="background-color: {{vmProfile.user.role_highlight_color ? vmProfile.user.role_highlight_color : 'grey'}}" ng-bind-html="vmProfile.user.role_name"></span> -->
           <span class="user-role" v-html="user.role_name"></span>
           <span class="user-rank">
-            <rank-display :user="user"></rank-display>
+            <rank-display :user="user" />
           </span>
         </div>
 
         <div class="profile-user-activity">
           <div class="user-activity-stat" v-if="user.activity > -1">Activity: <span class="value">{{user.activity}}</span>
           </div>
-           <!-- <trust-profile ng-if="vmProfile.isLoggedIn()" username="vmProfile.user.username"></trust-profile> -->
+           <trust-profile-display v-if="loggedIn" :username="user.username" />
         </div>
 
         <div class="user-profile-position">
@@ -113,9 +113,6 @@
           <a href="#" @click.prevent="toggleIgnoreMentions()">{{ user.ignoreMentions ? 'Uni' : 'I'}}gnore All Mentions by User</a>
           <a href="#" @click.prevent="toggleIgnoreMessages()">{{ user.ignore_messages ? 'Uni' : 'I'}}gnore All Messages from User</a>
         </div>
-  <!--       <ignore-user-profile ng-if="vmProfile.isLoggedIn()" user="vmProfile.user"></ignore-user-profile>
-        <mentions-ignore-profile ng-if="vmProfile.isLoggedIn() && !vmProfile.pageOwner()" user="vmProfile.user"></mentions-ignore-profile>
-        <messages-ignore-profile ng-if="vmProfile.isLoggedIn() && !vmProfile.pageOwner()" user="vmProfile.user"></messages-ignore-profile> -->
       </div>
 
       <div class="actions-edit actions-panel" v-if="canUpdate() || canUpdatePrivate() || pageOwner() || canPageUserNotes() || canBanUser() || canBoardBanUser()">
@@ -174,6 +171,7 @@
 <script>
 import { reactive, toRefs, inject } from 'vue'
 import humanDate from '@/composables/filters/humanDate'
+import TrustProfileDisplay from '@/components/trust/TrustProfileDisplay.vue'
 import RankDisplay from '@/components/users/RankDisplay.vue'
 import UpdatePasswordModal from '@/components/modals/profile/UpdatePassword.vue'
 import UpdateEmailModal from '@/components/modals/profile/UpdateEmail.vue'
@@ -192,7 +190,7 @@ import { AuthStore } from '@/composables/stores/auth'
 export default {
   name: 'Profile',
   props: [ 'username', 'saveScrollPos' ],
-  components: { RankDisplay, UpdateSignatureModal, UpdatePasswordModal, UpdateAvatarModal, UpdateEmailModal, DeleteAccountModal, DeactivateReactivateModal, UpdateProfileModal, QuickMessageModal,ManageBansModal, ModerationNotesModal },
+  components: { TrustProfileDisplay, RankDisplay, UpdateSignatureModal, UpdatePasswordModal, UpdateAvatarModal, UpdateEmailModal, DeleteAccountModal, DeactivateReactivateModal, UpdateProfileModal, QuickMessageModal,ManageBansModal, ModerationNotesModal },
   beforeRouteEnter(to, from, next) {
     next(vm => usersApi.find(to.params.username).then(u => vm.user = u))
   },
