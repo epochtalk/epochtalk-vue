@@ -40,10 +40,11 @@
           </span>
         </div>
 
-        <!-- TODO(akinsey): <div class="profile-user-activity">
-          <div class="user-activity-stat" v-if="user.activity > -1">Activity: <span class="value">{{user.activity}}</span></div>
-           <trust-profile ng-if="vmProfile.isLoggedIn()" username="vmProfile.user.username"></trust-profile>
-        </div> -->
+        <div class="profile-user-activity">
+          <div class="user-activity-stat" v-if="user.activity > -1">Activity: <span class="value">{{user.activity}}</span>
+          </div>
+           <!-- <trust-profile ng-if="vmProfile.isLoggedIn()" username="vmProfile.user.username"></trust-profile> -->
+        </div>
 
         <div class="user-profile-position">
           <span v-html="user.position"></span>
