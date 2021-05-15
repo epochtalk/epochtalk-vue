@@ -26,7 +26,7 @@
 
 <script>
 import Modal from '@/components/layout/Modal.vue'
-import { reactive, toRefs, inject } from 'vue'
+import { reactive, toRefs, inject, watch } from 'vue'
 import { usersApi } from '@/api'
 import { cloneDeep } from 'lodash'
 
@@ -67,6 +67,13 @@ export default {
       userReactive: props.user,
       focusInput: null,
       errorMessage: ''
+    })
+
+    watch(() => props.show, show => {
+      if (show) {
+        v.userCopy = cloneDeep(props.user)
+        v.userReactive = props.user
+      }
     })
 
     return { ...toRefs(v), updateSignature, close }
