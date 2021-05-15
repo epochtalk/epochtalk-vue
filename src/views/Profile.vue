@@ -33,8 +33,7 @@
         <div class="profile-user-name-role">
           <h1>{{user.username}}</h1>
           <span class="username-screen" v-html="user.name"></span>
-          <!--  TODO(akinsey): no style in vue <span class="user-role" style="background-color: {{vmProfile.user.role_highlight_color ? vmProfile.user.role_highlight_color : 'grey'}}" ng-bind-html="vmProfile.user.role_name"></span> -->
-          <span class="user-role" v-html="user.role_name"></span>
+          <span class="user-role" :style="{ 'background-color': user.role_highlight_color ? user.role_highlight_color : 'grey' }" v-html="user.role_name"></span>
           <span class="user-rank">
             <rank-display :user="user" />
           </span>
