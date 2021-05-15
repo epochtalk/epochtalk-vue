@@ -13,7 +13,7 @@ export default (dateStr, hideTime) => {
   if (hideTime) {
     if (isToday) { result = 'Today' }
     else if (isMaxDate) { result = 'Permanent' } // bans
-    else { result = dayjs(dateStr).format('MMMM D, YYYY') }
+    else { result = dayjs(dateStr).format('MMM D, YYYY') }
   }
   else {
     if (timezone) {
