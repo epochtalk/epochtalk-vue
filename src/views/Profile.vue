@@ -70,11 +70,11 @@
           </div>
           <div class="stats">
             <span class="label">Last Seen </span>
-            <span class="stat-text-sm">{{ humanDate(user.last_active) }}</span>
+            <span class="stat-text-sm">{{ humanDate(user.last_active, true) }}</span>
           </div>
           <div class="stats">
             <span class="label">Created </span>
-            <span class="stat-text-sm">{{ humanDate(user.created_at) }}</span>
+            <span class="stat-text-sm">{{ humanDate(user.created_at, true) }}</span>
           </div>
         </div>
       </div>
