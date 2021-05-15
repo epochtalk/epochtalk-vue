@@ -2,11 +2,11 @@
   <div class="user-profile-posts">
     <div class="table-actions">
       <button @click="toggleThreads(true)" :class="{'active': threads}">
-        <strong>Threads&nbsp;</strong> <span class="username">by {{username}}</span>
+        <strong>Threads&nbsp;</strong> <span class="username">by {{user.username}}</span>
       </button>
 
       <button @click="toggleThreads(false)" :class="{'active': !threads}">
-        <strong>Posts&nbsp;</strong> <span class="username">by {{username}}</span>
+        <strong>Posts&nbsp;</strong> <span class="username">by {{user.username}}</span>
       </button>
     </div>
 
