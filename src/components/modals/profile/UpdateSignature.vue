@@ -7,7 +7,7 @@
         <!-- Signature -->
         <div class="input-section textarea">
           <label for="signature">Signature
-            ({{ userCopy.raw_signature.length || 0 }}/5000)
+            ({{ userCopy?.raw_signature?.length || 0 }}/5000)
           </label>
           <textarea rows="10" id="signature" placeholder="Signature" v-model="userCopy.raw_signature" ref="focusInput" maxlength="5000"></textarea>
         </div>
