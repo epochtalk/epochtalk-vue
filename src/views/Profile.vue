@@ -370,19 +370,15 @@ export default {
     position: relative;
     text-align: center;
     .profile-avatar-container {
+      width: 120px;
+      height: 120px;
+      img { margin-bottom: 0.5rem; }
       &.circle img {
         @include border-radius(100%);
         object-fit: cover;
         height: 100%;
         width: 100%;
       }
-      width: 120px;
-      height: 120px;
-    }
-    .imageContainer {
-      width: $avatar-width;
-      height: $avatar-width;
-      margin-bottom: 0.5rem;
     }
 
     .edit-avatar { font-size: $font-size-sm; }
@@ -401,7 +397,6 @@ export default {
     }
 
     .rect {
-      .imageContainer { height: calc(#{$avatar-width / 1.5}); }
       .profile-user-status {
         top: -8px;
         right: -8px;
@@ -535,10 +530,6 @@ export default {
       margin-bottom: 1rem;
       margin-right: 0;
     }
-    .imageContainer {
-      width: 60px;
-      height: 60px;
-    }
     .profile-user-details {
       .profile-user-name-role {
         flex-direction: column;
@@ -587,8 +578,6 @@ export default {
     .profile-avatar-container {
       width: 100%;
       height: 100%;
-      .imageContainer.loaded { background: none; }
-      .imageContainer { background: url('/static/img/loading.gif') no-repeat center; display: inline;}
       .profile-avatar-image {
         display: block;
         position: relative;
