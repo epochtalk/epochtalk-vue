@@ -150,6 +150,26 @@ export default {
     })
 
     /* Watch Data */
+    watch(() => props.show, (show) => {
+      if (show) {
+        v.userCopy = {
+          username: props.user.username,
+          name: decodeHtml(props.user.name),
+          dob_formatted: moment(props.user.dob).format('YYYY-MM-DD'),
+          btc_address: props.user.btc_address,
+          gender: decodeHtml(props.user.gender),
+          website: decodeHtml(props.user.website),
+          location: decodeHtml(props.user.location),
+          language: decodeHtml(props.user.language),
+        }
+        v.userReactive = props.user
+        v.websiteValid = props.user.website ? websiteUrlRegex.test(props.user.website) : true
+        v.formValid = true
+        v.usernameUnique = true
+        v.usernameValid = true
+      }
+    })
+
     watch(() => v.userCopy.username, debounce(async val => {
       v.usernameValid = val ? usernameRegex.test(val) : true
       // check username unique
