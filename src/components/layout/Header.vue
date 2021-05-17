@@ -34,7 +34,9 @@
           </router-link>
         </li>
         <li @click="showMobileMenu = false" >
-          <a href="#"><i class="fa fa-users" aria-hidden="true"></i>Member Search</a>
+          <router-link :to="{ name: 'MemberSearch' }">
+            <i class="fa fa-users" aria-hidden="true"></i>Member Search
+          </router-link>
         </li>
         <!--<mentions-menu></mentions-menu>-->
         <li @click="showMobileMenu = false" >
@@ -101,9 +103,9 @@
               </form>
             </li>
             <li id="notifications-tray" class="hide-mobile">
-              <div class="tray-icon" href="user-search" data-balloon="Member Search" data-balloon-pos="down" v-if="permissionUtils.hasPermission('users.pagePublic.allow')">
+              <router-link :to="{ name: 'MemberSearch' }" class="tray-icon" data-balloon="Member Search" data-balloon-pos="down" v-if="permissionUtils.hasPermission('users.pagePublic.allow')">
                 <i class="fa fa-users"></i>
-              </div>
+              </router-link>
 
               <!-- <mentions-tray></mentions-tray> -->
 
@@ -622,6 +624,7 @@ header {
         #notifications-tray {
           line-height: $header-height;
           height: inherit;
+          overflow: hidden;
           #mentions-overlay {
             position: absolute;
             top: 0;
