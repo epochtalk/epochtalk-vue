@@ -169,6 +169,7 @@
 
 <script>
 import { reactive, toRefs, inject } from 'vue'
+import dayjs from 'dayjs'
 import humanDate from '@/composables/filters/humanDate'
 import TrustProfileDisplay from '@/components/trust/TrustProfileDisplay.vue'
 import RankDisplay from '@/components/users/RankDisplay.vue'
@@ -204,12 +205,9 @@ export default {
 
     const userAge = dob => {
       if (!dob) return
-      var today = new Date()
-      var birthDate = new Date(dob)
-      var age = today.getFullYear() - birthDate.getFullYear()
-      var m = today.getMonth() - birthDate.getMonth()
-      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--
-      return age
+      const today = dayjs.utc()
+      const birthDate = dayjs.utc(dob)
+      return today.diff(birthDate, 'year')
     }
 
     const canUpdate = () => {
