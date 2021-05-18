@@ -107,6 +107,7 @@ export const authApi = {
 
 export const usersApi = {
   search: username => $http('/api/users/search', { params: { username } }),
+  memberSearch: params => $http('/api/search/users', { params }),
   lookup: (username, params) => $http(`/api/users/lookup/${username}`, { params }),
   update: (userId, data) => $http(`/api/users/${userId}`, { method: 'PUT', data }),
   find: username => $http(`/api/users/${username}`),

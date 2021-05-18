@@ -86,7 +86,7 @@ const routes = [
     path: '/search/users',
     name: 'MemberSearch',
     component: MemberSearch,
-    meta: { requiresAuth: true, bodyClass: 'search-users' }
+    meta: { requiresAuth: true, bodyClass: 'member-search' }
   },
   {
     path: '/about',

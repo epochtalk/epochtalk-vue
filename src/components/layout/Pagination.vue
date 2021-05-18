@@ -30,6 +30,7 @@ export default {
     }
 
     const updatePageDisplay = (e, value) => {
+      if (!e) return
       if (v.pageCount < 2) return
       const range = e.target || e // account for passing in ref in nextTick
       value = value || range.value // account for passing in custom page
