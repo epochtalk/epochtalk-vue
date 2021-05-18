@@ -44,7 +44,7 @@
           <input type="radio" name="banType" v-model="permanentBan" :value="false" id="temporary" :disabled="banSubmitted"><label for="temporary">Temporary</label>
 
           <div v-if="permanentBan === false">
-            <label for="banUntil">Enter Ban Expiration Date:</label>
+            <label for="banUntil">Enter Ban Expiration Date (UTC):</label>
             <input type="date" v-model="banUntil" :min="minDate()" name="banUntil" :required="permanentBan === false" />
           </div>
 
