@@ -20,8 +20,8 @@
             <td>{{ humanDate(userCopy.created_at) }}</td>
           </tr>
           <tr v-if="userCopy.ban_expiration">
-            <td>Global Ban Expiration</td>
-            <td>{{ humanDate(userCopy.ban_expiration, true) }}</td>
+            <td>Global Ban Expiration (UTC)</td>
+            <td>{{ humanDate(dayjs.utc(userCopy.ban_expiration), true) }}</td>
           </tr>
           <tr v-if="userCopy?.banned_board_names?.length">
             <td>Banned From Boards</td>
@@ -324,7 +324,7 @@ export default {
       banSubmitted: false
     })
 
-    return { ...toRefs(v), minDate, updateBan, canGlobalBanUser, toggleIgnoredBoard, checkAll, humanDate, close }
+    return { ...toRefs(v), minDate, updateBan, canGlobalBanUser, toggleIgnoredBoard, checkAll, humanDate, close, dayjs }
   }
 }
 </script>
