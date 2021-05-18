@@ -217,9 +217,10 @@ export default {
       const oldBanIsTemp = v.userCopy.permanent_ban === false
       const oldBanIsPerm = v.userCopy.permanent_ban
       const userWasntBanned = v.userCopy.permanent_ban === undefined
+      const dateChanged = v.banUntil !== dayjs.utc(v.userCopy.ban_expiration).format('YYYY-MM-DD')
 
-      // Check if user wasn't banned and is now banned, or the ban type changed
-      const userBanned = (newBanIsTemp && (oldBanIsPerm || userWasntBanned)) || (newBanIsPerm && (oldBanIsTemp || userWasntBanned))
+      // Check if user wasn't banned and is now banned, or the ban type changed, or the ban date is changed
+      const userBanned = (newBanIsTemp && (oldBanIsPerm || userWasntBanned)) || (newBanIsPerm && (oldBanIsTemp || userWasntBanned)) || (newBanIsTemp && oldBanIsTemp && dateChanged)
       // Check if user was banned previously and is now unbanned
       const userUnbanned = oldBanIsRemoved && (oldBanIsTemp || oldBanIsPerm)
 
