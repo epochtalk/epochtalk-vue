@@ -507,7 +507,35 @@ export default {
       })
     }
     /* View Methods */
-    const canEditTitle = () => true
+    const canEditTitle = () => {
+      if (!$auth.loggedIn) { return false }
+      // TODO(boka): check for banned
+      // if (ctrl.bannedFromBoard) { return false }
+      if (!v.permissionUtils.hasPermission('threads.title.allow')) { return false }
+      if (!v.postData.data?.write_access) { return false }
+
+      const adminBypass = v.permissionUtils.hasPermission('threads.title.bypass.owner.admin')
+      const modBypass = v.permissionUtils.hasPermission('threads.title.bypass.owner.mod')
+      const priorityBypass = v.permissionUtils.hasPermission('threads.title.bypass.owner.priority')
+      const userPriority = v.postData.data.posts[0].user.priority
+      const elevatedPrivileges = adminBypass || modBypass || priorityBypass
+
+      // Check time on disablePostEdit
+      const disablePostEdit = v.postData.data.board.disable_post_edit
+      if (disablePostEdit && Number(disablePostEdit) > -1 && !elevatedPrivileges) {
+        const currentTime = new Date().getTime()
+        const minutes = Number(disablePostEdit) * 60 * 1000
+        const threadCreatedAt = new Date(v.postData.data.thread.created_at).getTime()
+        const canUpdate = currentTime - threadCreatedAt < minutes
+        if (!canUpdate) return false
+      }
+
+      if (v.postData.data.thread.user.id === $auth.user.id) return true
+      else if (adminBypass) return v.permissionUtils.getPriority() <= userPriority
+      else if (modBypass) return v.permissionUtils.getPriority() < userPriority && v.permissionUtils.moderatesBoard(v.postData.data.board.id)
+      else if (priorityBypass) return v.permissionUtils.getPriority() < userPriority
+      else return false
+    }
     const canPost = () => {
       // TODO(akinsey): Implement ban status check
       // TODO(boka): make sure it's correct
