@@ -4,6 +4,11 @@ import router from '@/router'
 import localStorageCache from '@/composables/utils/localStorageCache'
 import alertStore from '@/composables/stores/alert'
 
+// extend dayjs with utc plugin
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+dayjs.extend(utc)
+
 const app = createApp(App).use(router)
 
 /* Provide App Cache for caching Auth data */

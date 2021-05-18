@@ -91,8 +91,6 @@ import { cloneDeep, difference } from 'lodash'
 import { boardsApi, banApi, usersApi } from '@/api'
 import humanDate from '@/composables/filters/humanDate'
 import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
-dayjs.extend(utc)
 import IgnoredBoardsPartial from '@/components/settings/IgnoredBoardsPartial.vue'
 import { AuthStore } from '@/composables/stores/auth'
 
