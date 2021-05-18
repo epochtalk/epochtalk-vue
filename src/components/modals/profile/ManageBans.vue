@@ -90,7 +90,9 @@ import { reactive, toRefs, inject, watch } from 'vue'
 import { cloneDeep, difference } from 'lodash'
 import { boardsApi, banApi, usersApi } from '@/api'
 import humanDate from '@/composables/filters/humanDate'
-import moment from 'moment'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+dayjs.extend(utc)
 import IgnoredBoardsPartial from '@/components/settings/IgnoredBoardsPartial.vue'
 import { AuthStore } from '@/composables/stores/auth'
 
@@ -138,7 +140,7 @@ export default {
         // Preselect Global Ban Type radio button if the user is banned
         v.permanentBan = props.user.ban_expiration ? banDate.getTime() === maxDate.getTime() : undefined
         v.showIpBan = v.permanentBan ? false : true
-        v.banUntil = v.permanentBan ? undefined : moment(banDate).format('YYYY-MM-DD')
+        v.banUntil = v.permanentBan ? undefined : dayjs.utc(banDate).format('YYYY-MM-DD')
         v.userCopy.permanent_ban = v.banUntil ? false : true
       }
       else if (props.user.ban_expiration === null) { // Init data, user has perma ban
