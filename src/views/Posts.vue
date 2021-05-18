@@ -521,7 +521,24 @@ export default {
     const canMove = () => true
     const canPurge = () => true
     const canSticky = () => true
-    const canLock = () => true
+    const canLock = () => {
+      if (!$auth.loggedIn) { return false }
+      // TODO(boka): check for banned
+      // if (ctrl.bannedFromBoard) { return false }
+      if (!v.permissionUtils.hasPermission('threads.lock.allow')) { return false }
+      if (!v.postData.data?.write_access) { return false }
+
+      const adminBypass = v.permissionUtils.hasPermission('threads.lock.bypass.owner.admin')
+      const modBypass = v.permissionUtils.hasPermission('threads.lock.bypass.owner.mod')
+      const priorityBypass = v.permissionUtils.hasPermission('threads.lock.bypass.owner.priority')
+      const userPriority = v.postData.data.posts[0].user.priority
+
+      if (v.postData.data.thread.user.id === $auth.user.id) return true
+      else if (adminBypass) return v.permissionUtils.getPriority() <= userPriority
+      else if (modBypass) return v.permissionUtils.getPriority() < userPriority && v.permissionUtils.moderatesBoard(v.postData.data.board.id)
+      else if (priorityBypass) return v.permissionUtils.getPriority() < userPriority
+      else return false
+    }
     const canCreatePoll = () => true
     const canUpdate = (post) => {
       console.log(post, 'canUpdate')
