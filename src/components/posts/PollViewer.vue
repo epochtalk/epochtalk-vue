@@ -131,7 +131,7 @@ import { AuthStore } from '@/composables/stores/auth'
 import { reactive, toRefs, watch, inject } from 'vue'
 import { pollsApi } from '@/api'
 import { cloneDeep } from 'lodash'
-import moment from 'moment'
+import dayjs from 'dayjs'
 
 export default {
   props: ['poll', 'thread', 'userPriority', 'reset'],
@@ -273,11 +273,11 @@ export default {
     const calcExpiration = () => {
       if (v.options.expiration_date) {
         // parse expiration date
-        const expiration = moment(v.options.expiration_date)
+        const expiration = dayjs(v.options.expiration_date)
 
         // parse expiration time
         if (v.options.expiration_time) {
-          const time = moment.duration(v.options.expiration_time)
+          const time = dayjs.duration(v.options.expiration_time)
           expiration.add(time)
         }
 
@@ -308,8 +308,8 @@ export default {
         max_answers: props.poll.max_answers,
         display_mode: props.poll.display_mode,
         // used in view to track date and time from input field
-        expiration_date: props.poll.expiration ? moment(props.poll.expiration).format('YYYY-MM-DD') : undefined,
-        expiration_time: props.poll.expiration ? moment(props.poll.expiration).format('HH:mm') : undefined
+        expiration_date: props.poll.expiration ? dayjs(props.poll.expiration).format('YYYY-MM-DD') : undefined,
+        expiration_time: props.poll.expiration ? dayjs(props.poll.expiration).format('HH:mm') : undefined
       },
       editPoll: false,
       pollAnswers: [],
