@@ -4,13 +4,13 @@
       <div class="nested-input-container">
         <a v-if="search" @click="clearSearch()" class="nested-clear-btn fa fa-times"></a>
         <a @click="searchUsers()" class="nested-btn">Search</a>
-        <input class="input-text nested-input" type="search" v-model="searchStr" id="search-users" placeholder="Search users by username" @keydown="$event.which === 13 && searchUsers()" @keyup="$event.which === 27 && clearSearch()" />
+        <input class="input-text nested-input" type="search" v-model="search" id="search-users" placeholder="Search users by username" @keydown="$event.which === 13 && searchUsers()" @keyup="$event.which === 27 && clearSearch()" ref="searchInput" />
       </div>
     </div>
 
     <div class="member-search-results" v-if="searchData && (searchData.count > 0 || search)">
-      <div v-if="search">
-      Displaying {{searchData.count}} search result(s) for "<strong>{{search}}</strong>":<br /><br />
+      <div v-if="searchData?.search">
+      Displaying {{searchData.count}} search result(s) for "<strong>{{searchData.search}}</strong>":<br /><br />
       </div>
       <table width="100%">
         <thead class="members-header">
@@ -57,22 +57,24 @@ export default {
   name: 'About',
   components: { Pagination },
   beforeRouteEnter(to, from, next) {
-    const params = {
+    const query = {
       limit: 15,
       page: to.query.page || 1,
       field: to.query.field,
-      desc: to.query.desc
+      desc: to.query.desc,
+      search: to.query.search
     }
-    next(vm => usersApi.memberSearch(params).then(d => vm.searchData = d).catch(() => {}))
+    next(vm => usersApi.memberSearch(query).then(d => vm.searchData = d).catch(() => {}))
   },
   beforeRouteUpdate(to, from, next) {
-    const params = {
+    const query = {
       limit: 15,
       page: to.query.page || 1,
       field: to.query.field,
-      desc: to.query.desc
+      desc: to.query.desc,
+      search: to.query.search
     }
-    usersApi.memberSearch(params).then(d => this.searchData = d).catch(() => {})
+    usersApi.memberSearch(query).then(d => this.searchData = d).catch(() => {})
     next()
   },
   setup() {
@@ -86,8 +88,19 @@ export default {
         $router.replace({ name: $route.name, params: params, query: query })
     }
 
-    const searchUsers = () => console.log('search users')
-    const clearSearch = () => console.log('clear search')
+    const searchUsers = () => {
+      let query = { ...$route.query, search: v.search }
+      delete query.page
+      $router.replace({ name: $route.name, params: $route.params, query: query })
+    }
+    const clearSearch = () => {
+      let query = { ...$route.query }
+      delete query.search
+      $router.replace({ name: $route.name, params: $route.params, query: query })
+      v.search = null
+      v.searchInput.focus()
+    }
+
 
     const setSortField = () => {
       // // Get/Set new sort field
@@ -125,9 +138,9 @@ export default {
     const v = reactive({
       currentPage: Number($route.query.page) || 1,
       pages: computed(() => v.searchData?.page_count),
-      search: computed(() => v.searchData?.search),
       searchData: null,
-      searchStr: null,
+      search: $route.query.search,
+      searchInput: null,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
     })
