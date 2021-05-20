@@ -2,8 +2,8 @@
   <div class="user-search">
     <div class="member-search-field">
       <div class="nested-input-container">
-        <a v-if="search" @click="clearSearch()" class="nested-clear-btn fa fa-times"></a>
-        <a @click="searchUsers()" class="nested-btn">Search</a>
+        <a v-if="searchData?.search" @click="clearSearch()" class="nested-clear-btn fa fa-times pointer"></a>
+        <a @click="search ? searchUsers() : null" :class="{ 'disabled': (!search || search === searchData?.search), 'pointer': search }" class="nested-btn">Search</a>
         <input class="input-text nested-input" type="search" v-model="search" id="search-users" placeholder="Search users by username" @keydown="$event.which === 13 && searchUsers()" @keyup="$event.which === 27 && clearSearch()" ref="searchInput" />
       </div>
     </div>
@@ -42,13 +42,13 @@
   </div>
   <div class="sidebar">
     <div class="sidebar-block" v-if="searchData?.page_count > 1">
-       <pagination :page="searchData.page" :limit="searchData.limit" :count="searchData.count"></pagination>
+      <pagination :page="searchData.page" :limit="searchData.limit" :count="searchData.count" />
     </div>
   </div>
 </template>
 
 <script>
-import { reactive, toRefs, computed } from 'vue'
+import { reactive, toRefs, nextTick } from 'vue'
 import { usersApi } from '@/api'
 import Pagination from '@/components/layout/Pagination.vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -78,29 +78,21 @@ export default {
     next()
   },
   setup() {
-    const pageUsers = inc => {
-      const params = { ...$route.params, saveScrollPos: true }
-      // Handle different pagination controls (threads) prev/next vs (posts) actual pagination
-      const newPage = v.threads && inc ? v.postData.page + inc : v.currentPage
-      let query = { ...$route.query, page: newPage }
-      if (query.page === 1 || !query.page) delete query.page
-      if ($route.query.page !== v.currentPage)
-        $router.replace({ name: $route.name, params: params, query: query })
-    }
-
     const searchUsers = () => {
       let query = { ...$route.query, search: v.search }
       delete query.page
       $router.replace({ name: $route.name, params: $route.params, query: query })
+      v.searchInput.focus()
     }
+
     const clearSearch = () => {
       let query = { ...$route.query }
       delete query.search
+      delete query.page
       $router.replace({ name: $route.name, params: $route.params, query: query })
       v.search = null
       v.searchInput.focus()
     }
-
 
     const setSortField = () => {
       // // Get/Set new sort field
@@ -137,14 +129,16 @@ export default {
 
     const v = reactive({
       currentPage: Number($route.query.page) || 1,
-      pages: computed(() => v.searchData?.page_count),
       searchData: null,
       search: $route.query.search,
       searchInput: null,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
     })
-    return { ...toRefs(v), searchUsers, clearSearch, setSortField, getSortClass, pageUsers }
+
+    nextTick(() => v.searchInput.focus())
+
+    return { ...toRefs(v), searchUsers, clearSearch, setSortField, getSortClass }
   }
 }
 </script>
