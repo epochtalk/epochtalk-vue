@@ -338,6 +338,10 @@ textarea,
   }
 }
 
+a.disabled, a.disabled:hover, a.disabled:active, a.disabled:visited {
+  background-color: $secondary-font-color-light;
+}
+
 input[type="checkbox"] { vertical-align: middle; }
 input[type="radio"] { vertical-align: middle; }
 input[type="checkbox"] + label, input[type="radio"] + label {
