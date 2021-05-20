@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { computed, reactive, toRefs, nextTick } from 'vue'
+import { computed, reactive, toRefs, nextTick, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 export default {
@@ -30,7 +30,6 @@ export default {
     }
 
     const updatePageDisplay = (e, value) => {
-      if (!e) return
       if (v.pageCount < 2) return
       const range = e.target || e // account for passing in ref in nextTick
       value = value || range.value // account for passing in custom page
@@ -54,6 +53,12 @@ export default {
 
     /* Next Tick - waits for dom to load so refs are populated */
     nextTick(() => updatePageDisplay(v.rangeInput, v.currentPage)) // set init pos of page disp
+
+    /* Watch - this handles when query data changes, (e.g. query string for search changes) */
+    watch(() => props.count, () => {
+      v.currentPage = props.page
+      updatePageDisplay(v.rangeInput, v.currentPage)
+    })
 
     return { ...toRefs(v), smoothThumbDrag, updatePageDisplay }
   }
