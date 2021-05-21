@@ -1,6 +1,6 @@
 import * as dayjs from 'dayjs'
 
-export default (dateStr, hideTime) => {
+export default (dateStr, hideTime, customFormat) => {
   //let timezone = PreferencesSvc.preferences.timezone_offset || ''
   let timezone
   let result
@@ -15,6 +15,7 @@ export default (dateStr, hideTime) => {
     else if (isMaxDate) { result = 'Permanent' } // bans
     else { result = dayjs(dateStr).format('MMM D, YYYY') }
   }
+  else if (customFormat) result = dayjs(dateStr).format(customFormat)
   else {
     if (timezone) {
       if (isToday) { result = 'Today at ' +  dayjs(dateStr).format('h:mm A').tz(timezone) }
