@@ -378,6 +378,10 @@ export default {
         height: 100%;
         width: 100%;
       }
+      &.rect img {
+        object-fit: cover;
+        height: calc(#{$avatar-width / 1.5});
+      }
     }
 
     .edit-avatar { font-size: $font-size-sm; }

@@ -162,14 +162,19 @@ export default {
   padding-right: 0;
 }
 
-.user-avatar img {
-  object-fit: cover;
-  height: 6.25rem;
-  width: 6.25rem;
-  display: inline-block;
-  vertical-align: middle;
-  margin-right: .5rem
+.user-avatar {
+  img {
+    object-fit: cover;
+    width: calc(#{$avatar-width  * .666});
+    height: calc(#{$avatar-width  * .666});
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: .5rem
+  }
+  &.circle img { @include border-radius(100%); }
+  &.rect img { height: calc(#{($avatar-width  * .666)/ 1.5}); }
 }
+
 .members-header th { text-align: left; }
 
 .nested-input-container { position: relative; }
