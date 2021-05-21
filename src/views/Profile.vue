@@ -363,15 +363,14 @@ export default {
   grid-area: header;
   padding: 1rem 0;
 
-  $avatar-width: 120px;
   .profile-avatar {
     flex: 0 0 $avatar-width;
     margin-right: 2rem;
     position: relative;
     text-align: center;
     .profile-avatar-container {
-      width: 120px;
-      height: 120px;
+      width: $avatar-width;
+      height: $avatar-width;
       img { margin-bottom: 0.5rem; }
       &.circle img {
         @include border-radius(100%);

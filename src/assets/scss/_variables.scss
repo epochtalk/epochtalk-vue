@@ -6,6 +6,8 @@ $sidebarWidth: 240px;
 
 // Posts layout variables
 $postUserWidth: 80px;
+// avatar width
+$avatar-width: 120px;
 
 $dark-text-default: rgb(34, 34, 34);
 $light-text-default: rgb(255,255,255);
@@ -25,7 +27,6 @@ $font-size-med:   1.25rem;
 $font-size-sm:    0.875rem;
 $font-size-xs:    0.75rem;
 $font-size-tiny:  0.6375rem;
-
 
 @function brightness($color) {
   @if type-of($color) == color {
