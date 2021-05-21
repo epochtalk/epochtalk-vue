@@ -89,7 +89,7 @@ export default {
         // Special case for extended profile pages. Allows link back to user
         // profile from breadcrumbs
         if (breadcrumbs[1].label === pathLookup.profiles.label && breadcrumbs.length > 3) {
-          breadcrumbs[2].routePath =  '/profile/' + breadcrumbs[2].label
+          breadcrumbs[2].routePath =  '/profile/' + breadcrumbs[2].label.toLowerCase()
         }
       }
       if (breadcrumbs) {

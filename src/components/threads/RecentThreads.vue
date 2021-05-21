@@ -44,7 +44,7 @@
             <router-link class="thread-board" :title="decode(thread.board.name)" :to="{ name: 'Threads', params: { boardSlug: thread.board.slug } }" onclick="event.stopPropagation()">{{decode(thread.board.name)}}</router-link>
             by
             <span v-if="thread.deleted">deleted</span>
-            <router-link onclick="event.stopPropagation()" v-if="!thread.deleted" :to="{ path: '/profile/' + thread.user.username }">{{thread.user.username}}</router-link>
+            <router-link onclick="event.stopPropagation()" v-if="!thread.deleted" :to="{ path: '/profile/' + thread.user.username.toLowerCase() }">{{thread.user.username}}</router-link>
           </div>
           <div class="last-reply">
             <div>{{humanDate(thread.post.created_at)}}</div>

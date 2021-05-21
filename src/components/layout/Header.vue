@@ -24,7 +24,7 @@
           <a href="#"><i class="fa fa-binoculars" aria-hidden="true"></i>Patrol</a>
         </li>
         <li @click="showMobileMenu = false" >
-          <router-link :to="{ path: '/profile/' + currentUser.username }">
+          <router-link :to="{ path: '/profile/' + currentUser.username.toLowerCase() }">
             <i class="fa fa-user" aria-hidden="true"></i>Profile
           </router-link>
         </li>
@@ -121,7 +121,7 @@
             </li>
             <li id="user-dropdown-wrap" class="hide-mobile">
               <div>
-                <router-link :to="{ path: '/profile/' + currentUser.username }">
+                <router-link :to="{ path: '/profile/' + currentUser.username.toLowerCase() }">
                   <div class="avatar-wrap">
                     <img :src="currentUser.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" class="avatar" :class="defaultAvatarShape">
                   </div>
@@ -139,7 +139,7 @@
                   <a href="#">Patrol</a>
                 </li>
                 <li>
-                  <router-link :to="{ path: '/profile/' + currentUser.username }">
+                  <router-link :to="{ path: '/profile/' + currentUser.username.toLowerCase() }">
                     Profile
                   </router-link>
                 </li>

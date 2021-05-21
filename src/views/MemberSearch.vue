@@ -27,10 +27,10 @@
           </tr>
           <tr v-for="user in searchData?.users" :key="user.username">
             <td class="username">
-              <a class="search-users user-avatar hide-mobile" href="">
+              <router-link :to="{ path: '/profile/' + user.username.toLowerCase() }" :class="defaultAvatarShape" class="search-users user-avatar hide-mobile" href="">
                 <img :src="user.avatar || defaultAvatar">
-              </a>
-              <a href="" v-html="user.username"></a>
+              </router-link>
+              <router-link :to="{ path: '/profile/' + user.username.toLowerCase() }" v-html="user.username" />
             </td>
             <td v-html="user.role"></td>
             <td v-html="user.post_count"></td>
