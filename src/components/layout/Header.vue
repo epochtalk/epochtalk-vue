@@ -103,10 +103,11 @@
               </form>
             </li>
             <li id="notifications-tray" class="hide-mobile">
-              <router-link :to="{ name: 'MemberSearch' }" class="tray-icon" data-balloon="Member Search" data-balloon-pos="down" v-if="permissionUtils.hasPermission('users.pagePublic.allow')">
-                <i class="fa fa-users"></i>
-              </router-link>
-
+              <div data-balloon="Member Search" data-balloon-pos="down" v-if="permissionUtils.hasPermission('users.pagePublic.allow')">
+                <router-link :to="{ name: 'MemberSearch' }" class="tray-icon">
+                  <i class="fa fa-users"></i>
+                </router-link>
+              </div>
               <!-- <mentions-tray></mentions-tray> -->
 
               <div class="tray-icon" href="#" @click="dismissNotifications({ type: 'message' })" data-balloon="Messages" data-balloon-pos="down">
@@ -549,6 +550,8 @@ header {
           ::-moz-placeholder { color: $placeholder-text-color; }
           :-ms-input-placeholder { color: $placeholder-text-color; }
           .search-input {
+            position: relative;
+            top: -1px;
             height: inherit;
             display: inline-block;
             background-color: inherit;
@@ -586,9 +589,10 @@ header {
             @include pad(0 1rem);
             color: $header-logo-font-color;
             line-height: $header-height;
-            &:hover {
-              background-color:  $header-dropdown-bg-color;
-            }
+            height: inherit;
+            display: inline-block;
+            width: auto;
+            &:hover { background-color:  $header-dropdown-bg-color; }
             &.search-label-expanded {
               background-color: transparent;
               &:hover { background-color: transparent; }
@@ -624,7 +628,7 @@ header {
         #notifications-tray {
           line-height: $header-height;
           height: inherit;
-          overflow: hidden;
+          div { display: inline-block; }
           #mentions-overlay {
             position: absolute;
             top: 0;
@@ -640,6 +644,7 @@ header {
             display: inline-block;
             color: $header-logo-font-color;
             position: relative;
+            top: -1px;
             &:hover {
               background-color:  $header-dropdown-bg-color;
             }
