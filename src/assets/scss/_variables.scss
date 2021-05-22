@@ -136,6 +136,6 @@ $medium: 1024px;
 $large:   1280px;
 
 @import 'mixins';
-@import 'vendor';
+@import 'vendor/vendor';
 @import 'overrides';
 @import 'global-components';
