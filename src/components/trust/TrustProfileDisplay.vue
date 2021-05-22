@@ -2,7 +2,7 @@
 <template>
   <div class="trust-profile">
     <div v-if="stats">
-      <span>Trust:&nbsp;&nbsp;<strong><span class="trust-score" :class="getStyle(stats.score)"><!-- <span data-balloon="Trust Score"> --><span>{{stats.score}}</span> : <!-- TODO(akinsey): <span data-balloon="Negative Feedback" ng-class="{\'neg\' : vmTrust.stats.neg !== 0 }"> --><span :class="{'neg' : stats.neg !== 0 }">-{{stats.neg}}</span> / <!-- <span data-balloon="Positive Feedback"> --><span>+{{stats.pos}}</span></span></strong></span>
+      <span>Trust:&nbsp;&nbsp;<strong><span class="trust-score" :class="getStyle(stats.score)"><span data-balloon="Trust Score">{{stats.score}}</span> : <span data-balloon="Negative Feedback" :class="{'neg' : stats.neg !== 0 }">-{{stats.neg}}</span> / <span data-balloon="Positive Feedback">+{{stats.pos}}</span></span></strong></span>
     </div>
     <div v-if="stats?.score < 0">
       <span class="trust-score" :class="getStyle(stats.score)">Warning: Trade with extreme caution!</span>
