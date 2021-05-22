@@ -59,7 +59,7 @@ export default {
   components: { Pagination },
   beforeRouteEnter(to, from, next) {
     const query = {
-      limit: 15,
+      limit: 10,
       page: to.query.page || 1,
       field: to.query.field,
       desc: to.query.desc,
@@ -69,7 +69,7 @@ export default {
   },
   beforeRouteUpdate(to, from, next) {
     const query = {
-      limit: 15,
+      limit: 10,
       page: to.query.page || 1,
       field: to.query.field,
       desc: to.query.desc,
