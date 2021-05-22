@@ -55,7 +55,7 @@ const routes = [
     path: '/threads/posted',
     name: 'ThreadsPostedIn',
     component: ThreadsPostedIn,
-    meta: { requiresAuth: true, bodyClass: 'threadspostedin' }
+    meta: { requiresAuth: true, bodyClass: 'threads-posted-in' }
   },
   {
     path: '/profile/:username',

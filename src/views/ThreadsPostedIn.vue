@@ -1,6 +1,6 @@
 <template>
-  <h1 class="view-title">Threads Posted In</h1>
-  <div class="board-data" ui-view="data">
+  <div class="thread-data">
+    <h1 class="view-title">Threads Posted In</h1>
     <table class="threads-list">
       <caption>Threads</caption>
       <thead>
@@ -14,7 +14,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr class="threads-data" v-for="thread in threadData.data.threads" :key="thread.id">
+        <tr class="threads-data" v-for="thread in threadData?.threads" :key="thread.id">
           <td class="subject">
             <div class="title">
               <div class="thread-state">
@@ -66,7 +66,11 @@
       </tbody>
     </table>
   </div>
-  <pagination v-if="threadData.data?.threads" :page="threadData.data.page" :limit="threadData.data.limit" :count="threadData.data.count"></pagination>
+  <div class="sidebar">
+    <div class="sidebar-block" v-if="threadData?.threads">
+      <pagination :page="threadData.page" :limit="threadData.limit" :count="threadData.count"></pagination>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -77,26 +81,43 @@ import { threadsApi } from '@/api'
 import { localStoragePrefs } from '@/composables/stores/prefs'
 
 export default {
-  name: 'Posts',
+  name: 'ThreadsPostedIn',
   components: { Pagination },
   beforeRouteEnter(to, from, next) {
     const params = {
       limit: localStoragePrefs().data.threads_per_page,
       page: to.query.page || 1
     }
-    threadsApi.postedIn(params).then(data => next(vm => vm.threadData.data = data))
+    threadsApi.postedIn(params).then(data => next(vm => vm.threadData = data ))
+  },
+  beforeRouteUpdate(to) {
+    const params = {
+      limit: localStoragePrefs().data.threads_per_page,
+      page: to.query.page || 1
+    }
+    threadsApi.postedIn(params).then(data => this.threadData = data )
   },
   setup() {
     /* View Data */
     const v = reactive({
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
-      threadData: { data: {} }
+      threadData: null
     })
-    return {
-      ...toRefs(v),
-      humanDate
-    }
+    return { ...toRefs(v), humanDate }
   }
 }
 </script>
+
+<style scoped lang="scss">
+.threads-posted-in main #public-content { grid-template-areas: 'header header' 'main sidebar' 'main sidebar'; }
+.thread-data { grid-area: main; }
+.sidebar {
+  grid-area: sidebar;
+  .sidebar-block {
+    display: block;
+    position: sticky;
+    top: $header-offset;
+  }
+}
+</style>
