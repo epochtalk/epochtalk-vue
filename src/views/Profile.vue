@@ -15,8 +15,7 @@
         <div class="profile-avatar-container" :class="defaultAvatarShape">
           <a href="#" v-if="canUpdate()" @click.prevent="showEditAvatar = true" class="profile-avatar-image">
             <img :src="user.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
-            <!-- TODO(akinsey): <span class="profile-user-status" data-balloon="{{vmProfile.user.username}} is online" ng-if="vmProfile.isOnline"> -->
-            <span class="profile-user-status" v-if="isOnline">
+            <span class="profile-user-status" :data-balloon="user.username + ' is online'" v-if="isOnline">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <circle cx="24" cy="24" r="16"/>
               </svg>
@@ -53,8 +52,7 @@
         <div class="signature-block">
           <div class="signature" v-html="user.signature || user.raw_signature">
           </div>
-          <!-- TODO(akinsey): data-balloon="Edit your signature" -->
-          <a href="#" @click.prevent="showEditSignature = true" v-if="canUpdate()" class="signature-edit">
+          <a href="#" @click.prevent="showEditSignature = true" data-balloon="Edit your signature" v-if="canUpdate()" class="signature-edit">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
               <title></title>
               <path d="M7.38,33.74h0L4,44l10.26-3.39h0L41.74,13.14,34.86,6.26Zm31-21.15.54.55L14.26,37.79l-.54-.54"/>
