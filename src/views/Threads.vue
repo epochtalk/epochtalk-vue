@@ -90,20 +90,22 @@
           <td class="subject">
             <div class="title">
               <div class="thread-state">
-                <svg v-if="thread.has_new_post" class="is-unread" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" data-balloon="Unread">
-                  <title></title>
-                  <g id="icons">
-                    <circle cx="16" cy="16" r="16" />
-                  </g>
-                </svg>
-
-                <svg v-if="thread.sticky" class="is-sticky" viewBox="0 0 40.68 40.68" xmlns="http://www.w3.org/2000/svg" data-balloon="Sticky">
-                  <path d="m40 9.92-9.24-9.19a2.5 2.5 0 0 0 -3.54 3.54l9.2 9.19a2.5 2.5 0 0 0 3.58-3.54z" />
-                  <path
-                    d="m12 14.52a3 3 0 0 0 -4.24 4.24l5.66 5.66-11.3 11.31-2.12 4.95 5-2.12 11.26-11.31 5.66 5.66a3 3 0 0 0 4.24-4.25z" />
-                  <path d="m17.46 9.23h16v12h-16z" transform="matrix(.70710678 -.70710678 .70710678 .70710678 -3.31 22.46)" />
-                </svg>
-
+                <span data-balloon="Unread">
+                  <svg v-if="thread.has_new_post" class="is-unread" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                    <title></title>
+                    <g id="icons">
+                      <circle cx="16" cy="16" r="16" />
+                    </g>
+                  </svg>
+                </span>
+                <span data-balloon="Sticky">
+                  <svg v-if="thread.sticky" class="is-sticky" viewBox="0 0 40.68 40.68" xmlns="http://www.w3.org/2000/svg">
+                    <path d="m40 9.92-9.24-9.19a2.5 2.5 0 0 0 -3.54 3.54l9.2 9.19a2.5 2.5 0 0 0 3.58-3.54z" />
+                    <path
+                      d="m12 14.52a3 3 0 0 0 -4.24 4.24l5.66 5.66-11.3 11.31-2.12 4.95 5-2.12 11.26-11.31 5.66 5.66a3 3 0 0 0 4.24-4.25z" />
+                    <path d="m17.46 9.23h16v12h-16z" transform="matrix(.70710678 -.70710678 .70710678 .70710678 -3.31 22.46)" />
+                  </svg>
+                </span>
               </div>
               <router-link :class="{ 'bold': thread.has_new_post }" class="thread-title" :title="decode(thread.title)" :to="{ name: 'Posts', params: { threadSlug: thread.slug, threadId: thread.id } }">{{decode(thread.title)}}</router-link>
               <div class="thread-state-secondary">
