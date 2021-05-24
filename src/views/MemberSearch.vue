@@ -55,7 +55,7 @@ import { useRoute, useRouter } from 'vue-router'
 import humanDate from '@/composables/filters/humanDate'
 
 export default {
-  name: 'About',
+  name: 'MemberSearch',
   components: { Pagination },
   beforeRouteEnter(to, from, next) {
     const query = {
