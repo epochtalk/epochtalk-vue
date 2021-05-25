@@ -12,28 +12,36 @@
         <!-- Thread listing -->
         <div class="threads-data threads-recent" v-for="thread in threads" :key="thread.id">
           <div class="states">
-            <div class="thread-state" v-if="thread.sticky || thread.latest" >
-              <svg v-if="thread.latest" class="is-unread" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" data-balloon="Unread">
-                <title></title>
-                <g id="icons">
-                  <circle cx="16" cy="16" r="16" />
-                </g>
-              </svg>
-              <svg class="is-sticky" viewBox="0 0 40.68 40.68" xmlns="http://www.w3.org/2000/svg" data-balloon="Sticky">
-                <path d="m40 9.92-9.24-9.19a2.5 2.5 0 0 0 -3.54 3.54l9.2 9.19a2.5 2.5 0 0 0 3.58-3.54z" />
-                <path
-                  d="m12 14.52a3 3 0 0 0 -4.24 4.24l5.66 5.66-11.3 11.31-2.12 4.95 5-2.12 11.26-11.31 5.66 5.66a3 3 0 0 0 4.24-4.25z" />
-                <path d="m17.46 9.23h16v12h-16z" transform="matrix(.70710678 -.70710678 .70710678 .70710678 -3.31 22.46)" />
-              </svg>
+            <div class="thread-state" v-if="thread.sticky || thread.latest">
+              <span v-if="thread.latest" data-balloon="Unread">
+                <svg class="is-unread" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                  <title></title>
+                  <g id="icons">
+                    <circle cx="16" cy="16" r="16" />
+                  </g>
+                </svg>
+              </span>
+              <span v-if="thread.sticky" data-balloon="Sticky">
+                <svg class="is-sticky" viewBox="0 0 40.68 40.68" xmlns="http://www.w3.org/2000/svg">
+                  <path d="m40 9.92-9.24-9.19a2.5 2.5 0 0 0 -3.54 3.54l9.2 9.19a2.5 2.5 0 0 0 3.58-3.54z" />
+                  <path
+                    d="m12 14.52a3 3 0 0 0 -4.24 4.24l5.66 5.66-11.3 11.31-2.12 4.95 5-2.12 11.26-11.31 5.66 5.66a3 3 0 0 0 4.24-4.25z" />
+                  <path d="m17.46 9.23h16v12h-16z" transform="matrix(.70710678 -.70710678 .70710678 .70710678 -3.31 22.46)" />
+                </svg>
+              </span>
             </div>
             <div class="thread-status" v-if="thread.locked || thread.poll">
-              <svg v-if="thread.locked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" data-balloon="Locked">
-                <title></title>
-                <path d="M40,21H37.5V16.48a13.5,13.5,0,0,0-27,0V21H8a2,2,0,0,0-2,2V43a2,2,0,0,0,2,2H40a2,2,0,0,0,2-2V23A2,2,0,0,0,40,21ZM15.5,16.48a8.5,8.5,0,0,1,17,0V21h-17Z"/>
-              </svg>
-              <svg v-if="thread.poll" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" data-balloon="Includes a Poll">
-                <path class="cls-1" d="M42,2H6A4,4,0,0,0,2,6V42a4,4,0,0,0,4,4H42a4,4,0,0,0,4-4V6A4,4,0,0,0,42,2ZM13.75,40h-6V32h6Zm9,0h-6V22h6Zm9,0h-6V27h6Zm9,0h-6V12h6Z"/>
-              </svg>
+              <span v-if="thread.locked" data-balloon="Locked">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                  <title></title>
+                  <path d="M40,21H37.5V16.48a13.5,13.5,0,0,0-27,0V21H8a2,2,0,0,0-2,2V43a2,2,0,0,0,2,2H40a2,2,0,0,0,2-2V23A2,2,0,0,0,40,21ZM15.5,16.48a8.5,8.5,0,0,1,17,0V21h-17Z"/>
+                </svg>
+              </span>
+              <span v-if="thread.poll" data-balloon="Includes a Poll">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                  <path class="cls-1" d="M42,2H6A4,4,0,0,0,2,6V42a4,4,0,0,0,4,4H42a4,4,0,0,0,4-4V6A4,4,0,0,0,42,2ZM13.75,40h-6V32h6Zm9,0h-6V22h6Zm9,0h-6V27h6Zm9,0h-6V12h6Z"/>
+                </svg>
+              </span>
             </div>
           </div>
           <div class="title">
@@ -44,7 +52,7 @@
             <router-link class="thread-board" :title="decode(thread.board.name)" :to="{ name: 'Threads', params: { boardSlug: thread.board.slug } }" onclick="event.stopPropagation()">{{decode(thread.board.name)}}</router-link>
             by
             <span v-if="thread.deleted">deleted</span>
-            <router-link onclick="event.stopPropagation()" v-if="!thread.deleted" :to="{ path: '/profile/' + thread.user.username }">{{thread.user.username}}</router-link>
+            <router-link onclick="event.stopPropagation()" v-if="!thread.deleted" :to="{ path: '/profile/' + thread.user.username.toLowerCase() }">{{thread.user.username}}</router-link>
           </div>
           <div class="last-reply">
             <div>{{humanDate(thread.post.created_at)}}</div>

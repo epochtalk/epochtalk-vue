@@ -14,15 +14,13 @@
               <span class="date">{{ humanDate(comment.created_at) }}</span>
               <span v-if="comment.created_at !== comment.updated_at" class="date">&mdash;&nbsp;Edited {{ humanDate(comment.updated_at) }}</span>
               <div class="right" v-if="comment.author_id === authedUser.id">
-                <!-- TODO(akinsey): data-balloon="Delete" -->
-                <a v-if="accessControl.delete && !comment.showConfirmDelete" class="action pointer" @click="comment.showConfirmDelete = true">
+                <a v-if="accessControl.delete && !comment.showConfirmDelete" data-balloon="Delete" class="action pointer" @click="comment.showConfirmDelete = true">
                   <i class="fa fa-trash"></i>
                 </a>
                 <a class="small-text pointer" v-if="comment.showConfirmDelete" @click="deleteUserNote(comment)">&nbsp;Confirm&nbsp;</a>
                 <a class="small-text pointer" v-if="comment.showConfirmDelete" @click="comment.showConfirmDelete = false">&nbsp;Cancel&nbsp;</a>
                 &nbsp;&nbsp;
-                <!-- TODO(akinsey): data-balloon="Edit" -->
-                <a v-if="accessControl.update" class="action pointer" @click="comment.showEdit = !comment.showEdit; comment.noteEdit = comment.note">
+                <a v-if="accessControl.update" data-balloon="Edit" class="action pointer" @click="comment.showEdit = !comment.showEdit; comment.noteEdit = comment.note">
                   <i class="fa fa-edit"></i>
                 </a>
               </div>

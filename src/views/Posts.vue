@@ -12,9 +12,7 @@
       <!-- Show Title -->
       <div v-if="!editThread" class="thread-title">
         <h1>{{postData.data.thread.title}}</h1>
-        <!-- TODO(boka): add data-balloon plugin -->
-        <!-- <a data-balloon="Edit Thread Title" href="#" class="do-edit" v-if="PostsParentCtrl.canEditTitle()" @click.prevent="PostsParentCtrl.openEditThread()"> -->
-        <a href="#" class="do-edit" v-if="canEditTitle()" @click.prevent="openEditThread()">
+        <a href="#" data-balloon="Edit Thread Title" class="do-edit" v-if="canEditTitle()" @click.prevent="openEditThread()">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
             <title></title>
             <path d="M7.38,33.74h0L4,44l10.26-3.39h0L41.74,13.14,34.86,6.26Zm31-21.15.54.55L14.26,37.79l-.54-.54" />
@@ -24,9 +22,7 @@
         <div class="threadStates">
           <div class="badge locked" v-if="postData.data.thread.locked">
             <div class="">
-              <!-- TODO(boka): add data-balloon plugin -->
-              <!-- <a href="#" id="lockThread" v-if="canLock()" :class="{'clicked' : postData.data.thread.locked }" @click.prevent="updateThreadLock()" class="badgeContents" data-balloon="{{PostsParentCtrl.thread.locked ? 'Unlock Thread' : 'Lock Thread'}}"> -->
-              <a href="" id="lockThread" v-if="canLock()" :class="{'clicked' : postData.data.thread.locked }" @click.prevent="updateThreadLock(postData.data.thread)" class="badgeContents">
+              <a href="" id="lockThread" :data-balloon="postData.data.thread.locked ? 'Unlock Thread' : 'Lock Thread'" v-if="canLock()" :class="{'clicked' : postData.data.thread.locked }" @click.prevent="updateThreadLock(postData.data.thread)" class="badgeContents">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                   <title></title>
                   <path
@@ -48,9 +44,7 @@
             <a href="#" id="badge__stickyThread"
               :class="{'clicked' : postData.data.thread.sticky }"
               v-if="canSticky()"
-              @click.prevent="updateThreadSticky(postData.data.thread)" class="badgeContents">
-              <!-- TODO(boka): add data-balloon plugin -->
-              <!-- data-balloon="{{PostsParentCtrl.thread.canSticky ? 'Sticky Thread' : 'Unsticky Thread'}}"> -->
+              @click.prevent="updateThreadSticky(postData.data.thread)" class="badgeContents" :data-balloon="postData.data.thread.canSticky ? 'Sticky Thread' : 'Unsticky Thread'">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <title></title>
                   <g id="icons"><path d="M44.27,11.92,35.08,2.73a2.5,2.5,0,1,0-3.53,3.53l9.19,9.19a2.5,2.5,0,0,0,3.53-3.53Z"/><path d="M16.34,16.51a3,3,0,1,0-4.24,4.25l5.66,5.65L6.44,37.73l-2.12,5,4.95-2.12L20.59,29.24l5.65,5.66a3,3,0,1,0,4.25-4.24Z"/><rect x="21.78" y="11.22" width="16" height="12" transform="translate(-3.46 26.1) rotate(-45)"/>
@@ -120,9 +114,7 @@
           <a href="#">
           <!-- <a ui-sref="profile.posts({ username: post.user.username})"> -->
             <div class="user-avatar" :class="defaultAvatarShape">
-              <!-- TODO(boka): add data-balloon plugin -->
-              <!-- data-balloon="{{post.user.username}} is online" -->
-              <span v-if="post.user.online" class="online green">
+              <span v-if="post.user.online" class="online green" :data-balloon="post.user.username + ' is online'">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                   <title></title>
                   <circle cx="24" cy="24" r="16" />
@@ -150,9 +142,7 @@
           <!-- Post Title -->
           <div class="post-title">
             <div class="post-title-user">
-              <!-- TODO(boka): add data-balloon plugin -->
-              <!-- <a class="username" data-balloon="{{post.user.role_name || 'User'}}" ui-sref="profile.posts({ username: post.user.username})"  ng-bind="post.user.username"></a> -->
-              <a class="username" href="#">{{post.user.username}}</a>
+              <a class="username" href="#" :data-balloon="post.user.role_name || 'User'">{{post.user.username}}</a>
               <div :title="post.user.name" v-if="post.user.name" class="display-name">
                 <span>{{truncate(post.user.name, 33)}}</span>
                 <span class="hide-mobile">&nbsp;&mdash;&nbsp;</span>
@@ -169,9 +159,7 @@
 
             <ul class="post-action">
               <li v-if="canPurge() && post.position !== 1">
-                <!-- TODO(boka): add data-balloon plugin -->
-                <!-- data-balloon="Purge" -->
-                <a href="" class="post-action-icon" @click.prevent="openPostsPurgePostModal(post, i)">
+                <a href="" class="post-action-icon" @click.prevent="openPostsPurgePostModal(post, i)" data-balloon="Purge">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                     <title></title>
                     <path
@@ -182,9 +170,7 @@
                 </a>
               </li>
               <li v-if="canDelete(post) && post.position !== 1 && !post.deleted">
-                <!-- TODO(boka): add data-balloon plugin -->
-                <!-- data-balloon="Hide"  -->
-                <a href="" class="post-action-icon" @click.prevent="openPostsDeleteModal(post)">
+                <a href="" class="post-action-icon" @click.prevent="openPostsDeleteModal(post)" data-balloon="Hide">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                     <title></title>
                     <path
@@ -196,9 +182,7 @@
                 </a>
               </li>
               <li v-if="canDelete(post) && post.deleted">
-                <!-- TODO(boka): add data-balloon plugin -->
-                <!-- data-balloon="Unhide" -->
-                <a href="" class="post-action-icon selected" @click.prevent="openPostsUndeleteModal(post)">
+                <a href="" class="post-action-icon selected" @click.prevent="openPostsUndeleteModal(post)" data-balloon="Unhide">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                     <title></title>
                     <path
@@ -210,9 +194,7 @@
                 </a>
               </li>
               <li v-if="canPostLock(post) && !post.locked">
-                <!-- TODO(boka): add data-balloon plugin -->
-                <!-- data-balloon="Lock Post" -->
-                <a href="" class="post-action-icon" @click.prevent="lockPost(post)">
+                <a href="" class="post-action-icon" @click.prevent="lockPost(post)" data-balloon="Lock Post">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                     <title></title>
                     <path
@@ -221,9 +203,7 @@
                 </a>
               </li>
               <li v-if="canPostLock(post) && post.locked">
-                <!-- TODO(boka): add data-balloon plugin -->
-                <!-- data-balloon="Unlock Post" -->
-                <a href="" class="post-action-icon selected" @click.prevent="unlockPost(post)">
+                <a href="" class="post-action-icon selected" @click.prevent="unlockPost(post)" data-balloon="Unlock Post">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                     <title></title>
                     <path
@@ -233,9 +213,7 @@
               </li>
 
               <li v-if="loggedIn && (permissionUtils.hasPermission('reports.createPostReport') || permissionUtils.hasPermission('reports.createUserReport')) && !bannedFromBoard">
-                <!-- TODO(boka): add data-balloon plugin -->
-                <!-- data-balloon="Report" -->
-                <a href="" class="post-action-icon" @click.prevent="openPostsReportModal(post)">
+                <a href="" class="post-action-icon" @click.prevent="openPostsReportModal(post)" data-balloon="Report">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                     <title></title>
                     <path
@@ -244,9 +222,7 @@
                 </a>
               </li>
               <li v-if="canUpdate(post)">
-                <!-- TODO(boka): add data-balloon plugin -->
-                <!-- data-balloon="Edit" -->
-                <a href="" class="post-action-icon" @click.prevent="loadEditor(post)">
+                <a href="" class="post-action-icon" @click.prevent="loadEditor(post)" data-balloon="Edit">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                     <title></title>
                     <path d="M7.38,33.74h0L4,44l10.26-3.39h0L41.74,13.14,34.86,6.26Zm31-21.15.54.55L14.26,37.79l-.54-.54" />
@@ -255,9 +231,7 @@
                 </a>
               </li>
               <li v-if="canPost()">
-                <!-- TODO(boka): add data-balloon plugin -->
-                <!-- data-balloon="Quote" -->
-                <a href="" class="post-action-icon" @click.prevent="addQuote(post)">
+                <a href="" class="post-action-icon" @click.prevent="addQuote(post)" data-balloon="Quote">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                     <title></title>
                     <path
@@ -266,9 +240,7 @@
                 </a>
               </li>
               <li v-if="loggedIn && postData.data.thread.locked">
-                <!-- TODO(boka): add data-balloon plugin -->
-                <!-- data-balloon="Quote" -->
-                <a href="" @click.prevent="copyQuote(post)">
+                <a href="" @click.prevent="copyQuote(post)" data-balloon="Quote">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                     <title></title>
                     <path
@@ -277,9 +249,7 @@
                 </a>
               </li>
               <li>
-                <!-- TODO(boka): add data-balloon plugin -->
-                <!-- data-balloon="Permalink" -->
-                <router-link :to="{ name: 'Posts', query: { page: postData.data.page, limit: postData.data.limit }, hash: `#${post.id}`}" @click="highlightPost()" class="post-action-icon">
+                <router-link :to="{ name: 'Posts', query: { page: postData.data.page, limit: postData.data.limit }, hash: `#${post.id}`}" @click="highlightPost()" class="post-action-icon" data-balloon="Permalink">
                   <!-- <i class="icon-epoch-link"></i> -->
                   <strong>#{{post.position}}</strong>
                 </router-link>
@@ -309,10 +279,8 @@
         <!-- Post Tools -->
         <div class="post-tools">
           <!-- Watch Thread -->
-          <!-- TODO(boka): add data-balloon plugin -->
-          <!-- data-balloon="Watch Thread" -->
-          <div v-if="showUserControls()">
-            <a class="" v-if="!postData.data?.thread.watched" @click.prevent="watchThread()" >
+          <div v-if="showUserControls()" >
+            <a class="" v-if="!postData.data?.thread.watched" @click.prevent="watchThread()" data-balloon="Watch Thread">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <title></title>
                 <path
@@ -323,11 +291,9 @@
           </div>
 
           <!-- Add a Poll -->
-          <!-- TODO(boka): add data-balloon plugin -->
-          <!-- data-balloon="Add a Poll" -->
           <div v-if="showUserControls()">
             <a class="" v-if="canCreatePoll()"
-              @click.prevent="addPoll = !addPoll">
+              @click.prevent="addPoll = !addPoll" data-balloon="Add a Poll">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <title></title>
                 <polygon points="43.25 41.75 4.75 41.75 4.75 6.25 7.75 6.25 7.75 38.75 43.25 38.75 43.25 41.75" />
@@ -340,11 +306,9 @@
           </div>
 
           <!-- Thread Lock -->
-          <!-- TODO(boka): add data-balloon plugin -->
-          <!-- data-balloon="{{PostsParentCtrl.thread.locked ? 'Unlock Thread' : 'Lock Thread'}}" -->
           <div class="control" v-if="canLock()">
             <a href="#" id="lockThread" :class="{'clicked' : postData.data?.thread.locked }"
-              @click.prevent="updateThreadLock(postData.data.thread)">
+              @click.prevent="updateThreadLock(postData.data.thread)" :data-balloon="postData.data.thread.locked ? 'Unlock Thread' : 'Lock Thread'">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <title></title>
                 <path
@@ -354,11 +318,9 @@
           </div>
 
           <!-- Thread Sticky -->
-          <!-- TODO(boka): add data-balloon plugin -->
-          <!-- data-balloon="{{PostsParentCtrl.thread.sticky ? 'Unsticky Thread' : 'Sticky Thread'}}" -->
           <div class="control" v-if="canSticky()">
             <a href="#" id="stickyThread" :class="{'clicked' : postData.data?.thread.sticky }"
-              @click.prevent="updateThreadSticky(postData.data.thread)">
+              @click.prevent="updateThreadSticky(postData.data.thread)" :data-balloon="postData.data.thread.sticky ? 'Unsticky Thread' : 'Sticky Thread'">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <title></title>
                   <g id="icons"><path d="M44.27,11.92,35.08,2.73a2.5,2.5,0,1,0-3.53,3.53l9.19,9.19a2.5,2.5,0,0,0,3.53-3.53Z"/><path d="M16.34,16.51a3,3,0,1,0-4.24,4.25l5.66,5.65L6.44,37.73l-2.12,5,4.95-2.12L20.59,29.24l5.65,5.66a3,3,0,1,0,4.25-4.24Z"/><rect x="21.78" y="11.22" width="16" height="12" transform="translate(-3.46 26.1) rotate(-45)"/>
@@ -368,11 +330,9 @@
           </div>
 
           <!-- Purge Delete -->
-          <!-- TODO(boka): add data-balloon plugin -->
-          <!-- data-balloon="Purge Thread" -->
           <div class="control" v-if="canPurge()">
             <a href="#" id="purgeThread" :class="{'clicked' : showPostsPurgeThreadModal}"
-              @click.prevent="openPostsPurgeThreadModal()">
+              @click.prevent="openPostsPurgeThreadModal()" data-balloon="Purge Thread">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <title></title>
                 <path
@@ -382,11 +342,9 @@
           </div>
 
           <!-- Move Thread -->
-          <!-- TODO(boka): add data-balloon plugin -->
-          <!-- data-balloon="Move Thread" -->
           <div class="control" v-if="canMove()">
             <a href="#" id="moveBoard" :class="{'clicked' : showMoveThreadModal}"
-              @click.prevent="openMoveThreadModal()">
+              @click.prevent="openMoveThreadModal()" data-balloon="Move Thread">
               <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                 <title></title>
                 <path d="m29.36 7.74a3 3 0 0 0 -4.25 4.26l9 9h-28.73a3 3 0 0 0 0 6h28.76l-9 9a3 3 0 0 0 4.25 4.24l16.23-16.24z" />

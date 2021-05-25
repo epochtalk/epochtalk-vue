@@ -8,10 +8,9 @@
       </span>
       <div class="poll-controls">
         <!-- Poll Controls -->
-        <!-- TODO(boka): data-balloon="Lock Poll" data-balloon-pos="down" -->
-        <div class="poll-control" v-if="canLock()" :class="{'is_locked' : pollCopy.locked}">
+        <div class="poll-control" v-if="canLock()">
           <input id="lockPoll" class="icon" type="checkbox" v-model="pollCopy.locked">
-          <label for="lockPoll"  @click="updateLockPoll()">
+          <label for="lockPoll"  @click="updateLockPoll()" data-balloon="Lock Poll" data-balloon-pos="down" :class="{'is_locked' : pollCopy.locked}">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
               <title></title>
               <path
@@ -19,10 +18,9 @@
             </svg>
           </label>
         </div>
-        <!-- TODO(boka):  data-balloon="Edit Poll" data-balloon-pos="down" -->
         <div class="poll-control" v-if="canEdit()">
           <input id="editPoll" class="icon" type="checkbox" v-model="editPoll">
-          <label for="editPoll" @click="scrollPollView()">
+          <label for="editPoll" @click="scrollPollView()" data-balloon="Edit Poll" data-balloon-pos="down">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
               <title></title>
               <path d="M7.38,33.74h0L4,44l10.26-3.39h0L41.74,13.14,34.86,6.26Zm31-21.15.54.55L14.26,37.79l-.54-.54" />

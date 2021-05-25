@@ -72,7 +72,8 @@ export const postsApi = {
   byThread: params => $http('/api/posts', { params }),
   byUser: params => $http(`/api/posts/user/${params.username}`, { params }),
   startedByUser: params => $http(`/api/posts/user/${params.username}/started`, { params }),
-  slugToPostId: slug => $http(`/api/posts/${slug}/id`)
+  slugToPostId: slug => $http(`/api/posts/${slug}/id`),
+  postSearch: params => $http('/api/search/posts', { params }),
 }
 export const pollsApi = {
   vote: (threadId, pollId, answerIds) => $http(`/api/threads/${threadId}/polls/${pollId}/vote`, { method: 'POST', data: { answer_ids: answerIds }}),
@@ -116,6 +117,7 @@ export const authApi = {
 
 export const usersApi = {
   search: username => $http('/api/users/search', { params: { username } }),
+  memberSearch: params => $http('/api/search/users', { params }),
   lookup: (username, params) => $http(`/api/users/lookup/${username}`, { params }),
   update: (userId, data) => $http(`/api/users/${userId}`, { method: 'PUT', data }),
   find: username => $http(`/api/users/${username}`),
@@ -129,7 +131,10 @@ export const usersApi = {
   deleteNote: params => $http('/api/user/notes', { method: 'DELETE', params }),
   updateNote: data => $http('/api/user/notes', { method: 'PUT', data }),
   ignore: user => $http(`/api/ignoreUsers/ignore/${user.id}`, { method: 'POST' }),
-  unignore: user => $http(`/api/ignoreUsers/unignore/${user.id}`, { method: 'POST' })
+  unignore: user => $http(`/api/ignoreUsers/unignore/${user.id}`, { method: 'POST' }),
+  trust: {
+    getTrustStats: username => $http(`/api/trust/${username}`)
+  }
 }
 
 export const messagesApi = {

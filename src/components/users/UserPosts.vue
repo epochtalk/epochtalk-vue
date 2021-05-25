@@ -2,11 +2,11 @@
   <div class="user-profile-posts">
     <div class="table-actions">
       <button @click="toggleThreads(true)" :class="{'active': threads}">
-        <strong>Threads&nbsp;</strong> <span class="username">by {{username}}</span>
+        <strong>Threads&nbsp;</strong> <span class="username">by {{user.username}}</span>
       </button>
 
       <button @click="toggleThreads(false)" :class="{'active': !threads}">
-        <strong>Posts&nbsp;</strong> <span class="username">by {{username}}</span>
+        <strong>Posts&nbsp;</strong> <span class="username">by {{user.username}}</span>
       </button>
     </div>
 
@@ -35,8 +35,7 @@
 
           <tbody>
             <tr v-for="post in postData?.posts" :key="post.id">
-              <!-- TODO(akinsey): <td data-balloon="{{post.thread_title}}" data-balloon-pos="top"> -->
-              <td>
+              <td :data-balloon="post.thread_title" data-balloon-pos="top">
                 <div class="truncate-title">
                   <span v-if="post.hidden && !post._deleted"><i class="fa fa-eye-slash"></i></span>
                   <!-- <a ui-sref="posts.data({ slug: post.thread_slug, start: post.position, '#': post.id })" ng-bind-html="post.thread_title" ng-if="!post._deleted" class="thread-title"></a> -->
@@ -76,8 +75,7 @@
 
           <tbody>
             <tr v-for="post in postData?.posts" :key="post.id">
-              <!-- TODO(akinsey): <td data-balloon="{{post.thread_title}}" data-balloon-pos="top"> -->
-              <td>
+              <td :data-balloon="post.thread_title" data-balloon-pos="top">
                 <div class="truncate-title">
                   <span v-if="post.hidden && !post._deleted"><i class="fa fa-eye-slash"></i></span>
                   <!-- <a ui-sref="posts.data({ slug: post.thread_slug, start: post.position, '#': post.id })" ng-bind-html="post.thread_title" ng-if="!post._deleted" class="thread-title"></a> -->

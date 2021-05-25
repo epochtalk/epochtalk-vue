@@ -24,7 +24,7 @@
           <a href="#"><i class="fa fa-binoculars" aria-hidden="true"></i>Patrol</a>
         </li>
         <li @click="showMobileMenu = false" >
-          <router-link :to="{ path: '/profile/' + currentUser.username }">
+          <router-link :to="{ path: '/profile/' + currentUser.username.toLowerCase() }">
             <i class="fa fa-user" aria-hidden="true"></i>Profile
           </router-link>
         </li>
@@ -34,7 +34,9 @@
           </router-link>
         </li>
         <li @click="showMobileMenu = false" >
-          <a href="#"><i class="fa fa-users" aria-hidden="true"></i>Member Search</a>
+          <router-link :to="{ name: 'MemberSearch' }">
+            <i class="fa fa-users" aria-hidden="true"></i>Member Search
+          </router-link>
         </li>
         <!--<mentions-menu></mentions-menu>-->
         <li @click="showMobileMenu = false" >
@@ -101,10 +103,11 @@
               </form>
             </li>
             <li id="notifications-tray" class="hide-mobile">
-              <div class="tray-icon" href="user-search" data-balloon="Member Search" data-balloon-pos="down" v-if="permissionUtils.hasPermission('users.pagePublic.allow')">
-                <i class="fa fa-users"></i>
+              <div data-balloon="Member Search" data-balloon-pos="down" v-if="permissionUtils.hasPermission('users.pagePublic.allow')">
+                <router-link :to="{ name: 'MemberSearch' }" class="tray-icon">
+                  <i class="fa fa-users"></i>
+                </router-link>
               </div>
-
               <!-- <mentions-tray></mentions-tray> -->
 
               <div class="tray-icon" href="#" @click="dismissNotifications({ type: 'message' })" data-balloon="Messages" data-balloon-pos="down">
@@ -119,7 +122,7 @@
             </li>
             <li id="user-dropdown-wrap" class="hide-mobile">
               <div>
-                <router-link :to="{ path: '/profile/' + currentUser.username }">
+                <router-link :to="{ path: '/profile/' + currentUser.username.toLowerCase() }">
                   <div class="avatar-wrap">
                     <img :src="currentUser.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" class="avatar" :class="defaultAvatarShape">
                   </div>
@@ -137,7 +140,7 @@
                   <a href="#">Patrol</a>
                 </li>
                 <li>
-                  <router-link :to="{ path: '/profile/' + currentUser.username }">
+                  <router-link :to="{ path: '/profile/' + currentUser.username.toLowerCase() }">
                     Profile
                   </router-link>
                 </li>
@@ -547,6 +550,8 @@ header {
           ::-moz-placeholder { color: $placeholder-text-color; }
           :-ms-input-placeholder { color: $placeholder-text-color; }
           .search-input {
+            position: relative;
+            top: -1px;
             height: inherit;
             display: inline-block;
             background-color: inherit;
@@ -584,9 +589,10 @@ header {
             @include pad(0 1rem);
             color: $header-logo-font-color;
             line-height: $header-height;
-            &:hover {
-              background-color:  $header-dropdown-bg-color;
-            }
+            height: inherit;
+            display: inline-block;
+            width: auto;
+            &:hover { background-color:  $header-dropdown-bg-color; }
             &.search-label-expanded {
               background-color: transparent;
               &:hover { background-color: transparent; }
@@ -622,6 +628,7 @@ header {
         #notifications-tray {
           line-height: $header-height;
           height: inherit;
+          div { display: inline-block; }
           #mentions-overlay {
             position: absolute;
             top: 0;
@@ -637,6 +644,7 @@ header {
             display: inline-block;
             color: $header-logo-font-color;
             position: relative;
+            top: -1px;
             &:hover {
               background-color:  $header-dropdown-bg-color;
             }

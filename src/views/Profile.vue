@@ -15,8 +15,7 @@
         <div class="profile-avatar-container" :class="defaultAvatarShape">
           <a href="#" v-if="canUpdate()" @click.prevent="showEditAvatar = true" class="profile-avatar-image">
             <img :src="user.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
-            <!-- TODO(akinsey): <span class="profile-user-status" data-balloon="{{vmProfile.user.username}} is online" ng-if="vmProfile.isOnline"> -->
-            <span class="profile-user-status" v-if="isOnline">
+            <span class="profile-user-status" :data-balloon="user.username + ' is online'" v-if="isOnline">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <circle cx="24" cy="24" r="16"/>
               </svg>
@@ -33,17 +32,17 @@
         <div class="profile-user-name-role">
           <h1>{{user.username}}</h1>
           <span class="username-screen" v-html="user.name"></span>
-          <!--  TODO(akinsey): no style in vue <span class="user-role" style="background-color: {{vmProfile.user.role_highlight_color ? vmProfile.user.role_highlight_color : 'grey'}}" ng-bind-html="vmProfile.user.role_name"></span> -->
-          <span class="user-role" v-html="user.role_name"></span>
+          <span class="user-role" :style="{ 'background-color': user.role_highlight_color ? user.role_highlight_color : 'grey' }" v-html="user.role_name"></span>
           <span class="user-rank">
-            <rank-display :user="user"></rank-display>
+            <rank-display :user="user" />
           </span>
         </div>
 
-        <!-- TODO(akinsey): <div class="profile-user-activity">
-          <div class="user-activity-stat" v-if="user.activity > -1">Activity: <span class="value">{{user.activity}}</span></div>
-           <trust-profile ng-if="vmProfile.isLoggedIn()" username="vmProfile.user.username"></trust-profile>
-        </div> -->
+        <div class="profile-user-activity">
+          <div class="user-activity-stat" v-if="user.activity > -1">Activity: <span class="value">{{user.activity}}</span>
+          </div>
+           <trust-profile-display v-if="loggedIn" :username="user.username" />
+        </div>
 
         <div class="user-profile-position">
           <span v-html="user.position"></span>
@@ -53,8 +52,7 @@
         <div class="signature-block">
           <div class="signature" v-html="user.signature || user.raw_signature">
           </div>
-          <!-- TODO(akinsey): data-balloon="Edit your signature" -->
-          <a href="#" @click.prevent="showEditSignature = true" v-if="canUpdate()" class="signature-edit">
+          <a href="#" @click.prevent="showEditSignature = true" data-balloon="Edit your signature" v-if="canUpdate()" class="signature-edit">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
               <title></title>
               <path d="M7.38,33.74h0L4,44l10.26-3.39h0L41.74,13.14,34.86,6.26Zm31-21.15.54.55L14.26,37.79l-.54-.54"/>
@@ -70,11 +68,11 @@
           </div>
           <div class="stats">
             <span class="label">Last Seen </span>
-            <span class="stat-text-sm">{{ humanDate(user.last_active) }}</span>
+            <span class="stat-text-sm">{{ humanDate(user.last_active, true) }}</span>
           </div>
           <div class="stats">
             <span class="label">Created </span>
-            <span class="stat-text-sm">{{ humanDate(user.created_at) }}</span>
+            <span class="stat-text-sm">{{ humanDate(user.created_at, true) }}</span>
           </div>
         </div>
       </div>
@@ -112,9 +110,6 @@
           <a href="#" @click.prevent="toggleIgnoreMentions()">{{ user.ignoreMentions ? 'Uni' : 'I'}}gnore All Mentions by User</a>
           <a href="#" @click.prevent="toggleIgnoreMessages()">{{ user.ignore_messages ? 'Uni' : 'I'}}gnore All Messages from User</a>
         </div>
-  <!--       <ignore-user-profile ng-if="vmProfile.isLoggedIn()" user="vmProfile.user"></ignore-user-profile>
-        <mentions-ignore-profile ng-if="vmProfile.isLoggedIn() && !vmProfile.pageOwner()" user="vmProfile.user"></mentions-ignore-profile>
-        <messages-ignore-profile ng-if="vmProfile.isLoggedIn() && !vmProfile.pageOwner()" user="vmProfile.user"></messages-ignore-profile> -->
       </div>
 
       <div class="actions-edit actions-panel" v-if="canUpdate() || canUpdatePrivate() || pageOwner() || canPageUserNotes() || canBanUser() || canBoardBanUser()">
@@ -173,6 +168,7 @@
 <script>
 import { reactive, toRefs, inject } from 'vue'
 import humanDate from '@/composables/filters/humanDate'
+import TrustProfileDisplay from '@/components/trust/TrustProfileDisplay.vue'
 import RankDisplay from '@/components/users/RankDisplay.vue'
 import UpdatePasswordModal from '@/components/modals/profile/UpdatePassword.vue'
 import UpdateEmailModal from '@/components/modals/profile/UpdateEmail.vue'
@@ -191,7 +187,7 @@ import { AuthStore } from '@/composables/stores/auth'
 export default {
   name: 'Profile',
   props: [ 'username', 'saveScrollPos' ],
-  components: { RankDisplay, UpdateSignatureModal, UpdatePasswordModal, UpdateAvatarModal, UpdateEmailModal, DeleteAccountModal, DeactivateReactivateModal, UpdateProfileModal, QuickMessageModal,ManageBansModal, ModerationNotesModal },
+  components: { TrustProfileDisplay, RankDisplay, UpdateSignatureModal, UpdatePasswordModal, UpdateAvatarModal, UpdateEmailModal, DeleteAccountModal, DeactivateReactivateModal, UpdateProfileModal, QuickMessageModal,ManageBansModal, ModerationNotesModal },
   beforeRouteEnter(to, from, next) {
     next(vm => usersApi.find(to.params.username).then(u => vm.user = u))
   },
@@ -365,26 +361,25 @@ export default {
   grid-area: header;
   padding: 1rem 0;
 
-  $avatar-width: 120px;
   .profile-avatar {
     flex: 0 0 $avatar-width;
     margin-right: 2rem;
     position: relative;
     text-align: center;
     .profile-avatar-container {
+      width: $avatar-width;
+      height: $avatar-width;
+      img { margin-bottom: 0.5rem; }
       &.circle img {
         @include border-radius(100%);
         object-fit: cover;
         height: 100%;
         width: 100%;
       }
-      width: 120px;
-      height: 120px;
-    }
-    .imageContainer {
-      width: $avatar-width;
-      height: $avatar-width;
-      margin-bottom: 0.5rem;
+      &.rect img {
+        object-fit: cover;
+        height: calc(#{$avatar-width / 1.5});
+      }
     }
 
     .edit-avatar { font-size: $font-size-sm; }
@@ -403,7 +398,6 @@ export default {
     }
 
     .rect {
-      .imageContainer { height: calc(#{$avatar-width / 1.5}); }
       .profile-user-status {
         top: -8px;
         right: -8px;
@@ -537,10 +531,6 @@ export default {
       margin-bottom: 1rem;
       margin-right: 0;
     }
-    .imageContainer {
-      width: 60px;
-      height: 60px;
-    }
     .profile-user-details {
       .profile-user-name-role {
         flex-direction: column;
@@ -589,8 +579,6 @@ export default {
     .profile-avatar-container {
       width: 100%;
       height: 100%;
-      .imageContainer.loaded { background: none; }
-      .imageContainer { background: url('/static/img/loading.gif') no-repeat center; display: inline;}
       .profile-avatar-image {
         display: block;
         position: relative;
