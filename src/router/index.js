@@ -7,6 +7,7 @@ import Posts from '@/views/Posts.vue'
 import About from '@/views/About.vue'
 import Settings from '@/views/Settings.vue'
 import MemberSearch from '@/views/MemberSearch.vue'
+import PostSearch from '@/views/PostSearch.vue'
 import Profile from '@/views/Profile.vue'
 import Forbidden from '@/views/layout/Forbidden.vue'
 import NotFound from '@/views/layout/NotFound.vue'
@@ -87,6 +88,12 @@ const routes = [
     name: 'MemberSearch',
     component: MemberSearch,
     meta: { requiresAuth: true, bodyClass: 'member-search' }
+  },
+  {
+    path: '/search/posts',
+    name: 'PostSearch',
+    component: PostSearch,
+    meta: { requiresAuth: false, bodyClass: 'post-search' }
   },
   {
     path: '/about',
