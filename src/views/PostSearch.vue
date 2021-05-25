@@ -12,7 +12,41 @@
       <div v-if="searchData?.search">
       Displaying {{searchData.count}} search result(s) for "<strong>{{searchData.search}}</strong>":<br /><br />
       </div>
-      <!-- table -->
+      <div :id="post.id" v-for="post in searchData.posts" :key="post.id" class="post-block" :class="{ 'hidden': post.hidden, 'deleted': post._deleted || post.user.ignored, 'first': $first }">
+        <!-- Delete Post View -->
+        <div class="deleted" v-if="post._deleted || post.user.ignored">
+          Post
+          <span v-if="post._deleted">Deleted</span>
+          <span v-if="post.user.ignored">Ignored</span>
+          <small class="pointer" v-if="post.user.ignored" @click="post.user.ignored = false">
+            <strong>- Show Post</strong>
+          </small>
+        </div>
+
+        <!-- Visible Post View -->
+        <div v-if="!post._deleted && !post.user.ignored">
+
+          <!-- Post Body Section -->
+          <div class="post-content">
+            <!-- Post Title -->
+            <div class="thread-title">
+              <h5>
+                <a href="#" v-html="post.thread_title"></a>
+              </h5>
+              <span v-if="post.user.online" :data-balloon="post.user.username + ' is online'" class="online green"><i class="fa fa-circle"></i></span>
+              <span v-if="!post.user.online" class="online green"><i class="fa fa-circle-o"></i></span>
+              <a class="username" :data-balloon="post.user.role_name || 'User'" href="#" :style="usernameHighlight(post.user.highlight_color)" v-html="post.user.username"></a>
+              <div class="posted-in">posted in</div>
+              <a class="board-name" href="#" v-html="post.board_name"></a>
+              <div class="timestamp">{{ humanDate(post.created_at) }}</div>
+              <div class="clear"></div>
+            </div>
+            <!-- Post Body -->
+            <!--TODO(akinsey): post-processing="post.body_html" style-fix="true"-->
+            <div class="post-body" :class="{ 'rtl': post.right_to_left }" v-html="post.body_html"></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   <div class="sidebar">
@@ -24,35 +58,36 @@
 
 <script>
 import { reactive, toRefs, nextTick } from 'vue'
-// import { usersApi } from '@/api'
+import { postsApi } from '@/api'
 import Pagination from '@/components/layout/Pagination.vue'
 import { useRoute, useRouter } from 'vue-router'
 import humanDate from '@/composables/filters/humanDate'
+import { usernameHighlight } from '@/composables/utils/userUtils'
 
 export default {
   name: 'PostSearch',
   components: { Pagination },
-  // beforeRouteEnter(to, from, next) {
-  //   const query = {
-  //     limit: 10,
-  //     page: to.query.page || 1,
-  //     field: to.query.field,
-  //     desc: to.query.desc,
-  //     search: to.query.search
-  //   }
-  //   next(vm => usersApi.memberSearch(query).then(d => vm.searchData = d).catch(() => {}))
-  // },
-  // beforeRouteUpdate(to, from, next) {
-  //   const query = {
-  //     limit: 10,
-  //     page: to.query.page || 1,
-  //     field: to.query.field,
-  //     desc: to.query.desc,
-  //     search: to.query.search
-  //   }
-  //   usersApi.memberSearch(query).then(d => this.searchData = d).catch(() => {})
-  //   next()
-  // },
+  beforeRouteEnter(to, from, next) {
+    const query = {
+      limit: 10,
+      page: to.query.page || 1,
+      field: to.query.field,
+      desc: to.query.desc,
+      search: to.query.search
+    }
+    next(vm => postsApi.postSearch(query).then(d => vm.searchData = d).catch(() => {}))
+  },
+  beforeRouteUpdate(to, from, next) {
+    const query = {
+      limit: 10,
+      page: to.query.page || 1,
+      field: to.query.field,
+      desc: to.query.desc,
+      search: to.query.search
+    }
+    postsApi.postSearch(query).then(d => this.searchData = d).catch(() => {})
+    next()
+  },
   setup() {
     const searchPosts = () => {
       let query = { ...$route.query, search: v.search }
@@ -81,14 +116,12 @@ export default {
       currentPage: Number($route.query.page) || 1,
       searchData: null,
       search: $route.query.search,
-      searchInput: null,
-      defaultAvatar: window.default_avatar,
-      defaultAvatarShape: window.default_avatar_shape,
+      searchInput: null
     })
 
     nextTick(() => v.searchInput.focus())
 
-    return { ...toRefs(v), searchPosts, clearSearch, humanDate }
+    return { ...toRefs(v), searchPosts, clearSearch, humanDate, usernameHighlight }
   }
 }
 </script>
