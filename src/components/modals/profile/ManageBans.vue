@@ -20,8 +20,8 @@
             <td>{{ humanDate(userCopy.created_at) }}</td>
           </tr>
           <tr v-if="userCopy.ban_expiration">
-            <td>Global Ban Expiration</td>
-            <td>{{ humanDate(userCopy.ban_expiration, true) }}</td>
+            <td>Global Ban Expiration (UTC)</td>
+            <td>{{ humanDate(dayjs.utc(userCopy.ban_expiration), true) }}</td>
           </tr>
           <tr v-if="userCopy?.banned_board_names?.length">
             <td>Banned From Boards</td>
@@ -44,7 +44,7 @@
           <input type="radio" name="banType" v-model="permanentBan" :value="false" id="temporary" :disabled="banSubmitted"><label for="temporary">Temporary</label>
 
           <div v-if="permanentBan === false">
-            <label for="banUntil">Enter Ban Expiration Date:</label>
+            <label for="banUntil">Enter Ban Expiration Date (UTC):</label>
             <input type="date" v-model="banUntil" :min="minDate()" name="banUntil" :required="permanentBan === false" />
           </div>
 
@@ -90,7 +90,7 @@ import { reactive, toRefs, inject, watch } from 'vue'
 import { cloneDeep, difference } from 'lodash'
 import { boardsApi, banApi, usersApi } from '@/api'
 import humanDate from '@/composables/filters/humanDate'
-import moment from 'moment'
+import dayjs from 'dayjs'
 import IgnoredBoardsPartial from '@/components/settings/IgnoredBoardsPartial.vue'
 import { AuthStore } from '@/composables/stores/auth'
 
@@ -138,7 +138,7 @@ export default {
         // Preselect Global Ban Type radio button if the user is banned
         v.permanentBan = props.user.ban_expiration ? banDate.getTime() === maxDate.getTime() : undefined
         v.showIpBan = v.permanentBan ? false : true
-        v.banUntil = v.permanentBan ? undefined : moment(banDate).format('YYYY-MM-DD')
+        v.banUntil = v.permanentBan ? undefined : dayjs.utc(banDate).format('YYYY-MM-DD')
         v.userCopy.permanent_ban = v.banUntil ? false : true
       }
       else if (props.user.ban_expiration === null) { // Init data, user has perma ban
@@ -215,9 +215,10 @@ export default {
       const oldBanIsTemp = v.userCopy.permanent_ban === false
       const oldBanIsPerm = v.userCopy.permanent_ban
       const userWasntBanned = v.userCopy.permanent_ban === undefined
+      const dateChanged = v.banUntil !== dayjs.utc(v.userCopy.ban_expiration).format('YYYY-MM-DD')
 
-      // Check if user wasn't banned and is now banned, or the ban type changed
-      const userBanned = (newBanIsTemp && (oldBanIsPerm || userWasntBanned)) || (newBanIsPerm && (oldBanIsTemp || userWasntBanned))
+      // Check if user wasn't banned and is now banned, or the ban type changed, or the ban date is changed
+      const userBanned = (newBanIsTemp && (oldBanIsPerm || userWasntBanned)) || (newBanIsPerm && (oldBanIsTemp || userWasntBanned)) || (newBanIsTemp && oldBanIsTemp && dateChanged)
       // Check if user was banned previously and is now unbanned
       const userUnbanned = oldBanIsRemoved && (oldBanIsTemp || oldBanIsPerm)
 
@@ -322,7 +323,7 @@ export default {
       banSubmitted: false
     })
 
-    return { ...toRefs(v), minDate, updateBan, canGlobalBanUser, toggleIgnoredBoard, checkAll, humanDate, close }
+    return { ...toRefs(v), minDate, updateBan, canGlobalBanUser, toggleIgnoredBoard, checkAll, humanDate, close, dayjs }
   }
 }
 </script>
