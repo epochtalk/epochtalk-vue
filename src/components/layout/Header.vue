@@ -199,6 +199,7 @@ import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
 import { reactive, toRefs, onMounted, onUnmounted, inject } from 'vue'
 import { debounce } from 'lodash'
+import { useRouter } from 'vue-router'
 
 export default {
   components: { Breadcrumbs, LoginModal, InviteModal, RegisterModal, Alert },
@@ -223,7 +224,7 @@ export default {
     /* Template Methods */
     const logout = () => $auth.logout()
 
-    const searchForum = () => console.log('SEARCH!')
+    const searchForum = () => $router.push({ name: 'PostSearch', query: { search: v.searchTerms } })
 
     const dismissNotifications = params => console.log('DISMISS NOTIFICATIONS!', params)
 
@@ -238,6 +239,7 @@ export default {
     /* Internal Data */
     const $auth = inject(AuthStore)
     const $prefs = inject(PreferencesStore)
+    const $router = useRouter()
 
     /* Template Data */
     const v = reactive({

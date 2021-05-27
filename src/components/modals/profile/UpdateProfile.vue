@@ -87,7 +87,7 @@
 import Modal from '@/components/layout/Modal.vue'
 import { reactive, toRefs, inject, watch } from 'vue'
 import { usersApi, authApi } from '@/api'
-import moment from 'moment'
+import dayjs from 'dayjs'
 import { debounce } from 'lodash'
 import { websiteUrlRegex, usernameRegex } from '@/composables/utils/globalRegex'
 
@@ -110,7 +110,7 @@ export default {
     const updateProfile = () => {
       v.errorMessage = null
       let params = v.userCopy
-      params.dob = moment(params.dob_formatted).toDate()
+      params.dob = dayjs.utc(params.dob_formatted).toDate()
       usersApi.update(props.user.id, params)
       .then(() => {
         $alertStore.success(`Successfully updated profile for user ${params.username}`)
@@ -133,7 +133,7 @@ export default {
       userCopy: {
         username: props.user.username,
         name: decodeHtml(props.user.name),
-        dob_formatted: moment(props.user.dob).format('YYYY-MM-DD'),
+        dob_formatted: dayjs.utc(props.user.dob).format('YYYY-MM-DD'),
         btc_address: props.user.btc_address,
         gender: decodeHtml(props.user.gender),
         website: decodeHtml(props.user.website),
@@ -155,7 +155,7 @@ export default {
         v.userCopy = {
           username: props.user.username,
           name: decodeHtml(props.user.name),
-          dob_formatted: moment(props.user.dob).format('YYYY-MM-DD'),
+          dob_formatted: dayjs.utc(props.user.dob).format('YYYY-MM-DD'),
           btc_address: props.user.btc_address,
           gender: decodeHtml(props.user.gender),
           website: decodeHtml(props.user.website),
