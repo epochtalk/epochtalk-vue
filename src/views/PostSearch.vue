@@ -50,8 +50,11 @@
     </div>
   </div>
   <div class="sidebar">
-    <div class="sidebar-block" v-if="searchData?.page_count > 1">
-      <pagination :page="searchData.page" :limit="searchData.limit" :count="searchData.count" />
+    <div class="sidebar-block" v-if="searchData?.posts.length > 0">
+      <div class="pagination-simple">
+        <button @click="pageResults(-1)" :disabled="!searchData?.prev">&#10094; Prev</button>
+        <button @click="pageResults(1)" :disabled="!searchData?.next">Next &#10095;</button>
+      </div>
     </div>
   </div>
 </template>
@@ -59,14 +62,12 @@
 <script>
 import { reactive, toRefs, nextTick, watch } from 'vue'
 import { postsApi } from '@/api'
-import Pagination from '@/components/layout/Pagination.vue'
 import { useRoute, useRouter } from 'vue-router'
 import humanDate from '@/composables/filters/humanDate'
 import { usernameHighlight } from '@/composables/utils/userUtils'
 
 export default {
   name: 'PostSearch',
-  components: { Pagination },
   beforeRouteEnter(to, from, next) {
     const query = {
       limit: 10,
@@ -98,6 +99,14 @@ export default {
       v.searchInput.focus()
     }
 
+    const pageResults = inc => {
+      const newPage = v.searchData.page + inc
+      let query = { ...$route.query, page: newPage }
+      if (query.page === 1 || !query.page) delete query.page
+      if ($route.query.page !== v.currentPage)
+        $router.replace({ name: $route.name, params: $route.params, query: query })
+    }
+
     const clearSearch = () => {
       let query = { ...$route.query }
       delete query.field
@@ -123,7 +132,7 @@ export default {
     // Updates page input when user uses header search
     watch(() => $route.query.search, s => v.search = s)
 
-    return { ...toRefs(v), searchPosts, clearSearch, humanDate, usernameHighlight }
+    return { ...toRefs(v), searchPosts, pageResults, clearSearch, humanDate, usernameHighlight }
   }
 }
 </script>
@@ -137,6 +146,7 @@ export default {
     display: block;
     position: sticky;
     top: $header-offset;
+    padding-top: .5rem;
   }
 }
 </style>
