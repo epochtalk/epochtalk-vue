@@ -12,7 +12,7 @@
       <div v-if="searchData?.search">
       Displaying {{searchData.count}} search result(s) for "<strong>{{searchData.search}}</strong>":<br /><br />
       </div>
-      <div :id="post.id" v-for="post in searchData.posts" :key="post.id" class="post-block" :class="{ 'hidden': post.hidden, 'deleted': post._deleted || post.user.ignored, 'first': $first }">
+      <div :id="post.id" v-for="(post, i) in searchData.posts" :key="post.id" class="post-block" :class="{ 'hidden': post.hidden, 'deleted': post._deleted || post.user.ignored, 'first': i === 1 }">
         <!-- Delete Post View -->
         <div class="deleted" v-if="post._deleted || post.user.ignored">
           Post
@@ -57,7 +57,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, nextTick } from 'vue'
+import { reactive, toRefs, nextTick, watch } from 'vue'
 import { postsApi } from '@/api'
 import Pagination from '@/components/layout/Pagination.vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -120,6 +120,8 @@ export default {
     })
 
     nextTick(() => v.searchInput.focus())
+    // Updates page input when user uses header search
+    watch(() => $route.query.search, s => v.search = s)
 
     return { ...toRefs(v), searchPosts, clearSearch, humanDate, usernameHighlight }
   }
