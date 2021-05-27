@@ -158,7 +158,7 @@
             </div>
 
             <ul class="post-action">
-              <li v-if="canPurge() && post.position !== 1">
+              <li v-if="canPurgePost(post) && post.position !== 1">
                 <a href="" class="post-action-icon" @click.prevent="openPostsPurgePostModal(post, i)" data-balloon="Purge">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                     <title></title>
@@ -330,7 +330,7 @@
           </div>
 
           <!-- Purge Delete -->
-          <div class="control" v-if="canPurge()">
+          <div class="control" v-if="canPurgeThread()">
             <a href="#" id="purgeThread" :class="{'clicked' : showPostsPurgeThreadModal}"
               @click.prevent="openPostsPurgeThreadModal()" data-balloon="Purge Thread">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -505,7 +505,9 @@ export default {
     }
     const canSave = () => true
     const canMove = () => true
-    const canPurge = () => true
+    const canPurgeThread = () => true
+    const canPurgePost = (post) => {
+    }
     const canSticky = () => true
     const canLock = () => {
       if (!$auth.loggedIn) { return false }
@@ -632,7 +634,8 @@ export default {
       canPost,
       canSave,
       canMove,
-      canPurge,
+      canPurgeThread,
+      canPurgePost,
       canSticky,
       canLock,
       canCreatePoll,
