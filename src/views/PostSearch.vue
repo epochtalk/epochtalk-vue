@@ -37,8 +37,8 @@
               <h5>
                 <a href="#" v-html="post.thread_title"></a>
               </h5>
-              <span v-if="post.user.online" :data-balloon="post.user.username + ' is online'" class="online green"><i class="fa fa-circle"></i></span>
-              <span v-if="!post.user.online" class="online green"><i class="fa fa-circle-o"></i></span>
+              <span v-if="post.user.online" :data-balloon="post.user.username + ' is online'" class="online green"><i class="fas fa-circle"></i></span>
+              <span v-if="!post.user.online" class="online green"><i class="far fa-circle"></i></span>
               <a class="username" :data-balloon="post.user.role_name || 'User'" href="#" :style="usernameHighlight(post.user.highlight_color)" v-html="post.user.username"></a>
               <div class="posted-in">posted in</div>
               <a class="board-name" href="#" v-html="post.board_name"></a>
