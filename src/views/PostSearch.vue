@@ -1,6 +1,6 @@
 <template>
   <div class="main">
-    <div class="user-search-field">
+    <div class="search-field">
       <div class="nested-input-container">
         <a v-if="searchData?.search" @click="clearSearch()" class="nested-clear-btn fa fa-times pointer"></a>
         <a @click="search ? searchPosts() : null" :class="{ 'disabled': (!search || search === searchData?.search), 'pointer': search }" class="nested-btn">Search</a>
@@ -8,11 +8,15 @@
       </div>
     </div>
 
-    <div class="user-search-results" v-if="searchData && (searchData.count > 0 || search)">
+    <div v-if="!searchData?.search.length">
+      <h4>Enter a search term above, to search forum posts</h4>
+    </div>
+    <div class="search-results" v-if="searchData && (searchData.count > 0 || search)">
       <div v-if="searchData?.search">
       Displaying {{searchData.count}} search result(s) for "<strong>{{searchData.search}}</strong>":<br /><br />
       </div>
-      <div :id="post.id" v-for="(post, i) in searchData.posts" :key="post.id" class="post-block" :class="{ 'hidden': post.hidden, 'deleted': post._deleted || post.user.ignored, 'first': i === 1 }">
+
+      <div :id="post.id" v-for="(post, i) in searchData.posts" :key="post.id" class="post-block" :class="{ 'hidden': post.hidden, 'deleted': post._deleted || post.user.ignored, 'first': i === 0 }">
         <!-- Delete Post View -->
         <div class="deleted" v-if="post._deleted || post.user.ignored">
           Post
@@ -147,6 +151,60 @@ export default {
     position: sticky;
     top: $header-offset;
     padding-top: .5rem;
+  }
+}
+.search-results {
+  @include pad(0 0 1rem 0);
+  clear: both;
+  grid-area: main;
+
+  .post-block {
+    @include clearfix;
+    @include pad(2rem 0);
+    @include transition(background-color 250ms ease-in);
+    position: relative;
+    border-top: 1px solid $border-color;
+    &.first { border-top: 0; padding-top: 0.5rem; }
+    &.hidden { background-color: $sub-header-color; }
+    &.deleted { display: none; }
+    mark { background-color: $color-highlighted; font-weight: bold; display:inline; color: $base-font-color; }
+    .post-body {
+      color: $secondary-font-color-dark;
+    }
+    .post-content {
+      display: block;
+      .thread-title {
+        color: $secondary-font-color-dark;
+        margin-bottom: 0.5rem;
+        width: 100%;
+        .board-name {
+          color: $base-font-color;
+          margin-right: 0.25rem;
+          float: left;
+          &:hover { color: $color-primary; }
+        }
+        .posted-in { margin-right: 0.25rem; float: left; }
+        h5 { margin-bottom: 0; color: $base-font-color; }
+        .online { float: left; margin-right: 0.5rem; }
+        a.username {
+          float: left;
+          color: $base-font-color;
+          font-weight: 900;
+          margin-right: 0.25rem;
+          &:hover { color: $color-primary; }
+        }
+        .timestamp, .display-name {
+          display: inline-block;
+          color: $secondary-font-color;
+          line-height: 1.3rem;
+          font-size: 0.8125rem;
+          font-weight: 400;
+          float: left;
+        }
+        .display-name { color: $secondary-font-color-dark; }
+        .clear { @include clearfix; }
+      }
+    }
   }
 }
 </style>
