@@ -467,8 +467,7 @@ export default {
     /* View Methods */
     const canEditTitle = () => {
       if (!$auth.loggedIn) return false
-      // TODO(boka): check for banned
-      // if (ctrl.bannedFromBoard) return false
+      if (v.bannedFromBoard) return false
       if (!v.permissionUtils.hasPermission('threads.title.allow')) return false
       if (!v.postData.data?.write_access) return false
 
@@ -568,8 +567,7 @@ export default {
     }
     const canLock = () => {
       if (!$auth.loggedIn) return false
-      // TODO(boka): check for banned
-      // if (ctrl.bannedFromBoard) { return false }
+      if (v.bannedFromBoard) return false
       if (!v.permissionUtils.hasPermission('threads.lock.allow')) return false
       if (!v.postData.data?.write_access) return false
 
