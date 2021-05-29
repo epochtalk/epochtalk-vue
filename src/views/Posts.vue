@@ -580,7 +580,24 @@ export default {
       else if (priorityBypass) return v.permissionUtils.getPriority() < userPriority
       else return false
     }
-    const canCreatePoll = () => true
+    const canCreatePoll = () => {
+      if (!$auth.loggedIn) return false
+      if (v.bannedFromBoard) return false
+      if (!v.permissionUtils.hasPermission('threads.createPoll.allow')) return false
+      if (!v.postData.data?.write_access) return false
+      if (v.postData.data.thread.poll) return false
+
+      const adminBypass = v.permissionUtils.hasPermission('threads.createpoll.bypass.owner.admin')
+      const modBypass = v.permissionUtils.hasPermission('threads.createPoll.bypass.owner.mod')
+      const priorityBypass = v.permissionUtils.hasPermission('threads.createPoll.bypass.owner.priority')
+      const userPriority = v.postData.data.posts[0].user.priority
+
+      if (v.postData.data.thread.user.id === $auth.user.id) return true
+      else if (adminBypass) return true
+      else if (modBypass) return v.permissionUtils.moderatesBoard(v.postData.data.board.id)
+      else if (priorityBypass) return v.permissionUtils.getPriority() < userPriority
+      else return false
+    }
     const canUpdate = (post) => {
       console.log(post, 'canUpdate')
       return true
