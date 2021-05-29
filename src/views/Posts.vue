@@ -501,7 +501,19 @@ export default {
       return true
     }
     const canSave = () => true
-    const canMove = () => true
+    const canMove = () => {
+      if (!$auth.loggedIn) return false
+      if (v.bannedFromBoard) return false
+      if (!v.postData.data?.write_access) return false
+      if (!v.permissionUtils.hasPermission('threads.move.allow')) return false
+
+      const adminBypass = v.permissionUtils.hasPermission('threads.move.bypass.owner.admin')
+      const modBypass = v.permissionUtils.hasPermission('threads.move.bypass.owner.mod')
+
+      if (adminBypass) return true
+      else if (modBypass) return v.permissionUtils.moderatesBoard(v.postData.data.board.id)
+      else return false
+    }
     const canPurgeThread = () => {
       if (!$auth.loggedIn) return false
       if (v.bannedFromBoard) return false
