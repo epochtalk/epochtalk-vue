@@ -594,7 +594,7 @@ export default {
 
       if (v.postData.data.thread.user.id === $auth.user.id) return true
       else if (adminBypass) return true
-      else if (modBypass) return v.permissionUtils.moderatesBoard(v.postData.data.board.id)
+      else if (modBypass) return v.permissionUtils.getPriority() < userPriority && v.permissionUtils.moderatesBoard(v.postData.data.board.id)
       else if (priorityBypass) return v.permissionUtils.getPriority() < userPriority
       else return false
     }
