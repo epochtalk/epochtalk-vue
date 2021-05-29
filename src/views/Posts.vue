@@ -507,6 +507,33 @@ export default {
     const canMove = () => true
     const canPurgeThread = () => true
     const canPurgePost = (post) => {
+      if (!v.postData.data?.write_access) { return false }
+      if (!$auth.loggedIn) { return false }
+      // TODO(boka): check for banned
+      // if (BanSvc.banStatus()) { return false }
+      if (!v.permissionUtils.hasPermission('threads.purge.allow')) { return false }
+
+      const adminBypass = v.permissionUtils.hasPermission('posts.purge.bypass.purge.admin')
+      const modBypass = v.permissionUtils.hasPermission('posts.purge.bypass.purge.mod')
+      const postUserPriority = post.user.priority
+      const postUserId = post.user.id
+      const sessionUserPriority = v.permissionUtils.getPriority()
+      const sessionUserId = $auth.user.id
+      const moderators = v.postData.data.board.moderators.map((data) => data.id)
+
+      // admins can purge
+      if (adminBypass) return true
+      // if user is a mod and moderates this board and...
+      else if (modBypass && v.permissionUtils.moderatesBoard(v.postData.data.board.id)) {
+        // ...if any of the following conditions are met, allow purge
+        // user created the post
+        return postUserId === sessionUserId ||
+          // user has priority
+          sessionUserPriority < postUserPriority ||
+          // user priorities are equal and the posting user is not a mod
+          (sessionUserPriority === postUserPriority && !moderators.includes(post.user.id))
+      }
+      else return false
     }
     const canSticky = () => true
     const canLock = () => {
