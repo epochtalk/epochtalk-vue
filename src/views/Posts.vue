@@ -497,7 +497,7 @@ export default {
     const canPost = () => {
       // TODO(akinsey): Implement ban status check
       // TODO(boka): make sure it's correct
-      if (v.bannedFromBoard || !v.postData.data?.write_access || !v.permissionUtils.hasPermission('posts.create.allow')) { return false }
+      if (v.bannedFromBoard || !v.postData.data?.write_access || !v.permissionUtils.hasPermission('posts.create.allow')) return false
       if (v.postData.data.thread.locked) {
         return v.permissionUtils.hasPermission('posts.create.bypass.locked.admin') || (v.permissionUtils.hasPermission('posts.create.bypass.locked.mod') && v.permissionUtils.moderatesBoard(v.postData.data.board.id))
       }
@@ -522,11 +522,11 @@ export default {
       else return false
     }
     const canPurgePost = (post) => {
-      if (!v.postData.data?.write_access) { return false }
-      if (!$auth.loggedIn) { return false }
+      if (!v.postData.data?.write_access) return false
+      if (!$auth.loggedIn) return false
       // TODO(boka): check for banned
-      // if (BanSvc.banStatus()) { return false }
-      if (!v.permissionUtils.hasPermission('threads.purge.allow')) { return false }
+      // if (BanSvc.banStatus()) return false
+      if (!v.permissionUtils.hasPermission('threads.purge.allow')) return false
 
       const adminBypass = v.permissionUtils.hasPermission('posts.purge.bypass.purge.admin')
       const modBypass = v.permissionUtils.hasPermission('posts.purge.bypass.purge.mod')
@@ -567,11 +567,11 @@ export default {
       else return false
     }
     const canLock = () => {
-      if (!$auth.loggedIn) { return false }
+      if (!$auth.loggedIn) return false
       // TODO(boka): check for banned
       // if (ctrl.bannedFromBoard) { return false }
-      if (!v.permissionUtils.hasPermission('threads.lock.allow')) { return false }
-      if (!v.postData.data?.write_access) { return false }
+      if (!v.permissionUtils.hasPermission('threads.lock.allow')) return false
+      if (!v.postData.data?.write_access) return false
 
       const adminBypass = v.permissionUtils.hasPermission('threads.lock.bypass.owner.admin')
       const modBypass = v.permissionUtils.hasPermission('threads.lock.bypass.owner.mod')
