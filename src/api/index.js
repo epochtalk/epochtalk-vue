@@ -70,6 +70,7 @@ export const postsApi = {
   startedByUser: params => $http(`/api/posts/user/${params.username}/started`, { params }),
   slugToPostId: slug => $http(`/api/posts/${slug}/id`),
   postSearch: params => $http('/api/search/posts', { params }),
+  byNewbie: params => $http('/api/posts/patrol', { params })
 }
 export const pollsApi = {
   vote: (threadId, pollId, answerIds) => $http(`/api/threads/${threadId}/polls/${pollId}/vote`, { method: 'POST', data: { answer_ids: answerIds }}),

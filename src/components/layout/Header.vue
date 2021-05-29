@@ -21,7 +21,7 @@
           <a href="#"><i class="fa fa-cogs" aria-hidden="true"></i>Mod Panel</a>
         </li>
         <li @click="showMobileMenu = false" v-if="isPatroller()">
-          <a href="#"><i class="fa fa-binoculars" aria-hidden="true"></i>Patrol</a>
+          <router-link :to="{ name: 'Patrol' }"><i class="fa fa-binoculars" aria-hidden="true"></i>Patrol</router-link>
         </li>
         <li @click="showMobileMenu = false" >
           <router-link :to="{ path: '/profile/' + currentUser.username.toLowerCase() }">
@@ -137,7 +137,7 @@
                   <a href="#">Mod Panel</a>
                 </li>
                 <li v-if="isPatroller()">
-                  <a href="#">Patrol</a>
+                  <router-link :to="{ name: 'Patrol' }">Patrol</router-link>
                 </li>
                 <li>
                   <router-link :to="{ path: '/profile/' + currentUser.username.toLowerCase() }">
