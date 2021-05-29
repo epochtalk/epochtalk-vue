@@ -550,7 +550,22 @@ export default {
       }
       else return false
     }
-    const canSticky = () => true
+    const canSticky = () => {
+      if (!$auth.loggedIn) return false
+      if (v.bannedFromBoard) return false
+      if (!v.postData.data?.write_access) return false
+      if (!v.permissionUtils.hasPermission('threads.sticky.allow')) return false
+
+      const adminBypass = v.permissionUtils.hasPermission('threads.sticky.bypass.owner.admin')
+      const modBypass = v.permissionUtils.hasPermission('threads.sticky.bypass.owner.mod')
+      const priorityBypass = v.permissionUtils.hasPermission('threads.sticky.bypass.owner.priority')
+      const userPriority = v.postData.data.posts[0].user.priority
+
+      if (adminBypass) return true
+      else if (modBypass) return v.permissionUtils.moderatesBoard(v.postData.data.board.id)
+      else if (priorityBypass) return v.permissionUtils.getPriority() < userPriority
+      else return false
+    }
     const canLock = () => {
       if (!$auth.loggedIn) { return false }
       // TODO(boka): check for banned
