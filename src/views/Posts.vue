@@ -627,8 +627,72 @@ export default {
       return true
     }
     const canDelete = (post) => {
-      console.log(post, 'canDelete')
-      return true
+      if (!v.postData.data?.write_access) return false
+      if (!$auth.loggedIn) return false
+      // TODO(boka): check for banned
+      // if (BanSvc.banStatus()) return false
+      if (!v.permissionUtils.hasPermission('posts.delete.allow')) return false
+
+      const moderators = v.postData.data.board.moderators.map((data) => data.id)
+
+      // if thread is locked
+      if (v.postData.data.thread.locked) {
+        if (v.permissionUtils.hasPermission('posts.delete.bypass.locked.admin')) return true
+        else if (v.permissionUtils.hasPermission('posts.delete.bypass.locked.mod')) {
+          if (v.permissionUtils.moderatesBoard(v.postData.data.thread.board_id) && v.permissionUtils.getPriority() < post.user.priority) return true
+          // Check if mod is moderating another board's mod (which is allowed)
+          else if (v.permissionUtils.moderatesBoard(v.postData.data.thread.board_id) && (v.permissionUtils.getPriority() === post.user.priority && !moderators.includes(post.user.id))) return true
+        }
+        else if (v.permissionUtils.hasPermission('posts.delete.bypass.locked.priority')) {
+          if (v.permissionUtils.getPriority() < post.user.priority) return true
+          else if (v.permissionUtils.hasPermission('threads.moderated.allow') && v.postData.data.thread.user.id === $auth.user.id && parent.thread.moderated && $auth.user.id !== post.user.id && v.permissionUtils.getPriority() <= post.user.priority) return true
+        }
+      }
+
+      /*** translated
+      if (!pageData.write_access) { return false; }
+      if (!Session.isAuthenticated()) { return false; }
+      if (BanSvc.banStatus()) { return false; }
+      if (!Session.hasPermission('posts.delete.allow')) { return false; }
+
+      var validBypass = false;
+
+      // locked
+      if (ctrl.thread.locked) {
+        if (Session.hasPermission('posts.delete.bypass.locked.admin')) { validBypass = true; }
+        else if (Session.hasPermission('posts.delete.bypass.locked.mod')) {
+          if (Session.moderatesBoard(ctrl.thread.board_id) && Session.getPriority() < post.user.priority) { validBypass = true; }
+          // Check if mod is moderating another board's mod (which is allowed)
+          else if (Session.moderatesBoard(ctrl.thread.board_id) && (Session.getPriority() === post.user.priority && !ctrl.moderators.includes(post.user.id))) {
+            validBypass = true;
+          }
+        }
+        else if (Session.hasPermission('posts.delete.bypass.locked.priority')) {
+          if (Session.getPriority() < post.user.priority) { validBypass = true; }
+          else if (Session.hasPermission('threads.moderated.allow') && ctrl.thread.user.id === ctrl.user.id && parent.thread.moderated && ctrl.user.id !== post.user.id && Session.getPriority() <= post.user.priority) { validBypass = true; }
+        }
+      }
+      ***/
+
+      /*
+      // moderated/owner
+      if (post.user.id === ctrl.user.id) { validBypass = true; }
+      else if (ctrl.thread.moderated && ctrl.thread.user.id === ctrl.user.id && Session.hasPermission('threads.moderated.allow') && Session.hasPermission('posts.delete.bypass.owner.selfMod') && Session.getPriority() <= post.user.priority) { validBypass = true; }
+      else if (Session.hasPermission('posts.delete.bypass.owner.admin')) { validBypass = true; }
+      else if (Session.hasPermission('posts.delete.bypass.owner.mod')) {
+        if (Session.moderatesBoard(ctrl.thread.board_id) && Session.getPriority() < post.user.priority) { validBypass = true; }
+        // Check if mod is moderating another board's mod (which is allowed)
+        else if (Session.moderatesBoard(ctrl.thread.board_id) && (Session.getPriority() === post.user.priority && !ctrl.moderators.includes(post.user.id))) {
+          validBypass = true;
+        }
+      }
+      else if (Session.hasPermission('posts.delete.bypass.owner.priority')) {
+        if (Session.getPriority() < post.user.priority) { validBypass = true; }
+        else if (Session.hasPermission('threads.moderated.allow') && ctrl.thread.user.id === ctrl.user.id && parent.thread.moderated && ctrl.user.id !== post.user.id && Session.getPriority() <= post.user.priority) { validBypass = true; }
+      }
+
+      return validBypass;
+      */
     }
     const openEditThread = () => console.log('openEditThread')
     const updateThreadLock = (thread) => {
