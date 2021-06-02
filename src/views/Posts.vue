@@ -500,7 +500,15 @@ export default {
       }
       return true
     }
-    const canSave = () => true
+    const canSave = () => {
+      var text = v.posting.post.body_html
+      const imgSrcRegex = /<img[^>]+src="((http:\/\/|https:\/\/|\/)[^">]+)"/g
+      const stripTagsRegex = /(<([^>]+)>)/ig
+      const images = imgSrcRegex.exec(text)
+      text = text.replace(stripTagsRegex, '')
+      text = text.trim()
+      return text.length || images
+    }
     const canMove = () => {
       if (!$auth.loggedIn) return false
       if (v.bannedFromBoard) return false
