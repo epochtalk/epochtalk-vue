@@ -648,6 +648,23 @@ export default {
           else if (v.permissionUtils.hasPermission('threads.moderated.allow') && v.postData.data.thread.user.id === $auth.user.id && parent.thread.moderated && $auth.user.id !== post.user.id && v.permissionUtils.getPriority() <= post.user.priority) return true
         }
       }
+      // if user created post
+      else if (post.user.id === $auth.user.id) return true
+      // if thread is moderated and user started the thread and user can moderate threads and user can self mod and user's priority is higher than posting user
+      else if (v.postData.data.thread.moderated && v.postData.data.thread.user.id === $auth.user.id && v.permissionUtils.hasPermission('threads.moderated.allow') && v.permissionUtils.hasPermission('posts.delete.bypass.owner.selfMod') && v.permissionUtils.getPriority() <= post.user.priority) return true
+      // if user is an admin
+      else if (v.permissionUtils.hasPermission('posts.delete.bypass.owner.admin')) return true
+      // if user is a mod
+      else if (v.permissionUtils.hasPermission('posts.delete.bypass.owner.mod')) {
+        if (v.permissionUtils.moderatesBoard(v.postData.data.thread.board_id) && v.permissionUtils.getPriority() < post.user.priority) return true
+        // Check if mod is moderating another board's mod (which is allowed)
+        else if (v.permissionUtils.moderatesBoard(v.postData.data.thread.board_id) && (v.permissionUtils.getPriority() === post.user.priority && !v.moderators.includes(post.user.id))) return true
+      }
+      else if (v.permissionUtils.hasPermission('posts.delete.bypass.owner.priority')) {
+        if (v.permissionUtils.getPriority() < post.user.priority) return true
+        else if (v.permissionUtils.hasPermission('threads.moderated.allow') && v.postData.data.thread.user.id === $auth.user.id && v.postData.data.thread.moderated && $auth.user.id !== post.user.id && v.permissionUtils.getPriority() <= post.user.priority) return true
+      }
+      else return false
 
       /*** translated
       if (!pageData.write_access) { return false; }
