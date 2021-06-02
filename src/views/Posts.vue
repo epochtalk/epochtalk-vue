@@ -645,7 +645,7 @@ export default {
         }
         else if (v.permissionUtils.hasPermission('posts.delete.bypass.locked.priority')) {
           if (v.permissionUtils.getPriority() < post.user.priority) return true
-          else if (v.permissionUtils.hasPermission('threads.moderated.allow') && v.postData.data.thread.user.id === $auth.user.id && parent.thread.moderated && $auth.user.id !== post.user.id && v.permissionUtils.getPriority() <= post.user.priority) return true
+          else if (v.permissionUtils.hasPermission('threads.moderated.allow') && v.postData.data.thread.user.id === $auth.user.id && v.postData.data.thread.moderated && $auth.user.id !== post.user.id && v.permissionUtils.getPriority() <= post.user.priority) return true
         }
       }
       // if user created post
