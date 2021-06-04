@@ -23,12 +23,12 @@
         </div>
       </div>
 
-      <div v-if="recentMessages.length < 1" class="empty-message-container">
+      <div v-if="!recentMessages.messages" class="empty-message-container">
         <div class="empty-message">No messages</div>
       </div>
 
       <div class="list" v-if="pageMax > 0">
-        <div v-for="message in recentMessages" :key="message.id" class="cell" @click="loadConversation(message.conversation_id)" :class="{ 'active': selectedConversationId === message.conversation_id, 'unread': !message.viewed}">
+        <div v-for="message in recentMessages?.messages" :key="message.id" class="cell" @click="loadConversation(message.conversation_id)" :class="{ 'active': selectedConversationId === message.conversation_id, 'unread': !message.viewed}">
           <span class="state-unread" data-balloon="Unread">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
               <title></title>
@@ -38,7 +38,7 @@
           <div class="message-body">
             <span class="recipient" v-html="listMessageReceivers(message)"></span>
             <span class="msg-preview" v-html="humanDate(message.created_at)"></span>
-            <span class="msg-preview" v-html="message.content.subject"></span>
+            <span class="msg-preview" v-html="message?.content?.subject"></span>
             <a v-if="canDeleteConversation()" href="#" class="action" @click="openDeleteConvoModal(message.conversation_id)" data-balloon="Delete" data-balloon-pos="left">
               <i class="fa fa-trash"></i>
             </a>
@@ -59,7 +59,7 @@
         </a>
       </div>
       <!-- New Message -->
-      <div v-if="currentConversation.messages.length > 0">
+      <div v-if="currentConversation?.messages">
         <div class="message-details-container">
           <h4 class="message-details-header">Conversation with
             <span v-for="name in receiverNames" :key="name">
@@ -72,7 +72,7 @@
         </div>
         <h4 class=message-details-subject>{{currentSubject}}</h4>
       </div>
-      <h4 class="message-details-header centered-text" v-if="recentMessages.length > 0 && currentConversation.messages.length < 1">
+      <h4 class="message-details-header centered-text" v-if="recentMessages?.messages?.length > 0 && currentConversation?.messages?.length < 1">
         <div class="empty-message-container">
           <div class="empty-message">Select a conversation to read your messages</div>
         </div>
@@ -80,7 +80,7 @@
 
       <!-- Conversation Messages -->
       <div class="msg-container">
-        <div :id="message.id" v-for="message in currentConversation.messages" :key="message.id" class="message" :class="{ 'sender': currentUserId === message.sender_id, 'unread': !message.viewed }">
+        <div :id="message.id" v-for="message in currentConversation?.messages" :key="message.id" class="message" :class="{ 'sender': currentUserId === message.sender_id, 'unread': !message.viewed }">
           <div class="content">
             <div class="message-body-header">
               <div class="message-status">
@@ -97,7 +97,7 @@
                 </div>
               </div>
               <div class="avatar" :class="defaultAvatarShape">
-                <img v-src="message.sender_avatar || defaultAvatar" />
+                <img :src="message.sender_avatar || defaultAvatar" />
               </div>
               <div class="title">
                 <div class="title-username-role">
@@ -135,7 +135,7 @@
       </div>
 
       <!-- Empty view -->
-      <div v-if="recentMessages.length < 1" class="empty-message-container">
+      <div v-if="!recentMessages.messages" class="empty-message-container">
         <div class="empty-message"><strong>Your inbox is currently empty.</strong> Message someone to get started!</div>
 
         <div>
@@ -147,7 +147,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, inject } from 'vue'
+import { reactive, toRefs, inject, computed } from 'vue'
 import { messagesApi } from '@/api'
 import { useRoute, useRouter } from 'vue-router'
 import humanDate from '@/composables/filters/humanDate'
@@ -176,23 +176,39 @@ export default {
   },
   setup() {
     const pageResults = inc => {
-      const newPage = v.patrolData.page + inc
+      const newPage = v.recentMessages.page + inc
       let query = { ...$route.query, page: newPage }
       if (query.page === 1 || !query.page) delete query.page
-      if ($route.query.page !== v.currentPage)
+      if ($route.query.page !== v.page)
         $router.replace({ name: $route.name, params: $route.params, query: query })
     }
 
     const loadRecentMessages = () => console.log('loadRecentMessages')
     const reloadConversation = () => console.log('reloadConversation')
     const hasMoreMessages = () => true
+    const loadConversation = () => console.log('loadConversation')
     const loadMoreMessages = () => true
     const openReportModal = message => console.log(message)
     const openDeleteModal = message => console.log(message)
-    const canDeleteMessage = message => console.log(message)
     const addQuote = message => console.log(message)
+    const canDeleteConversation = () => true
+    const canDeleteMessage = () => true
     const canCreateConversation = () => true
-    const listMessageReceivers = message => console.log(message)
+    const canCreateMessage = () => true
+
+    const listMessageReceivers = message => {
+      let receiverNames = []
+      message.receivers.forEach(function(receiver) {
+        receiverNames.push(receiver.username)
+      })
+      let authedIndex = receiverNames.indexOf(v.authedUser.username)
+      if (authedIndex > -1) {
+        receiverNames.splice(authedIndex, 1)
+        receiverNames.push(message.sender_username)
+      }
+      receiverNames = receiverNames.filter((it, i, ar) => ar.indexOf(it) === i).sort()
+      return receiverNames.join(', ')
+    }
 
     const $auth = inject(AuthStore)
     const $route = useRoute()
@@ -201,21 +217,414 @@ export default {
     const v = reactive({
       loggedIn: $auth.loggedIn,
       authedUser: $auth.user,
-      currentPage: Number($route.query.page) || 1,
+      receiverNames: [],
+      page: Number($route.query.page) || 1,
       currentConversation: { messages: [] },
       currentUserId: null,
+      selectedConversationId: null,
       recentMessages: {},
+      currentSubject: null,
+      pageMax: computed(() => Math.ceil(v.recentMessages.total_convo_count / v.recentMessages.limit)),
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
       showEditor: false,
       editorConvoMode: false
     })
 
-    return { ...toRefs(v), loadRecentMessages, reloadConversation, hasMoreMessages, loadMoreMessages, openReportModal, openDeleteModal, canDeleteMessage, addQuote, canCreateConversation, listMessageReceivers, pageResults, humanDate }
+    return { ...toRefs(v), pageResults, loadRecentMessages, reloadConversation, hasMoreMessages, loadConversation, loadMoreMessages, openReportModal, openDeleteModal, canDeleteConversation, canDeleteMessage, addQuote, canCreateConversation, canCreateMessage, listMessageReceivers, humanDate }
   }
 }
 </script>
 
 <style lang="scss">
+.messages-grid {
+  grid-column: 1 / span 2;
+  display: grid;
+  grid-template-columns: minmax(320px, 1fr) 2fr;
+  grid-template-areas:
+    "list details"
+    "list details";
+  column-gap: 2rem;
 
+  @include break-mobile-sm {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "list"
+      "details";
+    grid-column: 1;
+  }
+}
+
+/*-------------- Messages Layout -------------- */
+.conversations {
+  grid-area: list;
+  // min-height: calc(100vh - 95px);
+
+  .pagination-slide {
+    font-size: $font-size-sm;
+    grid-template-columns: 40px 1fr 40px;
+    align-items: center;
+    justify-items: center;
+    text-align: center;
+    .page {
+      display: inline-block;
+      line-height: 2.5rem;
+    }
+    .next, .prev {
+      display: inline-block;
+    }
+    .next { float: right; }
+    .prev { float: left; }
+    button {
+      background-color: transparent;
+      color: $text-gray-dark;
+      padding: 0.5rem;
+      margin: 0;
+
+      &:disabled {
+        color: #ccc;
+      }
+    }
+  }
+
+  .list {
+    margin-bottom: 1rem;
+
+    .cell {
+      display: flex;
+      font-size: 0.8rem;
+      line-height: 0.95rem;
+      cursor: pointer;
+      padding: 0.5rem 0;
+      padding-left: 12px;
+      position: relative;
+
+      .msg-preview {
+        color: $secondary-font-color;
+      }
+
+      .message-body {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+
+        span {
+          padding-bottom: 0.25rem
+        }
+
+        .recipient,
+        .msg-preview {
+          font-weight: 600;
+        }
+
+        .msg-preview {
+          @include truncate-ellipsis;
+        }
+      }
+
+      .action {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.2rem;
+        color: $secondary-font-color;
+        opacity: .25;
+        transition: all ease-in-out 200ms;
+      }
+
+      .state-unread {
+        margin-left: -12px;
+        padding-top: 2px;
+        width: 14px;
+
+        svg {
+          display: none;
+          fill: $color-primary;
+          width: 10px;
+        }
+      }
+
+      &.active { background-color: $sub-header-color; }
+
+      &.unread {
+        .state-unread {
+          svg {
+            display: block;
+          }
+        }
+      }
+
+      &:hover {
+        .action {
+          opacity: 1;
+
+          &:hover {
+            color: $color-primary;
+          }
+        }
+      }
+    }
+  }
+
+  #recentMessagesHeader {
+    display: flex;
+    align-content: center;
+    cursor: pointer;
+    color: $secondary-font-color;
+    margin-bottom: 1rem;
+
+    .inbox {
+      @include transition(color 0.15s ease);
+      &:hover { @include transition(color 0.15s ease); color: $secondary-font-color-dark; }
+      flex: 1 0 auto;
+    }
+
+    .add {
+      color: $color-primary;
+      display: flex;
+      font-size: $font-size-sm;
+      align-content: center;
+      @include transition(color 0.15s ease);
+      &:hover { @include transition(color 0.15s ease); color: $color-primary-alt; }
+
+      svg {
+        margin-right: 0.25rem;
+        fill: $color-primary;
+
+        &:hover {
+          fill: $color-primary-alt;
+        }
+      }
+    }
+  }
+
+  @include break-mobile-sm {
+    // min-height: unset;
+    // height: 35vh;
+    // overflow-y: scroll;
+    margin-bottom: 2rem;
+    // border-bottom: $border;
+  }
+}
+
+.messages {
+  grid-area: details;
+
+  .action-bar {
+    display: none;
+    font-size: $font-size-sm;
+    margin-bottom: 0.25rem;
+    width: 100%;
+
+    .to__messages {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+
+      svg {
+        height: 10px;
+        fill: $color-primary;
+        transform: rotateZ(90deg);
+      }
+    }
+
+    @include break-mobile-sm {
+      display: block;
+    }
+  }
+
+  .message-details-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+
+    .to__reply {
+      flex: 0 0 auto;
+      font-size: $font-size-sm;
+    }
+  }
+
+  .message-details-header {
+    flex: 1 0 auto;
+    font-size: $font-size-base;
+    text-transform: none;
+  }
+
+  .message-details-subject {
+    font-size: $font-size-xl;
+    text-transform: none;
+
+    span {
+      font-weight: 600;
+    }
+  }
+
+  .thin-underline {
+    @include no-select;
+    margin-bottom: 0;
+    h4 { margin-bottom: 0; display: inline-block;}
+  }
+  .reply {
+    margin-top: 1rem;
+    .preview {
+      background-color: #fff;
+      height: 7rem;
+      margin-bottom: 1rem;
+      cursor: default;
+      white-space: pre-wrap;
+      overflow-y: auto;
+      padding: 0.5rem;
+      border: 1px solid $border-color;
+    }
+    button { margin-bottom: 0; }
+  }
+
+  .msg-container {
+    .message-body-header {
+      display: flex;
+      margin-bottom: 1rem;
+
+      .title {
+        display: flex;
+        flex-direction: column;
+        flex: 1 0 auto;
+
+        .title-username-role {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+        }
+
+        .username {
+          font-size: 1rem;
+          font-weight: 600;
+          margin-right: 0.5rem;
+        }
+
+        .date {
+          color: $secondary-font-color;
+          font-size: 1rem;
+        }
+      }
+
+      .actions {
+        align-self: center;
+      }
+
+      .action {
+        color: $secondary-font-color;
+        flex: 1 0 auto;
+        opacity: 0.25;
+        padding-left: 1rem;
+        transition: opacity ease-in-out 200ms, color  ease-in-out 200ms;
+      }
+    }
+
+    .message {
+      @include clearfix;
+      border-bottom: 1px solid $border-color;
+      padding: 1rem 1rem 1rem 1.5rem;
+
+      &:last-child { margin-bottom: 2rem; }
+      &:first-child { border-top: 1px solid $border-color; margin-top: 1rem;}
+
+      &.unread {
+        .message-status {
+          .status-unread {
+            display: block;
+          }
+        }
+      }
+
+      &.sender {
+        .message-status {
+          .status-sender {
+            display: block;
+          }
+        }
+      }
+
+
+      .message-status {
+        margin-left: -1.5rem;
+        padding-top: 2px;
+        width: 1.5rem;
+
+        .status-unread,
+        .status-sender {
+          display: none;
+        }
+
+        svg {
+          fill: $color-primary;
+          width: 10px;
+        }
+
+        .status-sender {
+          svg {
+            fill: $secondary-font-color;
+          }
+        }
+      }
+
+      .avatar {
+        margin-right: 0.5rem;
+        &.circle {
+          img {
+            @include border-radius(100px);
+            height: 2.5rem;
+            width: 2.5rem;
+          }
+        }
+        &.rect {
+          img {
+            height: 2.5rem;
+            width: 2.5rem;
+          }
+        }
+      }
+      .content {
+        word-wrap: break-word;
+      }
+
+      &:hover {
+        .action {
+          color: $secondary-font-color-dark;
+          opacity: 1;
+
+          &:hover {
+            color: $color-primary;
+            opacity: 1;
+          }
+        }
+      }
+    }
+  }
+
+  @include break-mobile-sm {
+    background: $base-background-color;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin-top: 1rem;
+    padding: 0.5rem;
+    transform: translateX(100%);
+    transition: all ease-in-out 150ms;
+
+    &.is__active {
+      transform: translateX(0%);
+    }
+  }
+}
+
+@include break-mobile-sm {
+  .conversations {
+     width: calc(100vw - 32px);
+    }
+
+  .messages {
+    // @include span-columns(8); @include omega;
+  }
+}
 </style>
