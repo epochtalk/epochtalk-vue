@@ -130,6 +130,7 @@ export const usersApi = {
 }
 
 export const messagesApi = {
+  page: params => $http('/api/messages', { params }),
   pageIgnored: params => $http('/api/messages/ignored', { params }),
   ignore: data => $http('/api/messages/ignore', { method: 'POST', data }),
   unignore: data => $http('/api/messages/unignore', { method: 'POST', data }),
@@ -137,7 +138,8 @@ export const messagesApi = {
   emailNotifications: enabled => $http('/api/messages/settings', { method: 'PUT', data:{enabled}}),
   ignoreNewbies: enabled => $http('/api/messages/settings/newbie', { method: 'PUT', data:{enabled}}),
   convos: {
-   create: data => $http('/api/conversations', { method: 'POST', data })
+    page: (id, params) => $http(`/api/conversations/${id}`, { params }),
+    create: data => $http('/api/conversations', { method: 'POST', data })
   }
 }
 
