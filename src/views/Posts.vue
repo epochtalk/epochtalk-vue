@@ -487,7 +487,7 @@ export default {
         if (!canUpdate) return false
       }
 
-      if (v.postData.data.thread.user.id === $auth.user.id) return true
+      if (v.postData.data.thread.user.id === v.authedUser.id) return true
       else if (adminBypass) return v.permissionUtils.getPriority() <= userPriority
       else if (modBypass) return v.permissionUtils.getPriority() < userPriority && v.permissionUtils.moderatesBoard(v.postData.data.board.id)
       else if (priorityBypass) return v.permissionUtils.getPriority() < userPriority
@@ -550,7 +550,7 @@ export default {
       const postUserPriority = post.user.priority
       const postUserId = post.user.id
       const sessionUserPriority = v.permissionUtils.getPriority()
-      const sessionUserId = $auth.user.id
+      const sessionUserId = v.authedUser.id
       const moderators = v.postData.data.board.moderators.map((data) => data.id)
 
       // admins can purge
@@ -594,7 +594,7 @@ export default {
       const priorityBypass = v.permissionUtils.hasPermission('threads.lock.bypass.owner.priority')
       const userPriority = v.postData.data.posts[0].user.priority
 
-      if (v.postData.data.thread.user.id === $auth.user.id) return true
+      if (v.postData.data.thread.user.id === v.authedUser.id) return true
       else if (adminBypass) return v.permissionUtils.getPriority() <= userPriority
       else if (modBypass) return v.permissionUtils.getPriority() < userPriority && v.permissionUtils.moderatesBoard(v.postData.data.board.id)
       else if (priorityBypass) return v.permissionUtils.getPriority() < userPriority
@@ -612,7 +612,7 @@ export default {
       const priorityBypass = v.permissionUtils.hasPermission('threads.createPoll.bypass.owner.priority')
       const userPriority = v.postData.data.posts[0].user.priority
 
-      if (v.postData.data.thread.user.id === $auth.user.id) return true
+      if (v.postData.data.thread.user.id === v.authedUser.id) return true
       else if (adminBypass) return true
       else if (modBypass) return v.permissionUtils.getPriority() < userPriority && v.permissionUtils.moderatesBoard(v.postData.data.board.id)
       else if (priorityBypass) return v.permissionUtils.getPriority() < userPriority
@@ -646,15 +646,15 @@ export default {
         }
         else if (v.permissionUtils.hasPermission('posts.delete.bypass.locked.priority')) {
           if (v.permissionUtils.getPriority() < post.user.priority) return true
-          else if (v.permissionUtils.hasPermission('threads.moderated.allow') && v.postData.data.thread.user.id === $auth.user.id && v.postData.data.thread.moderated && $auth.user.id !== post.user.id && v.permissionUtils.getPriority() <= post.user.priority) return true
+          else if (v.permissionUtils.hasPermission('threads.moderated.allow') && v.postData.data.thread.user.id === v.authedUser.id && v.postData.data.thread.moderated && v.authedUser.id !== post.user.id && v.permissionUtils.getPriority() <= post.user.priority) return true
           else return false
         }
         else return false
       }
       // if user created post
-      else if (post.user.id === $auth.user.id) return true
+      else if (post.user.id === v.authedUser.id) return true
       // if thread is moderated and user started the thread and user can moderate threads and user can self mod and user's priority is higher than posting user
-      else if (v.postData.data.thread.moderated && v.postData.data.thread.user.id === $auth.user.id && v.permissionUtils.hasPermission('threads.moderated.allow') && v.permissionUtils.hasPermission('posts.delete.bypass.owner.selfMod') && v.permissionUtils.getPriority() <= post.user.priority) return true
+      else if (v.postData.data.thread.moderated && v.postData.data.thread.user.id === v.authedUser.id && v.permissionUtils.hasPermission('threads.moderated.allow') && v.permissionUtils.hasPermission('posts.delete.bypass.owner.selfMod') && v.permissionUtils.getPriority() <= post.user.priority) return true
       // if user is an admin
       else if (v.permissionUtils.hasPermission('posts.delete.bypass.owner.admin')) return true
       // if user is a mod
@@ -666,7 +666,7 @@ export default {
       }
       else if (v.permissionUtils.hasPermission('posts.delete.bypass.owner.priority')) {
         if (v.permissionUtils.getPriority() < post.user.priority) return true
-        else if (v.permissionUtils.hasPermission('threads.moderated.allow') && v.postData.data.thread.user.id === $auth.user.id && v.postData.data.thread.moderated && $auth.user.id !== post.user.id && v.permissionUtils.getPriority() <= post.user.priority) return true
+        else if (v.permissionUtils.hasPermission('threads.moderated.allow') && v.postData.data.thread.user.id === v.authedUser.id && v.postData.data.thread.moderated && v.authedUser.id !== post.user.id && v.permissionUtils.getPriority() <= post.user.priority) return true
         else return false
       }
       else return false
@@ -776,6 +776,7 @@ export default {
 
     /* View Data */
     const v = reactive({
+      authedUser: $auth.user,
       selectedPost: null,
       selectedPostIndex: 0,
       prefs: $prefs.data,
