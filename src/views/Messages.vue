@@ -62,7 +62,7 @@
       <div v-if="currentConversation.messages.length > 0">
         <div class="message-details-container">
           <h4 class="message-details-header">Conversation with
-            <span v-for="name in receiverNames">
+            <span v-for="name in receiverNames" :key="name">
               <a href="">{{name}}</a>{{ $last ? '' : ', '}}
             </span>
           </h4>
@@ -72,7 +72,7 @@
         </div>
         <h4 class=message-details-subject>{{currentSubject}}</h4>
       </div>
-      <h4 class="message-details-header" v-if="recentMessages.length > 0 && currentConversation.messages.length < 1" class="centered-text">
+      <h4 class="message-details-header centered-text" v-if="recentMessages.length > 0 && currentConversation.messages.length < 1">
         <div class="empty-message-container">
           <div class="empty-message">Select a conversation to read your messages</div>
         </div>
@@ -147,12 +147,12 @@
 </template>
 
 <script>
-// import { reactive, toRefs, inject } from 'vue'
-// import { postsApi } from '@/api'
-// import { useRoute, useRouter } from 'vue-router'
-// import humanDate from '@/composables/filters/humanDate'
-// import { AuthStore } from '@/composables/stores/auth'
-// import { localStoragePrefs } from '@/composables/stores/prefs'
+import { reactive, toRefs, inject } from 'vue'
+import { messagesApi } from '@/api'
+import { useRoute, useRouter } from 'vue-router'
+import humanDate from '@/composables/filters/humanDate'
+import { AuthStore } from '@/composables/stores/auth'
+import { localStoragePrefs } from '@/composables/stores/prefs'
 // import { avatarHighlight, usernameHighlight, userRoleHighlight } from '@/composables/utils/userUtils'
 
 export default {
@@ -162,14 +162,16 @@ export default {
       limit: to.query.limit || localStoragePrefs().data.posts_per_page,
       page: to.query.page || 1
     }
-    next(vm => postsApi.byNewbie(query).then(d => vm.patrolData = d).catch(() => {}))
+    next(vm => {
+      messagesApi.page(query).then(d => vm.recentMessages = d).catch(() => {})
+    })
   },
   beforeRouteUpdate(to, from, next) {
     const query = {
       limit: to.query.limit || localStoragePrefs().data.posts_per_page,
       page: to.query.page || 1
     }
-    postsApi.byNewbie(query).then(d => this.patrolData = d).catch(() => {})
+    messagesApi.page(query).then(d => this.recentMessages = d).catch(() => {})
     next()
   },
   setup() {
@@ -182,7 +184,7 @@ export default {
     }
 
     const loadRecentMessages = () => console.log('loadRecentMessages')
-    const loadRecentMessages = () => console.log('loadRecentMessages')
+    const reloadConversation = () => console.log('reloadConversation')
     const hasMoreMessages = () => true
     const loadMoreMessages = () => true
     const openReportModal = message => console.log(message)
@@ -190,7 +192,8 @@ export default {
     const canDeleteMessage = message => console.log(message)
     const addQuote = message => console.log(message)
     const canCreateConversation = () => true
-    const
+    const listMessageReceivers = message => console.log(message)
+
     const $auth = inject(AuthStore)
     const $route = useRoute()
     const $router = useRouter()
@@ -208,7 +211,7 @@ export default {
       editorConvoMode: false
     })
 
-    return { ...toRefs(v), showEditDate, canPurge, canDelete, canPostLock, canUpdate, pageResults, humanDate, userRoleHighlight, usernameHighlight, avatarHighlight }
+    return { ...toRefs(v), loadRecentMessages, reloadConversation, hasMoreMessages, loadMoreMessages, openReportModal, openDeleteModal, canDeleteMessage, addQuote, canCreateConversation, listMessageReceivers, pageResults, humanDate }
   }
 }
 </script>
