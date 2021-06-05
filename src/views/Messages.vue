@@ -59,11 +59,11 @@
         </a>
       </div>
       <!-- New Message -->
-      <div v-if="currentConversation?.messages">
+      <div v-if="currentConversation">
         <div class="message-details-container">
           <h4 class="message-details-header">Conversation with
-            <span v-for="name in receiverNames" :key="name">
-              <a href="">{{name}}</a>{{ $last ? '' : ', '}}
+            <span v-for="(name, i) in receiverNames" :key="name">
+              <a href="">{{name}}</a>{{ i !== recentMessages.length - 1 ? '' : ', '}}
             </span>
           </h4>
           <a class="to__reply no-select" v-if="canCreateMessage()" @click="showEditor = true; editorConvoMode = false;">
@@ -72,7 +72,7 @@
         </div>
         <h4 class=message-details-subject>{{currentSubject}}</h4>
       </div>
-      <h4 class="message-details-header centered-text" v-if="recentMessages?.messages?.length > 0 && currentConversation?.messages?.length < 1">
+      <h4 class="message-details-header centered-text" v-if="recentMessages?.messages?.length > 0 && currentConversation?.length < 1">
         <div class="empty-message-container">
           <div class="empty-message">Select a conversation to read your messages</div>
         </div>
@@ -80,7 +80,7 @@
 
       <!-- Conversation Messages -->
       <div class="msg-container">
-        <div :id="message.id" v-for="message in currentConversation?.messages" :key="message.id" class="message" :class="{ 'sender': currentUserId === message.sender_id, 'unread': !message.viewed }">
+        <div :id="message.id" v-for="message in currentConversation?.messages" :key="message.id" class="message" :class="{ 'sender': authedUser.id === message.sender_id, 'unread': !message.viewed }">
           <div class="content">
             <div class="message-body-header">
               <div class="message-status">
@@ -102,7 +102,7 @@
               <div class="title">
                 <div class="title-username-role">
                   <span class="username" v-html="message.sender_username"></span>
-                  <span class="badge alert user-role info-tooltip" v-if="message.sender_newbie_alert && (message.sender_id !== currentUserId)" data-balloon="!!! WARNING: This user is a newbie. If you are expecting a message from a more veteran member, then this is an imposter !!!" data-balloon-pos="down" data-balloon-length="large" data-balloon-break>
+                  <span class="badge alert user-role info-tooltip" v-if="message.sender_newbie_alert && (message.sender_id !== authedUser.id)" data-balloon="!!! WARNING: This user is a newbie. If you are expecting a message from a more veteran member, then this is an imposter !!!" data-balloon-pos="down" data-balloon-length="large" data-balloon-break>
                     <i class="fa fa-info-circle"></i>
                     Newbie Alert!
                   </span>
@@ -121,7 +121,7 @@
                 </a>
               </div>
             </div>
-            <div>{{message.content.body_html}}</div>
+            <div v-html="message.content.body_html || message.content.body"></div>
 <!--            TODO(akinsey): <div class="msg-content post-body" post-processing="message.content.body_html" style-fix="true" is-newbie="message.sender_newbie_alert"></div> -->
           </div>
         </div>
@@ -129,7 +129,7 @@
 
       <!-- load more message -->
       <div class="clear">
-        <button class="fill-row no-animate" v-if="hasMoreMessages()" @click="loadMoreMessages()">
+        <button class="fill-row no-animate" v-if="currentConversation.has_next" @click="loadMoreMessages()">
           Load More Messages
         </button>
       </div>
@@ -163,7 +163,10 @@ export default {
       page: to.query.page || 1
     }
     next(vm => {
-      messagesApi.page(query).then(d => vm.recentMessages = d).catch(() => {})
+      messagesApi.page(query)
+      .then(d => vm.recentMessages = d)
+      .then(() => vm.loadConversation(vm.recentMessages.messages[0].conversation_id, { init: true }))
+      .catch(() => {})
     })
   },
   beforeRouteUpdate(to, from, next) {
@@ -171,7 +174,10 @@ export default {
       limit: to.query.limit || localStoragePrefs().data.posts_per_page,
       page: to.query.page || 1
     }
-    messagesApi.page(query).then(d => this.recentMessages = d).catch(() => {})
+    messagesApi.page(query)
+    .then(d => this.recentMessages = d)
+    .then(() => this.loadConversation(this.recentMessages.messages[0].conversation_id, { init: true }))
+    .catch(() => {})
     next()
   },
   setup() {
@@ -183,10 +189,56 @@ export default {
         $router.replace({ name: $route.name, params: $route.params, query: query })
     }
 
-    const loadRecentMessages = () => console.log('loadRecentMessages')
+    const loadConversation = (conversationId, options) => {
+      options = options || {}
+      v.selectedConversationId = conversationId
+      v.recentMessages.messages.forEach(message => {
+        if (message.conversation_id === conversationId) { message.viewed = true }
+      })
+      messagesApi.convos.page(conversationId)
+      // build out conversation information
+      .then(data => {
+        v.currentSubject = data.messages[0].content.subject
+        v.currentConversation = data
+        v.currentConversation.id = conversationId
+        if (options.init) { v.isActive = false }
+        else { v.isActive = true }
+        if (options.saveInput) {
+          v.newMessage.subject = v.newMessage.subject || v.currentConversation.subject
+          v.newMessage.content.body = v.newMessage.content.body || ''
+          v.newMessage.content.body_html = v.newMessage.content.body_html || ''
+        }
+        else {
+          v.newMessage = { subject: v.currentConversation.subject, content: { body_html: '', body: '' } }
+        }
+        v.newMessage.conversation_id = data.id
+        v.newMessage.sender_id = v.authedUser.id
+        v.newMessage.sender_username = v.authedUser.username
+        let lastMessage = data.messages[data.messages.length - 1]
+        let lastReceiverIds = lastMessage.receiver_ids
+        let lastReceiverUsernames = lastMessage.receivers.map(receiver => receiver.username)
+        let lastSenderId = lastMessage.sender_id
+        let lastSenderUsername = lastMessage.sender_username
+        if (v.authedUser.id !== lastSenderId) {
+          // Remove current users id from list of receivers and add senders id
+          let idIndex = lastReceiverIds.indexOf(v.authedUser.id)
+          if (idIndex > -1) { lastReceiverIds.splice(idIndex, 1) }
+          lastReceiverIds.push(lastSenderId)
+
+          // Remove current users username from list of receivers and add senders id
+          let usernameIndex = lastReceiverUsernames.indexOf(v.authedUser.username)
+          if (usernameIndex > -1) { lastReceiverUsernames.splice(usernameIndex, 1) }
+          lastReceiverUsernames.push(lastSenderUsername)
+        }
+        v.newMessage.receiver_ids = lastReceiverIds
+        v.newMessage.receiver_usernames = lastReceiverUsernames
+
+        v.receiverNames = lastReceiverUsernames.filter((it, i, ar) => ar.indexOf(it) === i).sort()
+      })
+    }
+
     const reloadConversation = () => console.log('reloadConversation')
-    const hasMoreMessages = () => true
-    const loadConversation = () => console.log('loadConversation')
+    const loadRecentMessages = () => console.log('loadRecentMessages')
     const loadMoreMessages = () => true
     const openReportModal = message => console.log(message)
     const openDeleteModal = message => console.log(message)
@@ -220,18 +272,22 @@ export default {
       receiverNames: [],
       page: Number($route.query.page) || 1,
       currentConversation: { messages: [] },
-      currentUserId: null,
       selectedConversationId: null,
+      newMessage: null,
+      isActive: false,
       recentMessages: {},
       currentSubject: null,
       pageMax: computed(() => Math.ceil(v.recentMessages.total_convo_count / v.recentMessages.limit)),
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
       showEditor: false,
-      editorConvoMode: false
+      editorConvoMode: false,
+      controlAccess: {
+        reportMessages: $auth.permissionUtils.hasPermission('reports.createMessageReport')
+      }
     })
 
-    return { ...toRefs(v), pageResults, loadRecentMessages, reloadConversation, hasMoreMessages, loadConversation, loadMoreMessages, openReportModal, openDeleteModal, canDeleteConversation, canDeleteMessage, addQuote, canCreateConversation, canCreateMessage, listMessageReceivers, humanDate }
+    return { ...toRefs(v), pageResults, loadRecentMessages, reloadConversation, loadConversation, loadMoreMessages, openReportModal, openDeleteModal, canDeleteConversation, canDeleteMessage, addQuote, canCreateConversation, canCreateMessage, listMessageReceivers, humanDate }
   }
 }
 </script>
