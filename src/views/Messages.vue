@@ -63,7 +63,7 @@
         <div class="message-details-container">
           <h4 class="message-details-header">Conversation with
             <span v-for="(name, i) in receiverNames" :key="name">
-              <a href="">{{name}}</a>{{ i !== recentMessages.length - 1 ? '' : ', '}}
+              <router-link :to="{ path: '/profile/' + name.toLowerCase() }">{{name}}</router-link>{{ i !== receiverNames.length - 1 ? ', ' : '' }}
             </span>
           </h4>
           <a class="to__reply no-select" v-if="canCreateMessage()" @click="showEditor = true; editorConvoMode = false;">
