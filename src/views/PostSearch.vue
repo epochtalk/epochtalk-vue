@@ -8,12 +8,12 @@
       </div>
     </div>
 
-    <div v-if="!searchData?.search.length">
+    <div v-if="!searchData?.posts.length">
       <h4>Enter a search term above, to search forum posts</h4>
     </div>
-    <div class="search-results" v-if="searchData && (searchData.count > 0 || search)">
+    <div class="search-results" v-if="searchData && (searchData.posts.length > 0 || search)">
       <div v-if="searchData?.search">
-      Displaying {{searchData.count}} search result(s) for "<strong>{{searchData.search}}</strong>":<br /><br />
+      Displaying{{ searchData.posts.length === 0 ? ' 0 ' : ' '}}search result(s) for "<strong>{{searchData.search}}</strong>":<br /><br />
       </div>
 
       <div :id="post.id" v-for="(post, i) in searchData.posts" :key="post.id" class="post-block" :class="{ 'hidden': post.hidden, 'deleted': post._deleted || post.user.ignored, 'first': i === 0 }">
