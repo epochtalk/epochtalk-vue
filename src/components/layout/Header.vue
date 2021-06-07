@@ -40,7 +40,9 @@
         </li>
         <!--<mentions-menu></mentions-menu>-->
         <li @click="showMobileMenu = false" >
-          <a href="#" @click="dismissNotifications({ type: 'message' })"><i class="fa fa-envelope" aria-hidden="true"></i>Messages</a>
+          <router-link :to="{ name: 'Messages' }" @click="dismissNotifications({ type: 'message' })">
+            <i class="fa fa-envelope" aria-hidden="true"></i>Messages
+          </router-link>
           <div class="count" v-if="notificationMessages">{{notificationMessages}}</div>
         </li>
         <li @click="showMobileMenu = false" >
@@ -110,10 +112,12 @@
               </div>
               <!-- <mentions-tray></mentions-tray> -->
 
-              <div class="tray-icon" href="#" @click="dismissNotifications({ type: 'message' })" data-balloon="Messages" data-balloon-pos="down">
-                <i class="fa fa-envelope"></i>
-                <div class="count" v-if="notificationMessages">{{notificationMessages}}</div>
-              </div>
+              <router-link :to="{ name: 'Messages' }" @click="dismissNotifications({ type: 'message' })">
+                <div class="tray-icon" data-balloon="Messages" data-balloon-pos="down">
+                  <i class="fa fa-envelope"></i>
+                  <div class="count" v-if="notificationMessages">{{notificationMessages}}</div>
+                </div>
+              </router-link>
 
               <!-- <div class="tray-icon">
                 <i class="fa fa-globe"></i>
@@ -148,7 +152,9 @@
                   <router-link :to="{ name: 'Settings' }">Settings</router-link>
                 </li>
                 <li>
-                  <a href="#">Messages</a>
+                  <router-link :to="{ name: 'Messages' }" @click="dismissNotifications({ type: 'message' })">
+                    Messages
+                  </router-link>
                 </li>
                 <li>
                   <a href="#">Watchlist</a>
