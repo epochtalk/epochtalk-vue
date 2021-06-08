@@ -663,9 +663,9 @@ export default {
       if (v.postData.data.thread.locked) {
         if (v.permissionUtils.hasPermission('posts.delete.bypass.locked.admin')) return true
         else if (v.permissionUtils.hasPermission('posts.delete.bypass.locked.mod')) {
-          if (v.permissionUtils.moderatesBoard(v.postData.data.thread.board_id) && v.permissionUtils.getPriority() < post.user.priority) return true
+          if (v.permissionUtils.moderatesBoard(v.postData.data.board.id) && v.permissionUtils.getPriority() < post.user.priority) return true
           // Check if mod is moderating another board's mod (which is allowed)
-          else if (v.permissionUtils.moderatesBoard(v.postData.data.thread.board_id) && (v.permissionUtils.getPriority() === post.user.priority && !moderators.includes(post.user.id))) return true
+          else if (v.permissionUtils.moderatesBoard(v.postData.data.board.id) && (v.permissionUtils.getPriority() === post.user.priority && !moderators.includes(post.user.id))) return true
           else return false
         }
         else if (v.permissionUtils.hasPermission('posts.delete.bypass.locked.priority')) {
@@ -683,9 +683,9 @@ export default {
       else if (v.permissionUtils.hasPermission('posts.delete.bypass.owner.admin')) return true
       // if user is a mod
       else if (v.permissionUtils.hasPermission('posts.delete.bypass.owner.mod')) {
-        if (v.permissionUtils.moderatesBoard(v.postData.data.thread.board_id) && v.permissionUtils.getPriority() < post.user.priority) return true
+        if (v.permissionUtils.moderatesBoard(v.postData.data.board.id) && v.permissionUtils.getPriority() < post.user.priority) return true
         // Check if mod is moderating another board's mod (which is allowed)
-        else if (v.permissionUtils.moderatesBoard(v.postData.data.thread.board_id) && (v.permissionUtils.getPriority() === post.user.priority && !v.moderators.includes(post.user.id))) return true
+        else if (v.permissionUtils.moderatesBoard(v.postData.data.board.id) && (v.permissionUtils.getPriority() === post.user.priority && !v.moderators.includes(post.user.id))) return true
         else return false
       }
       else if (v.permissionUtils.hasPermission('posts.delete.bypass.owner.priority')) {
