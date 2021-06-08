@@ -35,7 +35,7 @@
             <!-- Post Title -->
             <div class="thread-title">
               <h5>
-                <a href="#" v-html="post.thread_title"></a>
+                <router-link :title="decode(post.thread_title)" :to="{ name: 'Posts', params: { threadSlug: post.thread_slug, threadId: post.thread_id }, query: { start: post.position }, hash: `#${post.id}` }" v-html="decode(post.thread_title)"></router-link>
               </h5>
               <span v-if="post.user.online" :data-balloon="post.user.username + ' is online'" class="online green"><i class="fas fa-circle"></i></span>
               <span v-if="!post.user.online" class="online green"><i class="far fa-circle"></i></span>
@@ -69,6 +69,7 @@ import { postsApi } from '@/api'
 import { useRoute, useRouter } from 'vue-router'
 import humanDate from '@/composables/filters/humanDate'
 import { usernameHighlight } from '@/composables/utils/userUtils'
+import decode from '@/composables/filters/decode'
 
 export default {
   name: 'PostSearch',
@@ -136,7 +137,7 @@ export default {
     // Updates page input when user uses header search
     watch(() => $route.query.search, s => v.search = s)
 
-    return { ...toRefs(v), searchPosts, pageResults, clearSearch, humanDate, usernameHighlight }
+    return { ...toRefs(v), searchPosts, pageResults, clearSearch, humanDate, usernameHighlight, decode }
   }
 }
 </script>
