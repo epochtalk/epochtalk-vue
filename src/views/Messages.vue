@@ -165,7 +165,7 @@ export default {
     next(vm => {
       messagesApi.page(query)
       .then(d => vm.recentMessages = d)
-      .then(() => vm.loadConversation(vm.recentMessages.messages[0].conversation_id, { init: true }))
+      .then(() => vm.preloadConversation(to.query.id || vm.recentMessages.messages[0].conversation_id))
       .catch(() => {})
     })
   },
@@ -176,7 +176,7 @@ export default {
     }
     messagesApi.page(query)
     .then(d => this.recentMessages = d)
-    .then(() => this.loadConversation(this.recentMessages.messages[0].conversation_id, { init: true }))
+    .then(() => this.preloadConversation(to.query.id || this.recentMessages.messages[0].conversation_id))
     .catch(() => {})
     next()
   },
@@ -184,12 +184,16 @@ export default {
     const loadRecentMessages = inc => {
       const newPage = v.recentMessages.page + inc
       let query = { ...$route.query, page: newPage }
+      delete query.id
       if (query.page === 1 || !query.page) delete query.page
       if ($route.query.page !== v.page)
         $router.replace({ name: $route.name, params: $route.params, query: query })
     }
 
-    const loadConversation = (conversationId, options) => {
+    const loadConversation = conversationId =>
+      $router.replace({ name: $route.name, params: $route.params, query: { ...$route.query, id: conversationId } })
+
+    const preloadConversation = (conversationId, options) => {
       options = options || {}
       v.selectedConversationId = conversationId
       v.recentMessages.messages.forEach(message => {
@@ -201,8 +205,6 @@ export default {
         v.currentSubject = data.messages[0].content.subject
         v.currentConversation = data
         v.currentConversation.id = conversationId
-        if (options.init) { v.isActive = false }
-        else { v.isActive = true }
         if (options.saveInput) {
           v.newMessage.subject = v.newMessage.subject || v.currentConversation.subject
           v.newMessage.content.body = v.newMessage.content.body || ''
@@ -238,7 +240,20 @@ export default {
     }
 
     const reloadConversation = () => console.log('reloadConversation')
-    const loadMoreMessages = () => true
+    const loadMoreMessages = () => {
+      const options = {
+        timestamp: v.currentConversation.last_message_timestamp,
+        message_id: v.currentConversation.last_message_id
+      }
+      messagesApi.convos.page(v.currentConversation.id, options)
+      // build out conversation information
+      .then(data => {
+        v.currentConversation.messages = v.currentConversation.messages.concat(data.messages);
+        v.currentConversation.last_message_id = data.last_message_id;
+        v.currentConversation.last_message_timestamp = data.last_message_timestamp;
+        v.currentConversation.has_next = data.has_next;
+      })
+    }
     const openReportModal = message => console.log(message)
     const openDeleteModal = message => console.log(message)
     const addQuote = message => console.log(message)
@@ -273,7 +288,6 @@ export default {
       currentConversation: { messages: [] },
       selectedConversationId: null,
       newMessage: null,
-      isActive: false,
       recentMessages: {},
       currentSubject: null,
       pageMax: computed(() => Math.ceil(v.recentMessages.total_convo_count / v.recentMessages.limit)),
@@ -286,7 +300,7 @@ export default {
       }
     })
 
-    return { ...toRefs(v), loadRecentMessages, reloadConversation, loadConversation, loadMoreMessages, openReportModal, openDeleteModal, canDeleteConversation, canDeleteMessage, addQuote, canCreateConversation, canCreateMessage, listMessageReceivers, humanDate }
+    return { ...toRefs(v), loadRecentMessages, reloadConversation, preloadConversation, loadConversation, loadMoreMessages, openReportModal, openDeleteModal, canDeleteConversation, canDeleteMessage, addQuote, canCreateConversation, canCreateMessage, listMessageReceivers, humanDate }
   }
 }
 </script>
