@@ -48,7 +48,7 @@
     </div>
 
     <!-- Current Conversation -->
-    <div class="messages" :class="{ 'is__active' : selectedConversationId && isActive }">
+    <div class="messages" :class="{ 'is__active' : selectedConversationId }">
       <div class="action-bar">
         <a href="" class="to__messages" @click="selectedConversationId = null">
           <svg class="" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -129,7 +129,7 @@
 
       <!-- load more message -->
       <div class="clear">
-        <button class="fill-row no-animate" v-if="currentConversation.has_next" @click="loadMoreMessages()">
+        <button class="full-width no-animate" v-if="currentConversation.has_next" @click="loadMoreMessages()">
           Load More Messages
         </button>
       </div>
