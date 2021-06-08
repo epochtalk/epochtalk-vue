@@ -15,11 +15,11 @@
 
       <div class="pagination-slide" v-if="pageMax > 0">
         <div class="prev">
-          <button @click="loadRecentMessages(page - 1)" :disabled="page === 1">&#10094;</button>
+          <button @click="loadRecentMessages(-1)" :disabled="page === 1">&#10094;</button>
         </div>
         <div class="page" v-html="'Page ' + page + ' of ' + pageMax"></div>
         <div class="next">
-          <button @click="loadRecentMessages(page + 1)" :disabled="page === pageMax">&#10095;</button>
+          <button @click="loadRecentMessages(1)" :disabled="page === pageMax">&#10095;</button>
         </div>
       </div>
 
@@ -181,7 +181,7 @@ export default {
     next()
   },
   setup() {
-    const pageResults = inc => {
+    const loadRecentMessages = inc => {
       const newPage = v.recentMessages.page + inc
       let query = { ...$route.query, page: newPage }
       if (query.page === 1 || !query.page) delete query.page
@@ -238,7 +238,6 @@ export default {
     }
 
     const reloadConversation = () => console.log('reloadConversation')
-    const loadRecentMessages = () => console.log('loadRecentMessages')
     const loadMoreMessages = () => true
     const openReportModal = message => console.log(message)
     const openDeleteModal = message => console.log(message)
@@ -270,7 +269,7 @@ export default {
       loggedIn: $auth.loggedIn,
       authedUser: $auth.user,
       receiverNames: [],
-      page: Number($route.query.page) || 1,
+      page: computed(() => Number($route.query.page) || 1),
       currentConversation: { messages: [] },
       selectedConversationId: null,
       newMessage: null,
@@ -287,7 +286,7 @@ export default {
       }
     })
 
-    return { ...toRefs(v), pageResults, loadRecentMessages, reloadConversation, loadConversation, loadMoreMessages, openReportModal, openDeleteModal, canDeleteConversation, canDeleteMessage, addQuote, canCreateConversation, canCreateMessage, listMessageReceivers, humanDate }
+    return { ...toRefs(v), loadRecentMessages, reloadConversation, loadConversation, loadMoreMessages, openReportModal, openDeleteModal, canDeleteConversation, canDeleteMessage, addQuote, canCreateConversation, canCreateMessage, listMessageReceivers, humanDate }
   }
 }
 </script>
