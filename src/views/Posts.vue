@@ -623,8 +623,32 @@ export default {
       return true
     }
     const canPostLock = (post) => {
-      console.log(post, 'canPostLock')
-      return true
+      if (!v.postData.data?.write_access) return false
+      if (!$auth.loggedIn) return false
+      // TODO(boka): check for banned
+      // if (BanSvc.banStatus()) return false
+      if (!v.permissionUtils.hasPermission('posts.lock.allow')) return false
+
+      const moderators = v.postData.data.board.moderators.map((data) => data.id)
+
+      if (v.permissionUtils.hasPermission('posts.lock.bypass.lock.admin')) return true
+      else if (v.permissionUtils.hasPermission('posts.lock.bypass.lock.mod')) {
+        if (v.permissionUtils.moderatesBoard(v.postData.data.board.id) && v.permissionUtils.getPriority() < post.user.priority) return true
+        // Check if mod is moderating another board's mod (which is allowed)
+        else if (v.permissionUtils.moderatesBoard(v.postData.data.board.id) && (v.permissionUtils.getPriority() === post.user.priority && !moderators.includes(post.user.id))) return true
+        else return false
+      }
+      else if (v.permissionUtils.hasPermission('posts.lock.bypass.lock.priority')) {
+        if (v.permissionUtils.getPriority() < post.user.priority) return true
+        // Allow users with priority option to still self mod
+        else if (v.permissionUtils.hasPermission('threads.moderated.allow') && v.postData.data.thread.user.id === v.authedUser.id && v.postData.data.thread.moderated && v.authedUser.id !== post.user.id && v.permissionUtils.getPriority() <= post.user.priority) return true
+        else return false
+      }
+      else if (v.permissionUtils.hasPermission('threads.moderated.allow') && v.permissionUtils.hasPermission('posts.lock.bypass.lock.selfMod') && v.permissionUtils.getPriority() <= post.user.priority) {
+        if (v.postData.data.thread.user.id === v.authedUser.id && v.postData.data.thread.moderated && v.authedUser.id !== post.user.id) return true
+        else return false
+      }
+      else return false
     }
     const canDelete = (post) => {
       if (!v.postData.data?.write_access) return false
