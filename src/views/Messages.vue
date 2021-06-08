@@ -336,8 +336,23 @@ export default {
       padding: 0.5rem;
       margin: 0;
 
+      &:hover, &:focus:hover {
+        -webkit-transition: color 0.15s ease,background-color 0.15s ease;
+        -moz-transition: color 0.15s ease,background-color 0.15s ease;
+        transition: color 0.15s ease,background-color 0.15s ease;
+        border-color: $secondary-font-color;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        color: #fff;
+        text-decoration: none;
+        transform: translateY(-1px);
+        color: $text-gray-dark;
+        background-color: transparent;
+      }
       &:disabled {
-        color: #ccc;
+        color: $secondary-font-color;
+        &:hover, &:focus:hover {
+          box-shadow: none;
+        }
       }
     }
   }
