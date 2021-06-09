@@ -137,9 +137,11 @@ export const messagesApi = {
   settings: () => $http('/api/messages/settings'),
   emailNotifications: enabled => $http('/api/messages/settings', { method: 'PUT', data:{enabled}}),
   ignoreNewbies: enabled => $http('/api/messages/settings/newbie', { method: 'PUT', data:{enabled}}),
+  delete: id => $http(`/api/messages/${id}`, { method: 'DELETE' }),
   convos: {
     page: (id, params) => $http(`/api/conversations/${id}`, { params }),
-    create: data => $http('/api/conversations', { method: 'POST', data })
+    create: data => $http('/api/conversations', { method: 'POST', data }),
+    delete: id => $http(`/api/conversations/${id}`, { method: 'DELETE' })
   }
 }
 
