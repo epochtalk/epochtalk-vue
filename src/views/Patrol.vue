@@ -119,13 +119,13 @@
           <!-- Thread title -->
           <div class="thread-title">
             <span v-for="(breadcrumb, index) in post.breadcrumbs" :key="index" :class="{ active: index === (post.breadcrumbs.length - 1) }">
-              <span  v-if="breadcrumb.label">
+              <span v-if="breadcrumb.label">
                 <!-- TODO(akinsey): ui-sref="{{breadcrumb.state}}({{breadcrumb.opts}})" ui-sref-opts="{ reload: true }" ng-bind-html="breadcrumb.label | truncate:30" -->
-                <a v-if="index !== (post.breadcrumbs.length - 1) && breadcrumb.state" :title="breadcrumb.label" v-html="breadcrumb.label"></a>
+                <router-link :to="{ name: `${breadcrumbShim[breadcrumb.state]}`, params: breadcrumb.opts.boardSlug ? {...breadcrumb.opts} : undefined, hash: breadcrumb.opts['#'] ? `#${breadcrumb.opts['#']}` : undefined  }" v-if="index !== (post.breadcrumbs.length - 1) && breadcrumb.state" :title="breadcrumb.label" v-html="breadcrumb.label"></router-link>
                 <strong v-if="index !== (post.breadcrumbs.length - 1)">&nbsp;/&nbsp;</strong>
                 <strong v-if="index === (post.breadcrumbs.length - 1)">
                   <!-- TODO(akinsey): ui-sref="posts.data({ slug: post.slug, start: post.position, '#': post.id })" -->
-                  <a href="" v-html="post.thread_title"></a></strong>
+                  <router-link :to="{ name: 'Posts', params: { threadSlug: post.slug, threadId: post.thread_id }, query: { start: post.position}, hash: `#${post.id}` }" v-html="post.thread_title"></router-link></strong>
               </span>
             </span>
           </div>
@@ -178,6 +178,13 @@ export default {
     next()
   },
   setup() {
+    /* TODO(akinsey): update api to not return ui-sref states, remove shim */
+    const breadcrumbShim = {
+      '^.boards': 'Boards',
+      'posts.data': 'Posts',
+      'threads.data': 'Threads'
+    }
+
     const showEditDate = () => true
     const canPurge = () => true
     const canDelete = () => true
@@ -209,7 +216,7 @@ export default {
       }
     })
 
-    return { ...toRefs(v), showEditDate, canPurge, canDelete, canPostLock, canUpdate, pageResults, humanDate, userRoleHighlight, usernameHighlight, avatarHighlight }
+    return { ...toRefs(v), breadcrumbShim, showEditDate, canPurge, canDelete, canPostLock, canUpdate, pageResults, humanDate, userRoleHighlight, usernameHighlight, avatarHighlight }
   }
 }
 </script>
