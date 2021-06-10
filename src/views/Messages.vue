@@ -113,10 +113,10 @@
                 <a href="" class="action" data-balloon="Quote" @click="addQuote(message); editorConvoMode = false;">
                   <i class="icon-epoch-quote"></i>
                 </a>
-                <a v-if="canDeleteMessage(message.sender_id)" href="#" class="action"  @click="openDeleteModal(message.id)" data-balloon="Delete">
+                <a v-if="canDeleteMessage(message.sender_id)" href="#" class="action"  @click.prevent="selectedMessageId = message.id; showDeleteMessageModal = true" data-balloon="Delete">
                   <i class="fa fa-trash"></i>
                 </a>
-                <a v-if="controlAccess.reportMessages" href="#" class="action" @click="openReportModal(message)" data-balloon="Report">
+                <a v-if="controlAccess.reportMessages" href="" class="action" @click="openReportModal(message)" data-balloon="Report">
                   <i class="icon-epoch-flag"></i>
                 </a>
               </div>
@@ -144,6 +144,8 @@
       </div>
     </div>
   </div>
+
+  <delete-message-modal :show="showDeleteMessageModal" :message-id="selectedMessageId" @close="showDeleteMessageModal = false" @success="deleteMessageSuccess()" />
 </template>
 
 <script>
@@ -153,10 +155,12 @@ import { useRoute, useRouter } from 'vue-router'
 import humanDate from '@/composables/filters/humanDate'
 import { AuthStore } from '@/composables/stores/auth'
 import { localStoragePrefs } from '@/composables/stores/prefs'
+import DeleteMessageModal from '@/components/modals/messages/DeleteMessage.vue'
 // import { avatarHighlight, usernameHighlight, userRoleHighlight } from '@/composables/utils/userUtils'
 
 export default {
   name: 'Messages',
+  components: { DeleteMessageModal },
   beforeRouteEnter(to, from, next) {
     const query = {
       limit: to.query.limit || localStoragePrefs().data.posts_per_page,
@@ -248,14 +252,27 @@ export default {
       messagesApi.convos.page(v.currentConversation.id, options)
       // build out conversation information
       .then(data => {
-        v.currentConversation.messages = v.currentConversation.messages.concat(data.messages);
-        v.currentConversation.last_message_id = data.last_message_id;
-        v.currentConversation.last_message_timestamp = data.last_message_timestamp;
-        v.currentConversation.has_next = data.has_next;
+        v.currentConversation.messages = v.currentConversation.messages.concat(data.messages)
+        v.currentConversation.last_message_id = data.last_message_id
+        v.currentConversation.last_message_timestamp = data.last_message_timestamp
+        v.currentConversation.has_next = data.has_next
       })
     }
     const openReportModal = message => console.log(message)
-    const openDeleteModal = message => console.log(message)
+    const deleteMessageSuccess = () => {
+      const filteredMessages = v.currentConversation.messages.filter(message => message.id !== v.selectedMessageId)
+      console.log(filteredMessages, filteredMessages.length)
+      v.currentConversation.messages = filteredMessages
+      if (filteredMessages.length === 0) {
+        let query = $route.query
+        if (v.recentMessages.messages[1]) {
+          query.id = v.recentMessages.messages[1].conversation_id
+          console.log(query)
+          $router.push({ name: $route.name, params: $route.params, query: query })
+        }
+        else v.recentMessages = []
+      }
+    }
     const addQuote = message => console.log(message)
     const canDeleteConversation = () => true
     const canDeleteMessage = () => true
@@ -291,6 +308,8 @@ export default {
       recentMessages: {},
       currentSubject: null,
       pageMax: computed(() => Math.ceil(v.recentMessages.total_convo_count / v.recentMessages.limit)),
+      showDeleteMessageModal: false,
+      selectedMessageId: null,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
       showEditor: false,
@@ -300,7 +319,7 @@ export default {
       }
     })
 
-    return { ...toRefs(v), loadRecentMessages, reloadConversation, preloadConversation, loadConversation, loadMoreMessages, openReportModal, openDeleteModal, canDeleteConversation, canDeleteMessage, addQuote, canCreateConversation, canCreateMessage, listMessageReceivers, humanDate }
+    return { ...toRefs(v), loadRecentMessages, reloadConversation, preloadConversation, loadConversation, loadMoreMessages, openReportModal, canDeleteConversation, canDeleteMessage, addQuote, canCreateConversation, canCreateMessage, deleteMessageSuccess, listMessageReceivers, humanDate }
   }
 }
 </script>
