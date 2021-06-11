@@ -145,6 +145,10 @@ export const messagesApi = {
   }
 }
 
+export const reportsApi = {
+  reportMessage: data => $http('/api/reports/messages', { method: 'POST', data })
+}
+
 export const mentionsApi = {
   pageIgnored: params => $http('/api/mentions/ignored', { params }),
   ignore: data => $http(`/api/mentions/ignore`, { method: 'POST', data }),
