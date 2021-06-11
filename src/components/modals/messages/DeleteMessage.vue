@@ -34,14 +34,13 @@ export default {
       messagesApi.delete(props.messageId)
       .then(() => {
         emit('success')
-        $alertStore.success(`Successfully deleted reply!`)
+        $alertStore.success(`Successfully deleted message!`)
       })
-      .catch(() => v.errorMessage = `There was an error deleting reply, please contact an administrator.`)
+      .catch(() => v.errorMessage = `There was an error deleting message, please contact an administrator.`)
       .finally(() => v.errorMessage ? null : close())
     }
 
     const close = () => {
-      console.log('CLOSE!!!')
       v.errorMessage = null
       emit('close')
     }
