@@ -3,7 +3,7 @@
     <!-- Recent Conversations -->
     <div class="conversations">
       <div id="recentMessagesHeader">
-        <div class="inbox" @click="loadRecentMessages(); reloadConversation()">
+        <div class="inbox" @click="reload()">
           <i class="fa fa-envelope"></i> Inbox
         </div>
         <div class="add" v-if="canCreateConversation()" @click="showEditor = true; editorConvoMode = true;">
@@ -194,6 +194,8 @@ export default {
         $router.replace({ name: $route.name, params: $route.params, query: query })
     }
 
+    const reload = () => window.location.reload()
+
     const loadConversation = conversationId =>
       $router.replace({ name: $route.name, params: $route.params, query: { ...$route.query, id: conversationId } })
 
@@ -243,7 +245,6 @@ export default {
       })
     }
 
-    const reloadConversation = () => console.log('reloadConversation')
     const loadMoreMessages = () => {
       const options = {
         timestamp: v.currentConversation.last_message_timestamp,
@@ -261,14 +262,12 @@ export default {
     const openReportModal = message => console.log(message)
     const deleteMessageSuccess = () => {
       const filteredMessages = v.currentConversation.messages.filter(message => message.id !== v.selectedMessageId)
-      console.log(filteredMessages, filteredMessages.length)
       v.currentConversation.messages = filteredMessages
       if (filteredMessages.length === 0) {
-        let query = $route.query
-        if (v.recentMessages.messages[1]) {
-          query.id = v.recentMessages.messages[1].conversation_id
-          console.log(query)
-          $router.push({ name: $route.name, params: $route.params, query: query })
+        if (v.recentMessages.messages.length > 1) {
+          let index = v.selectedConversationId === v.recentMessages.messages[0].conversation_id ? 1 : 0
+          console.log({ ...$route.query, id: v.recentMessages.messages[index].conversation_id })
+          $router.replace({ name: $route.name, params: $route.params, query: { ...$route.query, id: v.recentMessages.messages[index].conversation_id } })
         }
         else v.recentMessages = []
       }
@@ -319,7 +318,7 @@ export default {
       }
     })
 
-    return { ...toRefs(v), loadRecentMessages, reloadConversation, preloadConversation, loadConversation, loadMoreMessages, openReportModal, canDeleteConversation, canDeleteMessage, addQuote, canCreateConversation, canCreateMessage, deleteMessageSuccess, listMessageReceivers, humanDate }
+    return { ...toRefs(v), reload, loadRecentMessages, preloadConversation, loadConversation, loadMoreMessages, openReportModal, canDeleteConversation, canDeleteMessage, addQuote, canCreateConversation, canCreateMessage, deleteMessageSuccess, listMessageReceivers, humanDate }
   }
 }
 </script>
