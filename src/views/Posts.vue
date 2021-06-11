@@ -619,73 +619,66 @@ export default {
       else return false
     }
     const canUpdate = (post) => {
-      /*
-      var elevatedPrivileges = Session.hasPermission('posts.update.bypass.owner.admin') || Session.hasPermission('posts.update.bypass.locked.mod') || Session.hasPermission('posts.update.bypass.locked.priority');
-      if (!pageData.write_access) { return false; }
-      if (!Session.isAuthenticated()) { return false; }
-      if (!Session.hasPermission('posts.update.allow')) { return false; }
-      if (BanSvc.banStatus()) { return false; }
+      var elevatedPrivileges = Session.hasPermission('posts.update.bypass.owner.admin') || Session.hasPermission('posts.update.bypass.locked.mod') || Session.hasPermission('posts.update.bypass.locked.priority')
+      if (!pageData.write_access) return false
+      if (!Session.isAuthenticated()) return false
+      if (!Session.hasPermission('posts.update.allow')) return false
+      if (BanSvc.banStatus()) return false
       // Shim for old disablePostEdit
-      if (ctrl.disablePostEdit === true && !elevatedPrivileges) { return false; }
+      if (ctrl.disablePostEdit === true && !elevatedPrivileges) return false
       // Check time on disablePostEdit
       if (ctrl.disablePostEdit && Number(ctrl.disablePostEdit) > -1 && !elevatedPrivileges) {
-        var currentTime = new Date().getTime();
-        var minutes = Number(ctrl.disablePostEdit) * 60 * 1000;
-        var postCreatedAt = new Date(post.created_at).getTime();
-        var canUpdate = currentTime - postCreatedAt < minutes;
-        if (!canUpdate) { return false; }
+        var currentTime = new Date().getTime()
+        var minutes = Number(ctrl.disablePostEdit) * 60 * 1000
+        var postCreatedAt = new Date(post.created_at).getTime()
+        var canUpdate = currentTime - postCreatedAt < minutes
+        if (!canUpdate) return false
       }
-
-      var validBypass = false;
 
       // locked
       if (ctrl.thread.locked) {
-        if (Session.hasPermission('posts.update.bypass.locked.admin')) { validBypass = true; }
+        if (Session.hasPermission('posts.update.bypass.locked.admin')) return true
         else if (Session.hasPermission('posts.update.bypass.locked.mod')) {
-          if (Session.moderatesBoard(ctrl.thread.board_id) && ctrl.user.id === post.user.id) { validBypass = true; }
-          else if (Session.moderatesBoard(ctrl.thread.board_id) && Session.getPriority() < post.user.priority) { validBypass = true; }
+          if (Session.moderatesBoard(ctrl.thread.board_id) && ctrl.user.id === post.user.id) return true
+          else if (Session.moderatesBoard(ctrl.thread.board_id) && Session.getPriority() < post.user.priority) return true
           else if (Session.moderatesBoard(ctrl.thread.board_id) && (Session.getPriority() === post.user.priority && !ctrl.moderators.includes(post.user.id))) {
-            validBypass = true;
+            return true
           }
         }
         else if (Session.hasPermission('posts.update.bypass.locked.priority')) {
-          if (Session.getPriority() < post.user.priority) { validBypass = true; }
+          if (Session.getPriority() < post.user.priority) return true
         }
       }
 
       // owner
-      if (post.user.id === ctrl.user.id && !ctrl.thread.locked) { validBypass = true; }
+      if (post.user.id === ctrl.user.id && !ctrl.thread.locked) return true
       else {
-        if (Session.hasPermission('posts.update.bypass.owner.admin')) { validBypass = true; }
+        if (Session.hasPermission('posts.update.bypass.owner.admin')) return true
         else if (Session.hasPermission('posts.update.bypass.owner.mod')) {
-          if (Session.moderatesBoard(ctrl.thread.board_id) && Session.getPriority() < post.user.priority) { validBypass = true; }
+          if (Session.moderatesBoard(ctrl.thread.board_id) && Session.getPriority() < post.user.priority) return true
           // Check if mod is moderating another board's mod (which is allowed)
           else if (Session.moderatesBoard(ctrl.thread.board_id) && (Session.getPriority() === post.user.priority && !ctrl.moderators.includes(post.user.id))) {
-            validBypass = true;
+            return true
           }
         }
         else if (Session.hasPermission('posts.update.bypass.owner.priority')) {
-          if (Session.getPriority() < post.user.priority) { validBypass = true; }
+          if (Session.getPriority() < post.user.priority) return true
         }
       }
 
       // deleted
       if (post.deleted) {
-        if (Session.hasPermission('posts.update.bypass.deleted.admin')) { validBypass = true; }
+        if (Session.hasPermission('posts.update.bypass.deleted.admin')) return true
         else if (Session.hasPermission('posts.update.bypass.deleted.mod')) {
-          if (Session.moderatesBoard(ctrl.thread.board_id) && Session.getPriority() < post.user.priority) { validBypass = true; }
+          if (Session.moderatesBoard(ctrl.thread.board_id) && Session.getPriority() < post.user.priority) return true
           else if (Session.moderatesBoard(ctrl.thread.board_id) && (Session.getPriority() === post.user.priority && !ctrl.moderators.includes(post.user.id))) {
-            validBypass = true;
+            return true
           }
         }
         else if (Session.hasPermission('posts.update.bypass.deleted.priority')) {
-          if (Session.getPriority() < post.user.priority) { validBypass = true; }
+          if (Session.getPriority() < post.user.priority) return true
         }
       }
-
-      return validBypass;
-      */
-      return true
     }
     const canPostLock = (post) => {
       if (!v.postData.data?.write_access) return false
