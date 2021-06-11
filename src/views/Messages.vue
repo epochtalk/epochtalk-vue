@@ -116,8 +116,8 @@
                 <a v-if="canDeleteMessage(message.sender_id)" href="#" class="action"  @click.prevent="selectedMessageId = message.id; showDeleteMessageModal = true" data-balloon="Delete">
                   <i class="fa fa-trash"></i>
                 </a>
-                <a v-if="controlAccess.reportMessages" href="" class="action" @click="openReportModal(message)" data-balloon="Report">
-                  <i class="icon-epoch-flag"></i>
+                <a v-if="controlAccess.reportMessages" href="" class="action" @click.prevent="selectedMessageId = message.id; showReportMessageModal = true" data-balloon="Report">
+                  <i class="fas fa-exclamation-triangle"></i>
                 </a>
               </div>
             </div>
@@ -146,6 +146,7 @@
   </div>
 
   <delete-message-modal :show="showDeleteMessageModal" :message-id="selectedMessageId" @close="showDeleteMessageModal = false" @success="deleteMessageSuccess()" />
+  <report-message-modal :show="showReportMessageModal" :message-id="selectedMessageId" @close="showReportMessageModal = false" @success="deleteMessageSuccess()" />
 </template>
 
 <script>
@@ -156,11 +157,12 @@ import humanDate from '@/composables/filters/humanDate'
 import { AuthStore } from '@/composables/stores/auth'
 import { localStoragePrefs } from '@/composables/stores/prefs'
 import DeleteMessageModal from '@/components/modals/messages/DeleteMessage.vue'
+import ReportMessageModal from '@/components/modals/messages/ReportMessage.vue'
 // import { avatarHighlight, usernameHighlight, userRoleHighlight } from '@/composables/utils/userUtils'
 
 export default {
   name: 'Messages',
-  components: { DeleteMessageModal },
+  components: { DeleteMessageModal, ReportMessageModal },
   beforeRouteEnter(to, from, next) {
     const query = {
       limit: to.query.limit || localStoragePrefs().data.posts_per_page,
@@ -266,7 +268,6 @@ export default {
       if (filteredMessages.length === 0) {
         if (v.recentMessages.messages.length > 1) {
           let index = v.selectedConversationId === v.recentMessages.messages[0].conversation_id ? 1 : 0
-          console.log({ ...$route.query, id: v.recentMessages.messages[index].conversation_id })
           $router.replace({ name: $route.name, params: $route.params, query: { ...$route.query, id: v.recentMessages.messages[index].conversation_id } })
         }
         else v.recentMessages = []
@@ -308,6 +309,7 @@ export default {
       currentSubject: null,
       pageMax: computed(() => Math.ceil(v.recentMessages.total_convo_count / v.recentMessages.limit)),
       showDeleteMessageModal: false,
+      showReportMessageModal: false,
       selectedMessageId: null,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
