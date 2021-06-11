@@ -466,7 +466,7 @@ export default {
     }
     /* View Methods */
     const canEditTitle = () => {
-      if (!$auth.loggedIn) return false
+      if (!v.loggedIn) return false
       if (v.bannedFromBoard) return false
       if (!v.permissionUtils.hasPermission('threads.title.allow')) return false
       if (!v.postData.data?.write_access) return false
@@ -510,7 +510,7 @@ export default {
       return text.length || images
     }
     const canMove = () => {
-      if (!$auth.loggedIn) return false
+      if (!v.loggedIn) return false
       if (v.bannedFromBoard) return false
       if (!v.postData.data?.write_access) return false
       if (!v.permissionUtils.hasPermission('threads.move.allow')) return false
@@ -523,7 +523,7 @@ export default {
       else return false
     }
     const canPurgeThread = () => {
-      if (!$auth.loggedIn) return false
+      if (!v.loggedIn) return false
       if (v.bannedFromBoard) return false
       if (!v.postData.data?.write_access) return false
       if (!v.permissionUtils.hasPermission('threads.purge.allow')) return false
@@ -540,7 +540,7 @@ export default {
     }
     const canPurgePost = (post) => {
       if (!v.postData.data?.write_access) return false
-      if (!$auth.loggedIn) return false
+      if (!v.loggedIn) return false
       // TODO(boka): check for banned
       // if (BanSvc.banStatus()) return false
       if (!v.permissionUtils.hasPermission('threads.purge.allow')) return false
@@ -568,7 +568,7 @@ export default {
       else return false
     }
     const canSticky = () => {
-      if (!$auth.loggedIn) return false
+      if (!v.loggedIn) return false
       if (v.bannedFromBoard) return false
       if (!v.postData.data?.write_access) return false
       if (!v.permissionUtils.hasPermission('threads.sticky.allow')) return false
@@ -584,7 +584,7 @@ export default {
       else return false
     }
     const canLock = () => {
-      if (!$auth.loggedIn) return false
+      if (!v.loggedIn) return false
       if (v.bannedFromBoard) return false
       if (!v.permissionUtils.hasPermission('threads.lock.allow')) return false
       if (!v.postData.data?.write_access) return false
@@ -601,7 +601,7 @@ export default {
       else return false
     }
     const canCreatePoll = () => {
-      if (!$auth.loggedIn) return false
+      if (!v.loggedIn) return false
       if (v.bannedFromBoard) return false
       if (!v.permissionUtils.hasPermission('threads.createPoll.allow')) return false
       if (!v.postData.data?.write_access) return false
@@ -689,7 +689,7 @@ export default {
     }
     const canPostLock = (post) => {
       if (!v.postData.data?.write_access) return false
-      if (!$auth.loggedIn) return false
+      if (!v.loggedIn) return false
       // TODO(boka): check for banned
       // if (BanSvc.banStatus()) return false
       if (!v.permissionUtils.hasPermission('posts.lock.allow')) return false
@@ -717,7 +717,7 @@ export default {
     }
     const canDelete = (post) => {
       if (!v.postData.data?.write_access) return false
-      if (!$auth.loggedIn) return false
+      if (!v.loggedIn) return false
       // TODO(boka): check for banned
       // if (BanSvc.banStatus()) return false
       if (!v.permissionUtils.hasPermission('posts.delete.allow')) return false
