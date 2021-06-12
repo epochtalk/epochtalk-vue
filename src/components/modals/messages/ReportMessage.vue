@@ -21,7 +21,8 @@
 <script>
 import Modal from '@/components/layout/Modal.vue'
 import { reactive, toRefs, inject } from 'vue'
-import { messagesApi } from '@/api'
+import { reportsApi } from '@/api'
+import { AuthStore } from '@/composables/stores/auth'
 
 export default {
   name: 'report-message-modal',
@@ -32,28 +33,35 @@ export default {
     /* Template Methods */
     const reportMessage = () => {
       v.errorMessage = null
-      messagesApi.delete(props.messageId)
+      const data = {
+        offender_message_id: props.messageId,
+        reporter_reason: v.reportReason,
+        reporter_user_id: v.authedUser.id
+      }
+      reportsApi.reportMessage(data)
       .then(() => {
         emit('success')
-        $alertStore.success(`Successfully deleted reply!`)
+        $alertStore.success(`Successfully reported message!`)
       })
-      .catch(() => v.errorMessage = `There was an error deleting reply, please contact an administrator.`)
+      .catch(() => v.errorMessage = `There was an error reporting message, please contact an administrator.`)
       .finally(() => v.errorMessage ? null : close())
     }
 
     const close = () => {
-      console.log('CLOSE!!!')
+      v.reportReason = ''
       v.errorMessage = null
       emit('close')
     }
 
     /* Internal Data */
     const $alertStore = inject('$alertStore')
+    const $auth = inject(AuthStore)
 
     /* Template Data */
     const v = reactive({
+      authedUser: $auth.user,
       focusInput: null,
-      reportReason: null,
+      reportReason: '',
       reportSubmitted: false,
       errorMessage: ''
     })

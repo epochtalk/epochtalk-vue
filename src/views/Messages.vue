@@ -39,7 +39,7 @@
             <span class="recipient" v-html="listMessageReceivers(message)"></span>
             <span class="msg-preview" v-html="humanDate(message.created_at)"></span>
             <span class="msg-preview" v-html="message?.content?.subject"></span>
-            <a v-if="canDeleteConversation()" href="#" class="action" @click="openDeleteConvoModal(message.conversation_id)" data-balloon="Delete" data-balloon-pos="left">
+            <a v-if="canDeleteConversation()" class="action" @click.prevent="selectedDeletedConvoId = message.conversation_id; showDeleteConversationModal = true" data-balloon="Delete" data-balloon-pos="left">
               <i class="fa fa-trash"></i>
             </a>
           </div>
@@ -97,11 +97,11 @@
                 </div>
               </div>
               <div class="avatar" :class="defaultAvatarShape">
-                <img :src="message.sender_avatar || defaultAvatar" />
+                <router-link :to="{ path: '/profile/' + message.sender_username.toLowerCase() }"><img :src="message.sender_avatar || defaultAvatar" /></router-link>
               </div>
               <div class="title">
                 <div class="title-username-role">
-                  <span class="username" v-html="message.sender_username"></span>
+                  <router-link class="username" :to="{ path: '/profile/' + message.sender_username.toLowerCase() }" v-html="message.sender_username"></router-link>
                   <span class="badge alert user-role info-tooltip" v-if="message.sender_newbie_alert && (message.sender_id !== authedUser.id)" data-balloon="!!! WARNING: This user is a newbie. If you are expecting a message from a more veteran member, then this is an imposter !!!" data-balloon-pos="down" data-balloon-length="large" data-balloon-break>
                     <i class="fa fa-info-circle"></i>
                     Newbie Alert!
@@ -145,8 +145,9 @@
     </div>
   </div>
 
+  <delete-conversation-modal :show="showDeleteConversationModal" :conversation-id="selectedDeletedConvoId" @close="showDeleteConversationModal = false" @success="reload()" />
   <delete-message-modal :show="showDeleteMessageModal" :message-id="selectedMessageId" @close="showDeleteMessageModal = false" @success="deleteMessageSuccess()" />
-  <report-message-modal :show="showReportMessageModal" :message-id="selectedMessageId" @close="showReportMessageModal = false" @success="deleteMessageSuccess()" />
+  <report-message-modal :show="showReportMessageModal" :message-id="selectedMessageId" @close="showReportMessageModal = false" @success="showReportMessageModal = false" />
 </template>
 
 <script>
@@ -156,13 +157,14 @@ import { useRoute, useRouter } from 'vue-router'
 import humanDate from '@/composables/filters/humanDate'
 import { AuthStore } from '@/composables/stores/auth'
 import { localStoragePrefs } from '@/composables/stores/prefs'
+import DeleteConversationModal from '@/components/modals/messages/DeleteConversation.vue'
 import DeleteMessageModal from '@/components/modals/messages/DeleteMessage.vue'
 import ReportMessageModal from '@/components/modals/messages/ReportMessage.vue'
 // import { avatarHighlight, usernameHighlight, userRoleHighlight } from '@/composables/utils/userUtils'
 
 export default {
   name: 'Messages',
-  components: { DeleteMessageModal, ReportMessageModal },
+  components: { DeleteConversationModal, DeleteMessageModal, ReportMessageModal },
   beforeRouteEnter(to, from, next) {
     const query = {
       limit: to.query.limit || localStoragePrefs().data.posts_per_page,
@@ -196,7 +198,23 @@ export default {
         $router.replace({ name: $route.name, params: $route.params, query: query })
     }
 
-    const reload = () => window.location.reload()
+    const reload = () => {
+      if ($route.query.id) {
+        const query = { ...$route.query }
+        delete query.id
+        $router.replace({ name: $route.name, params: $route.params, query })
+      }
+      else {
+        const query = {
+          limit: $route.query.limit || localStoragePrefs().data.posts_per_page,
+          page: $route.query.page || 1
+        }
+        messagesApi.page(query)
+        .then(d => v.recentMessages = d)
+        .then(() => loadConversation($route.query.id || v.recentMessages.messages[0].conversation_id))
+        .catch(() => {})
+      }
+    }
 
     const loadConversation = conversationId =>
       $router.replace({ name: $route.name, params: $route.params, query: { ...$route.query, id: conversationId } })
@@ -210,6 +228,7 @@ export default {
       messagesApi.convos.page(conversationId)
       // build out conversation information
       .then(data => {
+        console.log(data.messages[0].content.subject)
         v.currentSubject = data.messages[0].content.subject
         v.currentConversation = data
         v.currentConversation.id = conversationId
@@ -261,7 +280,6 @@ export default {
         v.currentConversation.has_next = data.has_next
       })
     }
-    const openReportModal = message => console.log(message)
     const deleteMessageSuccess = () => {
       const filteredMessages = v.currentConversation.messages.filter(message => message.id !== v.selectedMessageId)
       v.currentConversation.messages = filteredMessages
@@ -304,12 +322,14 @@ export default {
       page: computed(() => Number($route.query.page) || 1),
       currentConversation: { messages: [] },
       selectedConversationId: null,
+      selectedDeletedConvoId: null,
       newMessage: null,
       recentMessages: {},
       currentSubject: null,
       pageMax: computed(() => Math.ceil(v.recentMessages.total_convo_count / v.recentMessages.limit)),
       showDeleteMessageModal: false,
       showReportMessageModal: false,
+      showDeleteConversationModal: false,
       selectedMessageId: null,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
@@ -320,7 +340,7 @@ export default {
       }
     })
 
-    return { ...toRefs(v), reload, loadRecentMessages, preloadConversation, loadConversation, loadMoreMessages, openReportModal, canDeleteConversation, canDeleteMessage, addQuote, canCreateConversation, canCreateMessage, deleteMessageSuccess, listMessageReceivers, humanDate }
+    return { ...toRefs(v), reload, loadRecentMessages, preloadConversation, loadConversation, loadMoreMessages, canDeleteConversation, canDeleteMessage, addQuote, canCreateConversation, canCreateMessage, deleteMessageSuccess, listMessageReceivers, humanDate }
   }
 }
 </script>
