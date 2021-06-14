@@ -138,8 +138,8 @@
 
           <td class="last-post">
             <span v-if="thread.last_deleted">deleted</span>
-            <img v-if="!thread.last_deleted" class="avatar-small" :class="defaultAvatarShape" :src="thread.last_post_avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
-            <a v-if="!thread.last_deleted" href="#">{{thread.last_post_username}}</a> posted on
+            <router-link v-if="!thread.last_deleted" :to="{ path: '/profile/' + thread.last_post_username.toLowerCase() }"><img class="avatar-small" :class="defaultAvatarShape" :src="thread.last_post_avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" /></router-link>
+            <router-link v-if="!thread.last_deleted" :to="{ path: '/profile/' + thread.last_post_username.toLowerCase() }" v-html="thread.last_post_username"></router-link> posted on
             <a href="#">{{ humanDate(thread.last_post_created_at) }}.</a>
             <span v-if="thread.has_new_post">
               <a href="#">(Last unread post)</a>
@@ -189,8 +189,8 @@
 
           <td class="last-post">
             <span v-if="thread.last_deleted">deleted</span>
-            <img v-if="!thread.last_deleted" class="avatar-small" :class="defaultAvatar" :src="thread.last_post_avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
-            <a v-if="!thread.last_deleted" href="">{{thread.last_post_username}}</a> posted on
+            <router-link v-if="!thread.last_deleted" :to="{ path: '/profile/' + thread.last_post_username.toLowerCase() }"><img class="avatar-small" :class="defaultAvatar" :src="thread.last_post_avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" /></router-link>
+            <router-link v-if="!thread.last_deleted" :to="{ path: '/profile/' + thread.last_post_username.toLowerCase() }" v-html="thread.last_post_username"></router-link> posted on
             <a href="">{{ humanDate(thread.last_post_created_at) }}.</a>
             <span v-if="thread.has_new_post">
               <a href="">(Last unread post)</a>
