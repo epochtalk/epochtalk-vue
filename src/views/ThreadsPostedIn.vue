@@ -44,7 +44,7 @@
               Started by
               <span v-if="thread.user.deleted">deleted</span>
               <!-- TODO(boka): profile.posts({ username: thread.user.username }) -->
-              <a v-if="!thread.user.deleted" ui-sref="#">{{thread.user.username}}</a>
+              <router-link v-if="!thread.user.deleted" :to="{ path: '/profile/' + thread.user.username.toLowerCase() }" v-html="thread.user.username"></router-link>
               <span>{{' on ' + humanDate(thread.created_at)}}</span>
             </div>
           </td>
@@ -54,9 +54,9 @@
           </td>
           <td class="last-post">
             <span v-if="thread.last_deleted">deleted</span>
-            <img :src="thread.last_post_avatar || defaultAvatar" v-if="!thread.last_deleted" :class="`avatar-small ${defaultAvatarShape}`"/>
+            <router-link v-if="!thread.last_deleted" :to="{ path: '/profile/' + thread.last_post_username.toLowerCase() }"><img :src="thread.last_post_avatar || defaultAvatar" :class="`avatar-small ${defaultAvatarShape}`"/></router-link>
             <!-- TODO(boka): profile.posts({ username: thread.last_post_username }) -->
-            <a v-if="!thread.last_deleted" ui-sref="#">{{thread.last_post_username}}</a> posted on
+             <router-link v-if="!thread.last_deleted" :to="{ path: '/profile/' + thread.last_post_username.toLowerCase() }" v-html="thread.last_post_username"></router-link> posted on
             <router-link :to="{ name: 'Posts', params: { threadSlug: thread.slug, threadId: thread.id, start: thread.last_post_position }, hash: '#' + thread.last_post_id }"><span>{{humanDate(thread.last_post_created_at)}}</span>.</router-link>
             <span v-if="thread.has_new_post">
               <router-link :to="{ name: 'Posts', params: { threadSlug: thread.slug, threadId: thread.id, start: thread.latest_unread_position}, hash: '#' + thread.latest_unread_post_id }">(Last unread post)</router-link>
