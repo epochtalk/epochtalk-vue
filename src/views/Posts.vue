@@ -21,7 +21,7 @@
         </a>
         <div class="threadStates">
           <div class="badge locked" v-if="postData.data.thread.locked">
-            <div class="">
+            <div>
               <a href="" id="lockThread" :data-balloon="postData.data.thread.locked ? 'Unlock Thread' : 'Lock Thread'" v-if="canLock()" :class="{'clicked' : postData.data.thread.locked }" @click.prevent="updateThreadLock(postData.data.thread)" class="badgeContents">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                   <title></title>
@@ -120,10 +120,14 @@
                   <circle cx="24" cy="24" r="16" />
                 </svg>
               </span>
-              <img :src="post.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
+              <router-link :to="{ path: '/profile/' + post.user.username.toLowerCase() }">
+                <img :src="post.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
+              </router-link>
             </div>
-            <div class="original-poster" v-if="post.user.original_poster">OP</div>
-            <div v-if="post.user.activity > -1" :title="('Activity: ' + post.user.activity)" class="user-activity">Act: <span class="user-activity-value">{{post.user.activity}}</span></div>
+            <router-link :to="{ path: '/profile/' + post.user.username.toLowerCase() }">
+              <div class="original-poster" v-if="post.user.original_poster">OP</div>
+              <div v-if="post.user.activity > -1" :title="('Activity: ' + post.user.activity)" class="user-activity">Act: <span class="user-activity-value">{{post.user.activity}}</span></div>
+            </router-link>
           </a>
 
 
@@ -142,7 +146,7 @@
           <!-- Post Title -->
           <div class="post-title">
             <div class="post-title-user">
-              <a class="username" href="#" :data-balloon="post.user.role_name || 'User'">{{post.user.username}}</a>
+              <span class="username" :data-balloon="post.user.role_name || 'User'"><router-link :to="{ path: '/profile/' + post.user.username.toLowerCase() }" v-html="post.user.username" /></span>
               <div :title="post.user.name" v-if="post.user.name" class="display-name">
                 <span>{{truncate(post.user.name, 33)}}</span>
                 <span class="hide-mobile">&nbsp;&mdash;&nbsp;</span>
@@ -255,7 +259,6 @@
                 </router-link>
               </li>
             </ul>
-            <!-- <div class="clear"></div> -->
           </div>
           <!-- Post Body -->
           <!-- TODO(akinsey): post-processing="post.body_html" style-fix="true" -->
@@ -357,9 +360,6 @@
       <!-- Poll Viewer -->
       <poll-viewer v-if="postData.data.thread?.poll" :poll="postData.data.thread.poll" :thread="postData.data.thread" :user-priority="postData.data.posts[0].user.priority" :reset="resetPoll"></poll-viewer>
 
-      <!-- <div class="controls">
-        <pagination page-count="PostsParentCtrl.pageCount" page="PostsParentCtrl.page"></pagination>
-      </div> -->
       <pagination v-if="postData.data?.thread" :page="postData.data.page" :limit="postData.data.limit" :count="postData.data.thread.post_count"></pagination>
     </div>
 
@@ -369,7 +369,6 @@
   <div class="actions-bottom">
     <div class="actions-bottom-grid">
       <div id="pagination-bottom" class="pagination-bottom">
-        <!-- <pagination page-count="PostsParentCtrl.pageCount" page="PostsParentCtrl.page"></pagination> -->
       </div>
       <div v-if="canPost()" class="sidebar-actions">
         <a class="button small" @click.prevent="loadEditor()" v-if="canPost()">Post Reply</a>
@@ -831,7 +830,7 @@ ad-viewer {
           }
         }
 
-        img {
+         a, img {
           width: 100%;
           height: 100%;
         }
@@ -910,7 +909,7 @@ ad-viewer {
           flex-wrap: wrap;
         }
 
-        a.username {
+        span.username {
           margin-right: 0.5rem;
           color: $base-font-color;
           font-weight: 600;
