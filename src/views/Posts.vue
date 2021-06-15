@@ -626,7 +626,15 @@ export default {
       else return false
     }
     const canUpdate = (post) => {
-      var elevatedPrivileges = v.permissionUtils.hasPermission('posts.update.bypass.owner.admin') || v.permissionUtils.hasPermission('posts.update.bypass.locked.mod') || v.permissionUtils.hasPermission('posts.update.bypass.locked.priority')
+      const adminOwnerBypass = v.permissionUtils.hasPermission('posts.update.bypass.owner.admin')
+      const adminLockedBypass = v.permissionUtils.hasPermission('posts.update.bypass.locked.admin')
+      const adminDeletedBypass = v.permissionUtils.hasPermission('posts.update.bypass.deleted.admin')
+      const modOwnerBypass = v.permissionUtils.hasPermission('posts.update.bypass.owner.mod')
+      const modLockedBypass = v.permissionUtils.hasPermission('posts.update.bypass.locked.mod')
+      const modDeletedBypass = v.permissionUtils.hasPermission('posts.update.bypass.deleted.mod')
+      const priorityOwnerBypass = v.permissionUtils.hasPermission('posts.update.bypass.owner.priority')
+      const priorityLockedBypass = v.permissionUtils.hasPermission('posts.update.bypass.locked.priority')
+      const priorityDeletedBypass = v.permissionUtils.hasPermission('posts.update.bypass.deleted.priority')
       if (!v.postData.data?.write_access) return false
       if (!v.loggedIn) return false
       if (!v.permissionUtils.hasPermission('posts.update.allow')) return false
@@ -634,19 +642,20 @@ export default {
       // if (BanSvc.banStatus()) return false
 
       // check if post edit is disabled
+      var elevatedPrivileges = adminOwnerBypass || modLockedBypass || priorityLockedBypass
       if (postEditDisabled(post.created_at) && !elevatedPrivileges) return false
 
       // locked
       if (ctrl.thread.locked) {
-        if (v.permissionUtils.hasPermission('posts.update.bypass.locked.admin')) return true
-        else if (v.permissionUtils.hasPermission('posts.update.bypass.locked.mod')) {
+        if (adminLockedBypass) return true
+        else if (modLockedBypass) {
           if (v.permissionUtils.moderatesBoard(ctrl.thread.board_id) && ctrl.user.id === post.user.id) return true
           else if (v.permissionUtils.moderatesBoard(ctrl.thread.board_id) && v.permissionUtils.getPriority() < post.user.priority) return true
           else if (v.permissionUtils.moderatesBoard(ctrl.thread.board_id) && (v.permissionUtils.getPriority() === post.user.priority && !ctrl.moderators.includes(post.user.id))) {
             return true
           }
         }
-        else if (v.permissionUtils.hasPermission('posts.update.bypass.locked.priority')) {
+        else if (priorityLockedBypass) {
           if (v.permissionUtils.getPriority() < post.user.priority) return true
         }
       }
@@ -654,29 +663,29 @@ export default {
       // owner
       if (post.user.id === ctrl.user.id && !ctrl.thread.locked) return true
       else {
-        if (v.permissionUtils.hasPermission('posts.update.bypass.owner.admin')) return true
-        else if (v.permissionUtils.hasPermission('posts.update.bypass.owner.mod')) {
+        if (adminOwnerBypass) return true
+        else if (modOwnerBypass) {
           if (v.permissionUtils.moderatesBoard(ctrl.thread.board_id) && v.permissionUtils.getPriority() < post.user.priority) return true
           // Check if mod is moderating another board's mod (which is allowed)
           else if (v.permissionUtils.moderatesBoard(ctrl.thread.board_id) && (v.permissionUtils.getPriority() === post.user.priority && !ctrl.moderators.includes(post.user.id))) {
             return true
           }
         }
-        else if (v.permissionUtils.hasPermission('posts.update.bypass.owner.priority')) {
+        else if (priorityOwnerBypass) {
           if (v.permissionUtils.getPriority() < post.user.priority) return true
         }
       }
 
       // deleted
       if (post.deleted) {
-        if (v.permissionUtils.hasPermission('posts.update.bypass.deleted.admin')) return true
-        else if (v.permissionUtils.hasPermission('posts.update.bypass.deleted.mod')) {
+        if (adminDeletedBypass) return true
+        else if (modDeletedBypass) {
           if (v.permissionUtils.moderatesBoard(ctrl.thread.board_id) && v.permissionUtils.getPriority() < post.user.priority) return true
           else if (v.permissionUtils.moderatesBoard(ctrl.thread.board_id) && (v.permissionUtils.getPriority() === post.user.priority && !ctrl.moderators.includes(post.user.id))) {
             return true
           }
         }
-        else if (v.permissionUtils.hasPermission('posts.update.bypass.deleted.priority')) {
+        else if (priorityDeletedBypass) {
           if (v.permissionUtils.getPriority() < post.user.priority) return true
         }
       }
