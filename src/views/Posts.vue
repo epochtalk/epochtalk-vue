@@ -464,6 +464,20 @@ export default {
         return postsApi.byThread(params)
       })
     }
+    const postEditDisabled = (createdAt) => {
+      // get amount of time post edit has been disabled for in ms (if available)
+      const disablePostEdit = v.postData.data.board.disable_post_edit
+      if (disablePostEdit && Number(disablePostEdit) > -1) {
+        // get amount of time post edit has been disabled for in minutes
+        const disablePostEditMinutes = Number(disablePostEdit) * 60 * 1000
+        const currentTime = new Date().getTime()
+        const createdAtTime = new Date(created_at).getTime()
+        // if elapsed time since creation is less than disabled time
+        // post edit is disabled
+        return currentTime - createdAtTime < disablePostEditMinutes
+      }
+      else return false
+    }
     /* View Methods */
     const canEditTitle = () => {
       if (!v.loggedIn) return false
