@@ -491,15 +491,8 @@ export default {
       const userPriority = v.postData.data.posts[0].user.priority
       const elevatedPrivileges = adminBypass || modBypass || priorityBypass
 
-      // Check time on disablePostEdit
-      const disablePostEdit = v.postData.data.board.disable_post_edit
-      if (disablePostEdit && Number(disablePostEdit) > -1 && !elevatedPrivileges) {
-        const currentTime = new Date().getTime()
-        const minutes = Number(disablePostEdit) * 60 * 1000
-        const threadCreatedAt = new Date(v.postData.data.thread.created_at).getTime()
-        const canUpdate = currentTime - threadCreatedAt < minutes
-        if (!canUpdate) return false
-      }
+      // check if post edit is disabled
+      if (postEditDisabled(v.postData.data.thread.created_at) && !elevatedPrivileges) return false
 
       if (v.postData.data.thread.user.id === v.authedUser.id) return true
       else if (adminBypass) return v.permissionUtils.getPriority() <= userPriority
