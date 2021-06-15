@@ -642,7 +642,7 @@ export default {
       // if (BanSvc.banStatus()) return false
 
       // check if post edit is disabled
-      var elevatedPrivileges = adminOwnerBypass || modLockedBypass || priorityLockedBypass
+      var elevatedPrivileges = adminOwnerBypass || modOwnerBypass || priorityOwnerBypass
       if (postEditDisabled(post.created_at) && !elevatedPrivileges) return false
 
       // locked
