@@ -625,12 +625,12 @@ export default {
       if (!v.permissionUtils.hasPermission('posts.update.allow')) return false
       // TODO(boka): check for banned
       // if (BanSvc.banStatus()) return false
-      // Shim for old disablePostEdit
-      if (ctrl.disablePostEdit === true && !elevatedPrivileges) return false
+
       // Check time on disablePostEdit
-      if (ctrl.disablePostEdit && Number(ctrl.disablePostEdit) > -1 && !elevatedPrivileges) {
+      const disablePostEdit = v.postData.data.board.disable_post_edit
+      if (disablePostEdit && Number(disablePostEdit) > -1 && !elevatedPrivileges) {
         var currentTime = new Date().getTime()
-        var minutes = Number(ctrl.disablePostEdit) * 60 * 1000
+        var minutes = Number(disablePostEdit) * 60 * 1000
         var postCreatedAt = new Date(post.created_at).getTime()
         var canUpdate = currentTime - postCreatedAt < minutes
         if (!canUpdate) return false
