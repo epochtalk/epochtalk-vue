@@ -646,12 +646,12 @@ export default {
       if (postEditDisabled(post.created_at) && !elevatedPrivileges) return false
 
       // locked
-      if (ctrl.thread.locked) {
+      if (v.postData.data.thread.locked) {
         if (adminLockedBypass) return true
         else if (modLockedBypass) {
-          if (v.permissionUtils.moderatesBoard(ctrl.thread.board_id) && ctrl.user.id === post.user.id) return true
-          else if (v.permissionUtils.moderatesBoard(ctrl.thread.board_id) && v.permissionUtils.getPriority() < post.user.priority) return true
-          else if (v.permissionUtils.moderatesBoard(ctrl.thread.board_id) && (v.permissionUtils.getPriority() === post.user.priority && !ctrl.moderators.includes(post.user.id))) {
+          if (v.permissionUtils.moderatesBoard(v.postData.data.board.id) && ctrl.user.id === post.user.id) return true
+          else if (v.permissionUtils.moderatesBoard(v.postData.data.board.id) && v.permissionUtils.getPriority() < post.user.priority) return true
+          else if (v.permissionUtils.moderatesBoard(v.postData.data.board.id) && (v.permissionUtils.getPriority() === post.user.priority && !ctrl.moderators.includes(post.user.id))) {
             return true
           }
         }
@@ -661,13 +661,13 @@ export default {
       }
 
       // owner
-      if (post.user.id === ctrl.user.id && !ctrl.thread.locked) return true
+      if (post.user.id === ctrl.user.id && !v.postData.data.thread.locked) return true
       else {
         if (adminOwnerBypass) return true
         else if (modOwnerBypass) {
-          if (v.permissionUtils.moderatesBoard(ctrl.thread.board_id) && v.permissionUtils.getPriority() < post.user.priority) return true
+          if (v.permissionUtils.moderatesBoard(v.postData.data.board.id) && v.permissionUtils.getPriority() < post.user.priority) return true
           // Check if mod is moderating another board's mod (which is allowed)
-          else if (v.permissionUtils.moderatesBoard(ctrl.thread.board_id) && (v.permissionUtils.getPriority() === post.user.priority && !ctrl.moderators.includes(post.user.id))) {
+          else if (v.permissionUtils.moderatesBoard(v.postData.data.board.id) && (v.permissionUtils.getPriority() === post.user.priority && !ctrl.moderators.includes(post.user.id))) {
             return true
           }
         }
@@ -680,8 +680,8 @@ export default {
       if (post.deleted) {
         if (adminDeletedBypass) return true
         else if (modDeletedBypass) {
-          if (v.permissionUtils.moderatesBoard(ctrl.thread.board_id) && v.permissionUtils.getPriority() < post.user.priority) return true
-          else if (v.permissionUtils.moderatesBoard(ctrl.thread.board_id) && (v.permissionUtils.getPriority() === post.user.priority && !ctrl.moderators.includes(post.user.id))) {
+          if (v.permissionUtils.moderatesBoard(v.postData.data.board.id) && v.permissionUtils.getPriority() < post.user.priority) return true
+          else if (v.permissionUtils.moderatesBoard(v.postData.data.board.id) && (v.permissionUtils.getPriority() === post.user.priority && !ctrl.moderators.includes(post.user.id))) {
             return true
           }
         }
