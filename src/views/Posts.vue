@@ -262,10 +262,10 @@
           </div>
           <!-- Post Body -->
           <!-- TODO(akinsey): post-processing="post.body_html" style-fix="true" -->
-          <div class="post-body" :class="{ 'rtl': post.right_to_left }">{{post.body_html}}</div>
+          <div class="post-body" :class="{ 'rtl': post.right_to_left }" v-html="post.body_html"></div>
           <div v-if="post.user.signature && !disableSignature">
             <!-- TODO(akinsey): post-processing="post.user.signature" style-fix="true" -->
-            <div class="post-signature">{{post.user.signature}}</div>
+            <div class="post-signature" v-html="post.user.signature"></div>
           </div>
         </div>
       </div>
@@ -648,7 +648,6 @@ ad-viewer {
     display: flex;
     align-items: center;
     justify-content: space-evenly;
-    // margin-bottom: 2rem;
     height: $font-size-xl;
     width: 100%;
 
@@ -680,8 +679,6 @@ ad-viewer {
   margin: 0;
   padding: 1rem 0;
   width: 100%;
-  // margin: -$header-bottom-margin -2rem $header-bottom-margin;
-  // padding: calc(#{$header-bottom-margin} + 1rem) 2rem 1rem;
   border-bottom: $border;
 
   .inverted-button {
@@ -694,15 +691,6 @@ ad-viewer {
       border-color: $secondary-font-color;
       color: $secondary-font-color-dark;
     }
-  }
-  button, .button {
-    // float: right;
-    // color: $button-text-color;
-    // padding-top: 0.35rem;
-    // padding-bottom: 0.35rem;
-    // border: 1px solid transparent;
-    // line-height: unset;
-    // text-align: center;
   }
   .controls.two-thirds-column {
     text-align: right;
