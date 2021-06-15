@@ -471,7 +471,7 @@ export default {
         // get amount of time post edit has been disabled for in minutes
         const disablePostEditMinutes = Number(disablePostEdit) * 60 * 1000
         const currentTime = new Date().getTime()
-        const createdAtTime = new Date(created_at).getTime()
+        const createdAtTime = new Date(createdAt).getTime()
         // if elapsed time since creation is less than disabled time
         // post edit is disabled
         return currentTime - createdAtTime < disablePostEditMinutes
