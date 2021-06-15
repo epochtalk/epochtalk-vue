@@ -620,8 +620,8 @@ export default {
     }
     const canUpdate = (post) => {
       var elevatedPrivileges = v.permissionUtils.hasPermission('posts.update.bypass.owner.admin') || v.permissionUtils.hasPermission('posts.update.bypass.locked.mod') || v.permissionUtils.hasPermission('posts.update.bypass.locked.priority')
-      if (!pageData.write_access) return false
-      if (!Session.isAuthenticated()) return false
+      if (!v.postData.data?.write_access) return false
+      if (!v.loggedIn) return false
       if (!v.permissionUtils.hasPermission('posts.update.allow')) return false
       if (BanSvc.banStatus()) return false
       // Shim for old disablePostEdit
