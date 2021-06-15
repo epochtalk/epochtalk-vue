@@ -623,7 +623,8 @@ export default {
       if (!v.postData.data?.write_access) return false
       if (!v.loggedIn) return false
       if (!v.permissionUtils.hasPermission('posts.update.allow')) return false
-      if (BanSvc.banStatus()) return false
+      // TODO(boka): check for banned
+      // if (BanSvc.banStatus()) return false
       // Shim for old disablePostEdit
       if (ctrl.disablePostEdit === true && !elevatedPrivileges) return false
       // Check time on disablePostEdit
