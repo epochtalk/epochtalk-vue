@@ -1025,11 +1025,24 @@ ad-viewer {
     }
   }
 
+.thread-title {
+  flex: 1 0 calc(100% - 36px);
+  margin-bottom: 0;
+  max-width: 100%;
+}
+
+.page-header-split h1 {
+  color: #222;
+  display: inline;
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-transform: initial;
+}
 
 .threadStates {
   margin-top: 4px;
 }
-
 
 #post-spacer {
   min-height: 175px;
