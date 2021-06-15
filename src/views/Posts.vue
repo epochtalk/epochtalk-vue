@@ -640,15 +640,8 @@ export default {
       // TODO(boka): check for banned
       // if (BanSvc.banStatus()) return false
 
-      // Check time on disablePostEdit
-      const disablePostEdit = v.postData.data.board.disable_post_edit
-      if (disablePostEdit && Number(disablePostEdit) > -1 && !elevatedPrivileges) {
-        var currentTime = new Date().getTime()
-        var minutes = Number(disablePostEdit) * 60 * 1000
-        var postCreatedAt = new Date(post.created_at).getTime()
-        var canUpdate = currentTime - postCreatedAt < minutes
-        if (!canUpdate) return false
-      }
+      // check if post edit is disabled
+      if (postEditDisabled(post.created_at) && !elevatedPrivileges) return false
 
       // locked
       if (ctrl.thread.locked) {
