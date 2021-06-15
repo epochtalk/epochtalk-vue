@@ -128,7 +128,7 @@
             <div class="started-by">
               Started by
               <span v-if="thread.user.deleted">deleted</span>
-              <router-link v-if="!thread.user.deleted" :to="{ path: '/profile/' + thread.user.username.toLowerCase() }" v-html="thread.user.username"></router-link>
+              <router-link v-if="!thread.user.deleted" :to="{ path: '/profile/' + thread?.user?.username.toLowerCase() }" v-html="thread.user.username"></router-link>
               <span> on {{humanDate(thread.created_at)}}</span>
             </div>
           </td>
@@ -148,7 +148,7 @@
         </tr>
 
         <tr class="threads-data" v-for="thread in threadData.data.normal" :key="thread.id">
-          <td class="subject">
+          <td class="subject" v-if="thread.user.username">
             <div class="title">
               <div class="thread-state">
                 <svg class="is-unread" v-if="thread.has_new_post" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" data-balloon="Unread">
@@ -182,12 +182,12 @@
             </div>
           </td>
 
-          <td class="views-replies">
+          <td class="views-replies" v-if="thread.user.username">
             <span class="replies">{{ thread.post_count - 1 || 0 }}</span>
             <span class="views">{{ thread.view_count || 0 }}</span>
           </td>
 
-          <td class="last-post">
+          <td class="last-post" v-if="thread.user.username">
             <span v-if="thread.last_deleted">deleted</span>
             <router-link v-if="!thread.last_deleted" :to="{ path: '/profile/' + thread.last_post_username.toLowerCase() }"><img class="avatar-small" :class="defaultAvatar" :src="thread.last_post_avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" /></router-link>
             <router-link v-if="!thread.last_deleted" :to="{ path: '/profile/' + thread.last_post_username.toLowerCase() }" v-html="thread.last_post_username"></router-link> posted on <router-link :to="{ name: 'Posts', params: { threadSlug: thread.slug, threadId: thread.id }, query: { start: thread.last_post_position }, hash: '#' + thread.last_post_id }"><span>{{humanDate(thread.last_post_created_at)}}</span>.</router-link>
