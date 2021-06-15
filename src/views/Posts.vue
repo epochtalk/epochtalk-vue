@@ -649,7 +649,7 @@ export default {
       if (v.postData.data.thread.locked) {
         if (adminLockedBypass) return true
         else if (modLockedBypass) {
-          if (v.permissionUtils.moderatesBoard(v.postData.data.board.id) && ctrl.user.id === post.user.id) return true
+          if (v.permissionUtils.moderatesBoard(v.postData.data.board.id) && v.authedUser.id === post.user.id) return true
           else if (v.permissionUtils.moderatesBoard(v.postData.data.board.id) && v.permissionUtils.getPriority() < post.user.priority) return true
           else if (v.permissionUtils.moderatesBoard(v.postData.data.board.id) && (v.permissionUtils.getPriority() === post.user.priority && !ctrl.moderators.includes(post.user.id))) {
             return true
@@ -661,7 +661,7 @@ export default {
       }
 
       // owner
-      if (post.user.id === ctrl.user.id && !v.postData.data.thread.locked) return true
+      if (post.user.id === v.authedUser.id && !v.postData.data.thread.locked) return true
       else {
         if (adminOwnerBypass) return true
         else if (modOwnerBypass) {
