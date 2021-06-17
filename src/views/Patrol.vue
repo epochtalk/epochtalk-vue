@@ -233,4 +233,6 @@ export default {
     padding-top: .5rem;
   }
 }
+
+.username { margin-right: .5rem; }
 </style>
