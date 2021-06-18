@@ -404,6 +404,7 @@ import Pagination from '@/components/layout/Pagination.vue'
 import PollViewer from '@/components/posts/PollViewer.vue'
 import RankDisplay from '@/components/users/RankDisplay.vue'
 import humanDate from '@/composables/filters/humanDate'
+import { userRoleHighlight } from '@/composables/utils/userUtils'
 //import decode from '@/composables/filters/decode'
 import truncate from '@/composables/filters/truncate'
 import { inject, reactive, watch, toRefs } from 'vue'
@@ -503,7 +504,6 @@ export default {
     const updateThreadTitle = () => console.log('updateThreadTitle')
     const closeEditThread = () => console.log('closeEditThread')
     const createPoll = () => console.log('createPoll')
-    const userRoleHighlight = () => { return {} }
     const showEditDate = (post) => {
       console.log(post)
       return true
