@@ -658,7 +658,7 @@ export default {
         else if (modLockedBypass) {
           if (moderatesBoard && v.authedUser.id === post.user.id) return true
           else if (moderatesBoard && authedUserPriority < post.user.priority) return true
-          else if (moderatesBoard && (authedUserPriority === post.user.priority && !moderators.includes(post.user.id))) return true
+          else if (moderatesBoard && authedUserPriority === post.user.priority && !moderators.includes(post.user.id)) return true
           else return false
         }
         else if (priorityLockedBypass && authedUserPriority < post.user.priority) return true
@@ -669,7 +669,7 @@ export default {
         if (adminDeletedBypass) return true
         else if (modDeletedBypass) {
           if (moderatesBoard && authedUserPriority < post.user.priority) return true
-          else if (moderatesBoard && (authedUserPriority === post.user.priority && !moderators.includes(post.user.id))) return true
+          else if (moderatesBoard && authedUserPriority === post.user.priority && !moderators.includes(post.user.id)) return true
           else return false
         }
         else if (priorityDeletedBypass && authedUserPriority < post.user.priority) return true
