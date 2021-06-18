@@ -635,6 +635,7 @@ export default {
       const priorityOwnerBypass = v.permissionUtils.hasPermission('posts.update.bypass.owner.priority')
       const priorityLockedBypass = v.permissionUtils.hasPermission('posts.update.bypass.locked.priority')
       const priorityDeletedBypass = v.permissionUtils.hasPermission('posts.update.bypass.deleted.priority')
+      const moderators = v.postData.data.board.moderators.map((data) => data.id)
       if (!v.postData.data?.write_access) return false
       if (!v.loggedIn) return false
       if (!v.permissionUtils.hasPermission('posts.update.allow')) return false
@@ -651,7 +652,7 @@ export default {
         else if (modLockedBypass) {
           if (v.permissionUtils.moderatesBoard(v.postData.data.board.id) && v.authedUser.id === post.user.id) return true
           else if (v.permissionUtils.moderatesBoard(v.postData.data.board.id) && v.permissionUtils.getPriority() < post.user.priority) return true
-          else if (v.permissionUtils.moderatesBoard(v.postData.data.board.id) && (v.permissionUtils.getPriority() === post.user.priority && !ctrl.moderators.includes(post.user.id))) {
+          else if (v.permissionUtils.moderatesBoard(v.postData.data.board.id) && (v.permissionUtils.getPriority() === post.user.priority && !moderators.includes(post.user.id))) {
             return true
           }
         }
@@ -667,7 +668,7 @@ export default {
         else if (modOwnerBypass) {
           if (v.permissionUtils.moderatesBoard(v.postData.data.board.id) && v.permissionUtils.getPriority() < post.user.priority) return true
           // Check if mod is moderating another board's mod (which is allowed)
-          else if (v.permissionUtils.moderatesBoard(v.postData.data.board.id) && (v.permissionUtils.getPriority() === post.user.priority && !ctrl.moderators.includes(post.user.id))) {
+          else if (v.permissionUtils.moderatesBoard(v.postData.data.board.id) && (v.permissionUtils.getPriority() === post.user.priority && !moderators.includes(post.user.id))) {
             return true
           }
         }
@@ -681,7 +682,7 @@ export default {
         if (adminDeletedBypass) return true
         else if (modDeletedBypass) {
           if (v.permissionUtils.moderatesBoard(v.postData.data.board.id) && v.permissionUtils.getPriority() < post.user.priority) return true
-          else if (v.permissionUtils.moderatesBoard(v.postData.data.board.id) && (v.permissionUtils.getPriority() === post.user.priority && !ctrl.moderators.includes(post.user.id))) {
+          else if (v.permissionUtils.moderatesBoard(v.postData.data.board.id) && (v.permissionUtils.getPriority() === post.user.priority && !moderators.includes(post.user.id))) {
             return true
           }
         }
