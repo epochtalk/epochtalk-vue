@@ -652,7 +652,7 @@ export default {
       var elevatedPrivileges = adminOwnerBypass || modOwnerBypass || priorityOwnerBypass
       if (postEditDisabled(post.created_at) && !elevatedPrivileges) return false
 
-      // locked
+      // if thread is locked
       if (v.postData.data.thread.locked) {
         if (adminLockedBypass) return true
         else if (modLockedBypass) {
@@ -664,31 +664,27 @@ export default {
         else if (priorityLockedBypass && authedUserPriority < post.user.priority) return true
         else return false
       }
-
-      // owner
-      if (post.user.id === v.authedUser.id && !v.postData.data.thread.locked) return true
-      else {
-        if (adminOwnerBypass) return true
-        else if (modOwnerBypass) {
-          if (moderatesBoard && authedUserPriority < post.user.priority) return true
-          // Check if mod is moderating another board's mod (which is allowed)
-          else if (moderatesBoard && (authedUserPriority === post.user.priority && !moderators.includes(post.user.id))) return true
-        }
-        else if (priorityOwnerBypass && authedUserPriority < post.user.priority) return true
-      }
-
-      // deleted
-      if (post.deleted) {
+      // if post is deleted
+      else if (post.deleted) {
         if (adminDeletedBypass) return true
         else if (modDeletedBypass) {
           if (moderatesBoard && authedUserPriority < post.user.priority) return true
-          else if (moderatesBoard && (authedUserPriority === post.user.priority && !moderators.includes(post.user.id))) {
-            return true
-          }
+          else if (moderatesBoard && (authedUserPriority === post.user.priority && !moderators.includes(post.user.id))) return true
+          else return false
         }
-        else if (priorityDeletedBypass) {
-          if (authedUserPriority < post.user.priority) return true
+        else if (priorityDeletedBypass && authedUserPriority < post.user.priority) return true
+        else return false
+      }
+      else {
+        if (adminOwnerBypass) return true
+        else if (post.user.id === v.authedUser.id) return true
+        else if (modOwnerBypass) {
+          if (moderatesBoard && authedUserPriority < post.user.priority) return true
+          else if (moderatesBoard && (authedUserPriority === post.user.priority && !moderators.includes(post.user.id))) return true
+          else return false
         }
+        else if (priorityOwnerBypass && authedUserPriority < post.user.priority) return true
+        else return false
       }
     }
     const canPostLock = (post) => {
