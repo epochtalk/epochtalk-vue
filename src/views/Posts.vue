@@ -136,7 +136,7 @@
           </div>
 
           <div class="user-rank">
-            <!-- <rank-display ranks="postData.data.metadata.ranks" maps="postData.data.metadata.rank_metric_maps" user="post.user"></rank-display> -->
+            <rank-display :user="{ ...post.user, metadata: {...postData.data.metadata } }" />
           </div>
           <!-- TODO(akinsey): <ignore-posts post="post"></ignore-posts> -->
         </div>
@@ -399,6 +399,7 @@
 import { useRoute } from 'vue-router'
 import Pagination from '@/components/layout/Pagination.vue'
 import PollViewer from '@/components/posts/PollViewer.vue'
+import RankDisplay from '@/components/users/RankDisplay.vue'
 import humanDate from '@/composables/filters/humanDate'
 //import decode from '@/composables/filters/decode'
 import truncate from '@/composables/filters/truncate'
@@ -412,7 +413,7 @@ import { BreadcrumbStore } from '@/composables/stores/breadcrumbs'
 export default {
   name: 'Posts',
   props: ['threadSlug', 'threadId'],
-  components: { Pagination, PollViewer },
+  components: { Pagination, PollViewer, RankDisplay },
   beforeRouteEnter(to, from, next) {
     const params = {
       limit: localStoragePrefs().data.posts_per_page,
