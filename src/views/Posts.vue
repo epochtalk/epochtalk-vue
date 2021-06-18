@@ -139,8 +139,7 @@
             <rank-display :user="{ ...post.user, metadata: {...postData.data.metadata } }" />
           </div>
           <div v-if="loggedIn && post.user.id !== authedUser.id" class="ignore-directive">
-            <a v-if="!post.user._ignored" href="" @click.prevent="() => {}">Ignore Posts</a>
-            <a v-if="post.user._ignored" href="" @click.prevent="() => {}">Unignore Posts</a>
+            <a href="" @click.prevent="toggleIgnoredPosts(post)" v-html="post.user._ignored ? 'Unignore Posts' : 'Ignore Posts'"></a>
           </div>
           <!-- TODO(akinsey): <ignore-posts post="post"></ignore-posts> -->
         </div>
@@ -408,7 +407,7 @@ import humanDate from '@/composables/filters/humanDate'
 //import decode from '@/composables/filters/decode'
 import truncate from '@/composables/filters/truncate'
 import { inject, reactive, watch, toRefs } from 'vue'
-import { postsApi, threadsApi } from '@/api'
+import { postsApi, threadsApi, usersApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore, localStoragePrefs } from '@/composables/stores/prefs'
 //import { countTotals, getLastPost, filterIgnoredBoards } from '@/composables/utils/boardUtils'
@@ -526,12 +525,22 @@ export default {
     const showUserControls = () => console.log('showUserControls')
     const watchThread = () => console.log('watchThread')
     const openMoveThreadModal = () => console.log('openMoveThreadModal')
+    const toggleIgnoredPosts = post => {
+      const toggleIgnore = post.user._ignored ? usersApi.unignore : usersApi.ignore
+      toggleIgnore(post.user)
+      .then(() => {
+        $alertStore.success(`${post.user._ignored ? 'Unig' : 'Ig'}noring posts from user ${post.user.username}`)
+        processPosts()
+        .then(data => v.postData.data = data)
+      })
+    }
 
     /* Internal Data */
     const $route = useRoute()
     const $prefs = inject(PreferencesStore)
     const $auth = inject(AuthStore)
     const $breadcrumbs = inject(BreadcrumbStore)
+    const $alertStore = inject('$alertStore')
 
     /* View Data */
     const v = reactive({
@@ -593,6 +602,7 @@ export default {
       highlightPost,
       showUserControls,
       watchThread,
+      toggleIgnoredPosts,
       openMoveThreadModal
     }
   }
