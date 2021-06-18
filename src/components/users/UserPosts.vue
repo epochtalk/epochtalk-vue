@@ -39,11 +39,11 @@
                 <div class="truncate-title">
                   <span v-if="post.hidden && !post._deleted"><i class="fa fa-eye-slash"></i></span>
                   <!-- <a ui-sref="posts.data({ slug: post.thread_slug, start: post.position, '#': post.id })" ng-bind-html="post.thread_title" ng-if="!post._deleted" class="thread-title"></a> -->
-                  <a href="" v-if="!post._deleted" class="thread-title">{{post.thread_title}}</a>
+                  <a href="" v-if="!post._deleted" class="thread-title" v-html="post.thread_title"></a>
                   <span v-if="post._deleted">Deleted</span>
                 </div>
                 <div class="post" @click="post.open = !post.open">
-                  <div class="post-body" :class="{ closed: !post.open }">{{post.body_html}}</div>
+                  <div class="post-body" :class="{ closed: !post.open }" v-html="post.body_html"></div>
                 </div>
               </td>
               <td class="timestamp">{{humanDate(post.created_at)}}</td>
@@ -79,11 +79,11 @@
                 <div class="truncate-title">
                   <span v-if="post.hidden && !post._deleted"><i class="fa fa-eye-slash"></i></span>
                   <!-- <a ui-sref="posts.data({ slug: post.thread_slug, start: post.position, '#': post.id })" ng-bind-html="post.thread_title" ng-if="!post._deleted" class="thread-title"></a> -->
-                  <a href="" v-if="!post._deleted" class="thread-title">{{post.thread_title}}</a>
+                  <a href="" v-if="!post._deleted" class="thread-title" v-html="post.thread_title"></a>
                   <span v-if="post._deleted">Deleted</span>
                 </div>
                 <div class="post" @click="post.open = !post.open">
-                  <div class="post-body" :class="{ closed: !post.open }">{{post.body_html}}</div>
+                  <div class="post-body" :class="{ closed: !post.open }" v-html="post.body_html"></div>
                 </div>
               </td>
               <td class="timestamp">{{humanDate(post.created_at)}}</td>

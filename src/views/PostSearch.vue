@@ -1,6 +1,6 @@
 <template>
   <div class="main">
-    <div class="user-search-field">
+    <div class="search-field">
       <div class="nested-input-container">
         <a v-if="searchData?.search" @click="clearSearch()" class="nested-clear-btn fa fa-times pointer"></a>
         <a @click="search ? searchPosts() : null" :class="{ 'disabled': (!search || search === searchData?.search), 'pointer': search }" class="nested-btn">Search</a>
@@ -8,11 +8,15 @@
       </div>
     </div>
 
-    <div class="user-search-results" v-if="searchData && (searchData.count > 0 || search)">
+    <div v-if="!searchData?.posts.length">
+      <h4>Enter a search term above, to search forum posts</h4>
+    </div>
+    <div class="search-results" v-if="searchData && (searchData.posts.length > 0 || search)">
       <div v-if="searchData?.search">
-      Displaying {{searchData.count}} search result(s) for "<strong>{{searchData.search}}</strong>":<br /><br />
+      Displaying{{ searchData.posts.length === 0 ? ' 0 ' : ' '}}search result(s) for "<strong>{{searchData.search}}</strong>":<br /><br />
       </div>
-      <div :id="post.id" v-for="(post, i) in searchData.posts" :key="post.id" class="post-block" :class="{ 'hidden': post.hidden, 'deleted': post._deleted || post.user.ignored, 'first': i === 1 }">
+
+      <div :id="post.id" v-for="(post, i) in searchData.posts" :key="post.id" class="post-block" :class="{ 'hidden': post.hidden, 'deleted': post._deleted || post.user.ignored, 'first': i === 0 }">
         <!-- Delete Post View -->
         <div class="deleted" v-if="post._deleted || post.user.ignored">
           Post
@@ -31,10 +35,10 @@
             <!-- Post Title -->
             <div class="thread-title">
               <h5>
-                <a href="#" v-html="post.thread_title"></a>
+                <router-link :title="decode(post.thread_title)" :to="{ name: 'Posts', params: { threadSlug: post.thread_slug, threadId: post.thread_id }, query: { start: post.position }, hash: `#${post.id}` }" v-html="decode(post.thread_title)"></router-link>
               </h5>
-              <span v-if="post.user.online" :data-balloon="post.user.username + ' is online'" class="online green"><i class="fa fa-circle"></i></span>
-              <span v-if="!post.user.online" class="online green"><i class="fa fa-circle-o"></i></span>
+              <span v-if="post.user.online" :data-balloon="post.user.username + ' is online'" class="online green"><i class="fas fa-circle"></i></span>
+              <span v-if="!post.user.online" class="online green"><i class="far fa-circle"></i></span>
               <a class="username" :data-balloon="post.user.role_name || 'User'" href="#" :style="usernameHighlight(post.user.highlight_color)" v-html="post.user.username"></a>
               <div class="posted-in">posted in</div>
               <a class="board-name" href="#" v-html="post.board_name"></a>
@@ -50,8 +54,11 @@
     </div>
   </div>
   <div class="sidebar">
-    <div class="sidebar-block" v-if="searchData?.page_count > 1">
-      <pagination :page="searchData.page" :limit="searchData.limit" :count="searchData.count" />
+    <div class="sidebar-block" v-if="searchData?.posts.length > 0">
+      <div class="pagination-simple">
+        <button @click="pageResults(-1)" :disabled="!searchData?.prev">&#10094; Prev</button>
+        <button @click="pageResults(1)" :disabled="!searchData?.next">Next &#10095;</button>
+      </div>
     </div>
   </div>
 </template>
@@ -59,14 +66,13 @@
 <script>
 import { reactive, toRefs, nextTick, watch } from 'vue'
 import { postsApi } from '@/api'
-import Pagination from '@/components/layout/Pagination.vue'
 import { useRoute, useRouter } from 'vue-router'
 import humanDate from '@/composables/filters/humanDate'
 import { usernameHighlight } from '@/composables/utils/userUtils'
+import decode from '@/composables/filters/decode'
 
 export default {
   name: 'PostSearch',
-  components: { Pagination },
   beforeRouteEnter(to, from, next) {
     const query = {
       limit: 10,
@@ -98,6 +104,14 @@ export default {
       v.searchInput.focus()
     }
 
+    const pageResults = inc => {
+      const newPage = v.searchData.page + inc
+      let query = { ...$route.query, page: newPage }
+      if (query.page === 1 || !query.page) delete query.page
+      if ($route.query.page !== v.currentPage)
+        $router.replace({ name: $route.name, params: $route.params, query: query })
+    }
+
     const clearSearch = () => {
       let query = { ...$route.query }
       delete query.field
@@ -123,7 +137,7 @@ export default {
     // Updates page input when user uses header search
     watch(() => $route.query.search, s => v.search = s)
 
-    return { ...toRefs(v), searchPosts, clearSearch, humanDate, usernameHighlight }
+    return { ...toRefs(v), searchPosts, pageResults, clearSearch, humanDate, usernameHighlight, decode }
   }
 }
 </script>
@@ -137,6 +151,61 @@ export default {
     display: block;
     position: sticky;
     top: $header-offset;
+    padding-top: .5rem;
+  }
+}
+.search-results {
+  @include pad(0 0 1rem 0);
+  clear: both;
+  grid-area: main;
+
+  .post-block {
+    @include clearfix;
+    @include pad(2rem 0);
+    @include transition(background-color 250ms ease-in);
+    position: relative;
+    border-top: 1px solid $border-color;
+    &.first { border-top: 0; padding-top: 0.5rem; }
+    &.hidden { background-color: $sub-header-color; }
+    &.deleted { display: none; }
+    mark { background-color: $color-highlighted; font-weight: bold; display:inline; color: $base-font-color; }
+    .post-body {
+      color: $secondary-font-color-dark;
+    }
+    .post-content {
+      display: block;
+      .thread-title {
+        color: $secondary-font-color-dark;
+        margin-bottom: 0.5rem;
+        width: 100%;
+        .board-name {
+          color: $base-font-color;
+          margin-right: 0.25rem;
+          float: left;
+          &:hover { color: $color-primary; }
+        }
+        .posted-in { margin-right: 0.25rem; float: left; }
+        h5 { margin-bottom: 0; color: $base-font-color; }
+        .online { float: left; margin-right: 0.5rem; }
+        a.username {
+          float: left;
+          color: $base-font-color;
+          font-weight: 900;
+          margin-right: 0.25rem;
+          &:hover { color: $color-primary; }
+        }
+        .timestamp, .display-name {
+          display: inline-block;
+          color: $secondary-font-color;
+          line-height: 1.3rem;
+          font-size: 0.8125rem;
+          font-weight: 400;
+          float: left;
+        }
+        .display-name { color: $secondary-font-color-dark; }
+        .clear { @include clearfix; }
+      }
+    }
   }
 }
 </style>

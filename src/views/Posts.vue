@@ -21,7 +21,7 @@
         </a>
         <div class="threadStates">
           <div class="badge locked" v-if="postData.data.thread.locked">
-            <div class="">
+            <div>
               <a href="" id="lockThread" :data-balloon="postData.data.thread.locked ? 'Unlock Thread' : 'Lock Thread'" v-if="canLock()" :class="{'clicked' : postData.data.thread.locked }" @click.prevent="updateThreadLock(postData.data.thread)" class="badgeContents">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                   <title></title>
@@ -120,10 +120,14 @@
                   <circle cx="24" cy="24" r="16" />
                 </svg>
               </span>
-              <img :src="post.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
+              <router-link :to="{ path: '/profile/' + post.user.username.toLowerCase() }">
+                <img :src="post.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
+              </router-link>
             </div>
-            <div class="original-poster" v-if="post.user.original_poster">OP</div>
-            <div v-if="post.user.activity > -1" :title="('Activity: ' + post.user.activity)" class="user-activity">Act: <span class="user-activity-value">{{post.user.activity}}</span></div>
+            <router-link :to="{ path: '/profile/' + post.user.username.toLowerCase() }">
+              <div class="original-poster" v-if="post.user.original_poster">OP</div>
+              <div v-if="post.user.activity > -1" :title="('Activity: ' + post.user.activity)" class="user-activity">Act: <span class="user-activity-value">{{post.user.activity}}</span></div>
+            </router-link>
           </a>
 
 
@@ -132,7 +136,11 @@
           </div>
 
           <div class="user-rank">
-            <!-- <rank-display ranks="postData.data.metadata.ranks" maps="postData.data.metadata.rank_metric_maps" user="post.user"></rank-display> -->
+            <rank-display :user="{ ...post.user, metadata: {...postData.data.metadata } }" />
+          </div>
+          <div v-if="loggedIn && post.user.id !== authedUser.id" class="ignore-directive">
+            <a v-if="!post.user._ignored" href="" @click.prevent="() => {}">Ignore Posts</a>
+            <a v-if="post.user._ignored" href="" @click.prevent="() => {}">Unignore Posts</a>
           </div>
           <!-- TODO(akinsey): <ignore-posts post="post"></ignore-posts> -->
         </div>
@@ -142,7 +150,7 @@
           <!-- Post Title -->
           <div class="post-title">
             <div class="post-title-user">
-              <a class="username" href="#" :data-balloon="post.user.role_name || 'User'">{{post.user.username}}</a>
+              <span class="username" :data-balloon="post.user.role_name || 'User'"><router-link :to="{ path: '/profile/' + post.user.username.toLowerCase() }" v-html="post.user.username" /></span>
               <div :title="post.user.name" v-if="post.user.name" class="display-name">
                 <span>{{truncate(post.user.name, 33)}}</span>
                 <span class="hide-mobile">&nbsp;&mdash;&nbsp;</span>
@@ -255,14 +263,13 @@
                 </router-link>
               </li>
             </ul>
-            <!-- <div class="clear"></div> -->
           </div>
           <!-- Post Body -->
           <!-- TODO(akinsey): post-processing="post.body_html" style-fix="true" -->
-          <div class="post-body" :class="{ 'rtl': post.right_to_left }">{{post.body_html}}</div>
+          <div class="post-body" :class="{ 'rtl': post.right_to_left }" v-html="post.body_html"></div>
           <div v-if="post.user.signature && !disableSignature">
             <!-- TODO(akinsey): post-processing="post.user.signature" style-fix="true" -->
-            <div class="post-signature">{{post.user.signature}}</div>
+            <div class="post-signature" v-html="post.user.signature"></div>
           </div>
         </div>
       </div>
@@ -358,9 +365,6 @@
       <!-- Poll Viewer -->
       <poll-viewer v-if="postData.data.thread?.poll" :poll="postData.data.thread.poll" :thread="postData.data.thread" :user-priority="postData.data.posts[0].user.priority" :reset="resetPoll"></poll-viewer>
 
-      <!-- <div class="controls">
-        <pagination page-count="PostsParentCtrl.pageCount" page="PostsParentCtrl.page"></pagination>
-      </div> -->
       <pagination v-if="postData.data?.thread" :page="postData.data.page" :limit="postData.data.limit" :count="postData.data.thread.post_count"></pagination>
     </div>
 
@@ -370,7 +374,6 @@
   <div class="actions-bottom">
     <div class="actions-bottom-grid">
       <div id="pagination-bottom" class="pagination-bottom">
-        <!-- <pagination page-count="PostsParentCtrl.pageCount" page="PostsParentCtrl.page"></pagination> -->
       </div>
       <div v-if="canPost()" class="sidebar-actions">
         <a class="button small" @click.prevent="loadEditor()" v-if="canPost()">Post Reply</a>
@@ -406,6 +409,7 @@
 import { useRoute } from 'vue-router'
 import Pagination from '@/components/layout/Pagination.vue'
 import PollViewer from '@/components/posts/PollViewer.vue'
+import RankDisplay from '@/components/users/RankDisplay.vue'
 import humanDate from '@/composables/filters/humanDate'
 import truncate from '@/composables/filters/truncate'
 import { inject, reactive, watch, toRefs } from 'vue'
@@ -422,7 +426,7 @@ import { BreadcrumbStore } from '@/composables/stores/breadcrumbs'
 export default {
   name: 'Posts',
   props: ['threadSlug', 'threadId'],
-  components: { Pagination, PostsDeleteModal, PostsUndeleteModal, PostsPurgePostModal, PostsPurgeThreadModal, PostsReportModal, PollViewer },
+  components: { Pagination, PostsDeleteModal, PostsUndeleteModal, PostsPurgePostModal, PostsPurgeThreadModal, PostsReportModal, PollViewer, RankDisplay },
   beforeRouteEnter(to, from, next) {
     const params = {
       limit: localStoragePrefs().data.posts_per_page,
@@ -829,6 +833,7 @@ export default {
       selectedPostIndex: 0,
       prefs: $prefs.data,
       loggedIn: $auth.loggedIn,
+      authedUser: $auth.user,
       postData: {data: {}},
       editThread: false,
       addPoll: false,
@@ -952,7 +957,6 @@ ad-viewer {
     display: flex;
     align-items: center;
     justify-content: space-evenly;
-    // margin-bottom: 2rem;
     height: $font-size-xl;
     width: 100%;
 
@@ -984,8 +988,6 @@ ad-viewer {
   margin: 0;
   padding: 1rem 0;
   width: 100%;
-  // margin: -$header-bottom-margin -2rem $header-bottom-margin;
-  // padding: calc(#{$header-bottom-margin} + 1rem) 2rem 1rem;
   border-bottom: $border;
 
   .inverted-button {
@@ -998,15 +1000,6 @@ ad-viewer {
       border-color: $secondary-font-color;
       color: $secondary-font-color-dark;
     }
-  }
-  button, .button {
-    // float: right;
-    // color: $button-text-color;
-    // padding-top: 0.35rem;
-    // padding-bottom: 0.35rem;
-    // border: 1px solid transparent;
-    // line-height: unset;
-    // text-align: center;
   }
   .controls.two-thirds-column {
     text-align: right;
@@ -1134,7 +1127,7 @@ ad-viewer {
           }
         }
 
-        img {
+         a, img {
           width: 100%;
           height: 100%;
         }
@@ -1213,7 +1206,7 @@ ad-viewer {
           flex-wrap: wrap;
         }
 
-        a.username {
+        span.username {
           margin-right: 0.5rem;
           color: $base-font-color;
           font-weight: 600;
@@ -1329,11 +1322,24 @@ ad-viewer {
     }
   }
 
+.thread-title {
+  flex: 1 0 calc(100% - 36px);
+  margin-bottom: 0;
+  max-width: 100%;
+}
+
+.page-header-split h1 {
+  color: #222;
+  display: inline;
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-transform: initial;
+}
 
 .threadStates {
   margin-top: 4px;
 }
-
 
 #post-spacer {
   min-height: 175px;

@@ -6,7 +6,9 @@ import ThreadsPostedIn from '@/views/ThreadsPostedIn.vue'
 import Posts from '@/views/Posts.vue'
 import About from '@/views/About.vue'
 import Settings from '@/views/Settings.vue'
+import Patrol from '@/views/Patrol.vue'
 import MemberSearch from '@/views/MemberSearch.vue'
+import Messages from '@/views/Messages.vue'
 import PostSearch from '@/views/PostSearch.vue'
 import Profile from '@/views/Profile.vue'
 import Forbidden from '@/views/layout/Forbidden.vue'
@@ -82,6 +84,18 @@ const routes = [
     name: 'Settings',
     component: Settings,
     meta: { requiresAuth: true, bodyClass: 'settings' }
+  },
+  {
+    path: '/patrol',
+    name: 'Patrol',
+    component: Patrol,
+    meta: { requiresAuth: true, bodyClass: 'patrol' }
+  },
+  {
+    path: '/messages',
+    name: 'Messages',
+    component: Messages,
+    meta: { requiresAuth: true, bodyClass: 'messages' }
   },
   {
     path: '/search/users',

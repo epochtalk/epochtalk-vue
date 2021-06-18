@@ -11,9 +11,42 @@ a:hover { color: $color-primary-alt; }
 .bold { font-weight: bold }
 .right { float: right; }
 .red { color: red; }
+.green { color: green; }
 .centered-text { text-align: center; }
 .inline-block { display: inline-block; }
 .small-text { font-size: 0.75rem; }
+.full-width { width: 100%; }
+.badge {
+  background-color: $base-background-color;
+  border: 1px solid $secondary-font-color;
+  border-radius: 4px;
+  color: $secondary-font-color;
+  display: inline-block;
+  font-size: $font-size-xs;
+  margin-right: 0.25rem;
+  padding: 0 0.5rem;
+  position: relative;
+  text-transform: uppercase;
+  a {
+    color: $secondary-font-color;
+    &:active, &:focus, &:hover { text-decoration: none; }
+  }
+  .badgeContents {
+    display: flex;
+    align-items: center;
+  }
+  svg, svg:hover, .fa {
+    height: 0.75rem;
+    fill: $secondary-font-color;
+    margin-right: 0.25rem;
+  }
+  &.alert {
+    background-color: $color-alert;
+    border: none;
+    color: #fff;
+    svg { fill: #fff; }
+  }
+}
 
 img {
   max-width: 100%;

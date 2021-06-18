@@ -74,6 +74,7 @@ export const postsApi = {
   startedByUser: params => $http(`/api/posts/user/${params.username}/started`, { params }),
   slugToPostId: slug => $http(`/api/posts/${slug}/id`),
   postSearch: params => $http('/api/search/posts', { params }),
+  byNewbie: params => $http('/api/posts/patrol', { params })
 }
 export const pollsApi = {
   vote: (threadId, pollId, answerIds) => $http(`/api/threads/${threadId}/polls/${pollId}/vote`, { method: 'POST', data: { answer_ids: answerIds }}),
@@ -138,15 +139,23 @@ export const usersApi = {
 }
 
 export const messagesApi = {
+  page: params => $http('/api/messages', { params }),
   pageIgnored: params => $http('/api/messages/ignored', { params }),
   ignore: data => $http('/api/messages/ignore', { method: 'POST', data }),
   unignore: data => $http('/api/messages/unignore', { method: 'POST', data }),
   settings: () => $http('/api/messages/settings'),
   emailNotifications: enabled => $http('/api/messages/settings', { method: 'PUT', data:{enabled}}),
   ignoreNewbies: enabled => $http('/api/messages/settings/newbie', { method: 'PUT', data:{enabled}}),
+  delete: id => $http(`/api/messages/${id}`, { method: 'DELETE' }),
   convos: {
-   create: data => $http('/api/conversations', { method: 'POST', data })
+    page: (id, params) => $http(`/api/conversations/${id}`, { params }),
+    create: data => $http('/api/conversations', { method: 'POST', data }),
+    delete: id => $http(`/api/conversations/${id}`, { method: 'DELETE' })
   }
+}
+
+export const reportsApi = {
+  reportMessage: data => $http('/api/reports/messages', { method: 'POST', data })
 }
 
 export const mentionsApi = {

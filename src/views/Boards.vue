@@ -67,7 +67,7 @@
                     <img v-if="!board.user_deleted && !board.post_deleted" class="avatar-small" :class="defaultAvatarShape" :src="board.last_post_avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
                     <router-link v-if="!board.user_deleted && !board.post_deleted" :to="{ path: '/profile/' + board.last_post_username.toLowerCase() }">{{board.last_post_username}}</router-link> posted in
                     <span v-if="board.last_thread_title">
-                      <a href="#">{{board.last_thread_title }}</a> on
+                      <router-link :to="{ name: 'Posts', params: { threadSlug: board.last_thread_slug, threadId: board.last_thread_id }, query: { start: board.last_post_position} }" v-html="board.last_thread_title"></router-link> on
                     </span>
                     <span vi-if="board.last_post_created_at">
                       <span>{{humanDate(board.last_post_created_at)}}</span>
