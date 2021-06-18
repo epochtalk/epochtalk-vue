@@ -138,6 +138,10 @@
           <div class="user-rank">
             <rank-display :user="{ ...post.user, metadata: {...postData.data.metadata } }" />
           </div>
+          <div v-if="loggedIn && post.user.id !== authedUser.id" class="ignore-directive">
+            <a v-if="!post.user._ignored" href="" @click.prevent="() => {}">Ignore Posts</a>
+            <a v-if="post.user._ignored" href="" @click.prevent="() => {}">Unignore Posts</a>
+          </div>
           <!-- TODO(akinsey): <ignore-posts post="post"></ignore-posts> -->
         </div>
 
@@ -533,6 +537,7 @@ export default {
     const v = reactive({
       prefs: $prefs.data,
       loggedIn: $auth.loggedIn,
+      authedUser: $auth.user,
       postData: {data: {}},
       editThread: false,
       addPoll: false,
