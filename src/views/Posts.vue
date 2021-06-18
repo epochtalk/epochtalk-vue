@@ -659,10 +659,10 @@ export default {
           if (moderatesBoard && v.authedUser.id === post.user.id) return true
           else if (moderatesBoard && ownPriority < post.user.priority) return true
           else if (moderatesBoard && (ownPriority === post.user.priority && !moderators.includes(post.user.id))) return true
+          else return false
         }
-        else if (priorityLockedBypass) {
-          if (ownPriority < post.user.priority) return true
-        }
+        else if (priorityLockedBypass && ownPriority < post.user.priority) return true
+        else return false
       }
 
       // owner
