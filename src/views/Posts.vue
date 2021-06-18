@@ -640,7 +640,7 @@ export default {
       const priorityLockedBypass = v.permissionUtils.hasPermission('posts.update.bypass.locked.priority')
       const priorityDeletedBypass = v.permissionUtils.hasPermission('posts.update.bypass.deleted.priority')
       const moderatesBoard = v.permissionUtils.moderatesBoard(v.postData.data.board.id)
-      const ownPriority = v.permissionUtils.getPriority()
+      const authedUserPriority = v.permissionUtils.getPriority()
       const moderators = v.postData.data.board.moderators.map((data) => data.id)
       if (!v.postData.data?.write_access) return false
       if (!v.loggedIn) return false
@@ -657,11 +657,11 @@ export default {
         if (adminLockedBypass) return true
         else if (modLockedBypass) {
           if (moderatesBoard && v.authedUser.id === post.user.id) return true
-          else if (moderatesBoard && ownPriority < post.user.priority) return true
-          else if (moderatesBoard && (ownPriority === post.user.priority && !moderators.includes(post.user.id))) return true
+          else if (moderatesBoard && authedUserPriority < post.user.priority) return true
+          else if (moderatesBoard && (authedUserPriority === post.user.priority && !moderators.includes(post.user.id))) return true
           else return false
         }
-        else if (priorityLockedBypass && ownPriority < post.user.priority) return true
+        else if (priorityLockedBypass && authedUserPriority < post.user.priority) return true
         else return false
       }
 
@@ -670,28 +670,24 @@ export default {
       else {
         if (adminOwnerBypass) return true
         else if (modOwnerBypass) {
-          if (moderatesBoard && ownPriority < post.user.priority) return true
+          if (moderatesBoard && authedUserPriority < post.user.priority) return true
           // Check if mod is moderating another board's mod (which is allowed)
-          else if (moderatesBoard && (ownPriority === post.user.priority && !moderators.includes(post.user.id))) {
-            return true
-          }
+          else if (moderatesBoard && (authedUserPriority === post.user.priority && !moderators.includes(post.user.id))) return true
         }
-        else if (priorityOwnerBypass) {
-          if (ownPriority < post.user.priority) return true
-        }
+        else if (priorityOwnerBypass && authedUserPriority < post.user.priority) return true
       }
 
       // deleted
       if (post.deleted) {
         if (adminDeletedBypass) return true
         else if (modDeletedBypass) {
-          if (moderatesBoard && ownPriority < post.user.priority) return true
-          else if (moderatesBoard && (ownPriority === post.user.priority && !moderators.includes(post.user.id))) {
+          if (moderatesBoard && authedUserPriority < post.user.priority) return true
+          else if (moderatesBoard && (authedUserPriority === post.user.priority && !moderators.includes(post.user.id))) {
             return true
           }
         }
         else if (priorityDeletedBypass) {
-          if (ownPriority < post.user.priority) return true
+          if (authedUserPriority < post.user.priority) return true
         }
       }
     }
