@@ -409,7 +409,7 @@ import { userRoleHighlight } from '@/composables/utils/userUtils'
 //import decode from '@/composables/filters/decode'
 import truncate from '@/composables/filters/truncate'
 import { inject, reactive, watch, toRefs } from 'vue'
-import { postsApi, threadsApi, usersApi } from '@/api'
+import { postsApi, threadsApi, usersApi, watchlistApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore, localStoragePrefs } from '@/composables/stores/prefs'
 //import { countTotals, getLastPost, filterIgnoredBoards } from '@/composables/utils/boardUtils'
@@ -522,9 +522,24 @@ export default {
     const loadEditor = (post) => console.log(post, 'loadEditor')
     const addQuote = (post) => console.log(post, 'addQuote')
     const copyQuote = (post) => console.log(post, 'copyQuote')
-    const highlightPost = () => console.log('highlightPost')
-    const showUserControls = () => console.log('showUserControls')
-    const watchThread = () => console.log('watchThread')
+    const showUserControls = () => true
+    const highlightPost = () => {
+      if ($route.hash) {
+        const postId = $route.hash.substring(1)
+        v.postData.data.posts = v.postData.data.posts.map(p => {
+          p.highlighted = p.id === postId
+          return p
+        })
+      }
+    }
+    const watchThread = () => {
+      const watching = v.postData.data.thread.watched
+      const toggleWatchThread = watching ? watchlistApi.unwatchThread : watchlistApi.watchThread
+      toggleWatchThread(v.postData.data.thread.id)
+      .then(() => v.postData.data.thread.watched = !v.postData.data.thread.watched)
+      .then(() => $alertStore.success(`${watching ? 'Unw' : 'W'}atching thread ${v.postData.data.thread.title}`))
+    }
+
     const openMoveThreadModal = () => console.log('openMoveThreadModal')
     const toggleIgnoredPosts = post => {
       const toggleIgnore = post.user._ignored ? usersApi.unignore : usersApi.ignore
