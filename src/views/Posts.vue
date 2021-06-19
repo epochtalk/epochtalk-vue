@@ -298,14 +298,13 @@
         <div class="post-tools">
           <!-- Watch Thread -->
           <div v-if="showUserControls()" >
-            <a class="pointer" :class="{'clicked' : postData.data?.thread.watched }" @click.prevent="watchThread()" data-balloon="Watch Thread">
+            <a class="pointer" :class="{'clicked' : postData.data?.thread.watched }" @click.prevent="watchThread()" :data-balloon="postData.data?.thread.watched ? 'Unwatch Thread' : 'Watch Thread'">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <title></title>
                 <path
                   d="M24,9.75C11.3,9.75,0,24,0,24S11.3,38.25,24,38.25,48,24,48,24,36.7,9.75,24,9.75ZM24,36A12,12,0,1,1,36,24,12,12,0,0,1,24,36Z" />
                 <path d="M24,15a8.89,8.89,0,0,0-3.06.57,3.93,3.93,0,1,1-5.37,5.37A8.89,8.89,0,0,0,15,24a9,9,0,1,0,9-9Z" />
               </svg>
-              <!--TODO(akinsey): Implment epochtalk version of eye-slash icon -->
             </a>
           </div>
 
