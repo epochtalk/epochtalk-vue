@@ -269,7 +269,7 @@
                 </a>
               </li>
               <li>
-                <router-link :to="{ name: 'Posts', query: { page: postData.data.page, limit: postData.data.limit }, hash: `#${post.id}`}" @click="highlightPost()" class="post-action-icon" data-balloon="Permalink">
+                <router-link :to="{ name: 'Posts', query: { page: postData.data.page, limit: postData.data.limit }, hash: `#${post.id}`}" class="post-action-icon" data-balloon="Permalink">
                   <!-- <i class="icon-epoch-link"></i> -->
                   <strong>#{{post.position}}</strong>
                 </router-link>
