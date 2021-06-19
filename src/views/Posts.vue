@@ -441,7 +441,11 @@ export default {
     threadsApi.slugToThreadId(to.params.threadSlug).then(t => t.id)
       .then(threadId => {
         params.thread_id = threadId
-        return postsApi.byThread(params).then(data => next(vm => vm.postData.data = data))
+        return postsApi.byThread(params)
+        .then(data => next(vm => {
+          vm.postData.data = data
+          vm.highlightPost()
+        }))
       })
   },
   beforeRouteUpdate(to, from, next) {
@@ -456,6 +460,7 @@ export default {
         params.thread_id = threadId
         return postsApi.byThread(params).then(data => {
           this.postData.data = data
+          this.highlightPost()
           next()
         })
       })
@@ -559,7 +564,10 @@ export default {
       .then(() => {
         $alertStore.success(`${post.user._ignored ? 'Unig' : 'Ig'}noring posts from user ${post.user.username}`)
         processPosts()
-        .then(data => v.postData.data = data)
+        .then(data => {
+          v.postData.data = data
+          $route.hash ? highlightPost() : null
+        })
       })
     }
 
@@ -593,7 +601,12 @@ export default {
     })
 
     /* Watched Data */
-    watch(() => v.loggedIn, () => processPosts().then(data => v.postData.data = data)) // Update on login
+    watch(() => v.loggedIn, () => processPosts().then(data => {
+      v.postData.data = data
+      $route.hash ? highlightPost() : null
+    })) // Update on login
+
+    watch(() => $route.hash, () => highlightPost())
 
     return {
       ...toRefs(v),
