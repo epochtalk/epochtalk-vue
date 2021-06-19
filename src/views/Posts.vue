@@ -554,7 +554,6 @@ export default {
       const toggleWatchThread = watching ? watchlistApi.unwatchThread : watchlistApi.watchThread
       toggleWatchThread(v.postData.data.thread.id)
       .then(() => v.postData.data.thread.watched = !v.postData.data.thread.watched)
-      .then(() => $alertStore.success(`${watching ? 'Unw' : 'W'}atching thread ${v.postData.data.thread.title}`))
     }
 
     const openMoveThreadModal = () => console.log('openMoveThreadModal')
