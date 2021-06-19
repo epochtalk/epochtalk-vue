@@ -84,11 +84,6 @@ export const pollsApi = {
   unlock: (threadId, pollId) => $http(`/api/threads/${threadId}/polls/${pollId}/lock`, { method: 'POST', data: { locked: false }})
 }
 
-export const reportsApi = {
-  reportUser: (userId, reason) => $http('/api/reports/users', { method: 'POST', data: { offender_user_id: userId, reporter_reason: reason }}),
-  reportPost: (postId, reason) => $http('/api/reports/posts', { method: 'POST', data: { offender_post_id: postId, reporter_reason: reason }})
-}
-
 export const watchlistApi = {
   watchBoard: boardId => $http(`/api/watchlist/boards/${boardId}`, { method: 'POST' }),
   unwatchBoard: boardId => $http(`/api/watchlist/boards/${boardId}`, { method: 'DELETE' })
@@ -155,7 +150,9 @@ export const messagesApi = {
 }
 
 export const reportsApi = {
-  reportMessage: data => $http('/api/reports/messages', { method: 'POST', data })
+  reportMessage: data => $http('/api/reports/messages', { method: 'POST', data }),
+  reportUser: (userId, reason) => $http('/api/reports/users', { method: 'POST', data: { offender_user_id: userId, reporter_reason: reason }}),
+  reportPost: (postId, reason) => $http('/api/reports/posts', { method: 'POST', data: { offender_post_id: postId, reporter_reason: reason }})
 }
 
 export const mentionsApi = {

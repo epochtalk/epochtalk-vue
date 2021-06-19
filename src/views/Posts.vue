@@ -825,7 +825,6 @@ export default {
       selectedPostIndex: 0,
       prefs: $prefs.data,
       loggedIn: $auth.loggedIn,
-      authedUser: $auth.user,
       postData: {data: {}},
       editThread: false,
       addPoll: false,
