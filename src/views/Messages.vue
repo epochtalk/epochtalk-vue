@@ -228,7 +228,6 @@ export default {
       messagesApi.convos.page(conversationId)
       // build out conversation information
       .then(data => {
-        console.log(data.messages[0].content.subject)
         v.currentSubject = data.messages[0].content.subject
         v.currentConversation = data
         v.currentConversation.id = conversationId
