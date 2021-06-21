@@ -3,6 +3,7 @@ import { cloneDeep } from 'lodash'
 import { authApi } from '@/api'
 import { PreferencesStore } from '@/composables/stores/prefs'
 import PermissionUtils from '@/composables/utils/permissions'
+import BanUtils from '@/composables/utils/bans'
 import localStorageCache from '@/composables/utils/localStorageCache'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -74,6 +75,7 @@ export default {
     return provide(AuthStore, {
       user: readonly(user),
       permissionUtils: new PermissionUtils(user),
+      banUtils: new BanUtils(user),
       loggedIn: computed(() => !!user.token),
       login,
       logout,
