@@ -64,6 +64,19 @@
               Sticky
             </span>
           </div>
+          <div class="badge watched" v-if="postData.data.thread.watched">
+            <div>
+              <a href="" id="watchThread" :data-balloon="postData.data.thread.watched ? 'Unwatch Thread' : 'Watch Thread'" :class="{'clicked' : postData.data.thread.watched }" @click.prevent="watchThread()" class="badgeContents">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                <title></title>
+                <path
+                  d="M24,9.75C11.3,9.75,0,24,0,24S11.3,38.25,24,38.25,48,24,48,24,36.7,9.75,24,9.75ZM24,36A12,12,0,1,1,36,24,12,12,0,0,1,24,36Z" />
+                <path d="M24,15a8.89,8.89,0,0,0-3.06.57,3.93,3.93,0,1,1-5.37,5.37A8.89,8.89,0,0,0,15,24a9,9,0,1,0,9-9Z" />
+              </svg>
+                Watched
+              </a>
+            </div>
+          </div>
         </div>
       </div>
       <!-- Edit Title -->
@@ -139,8 +152,7 @@
             <rank-display :user="{ ...post.user, metadata: {...postData.data.metadata } }" />
           </div>
           <div v-if="loggedIn && post.user.id !== authedUser.id" class="ignore-directive">
-            <a v-if="!post.user._ignored" href="" @click.prevent="() => {}">Ignore Posts</a>
-            <a v-if="post.user._ignored" href="" @click.prevent="() => {}">Unignore Posts</a>
+            <a href="" @click.prevent="toggleIgnoredPosts(post)" v-html="post.user._ignored ? 'Unignore Posts' : 'Ignore Posts'"></a>
           </div>
           <!-- TODO(akinsey): <ignore-posts post="post"></ignore-posts> -->
         </div>
@@ -257,7 +269,7 @@
                 </a>
               </li>
               <li>
-                <router-link :to="{ name: 'Posts', query: { page: postData.data.page, limit: postData.data.limit }, hash: `#${post.id}`}" @click="highlightPost()" class="post-action-icon" data-balloon="Permalink">
+                <router-link :to="{ name: 'Posts', query: { page: postData.data.page, limit: postData.data.limit }, hash: `#${post.id}`}" class="post-action-icon" data-balloon="Permalink">
                   <!-- <i class="icon-epoch-link"></i> -->
                   <strong>#{{post.position}}</strong>
                 </router-link>
@@ -287,7 +299,7 @@
         <div class="post-tools">
           <!-- Watch Thread -->
           <div v-if="showUserControls()" >
-            <a class="" v-if="!postData.data?.thread.watched" @click.prevent="watchThread()" data-balloon="Watch Thread">
+            <a class="pointer" :class="{'clicked' : postData.data?.thread.watched }" @click.prevent="watchThread()" :data-balloon="postData.data?.thread.watched ? 'Unwatch Thread' : 'Watch Thread'">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <title></title>
                 <path
@@ -299,7 +311,7 @@
 
           <!-- Add a Poll -->
           <div v-if="showUserControls()">
-            <a class="" v-if="canCreatePoll()"
+            <a class="pointer" v-if="canCreatePoll()"
               @click.prevent="addPoll = !addPoll" data-balloon="Add a Poll">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <title></title>
@@ -314,7 +326,7 @@
 
           <!-- Thread Lock -->
           <div class="control" v-if="canLock()">
-            <a href="#" id="lockThread" :class="{'clicked' : postData.data?.thread.locked }"
+            <a class="pointer" id="lockThread" :class="{'clicked' : postData.data?.thread.locked }"
               @click.prevent="updateThreadLock(postData.data.thread)" :data-balloon="postData.data.thread.locked ? 'Unlock Thread' : 'Lock Thread'">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <title></title>
@@ -411,9 +423,10 @@ import Pagination from '@/components/layout/Pagination.vue'
 import PollViewer from '@/components/posts/PollViewer.vue'
 import RankDisplay from '@/components/users/RankDisplay.vue'
 import humanDate from '@/composables/filters/humanDate'
+import { userRoleHighlight } from '@/composables/utils/userUtils'
 import truncate from '@/composables/filters/truncate'
 import { inject, reactive, watch, toRefs } from 'vue'
-import { postsApi, threadsApi } from '@/api'
+import { postsApi, threadsApi, usersApi, watchlistApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore, localStoragePrefs } from '@/composables/stores/prefs'
 import PostsDeleteModal from '@/components/modals/posts/Delete.vue'
@@ -436,7 +449,11 @@ export default {
     threadsApi.slugToThreadId(to.params.threadSlug).then(t => t.id)
       .then(threadId => {
         params.thread_id = threadId
-        return postsApi.byThread(params).then(data => next(vm => vm.postData.data = data))
+        return postsApi.byThread(params)
+        .then(data => next(vm => {
+          vm.postData.data = data
+          vm.highlightPost()
+        }))
       })
   },
   beforeRouteUpdate(to, from, next) {
@@ -450,6 +467,7 @@ export default {
         params.thread_id = threadId
         return postsApi.byThread(params).then(data => {
           this.postData.data = data
+          this.highlightPost()
           next()
         })
       })
@@ -777,7 +795,6 @@ export default {
     const updateThreadTitle = () => console.log('updateThreadTitle')
     const closeEditThread = () => console.log('closeEditThread')
     const createPoll = () => console.log('createPoll')
-    const userRoleHighlight = () => { return {} }
     const showEditDate = (post) => {
       console.log(post)
       return true
@@ -811,16 +828,43 @@ export default {
     const loadEditor = (post) => console.log(post, 'loadEditor')
     const addQuote = (post) => console.log(post, 'addQuote')
     const copyQuote = (post) => console.log(post, 'copyQuote')
-    const highlightPost = () => console.log('highlightPost')
-    const showUserControls = () => console.log('showUserControls')
-    const watchThread = () => console.log('watchThread')
+    const showUserControls = () => true
+    const highlightPost = () => {
+      if ($route.hash) {
+        const postId = $route.hash.substring(1)
+        v.postData.data.posts = v.postData.data.posts.map(p => {
+          p.highlighted = p.id === postId
+          return p
+        })
+      }
+    }
+    const watchThread = () => {
+      const watching = v.postData.data.thread.watched
+      const toggleWatchThread = watching ? watchlistApi.unwatchThread : watchlistApi.watchThread
+      toggleWatchThread(v.postData.data.thread.id)
+      .then(() => v.postData.data.thread.watched = !v.postData.data.thread.watched)
+    }
+
     const openMoveThreadModal = () => console.log('openMoveThreadModal')
+    const toggleIgnoredPosts = post => {
+      const toggleIgnore = post.user._ignored ? usersApi.unignore : usersApi.ignore
+      toggleIgnore(post.user)
+      .then(() => {
+        $alertStore.success(`${post.user._ignored ? 'Unig' : 'Ig'}noring posts from user ${post.user.username}`)
+        processPosts()
+        .then(data => {
+          v.postData.data = data
+          $route.hash ? highlightPost() : null
+        })
+      })
+    }
 
     /* Internal Data */
     const $route = useRoute()
     const $prefs = inject(PreferencesStore)
     const $auth = inject(AuthStore)
     const $breadcrumbs = inject(BreadcrumbStore)
+    const $alertStore = inject('$alertStore')
 
     /* View Data */
     const v = reactive({
@@ -852,7 +896,12 @@ export default {
     })
 
     /* Watched Data */
-    watch(() => v.loggedIn, () => processPosts().then(data => v.postData.data = data)) // Update on login
+    watch(() => v.loggedIn, () => processPosts().then(data => {
+      v.postData.data = data
+      $route.hash ? highlightPost() : null
+    })) // Update on login
+
+    watch(() => $route.hash, () => highlightPost())
 
     return {
       ...toRefs(v),
@@ -891,6 +940,7 @@ export default {
       highlightPost,
       showUserControls,
       watchThread,
+      toggleIgnoredPosts,
       openMoveThreadModal
     }
   }
