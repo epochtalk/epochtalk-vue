@@ -652,6 +652,10 @@ export default {
       var elevatedPrivileges = adminOwnerBypass || modOwnerBypass || priorityOwnerBypass
       if (postEditDisabled(post.created_at) && !elevatedPrivileges) return false
 
+      // developer note: avoid unreachable code
+      // ensure that all if blocks end with else
+      // defaults to return false
+
       // if thread is locked
       if (v.postData.data.thread.locked) {
         if (adminLockedBypass) return true
