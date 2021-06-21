@@ -828,7 +828,7 @@ export default {
     const loadEditor = (post) => console.log(post, 'loadEditor')
     const addQuote = (post) => console.log(post, 'addQuote')
     const copyQuote = (post) => console.log(post, 'copyQuote')
-    const showUserControls = () => (v.loggedIn && (!v.postData.data.thread.watched || v.canCreatePoll()))
+    const showUserControls = () => (v.loggedIn && (!v.postData.data.thread.watched || canCreatePoll()))
     const highlightPost = () => {
       if ($route.hash) {
         const postId = $route.hash.substring(1)
