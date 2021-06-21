@@ -10,8 +10,8 @@ export default class BanUtils {
   }
 
   update(bannedFromBoard) {
-    // banExpiration = Session.user.ban_expiration;
-    this.boardBanned = bannedFromBoard;
+    this.banExpiration = this.user.ban_expiration
+    this.boardBanned = bannedFromBoard
     this.globallyBanned = this.banExpiration ? true : false
     // Sets board ban message, ignored if global ban is set
     if (this.boardBanned && !this.globallyBanned) this.message = 'Read Only Access &mdash; You have been banned from this board'
