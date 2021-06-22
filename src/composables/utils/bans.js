@@ -6,7 +6,8 @@ export default class BanUtils {
     this.message = undefined
     this.boardBanned = false
     this.banExpiration = user.ban_expiration
-    this.globallyBanned = user.ban_expiration ? true : false;
+    this.globallyBanned = user.ban_expiration ? true : false
+    this.update()
   }
 
   update(bannedFromBoard) {
