@@ -788,7 +788,8 @@ export default {
       }
       else return false
     }
-    const openEditThread = () => console.log('openEditThread')
+    const openEditThread = () => v.editThread = true
+    const closeEditThread = () => v.editThread = false
     const updateThreadLock = (thread) => {
       const promise = thread.locked ? threadsApi.unlock(thread.id) : threadsApi.lock(thread.id)
       promise.then(() => thread.locked = !thread.locked)
@@ -809,7 +810,6 @@ export default {
         })
         .catch(() => $alertStore.error('Error changing thread title'))
     }
-    const closeEditThread = () => console.log('closeEditThread')
     const createPoll = () => console.log('createPoll')
     const showEditDate = (post) => {
       console.log(post)
