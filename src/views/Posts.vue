@@ -793,14 +793,15 @@ export default {
       promise.then(() => thread.sticky = !thread.sticky)
     }
     const updateThreadTitle = () => {
-      var title = ctrl.thread.title;
-      return Threads.title({id: ctrl.thread.id}, {title: title}).$promise
-      .then(function() { ctrl.editThread = false; })
-      .then(function() {
-        Alert.success('Thread\'s title changed to: ' + title);
-        BreadcrumbSvc.updateLabelInPlace(title);
-      })
-      .catch(function() { Alert.error('Error changing thread title'); });
+      const title = v.postData.data.thread.title
+      const id = v.postData.data.thread.id
+      return threadsApi.title(id, title)
+        .then(() => {
+          v.editThread = false
+          $alertStore.success(`Thread's title changed to: ${title}`)
+          $breadcrumbs.updateLabelInPlace(title)
+        })
+        .catch(() => $alertStore.error('Error changing thread title'))
     }
     const closeEditThread = () => console.log('closeEditThread')
     const createPoll = () => console.log('createPoll')
