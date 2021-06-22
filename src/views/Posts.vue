@@ -811,7 +811,7 @@ export default {
         .catch(() => $alertStore.error('Error changing thread title'))
     }
     const createPoll = () => console.log('createPoll')
-    const showEditDate = (post) => (new Date(post.created_at) < new Date(post.updated_at))
+    const showEditDate = (post) => dayjs(post.updated_at).isAfter(dayjs(post.created_at))
     const openPostsPurgePostModal = (post, postIndex) => {
       v.selectedPost = post
       v.selectedPostIndex = postIndex
