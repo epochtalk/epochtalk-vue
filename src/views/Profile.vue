@@ -202,11 +202,10 @@ export default {
     const redirectHome = () => $router.replace('/')
 
     const banExpiration = () => {
-      let result
-      const expiration = v.user.ban_expiration;
-      const canBan = v.permUtils.hasPermission('bans.ban.allow');
-      if (canBan && expiration && new Date(expiration) > new Date()) result = humanDate(expiration, true)
-      return result
+      const expiration = v.user.ban_expiration
+      const canBan = v.permUtils.hasPermission('bans.ban.allow')
+      if (canBan && expiration && new Date(expiration) > new Date()) return humanDate(expiration, true)
+      else return false
     }
 
     const userAge = dob => {
