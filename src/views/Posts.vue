@@ -423,6 +423,7 @@ import Pagination from '@/components/layout/Pagination.vue'
 import PollViewer from '@/components/posts/PollViewer.vue'
 import RankDisplay from '@/components/users/RankDisplay.vue'
 import humanDate from '@/composables/filters/humanDate'
+import dayjs from 'dayjs'
 import { userRoleHighlight } from '@/composables/utils/userUtils'
 import truncate from '@/composables/filters/truncate'
 import { inject, reactive, watch, toRefs } from 'vue'
@@ -496,13 +497,12 @@ export default {
       // get amount of time post edit has been disabled for in ms (if available)
       const disablePostEdit = v.postData.data.board.disable_post_edit
       if (disablePostEdit && Number(disablePostEdit) > -1) {
-        // get amount of time post edit has been disabled for in minutes
-        const disablePostEditMinutes = Number(disablePostEdit) * 60 * 1000
-        const currentTime = new Date().getTime()
-        const createdAtTime = new Date(createdAt).getTime()
-        // if elapsed time since creation is less than disabled time
+        const disablePostEditDuration = dayjs.duration(disablePostEdit)
+        const currentTime = dayjs()
+        const createdAtTime = dayjs(createdAt)
+        // if elapsed time since creation has not passed disabled duration
         // post edit is disabled
-        return currentTime - createdAtTime < disablePostEditMinutes
+        return currentTime.isBefore(createdAtTime.add(disablePostEditDuration))
       }
       else return false
     }
