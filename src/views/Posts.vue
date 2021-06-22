@@ -642,7 +642,7 @@ export default {
       if (!v.postData.data?.write_access) return false
       if (v.postData.data.thread.poll) return false
 
-      const adminBypass = v.permissionUtils.hasPermission('threads.createpoll.bypass.owner.admin')
+      const adminBypass = v.permissionUtils.hasPermission('threads.createPoll.bypass.owner.admin')
       const modBypass = v.permissionUtils.hasPermission('threads.createPoll.bypass.owner.mod')
       const priorityBypass = v.permissionUtils.hasPermission('threads.createPoll.bypass.owner.priority')
       const userPriority = v.postData.data.posts[0].user.priority
