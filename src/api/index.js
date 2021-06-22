@@ -49,6 +49,7 @@ export const boardsApi = {
 }
 
 export const threadsApi = {
+  title: (threadId, title) => $http(`/api/threads/${threadId}`, { data: { title: title }, method: 'POST'}),
   purge: threadId => $http(`/api/threads/${threadId}`, { method: 'DELETE' }),
   lock: threadId => $http(`/api/threads/${threadId}/lock`, { data: { status: true }, method: 'POST'}),
   unlock: threadId => $http(`/api/threads/${threadId}/lock`, { data: { status: false }, method: 'POST'}),
