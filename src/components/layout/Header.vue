@@ -182,6 +182,9 @@
       <!-- Alerts -->
       <alert></alert>
 
+      <!-- Bans -->
+      <div id="ban-notice" v-if="banUtils.isBanned()" v-html="banUtils.isBanned()"></div>
+
       <!-- Message of the Day -->
       <!-- <motd></motd> -->
 
@@ -256,6 +259,7 @@ export default {
       showInvite: false,
       showRegister: false,
       showLogin: false,
+      banUtils: $auth.banUtils,
       loggedIn: $auth.loggedIn,
       logo: '',
       scrollDownPos: 95,

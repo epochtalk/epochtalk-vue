@@ -244,7 +244,10 @@ export default {
     .then(boardId => {
       params.board_id = boardId
       return threadsApi.byBoard(params)
-      .then(d => next(vm => vm.threadData.data = processThreads(d)))
+      .then(d => next(vm => {
+        vm.threadData.data = processThreads(d)
+        vm.banUtils.update(vm.threadData.data.banned_from_board)
+      }))
     })
   },
   beforeRouteUpdate(to, from, next) {
@@ -259,9 +262,14 @@ export default {
       params.board_id = boardId
       return threadsApi.byBoard(params).then(d => {
         this.threadData.data = processThreads(d)
+        this.banUtils.update(this.threadData.data.banned_from_board)
         next()
       })
     })
+  },
+  beforeRouteLeave(to, from, next) { // clears ban message
+    this.banUtils.update()
+    next()
   },
   setup(props) {
     /* Internal Methods */
@@ -351,6 +359,7 @@ export default {
       prefs: $prefs.data,
       loggedIn: $auth.loggedIn,
       permissionUtils: $auth.permissionUtils,
+      banUtils: $auth.banUtils,
       showSetModerators: false,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
@@ -376,7 +385,10 @@ export default {
     })
 
     /* Watched Data */
-    watch(() => v.loggedIn, () => getThreads().then(d => v.threadData.data = d)) // Update threads on login
+    watch(() => v.loggedIn, () => getThreads().then(d => {
+      v.threadData.data = d
+      v.banUtils.update(v.threadData.data.banned_from_board)
+    })) // Update threads on login
 
     return { ...toRefs(v), canCreate, canSetModerator, loadEditor, watchBoard, setSortField, getSortClass, humanDate, decode, truncate }
   }

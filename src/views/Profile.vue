@@ -1,11 +1,11 @@
 <template>
   <div class="profile-wrap" v-if="user">
-    <div class="message-banned" v-if="banExpiration">
+    <div class="message-banned" v-if="banExpiration()">
       {{ user.username }}
-      <span v-if="banExpiration !== 'Permanent'">
-        is banned until {{ banExpiration }}
+      <span v-if="banExpiration() !== 'Permanent'">
+        is banned until {{ banExpiration() }}
       </span>
-      <span v-if="banExpiration === 'Permanent'">
+      <span v-if="banExpiration() === 'Permanent'">
          is permanently banned
        </span>
     </div>
@@ -190,7 +190,7 @@ export default {
   props: [ 'username', 'saveScrollPos' ],
   components: { TrustProfileDisplay, RankDisplay, UpdateSignatureModal, UpdatePasswordModal, UpdateAvatarModal, UpdateEmailModal, DeleteAccountModal, DeactivateReactivateModal, UpdateProfileModal, QuickMessageModal,ManageBansModal, ModerationNotesModal },
   beforeRouteEnter(to, from, next) {
-    next(vm => usersApi.find(to.params.username).then(u => vm.user = u))
+    usersApi.find(to.params.username).then(u => next(vm => vm.user = u))
   },
   beforeRouteUpdate(to, from, next) {
     usersApi.find(to.params.username).then(u => this.user = u)
@@ -200,6 +200,13 @@ export default {
     /* Template Methods */
     const refreshUser = () => usersApi.find(v.user.username).then(u => v.user = u)
     const redirectHome = () => $router.replace('/')
+
+    const banExpiration = () => {
+      const expiration = v.user.ban_expiration
+      const canBan = v.permUtils.hasPermission('bans.ban.allow')
+      if (canBan && expiration && new Date(expiration) > new Date()) return humanDate(expiration, true)
+      else return false
+    }
 
     const userAge = dob => {
       if (!dob) return
@@ -302,7 +309,6 @@ export default {
     const v = reactive({
       loggedIn: $auth.loggedIn,
       permUtils: $auth.permissionUtils,
-      banExpiration: null,
       isOnline: true,
       userLocalTime: null,
       user: null,
@@ -320,7 +326,7 @@ export default {
       showDelete: false,
       showManageBans: false
     })
-    return { ...toRefs(v), refreshUser, toggleIgnorePosts, toggleIgnoreMessages, toggleIgnoreMentions, redirectHome, canUpdate, canUpdateUsername, canMessage, userAge, canUpdatePrivate, pageOwner, canPageUserNotes, canBanUser, canBoardBanUser, canReactivate, canDeactivate, canDelete, humanDate }
+    return { ...toRefs(v), refreshUser, banExpiration, toggleIgnorePosts, toggleIgnoreMessages, toggleIgnoreMentions, redirectHome, canUpdate, canUpdateUsername, canMessage, userAge, canUpdatePrivate, pageOwner, canPageUserNotes, canBanUser, canBoardBanUser, canReactivate, canDeactivate, canDelete, humanDate }
   }
 }
 </script>

@@ -452,6 +452,7 @@ export default {
         return postsApi.byThread(params)
         .then(data => next(vm => {
           vm.postData.data = data
+          vm.banUtils.update(vm.postData.data.banned_from_board)
           vm.highlightPost()
         }))
       })
@@ -467,10 +468,15 @@ export default {
         params.thread_id = threadId
         return postsApi.byThread(params).then(data => {
           this.postData.data = data
+          this.banUtils.update(this.postData.data.banned_from_board)
           this.highlightPost()
           next()
         })
       })
+  },
+  beforeRouteLeave(to, from, next) { // clears ban message
+    this.banUtils.update()
+    next()
   },
   setup(props) {
     /* Internal Methods */
@@ -893,6 +899,7 @@ export default {
       },
       permissionUtils: $auth.permissionUtils,
       // TODO(boka): Implement ban status check
+      banUtils: $auth.banUtils,
       bannedFromBoard: false,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
@@ -908,6 +915,7 @@ export default {
     /* Watched Data */
     watch(() => v.loggedIn, () => processPosts().then(data => {
       v.postData.data = data
+      v.banUtils.update(v.postData.data.banned_from_board)
       $route.hash ? highlightPost() : null
     })) // Update on login
 
