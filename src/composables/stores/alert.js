@@ -1,7 +1,7 @@
 import { toRefs, reactive, readonly } from 'vue'
 
 const store = reactive({ alerts: [] })
-let id = 0;
+let id = 0
 
 const addAlert = (msg, type) => {
   // Destructure and handle SWRV object's errors in here to make Vue Component code cleaner
@@ -16,11 +16,11 @@ const addAlert = (msg, type) => {
           msg = `${error.name}: ${error.message}`
       }
     }
-    else { return } // no error do nothing
+    else return // no error do nothing
   }
 
   store.alerts.unshift({ id: id, type: type, message: msg })
-  id = ++id;
+  id = ++id
 }
 
 const success = message => addAlert(message, 'success')
@@ -34,4 +34,4 @@ export default readonly({
   info,
   warn,
   error
-});
+})
