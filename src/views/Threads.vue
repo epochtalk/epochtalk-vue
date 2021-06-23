@@ -228,6 +228,7 @@ import { boardsApi, threadsApi, watchlistApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore, localStoragePrefs } from '@/composables/stores/prefs'
 import { processThreads } from '@/composables/utils/boardUtils'
+import BanStore from '@/composables/stores/ban'
 
 export default {
   name: 'Threads',
@@ -246,7 +247,7 @@ export default {
       return threadsApi.byBoard(params)
       .then(d => next(vm => {
         vm.threadData.data = processThreads(d)
-        vm.banUtils.update(vm.threadData.data.banned_from_board)
+        BanStore.updateBanNotice(vm.threadData.data.banned_from_board)
       }))
     })
   },
@@ -262,13 +263,13 @@ export default {
       params.board_id = boardId
       return threadsApi.byBoard(params).then(d => {
         this.threadData.data = processThreads(d)
-        this.banUtils.update(this.threadData.data.banned_from_board)
+        BanStore.updateBanNotice(this.threadData.data.banned_from_board)
         next()
       })
     })
   },
   beforeRouteLeave(to, from, next) { // clears ban message
-    this.banUtils.update()
+    BanStore.updateBanNotice()
     next()
   },
   setup(props) {
@@ -387,7 +388,7 @@ export default {
     /* Watched Data */
     watch(() => v.loggedIn, () => getThreads().then(d => {
       v.threadData.data = d
-      v.banUtils.update(v.threadData.data.banned_from_board)
+      BanStore.updateBanNotice(v.threadData.data.banned_from_board)
     })) // Update threads on login
 
     return { ...toRefs(v), canCreate, canSetModerator, loadEditor, watchBoard, setSortField, getSortClass, humanDate, decode, truncate }

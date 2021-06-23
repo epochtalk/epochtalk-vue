@@ -3,7 +3,7 @@ import { cloneDeep } from 'lodash'
 import { authApi } from '@/api'
 import { PreferencesStore } from '@/composables/stores/prefs'
 import PermissionUtils from '@/composables/utils/permissions'
-import BanUtils from '@/composables/utils/bans'
+import BanStore from '@/composables/stores/ban'
 import localStorageCache from '@/composables/utils/localStorageCache'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -36,11 +36,14 @@ export default {
     /* Provided Data */
     const user = reactive(cachedUser ? cachedUser.data : cloneDeep(emtpyUser))
 
+    BanStore.initBanNotice(user)
+
     /* Provided Methods */
     const login = (username, password, rememberMe) => authApi.login({ username, password, rememberMe })
       .then(dbUser => {
         $appCache.set(AUTH_KEY, dbUser)
         Object.assign(user, dbUser)
+        BanStore.initBanNotice(user)
         $prefs.fetch()
         $alertStore.success(`Welcome ${user.username}, you have successfully logged in!`)
       }).catch(() => {})
@@ -75,7 +78,6 @@ export default {
     return provide(AuthStore, {
       user: readonly(user),
       permissionUtils: new PermissionUtils(user),
-      banUtils: new BanUtils(user),
       loggedIn: computed(() => !!user.token),
       login,
       logout,

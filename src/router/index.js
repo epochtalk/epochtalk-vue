@@ -19,6 +19,7 @@ import Login from '@/views/layout/Login.vue'
 import NProgress from 'nprogress'
 import { nextTick } from 'vue'
 import { localStorageAuth } from '@/composables/stores/auth'
+import BanStore from '@/composables/stores/ban'
 
 const routes = [
   {
@@ -157,6 +158,9 @@ const router = createRouter({
 router.beforeEach(to => {
   // Start progress bar
   NProgress.start()
+
+  console.log(localStorageAuth().data)
+  BanStore.initBanNotice(localStorageAuth().data)
 
   // Redirect to login page if route has meta.requiresAuth set
   if (to.meta.requiresAuth && !localStorageAuth().data.token) {

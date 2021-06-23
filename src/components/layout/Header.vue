@@ -183,7 +183,7 @@
       <alert></alert>
 
       <!-- Bans -->
-      <div id="ban-notice" v-if="banUtils.isBanned()" v-html="banUtils.isBanned()"></div>
+      <div id="ban-notice" v-if="BanStore.updateBanNotice()" v-html="BanStore.updateBanNotice()"></div>
 
       <!-- Message of the Day -->
       <!-- <motd></motd> -->
@@ -209,6 +209,7 @@ import { PreferencesStore } from '@/composables/stores/prefs'
 import { reactive, toRefs, onMounted, onUnmounted, inject } from 'vue'
 import { debounce } from 'lodash'
 import { useRouter } from 'vue-router'
+import BanStore from '@/composables/stores/ban'
 
 export default {
   components: { Breadcrumbs, LoginModal, InviteModal, RegisterModal, Alert },
@@ -259,7 +260,6 @@ export default {
       showInvite: false,
       showRegister: false,
       showLogin: false,
-      banUtils: $auth.banUtils,
       loggedIn: $auth.loggedIn,
       logo: '',
       scrollDownPos: 95,
@@ -284,7 +284,7 @@ export default {
       window.removeEventListener('scroll', debounce(scrollHeader, 10))
     })
 
-    return { ...toRefs(v), logout, isPatroller, searchForum, dismissNotifications, toggleFocusSearch, decode }
+    return { ...toRefs(v), BanStore, logout, isPatroller, searchForum, dismissNotifications, toggleFocusSearch, decode }
   }
 }
 </script>

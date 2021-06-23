@@ -436,6 +436,7 @@ import PostsPurgePostModal from '@/components/modals/posts/PurgePost.vue'
 import PostsPurgeThreadModal from '@/components/modals/posts/PurgeThread.vue'
 import PostsReportModal from '@/components/modals/posts/Report.vue'
 import { BreadcrumbStore } from '@/composables/stores/breadcrumbs'
+import BanStore from '@/composables/stores/ban'
 
 export default {
   name: 'Posts',
@@ -453,7 +454,7 @@ export default {
         return postsApi.byThread(params)
         .then(data => next(vm => {
           vm.postData.data = data
-          vm.banUtils.update(vm.postData.data.banned_from_board)
+          BanStore.updateBanNotice(vm.postData.data.banned_from_board)
           vm.highlightPost()
         }))
       })
@@ -469,14 +470,14 @@ export default {
         params.thread_id = threadId
         return postsApi.byThread(params).then(data => {
           this.postData.data = data
-          this.banUtils.update(this.postData.data.banned_from_board)
+          BanStore.updateBanNotice(this.postData.data.banned_from_board)
           this.highlightPost()
           next()
         })
       })
   },
   beforeRouteLeave(to, from, next) { // clears ban message
-    this.banUtils.update()
+    BanStore.updateBanNotice()
     next()
   },
   setup(props) {
