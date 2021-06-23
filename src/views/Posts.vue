@@ -178,8 +178,8 @@
             </div>
 
             <ul class="post-action">
-              <li v-if="canPurge() && post.position !== 1">
-                <a href="" class="post-action-icon" @click.prevent="openPurgeModal(i)" data-balloon="Purge">
+              <li v-if="canPurgePost(post) && post.position !== 1">
+                <a href="" class="post-action-icon" @click.prevent="openPostsPurgePostModal(post, i)" data-balloon="Purge">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                     <title></title>
                     <path
@@ -190,7 +190,7 @@
                 </a>
               </li>
               <li v-if="canDelete(post) && post.position !== 1 && !post.deleted">
-                <a href="" class="post-action-icon" @click.prevent="openDeleteModal(i, post.locked)" data-balloon="Hide">
+                <a href="" class="post-action-icon" @click.prevent="openPostsDeleteModal(post)" data-balloon="Hide">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                     <title></title>
                     <path
@@ -202,7 +202,7 @@
                 </a>
               </li>
               <li v-if="canDelete(post) && post.deleted">
-                <a href="" class="post-action-icon selected" @click.prevent="openUndeleteModal(i)" data-balloon="Unhide">
+                <a href="" class="post-action-icon selected" @click.prevent="openPostsUndeleteModal(post)" data-balloon="Unhide">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                     <title></title>
                     <path
@@ -233,7 +233,7 @@
               </li>
 
               <li v-if="loggedIn && (permissionUtils.hasPermission('reports.createPostReport') || permissionUtils.hasPermission('reports.createUserReport')) && !bannedFromBoard">
-                <a href="" class="post-action-icon" @click.prevent="openReportModal(post)" data-balloon="Report">
+                <a href="" class="post-action-icon" @click.prevent="openPostsReportModal(post)" data-balloon="Report">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                     <title></title>
                     <path
@@ -287,6 +287,7 @@
       </div>
     </div>
   </div>
+  <span id="last"></span>
 
   <!-- Sidebar -->
   <div class="sidebar">
@@ -348,9 +349,9 @@
           </div>
 
           <!-- Purge Delete -->
-          <div class="control" v-if="canPurge()">
-            <a href="#" id="purgeThread" :class="{'clicked' : showPurgeThreadModal}"
-              @click.prevent="showPurgeThreadModal = true" data-balloon="Purge Thread">
+          <div class="control" v-if="canPurgeThread()">
+            <a href="#" id="purgeThread" :class="{'clicked' : showPostsPurgeThreadModal}"
+              @click.prevent="openPostsPurgeThreadModal()" data-balloon="Purge Thread">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <title></title>
                 <path
@@ -409,6 +410,11 @@
   <!--     show-switch="PostsParentCtrl.showEditor"> -->
   <!--   </epochtalk-editor> -->
   <!-- </div> -->
+  <posts-delete-modal :selectedPost="selectedPost" :show="showPostsDeleteModal" @close="showPostsDeleteModal = false; selectedPost = null"/>
+  <posts-undelete-modal :selectedPost="selectedPost" :show="showPostsUndeleteModal" @close="showPostsUndeleteModal = false; selectedPost = null"/>
+  <posts-purge-post-modal :selectedPost="selectedPost" :selectedPostIndex="selectedPostIndex" :page="postData.data.page" :limit="postData.data.limit" :posts="postData.data?.posts" :show="showPostsPurgePostModal" @close="showPostsPurgePostModal = false; selectedPost = null; selectedPostIndex = 0"/>
+  <posts-purge-thread-modal :threadId="postData.data.thread?.id" :boardId="postData.data.board?.id" :boardSlug="postData.data.board?.slug" :show="showPostsPurgeThreadModal" @close="showPostsPurgeThreadModal = false"/>
+  <posts-report-modal :selectedPost="selectedPost" :canReportPosts="true" :canReportUsers="true" :show="showPostsReportModal" @close="showPostsReportModal = false; selectedPost = null"/>
 </template>
 
 <script>
@@ -417,26 +423,29 @@ import Pagination from '@/components/layout/Pagination.vue'
 import PollViewer from '@/components/posts/PollViewer.vue'
 import RankDisplay from '@/components/users/RankDisplay.vue'
 import humanDate from '@/composables/filters/humanDate'
+import dayjs from 'dayjs'
 import { userRoleHighlight } from '@/composables/utils/userUtils'
-//import decode from '@/composables/filters/decode'
 import truncate from '@/composables/filters/truncate'
 import { inject, reactive, watch, toRefs } from 'vue'
 import { postsApi, threadsApi, usersApi, watchlistApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore, localStoragePrefs } from '@/composables/stores/prefs'
-//import { countTotals, getLastPost, filterIgnoredBoards } from '@/composables/utils/boardUtils'
+import PostsDeleteModal from '@/components/modals/posts/Delete.vue'
+import PostsUndeleteModal from '@/components/modals/posts/Undelete.vue'
+import PostsPurgePostModal from '@/components/modals/posts/PurgePost.vue'
+import PostsPurgeThreadModal from '@/components/modals/posts/PurgeThread.vue'
+import PostsReportModal from '@/components/modals/posts/Report.vue'
 import { BreadcrumbStore } from '@/composables/stores/breadcrumbs'
 
 export default {
   name: 'Posts',
   props: ['threadSlug', 'threadId'],
-  components: { Pagination, PollViewer, RankDisplay },
+  components: { Pagination, PostsDeleteModal, PostsUndeleteModal, PostsPurgePostModal, PostsPurgeThreadModal, PostsReportModal, PollViewer, RankDisplay },
   beforeRouteEnter(to, from, next) {
     const params = {
       limit: localStoragePrefs().data.posts_per_page,
       page: to.query.page || 1,
-      field: to.query.field,
-      desc: to.query.desc
+      start: to.query.start
     }
     threadsApi.slugToThreadId(to.params.threadSlug).then(t => t.id)
       .then(threadId => {
@@ -453,8 +462,7 @@ export default {
     const params = {
       limit: localStoragePrefs().data.posts_per_page,
       page: to.query.page || 1,
-      field: to.query.field,
-      desc: to.query.desc
+      start: to.query.start
     }
     threadsApi.slugToThreadId(to.params.threadSlug).then(t => t.id)
       .then(threadId => {
@@ -480,42 +488,308 @@ export default {
           thread_id: threadId,
           limit: v.prefs.posts_per_page,
           page: $route.query.page || 1,
-          field: $route.query.field,
-          desc: $route.query.desc
+          start: $route.query.start
         }
         return postsApi.byThread(params)
       })
     }
+    const postEditDisabled = (createdAt) => {
+      // get amount of time post edit has been disabled for in ms (if available)
+      const disablePostEdit = v.postData.data.board.disable_post_edit
+      if (disablePostEdit && Number(disablePostEdit) > -1) {
+        const disablePostEditDuration = dayjs.duration(disablePostEdit)
+        const currentTime = dayjs()
+        const createdAtTime = dayjs(createdAt)
+        // if elapsed time since creation has not passed disabled duration
+        // post edit is disabled
+        return currentTime.isBefore(createdAtTime.add(disablePostEditDuration))
+      }
+      else return false
+    }
     /* View Methods */
-    const canEditTitle = () => true
+    const canEditTitle = () => {
+      if (!v.loggedIn) return false
+      if (v.bannedFromBoard) return false
+      if (!v.permissionUtils.hasPermission('threads.title.allow')) return false
+      if (!v.postData.data?.write_access) return false
+
+      const adminBypass = v.permissionUtils.hasPermission('threads.title.bypass.owner.admin')
+      const modBypass = v.permissionUtils.hasPermission('threads.title.bypass.owner.mod')
+      const priorityBypass = v.permissionUtils.hasPermission('threads.title.bypass.owner.priority')
+      const userPriority = v.postData.data.posts[0].user.priority
+      const elevatedPrivileges = adminBypass || modBypass || priorityBypass
+
+      // check if post edit is disabled
+      if (postEditDisabled(v.postData.data.thread.created_at) && !elevatedPrivileges) return false
+
+      if (v.postData.data.thread.user.id === v.authedUser.id) return true
+      else if (adminBypass) return v.permissionUtils.getPriority() <= userPriority
+      else if (modBypass) return v.permissionUtils.getPriority() < userPriority && v.permissionUtils.moderatesBoard(v.postData.data.board.id)
+      else if (priorityBypass) return v.permissionUtils.getPriority() < userPriority
+      else return false
+    }
     const canPost = () => {
-      // TODO(akinsey): Implement ban status check
-      // TODO(boka): make sure it's correct
-      if (v.bannedFromBoard || !v.postData.data?.write_access || !v.permissionUtils.hasPermission('posts.create.allow')) { return false }
+      if (v.bannedFromBoard || !v.postData.data?.write_access || !v.permissionUtils.hasPermission('posts.create.allow')) return false
       if (v.postData.data.thread.locked) {
         return v.permissionUtils.hasPermission('posts.create.bypass.locked.admin') || (v.permissionUtils.hasPermission('posts.create.bypass.locked.mod') && v.permissionUtils.moderatesBoard(v.postData.data.board.id))
       }
       return true
     }
-    const canSave = () => true
-    const canMove = () => true
-    const canPurge = () => true
-    const canSticky = () => true
-    const canLock = () => true
-    const canCreatePoll = () => true
+    const canSave = () => {
+      var text = v.posting.post.body_html
+      const imgSrcRegex = /<img[^>]+src="((http:\/\/|https:\/\/|\/)[^">]+)"/g
+      const stripTagsRegex = /(<([^>]+)>)/ig
+      const images = imgSrcRegex.exec(text)
+      text = text.replace(stripTagsRegex, '')
+      text = text.trim()
+      return text.length || images
+    }
+    const canMove = () => {
+      if (!v.loggedIn) return false
+      if (v.bannedFromBoard) return false
+      if (!v.postData.data?.write_access) return false
+      if (!v.permissionUtils.hasPermission('threads.move.allow')) return false
+
+      const adminBypass = v.permissionUtils.hasPermission('threads.move.bypass.owner.admin')
+      const modBypass = v.permissionUtils.hasPermission('threads.move.bypass.owner.mod')
+
+      if (adminBypass) return true
+      else if (modBypass) return v.permissionUtils.moderatesBoard(v.postData.data.board.id)
+      else return false
+    }
+    const canPurgeThread = () => {
+      if (!v.loggedIn) return false
+      if (v.bannedFromBoard) return false
+      if (!v.postData.data?.write_access) return false
+      if (!v.permissionUtils.hasPermission('threads.purge.allow')) return false
+
+      const adminBypass = v.permissionUtils.hasPermission('threads.purge.bypass.owner.admin')
+      const modBypass = v.permissionUtils.hasPermission('threads.purge.bypass.owner.mod')
+      const priorityBypass = v.permissionUtils.hasPermission('threads.purge.bypass.owner.priority')
+      const userPriority = v.postData.data.posts[0].user.priority
+
+      if (adminBypass) return true
+      else if (modBypass) return v.permissionUtils.moderatesBoard(v.postData.data.board.id)
+      else if (priorityBypass) return v.permissionUtils.getPriority() < userPriority
+      else return false
+    }
+    const canPurgePost = (post) => {
+      if (!v.postData.data?.write_access) return false
+      if (!v.loggedIn) return false
+      // TODO(boka): check for banned
+      // if (BanSvc.banStatus()) return false
+      if (!v.permissionUtils.hasPermission('threads.purge.allow')) return false
+
+      const adminBypass = v.permissionUtils.hasPermission('posts.purge.bypass.purge.admin')
+      const modBypass = v.permissionUtils.hasPermission('posts.purge.bypass.purge.mod')
+      const postUserPriority = post.user.priority
+      const postUserId = post.user.id
+      const sessionUserPriority = v.permissionUtils.getPriority()
+      const sessionUserId = v.authedUser.id
+      const moderators = v.postData.data.board.moderators.map((data) => data.id)
+
+      // admins can purge
+      if (adminBypass) return true
+      // if user is a mod and moderates this board and...
+      else if (modBypass && v.permissionUtils.moderatesBoard(v.postData.data.board.id)) {
+        // ...if any of the following conditions are met, allow purge
+        // user created the post
+        return postUserId === sessionUserId ||
+          // user has priority
+          sessionUserPriority < postUserPriority ||
+          // user priorities are equal and the posting user is not a mod
+          (sessionUserPriority === postUserPriority && !moderators.includes(post.user.id))
+      }
+      else return false
+    }
+    const canSticky = () => {
+      if (!v.loggedIn) return false
+      if (v.bannedFromBoard) return false
+      if (!v.postData.data?.write_access) return false
+      if (!v.permissionUtils.hasPermission('threads.sticky.allow')) return false
+
+      const adminBypass = v.permissionUtils.hasPermission('threads.sticky.bypass.owner.admin')
+      const modBypass = v.permissionUtils.hasPermission('threads.sticky.bypass.owner.mod')
+      const priorityBypass = v.permissionUtils.hasPermission('threads.sticky.bypass.owner.priority')
+      const userPriority = v.postData.data.posts[0].user.priority
+
+      if (adminBypass) return true
+      else if (modBypass) return v.permissionUtils.moderatesBoard(v.postData.data.board.id)
+      else if (priorityBypass) return v.permissionUtils.getPriority() < userPriority
+      else return false
+    }
+    const canLock = () => {
+      if (!v.loggedIn) return false
+      if (v.bannedFromBoard) return false
+      if (!v.permissionUtils.hasPermission('threads.lock.allow')) return false
+      if (!v.postData.data?.write_access) return false
+
+      const adminBypass = v.permissionUtils.hasPermission('threads.lock.bypass.owner.admin')
+      const modBypass = v.permissionUtils.hasPermission('threads.lock.bypass.owner.mod')
+      const priorityBypass = v.permissionUtils.hasPermission('threads.lock.bypass.owner.priority')
+      const userPriority = v.postData.data.posts[0].user.priority
+
+      if (v.postData.data.thread.user.id === v.authedUser.id) return true
+      else if (adminBypass) return v.permissionUtils.getPriority() <= userPriority
+      else if (modBypass) return v.permissionUtils.getPriority() < userPriority && v.permissionUtils.moderatesBoard(v.postData.data.board.id)
+      else if (priorityBypass) return v.permissionUtils.getPriority() < userPriority
+      else return false
+    }
+    const canCreatePoll = () => {
+      if (!v.loggedIn) return false
+      if (v.bannedFromBoard) return false
+      if (!v.permissionUtils.hasPermission('threads.createPoll.allow')) return false
+      if (!v.postData.data?.write_access) return false
+      if (v.postData.data.thread.poll) return false
+
+      const adminBypass = v.permissionUtils.hasPermission('threads.createPoll.bypass.owner.admin')
+      const modBypass = v.permissionUtils.hasPermission('threads.createPoll.bypass.owner.mod')
+      const priorityBypass = v.permissionUtils.hasPermission('threads.createPoll.bypass.owner.priority')
+      const userPriority = v.postData.data.posts[0].user.priority
+
+      if (v.postData.data.thread.user.id === v.authedUser.id) return true
+      else if (adminBypass) return true
+      else if (modBypass) return v.permissionUtils.getPriority() < userPriority && v.permissionUtils.moderatesBoard(v.postData.data.board.id)
+      else if (priorityBypass) return v.permissionUtils.getPriority() < userPriority
+      else return false
+    }
     const canUpdate = (post) => {
-      console.log(post, 'canUpdate')
-      return true
+      const adminOwnerBypass = v.permissionUtils.hasPermission('posts.update.bypass.owner.admin')
+      const adminLockedBypass = v.permissionUtils.hasPermission('posts.update.bypass.locked.admin')
+      const adminDeletedBypass = v.permissionUtils.hasPermission('posts.update.bypass.deleted.admin')
+      const modOwnerBypass = v.permissionUtils.hasPermission('posts.update.bypass.owner.mod')
+      const modLockedBypass = v.permissionUtils.hasPermission('posts.update.bypass.locked.mod')
+      const modDeletedBypass = v.permissionUtils.hasPermission('posts.update.bypass.deleted.mod')
+      const priorityOwnerBypass = v.permissionUtils.hasPermission('posts.update.bypass.owner.priority')
+      const priorityLockedBypass = v.permissionUtils.hasPermission('posts.update.bypass.locked.priority')
+      const priorityDeletedBypass = v.permissionUtils.hasPermission('posts.update.bypass.deleted.priority')
+      const moderatesBoard = v.permissionUtils.moderatesBoard(v.postData.data.board.id)
+      const authedUserPriority = v.permissionUtils.getPriority()
+      const moderators = v.postData.data.board.moderators.map((data) => data.id)
+      if (!v.postData.data?.write_access) return false
+      if (!v.loggedIn) return false
+      if (!v.permissionUtils.hasPermission('posts.update.allow')) return false
+      // TODO(boka): check for banned
+      // if (BanSvc.banStatus()) return false
+
+      // check if post edit is disabled
+      var elevatedPrivileges = adminOwnerBypass || modOwnerBypass || priorityOwnerBypass
+      if (postEditDisabled(post.created_at) && !elevatedPrivileges) return false
+
+      // developer note: avoid unreachable code
+      // ensure that all if blocks end with else
+      // defaults to return false
+
+      // if thread is locked
+      if (v.postData.data.thread.locked) {
+        if (adminLockedBypass) return true
+        else if (modLockedBypass) {
+          if (moderatesBoard && v.authedUser.id === post.user.id) return true
+          else if (moderatesBoard && authedUserPriority < post.user.priority) return true
+          else if (moderatesBoard && authedUserPriority === post.user.priority && !moderators.includes(post.user.id)) return true
+          else return false
+        }
+        else if (priorityLockedBypass && authedUserPriority < post.user.priority) return true
+        else return false
+      }
+      // if post is deleted
+      else if (post.deleted) {
+        if (adminDeletedBypass) return true
+        else if (modDeletedBypass) {
+          if (moderatesBoard && authedUserPriority < post.user.priority) return true
+          else if (moderatesBoard && authedUserPriority === post.user.priority && !moderators.includes(post.user.id)) return true
+          else return false
+        }
+        else if (priorityDeletedBypass && authedUserPriority < post.user.priority) return true
+        else return false
+      }
+      else {
+        if (adminOwnerBypass) return true
+        else if (post.user.id === v.authedUser.id) return true
+        else if (modOwnerBypass) {
+          if (moderatesBoard && authedUserPriority < post.user.priority) return true
+          else if (moderatesBoard && (authedUserPriority === post.user.priority && !moderators.includes(post.user.id))) return true
+          else return false
+        }
+        else if (priorityOwnerBypass && authedUserPriority < post.user.priority) return true
+        else return false
+      }
     }
     const canPostLock = (post) => {
-      console.log(post, 'canPostLock')
-      return true
+      if (!v.postData.data?.write_access) return false
+      if (!v.loggedIn) return false
+      // TODO(boka): check for banned
+      // if (BanSvc.banStatus()) return false
+      if (!v.permissionUtils.hasPermission('posts.lock.allow')) return false
+
+      const moderators = v.postData.data.board.moderators.map((data) => data.id)
+
+      if (v.permissionUtils.hasPermission('posts.lock.bypass.lock.admin')) return true
+      else if (v.permissionUtils.hasPermission('posts.lock.bypass.lock.mod')) {
+        if (v.permissionUtils.moderatesBoard(v.postData.data.board.id) && v.permissionUtils.getPriority() < post.user.priority) return true
+        // Check if mod is moderating another board's mod (which is allowed)
+        else if (v.permissionUtils.moderatesBoard(v.postData.data.board.id) && (v.permissionUtils.getPriority() === post.user.priority && !moderators.includes(post.user.id))) return true
+        else return false
+      }
+      else if (v.permissionUtils.hasPermission('posts.lock.bypass.lock.priority')) {
+        if (v.permissionUtils.getPriority() < post.user.priority) return true
+        // Allow users with priority option to still self mod
+        else if (v.permissionUtils.hasPermission('threads.moderated.allow') && v.postData.data.thread.user.id === v.authedUser.id && v.postData.data.thread.moderated && v.authedUser.id !== post.user.id && v.permissionUtils.getPriority() <= post.user.priority) return true
+        else return false
+      }
+      else if (v.permissionUtils.hasPermission('threads.moderated.allow') && v.permissionUtils.hasPermission('posts.lock.bypass.lock.selfMod') && v.permissionUtils.getPriority() <= post.user.priority) {
+        if (v.postData.data.thread.user.id === v.authedUser.id && v.postData.data.thread.moderated && v.authedUser.id !== post.user.id) return true
+        else return false
+      }
+      else return false
     }
     const canDelete = (post) => {
-      console.log(post, 'canDelete')
-      return true
+      if (!v.postData.data?.write_access) return false
+      if (!v.loggedIn) return false
+      // TODO(boka): check for banned
+      // if (BanSvc.banStatus()) return false
+      if (!v.permissionUtils.hasPermission('posts.delete.allow')) return false
+
+      const moderators = v.postData.data.board.moderators.map((data) => data.id)
+
+      // if thread is locked
+      if (v.postData.data.thread.locked) {
+        if (v.permissionUtils.hasPermission('posts.delete.bypass.locked.admin')) return true
+        else if (v.permissionUtils.hasPermission('posts.delete.bypass.locked.mod')) {
+          if (v.permissionUtils.moderatesBoard(v.postData.data.board.id) && v.permissionUtils.getPriority() < post.user.priority) return true
+          // Check if mod is moderating another board's mod (which is allowed)
+          else if (v.permissionUtils.moderatesBoard(v.postData.data.board.id) && (v.permissionUtils.getPriority() === post.user.priority && !moderators.includes(post.user.id))) return true
+          else return false
+        }
+        else if (v.permissionUtils.hasPermission('posts.delete.bypass.locked.priority')) {
+          if (v.permissionUtils.getPriority() < post.user.priority) return true
+          else if (v.permissionUtils.hasPermission('threads.moderated.allow') && v.postData.data.thread.user.id === v.authedUser.id && v.postData.data.thread.moderated && v.authedUser.id !== post.user.id && v.permissionUtils.getPriority() <= post.user.priority) return true
+          else return false
+        }
+        else return false
+      }
+      // if user created post
+      else if (post.user.id === v.authedUser.id) return true
+      // if thread is moderated and user started the thread and user can moderate threads and user can self mod and user's priority is higher than posting user
+      else if (v.postData.data.thread.moderated && v.postData.data.thread.user.id === v.authedUser.id && v.permissionUtils.hasPermission('threads.moderated.allow') && v.permissionUtils.hasPermission('posts.delete.bypass.owner.selfMod') && v.permissionUtils.getPriority() <= post.user.priority) return true
+      // if user is an admin
+      else if (v.permissionUtils.hasPermission('posts.delete.bypass.owner.admin')) return true
+      // if user is a mod
+      else if (v.permissionUtils.hasPermission('posts.delete.bypass.owner.mod')) {
+        if (v.permissionUtils.moderatesBoard(v.postData.data.board.id) && v.permissionUtils.getPriority() < post.user.priority) return true
+        // Check if mod is moderating another board's mod (which is allowed)
+        else if (v.permissionUtils.moderatesBoard(v.postData.data.board.id) && (v.permissionUtils.getPriority() === post.user.priority && !v.moderators.includes(post.user.id))) return true
+        else return false
+      }
+      else if (v.permissionUtils.hasPermission('posts.delete.bypass.owner.priority')) {
+        if (v.permissionUtils.getPriority() < post.user.priority) return true
+        else if (v.permissionUtils.hasPermission('threads.moderated.allow') && v.postData.data.thread.user.id === v.authedUser.id && v.postData.data.thread.moderated && v.authedUser.id !== post.user.id && v.permissionUtils.getPriority() <= post.user.priority) return true
+        else return false
+      }
+      else return false
     }
-    const openEditThread = () => console.log('openEditThread')
+    const openEditThread = () => v.editThread = true
+    const closeEditThread = () => v.editThread = false
     const updateThreadLock = (thread) => {
       const promise = thread.locked ? threadsApi.unlock(thread.id) : threadsApi.lock(thread.id)
       promise.then(() => thread.locked = !thread.locked)
@@ -525,17 +799,39 @@ export default {
       const promise = thread.sticky ? threadsApi.unsticky(thread.id) : threadsApi.sticky(thread.id)
       promise.then(() => thread.sticky = !thread.sticky)
     }
-    const updateThreadTitle = () => console.log('updateThreadTitle')
-    const closeEditThread = () => console.log('closeEditThread')
-    const createPoll = () => console.log('createPoll')
-    const showEditDate = (post) => {
-      console.log(post)
-      return true
+    const updateThreadTitle = () => {
+      const title = v.postData.data.thread.title
+      const id = v.postData.data.thread.id
+      return threadsApi.title(id, title)
+        .then(() => {
+          v.editThread = false
+          $alertStore.success(`Thread's title changed to: ${title}`)
+          $breadcrumbs.updateLabelInPlace(title)
+        })
+        .catch(() => $alertStore.error('Error changing thread title'))
     }
-    const openPurgeModal = (i) => console.log(i, 'openPurgeModal')
-    const openDeleteModal = (i, postLocked) => console.log(i, postLocked, 'openDeleteModal')
-    const openUndeleteModal = (i) => console.log(i, 'openUndeleteModal')
-    const openReportModal = (post) => console.log(post, 'openReportModal')
+    const createPoll = () => console.log('createPoll')
+    const showEditDate = (post) => dayjs(post.updated_at).isAfter(dayjs(post.created_at))
+    const openPostsPurgePostModal = (post, postIndex) => {
+      v.selectedPost = post
+      v.selectedPostIndex = postIndex
+      v.showPostsPurgePostModal = true
+    }
+    const openPostsPurgeThreadModal = () => {
+      v.showPostsPurgeThreadModal = true
+    }
+    const openPostsDeleteModal = (post) => {
+      v.selectedPost = post
+      v.showPostsDeleteModal = true
+    }
+    const openPostsUndeleteModal = (post) => {
+      v.selectedPost = post
+      v.showPostsUndeleteModal = true
+    }
+    const openPostsReportModal = (post) => {
+      v.selectedPost = post
+      v.showPostsReportModal = true
+    }
     const lockPost = (post) => {
       postsApi.lock(post.id).then(() => post.locked = true)
     }
@@ -545,7 +841,7 @@ export default {
     const loadEditor = (post) => console.log(post, 'loadEditor')
     const addQuote = (post) => console.log(post, 'addQuote')
     const copyQuote = (post) => console.log(post, 'copyQuote')
-    const showUserControls = () => true
+    const showUserControls = () => (v.loggedIn && (!v.postData.data.thread.watched || canCreatePoll()))
     const highlightPost = () => {
       if ($route.hash) {
         const postId = $route.hash.substring(1)
@@ -585,9 +881,11 @@ export default {
 
     /* View Data */
     const v = reactive({
+      authedUser: $auth.user,
+      selectedPost: null,
+      selectedPostIndex: 0,
       prefs: $prefs.data,
       loggedIn: $auth.loggedIn,
-      authedUser: $auth.user,
       postData: {data: {}},
       editThread: false,
       addPoll: false,
@@ -597,13 +895,18 @@ export default {
         post: {}
       },
       permissionUtils: $auth.permissionUtils,
+      // TODO(boka): Implement ban status check
       banUtils: $auth.banUtils,
       bannedFromBoard: false,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
       disableSignature: false,
-      showPurgeThreadModal: true,
-      showMoveThreadModal: true
+      showPostsPurgePostModal: false,
+      showPostsPurgeThreadModal: false,
+      showPostsDeleteModal: false,
+      showPostsUndeleteModal: false,
+      showPostsReportModal: false,
+      showMoveThreadModal: false
     })
 
     /* Watched Data */
@@ -621,7 +924,8 @@ export default {
       canPost,
       canSave,
       canMove,
-      canPurge,
+      canPurgeThread,
+      canPurgePost,
       canSticky,
       canLock,
       canCreatePoll,
@@ -638,10 +942,11 @@ export default {
       humanDate,
       userRoleHighlight,
       showEditDate,
-      openPurgeModal,
-      openDeleteModal,
-      openUndeleteModal,
-      openReportModal,
+      openPostsPurgePostModal,
+      openPostsPurgeThreadModal,
+      openPostsDeleteModal,
+      openPostsUndeleteModal,
+      openPostsReportModal,
       lockPost,
       unlockPost,
       loadEditor,

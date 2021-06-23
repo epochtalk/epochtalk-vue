@@ -710,3 +710,27 @@ input[disabled].toggle-switch:checked + label:after { background-color: lighten(
     .message { font-size: 1.5rem; }
   }
 }
+
+/*-- Shared Page Header Layout (Threads and Posts View) --*/
+.page-header-split {
+  h1 {
+    color: $sub-header-font-color;
+    display: inline;
+    font-size: $font-size-xl;
+    font-weight: 600;
+    line-height: 1.2;
+    text-transform: initial;
+  }
+
+  @include break-mobile-sm {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    row-gap: 1rem;
+
+    .user-controls {
+      .user-controls-base {
+        justify-content: space-evenly;
+      }
+    }
+  }
+}
