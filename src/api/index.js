@@ -108,6 +108,7 @@ export const authApi = {
     $axios.defaults.headers.common['Authorization'] = `BEARER ${user.token}`
     return user
   }),
+  authenticate: () => $http('/api/authenticate'),
   emailAvailable: email => $http(`/api/register/email/${email}`),
   usernameAvailable: username => $http(`/api/register/username/${username}`),
   inviteExists: email => $http(`/api/invites/exists?email=${email}`),
