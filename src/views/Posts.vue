@@ -455,6 +455,7 @@ export default {
         .then(data => next(vm => {
           vm.postData.data = data
           BanStore.updateBanNotice(vm.postData.data.banned_from_board)
+          vm.bannedFromBoard = vm.postData.data.banned_from_board
           vm.highlightPost()
         }))
       })
@@ -471,6 +472,7 @@ export default {
         return postsApi.byThread(params).then(data => {
           this.postData.data = data
           BanStore.updateBanNotice(this.postData.data.banned_from_board)
+          this.bannedFromBoard = this.postData.data.banned_from_board
           this.highlightPost()
           next()
         })
@@ -896,7 +898,6 @@ export default {
         post: {}
       },
       permissionUtils: $auth.permissionUtils,
-      // TODO(boka): Implement ban status check
       bannedFromBoard: false,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
@@ -913,6 +914,7 @@ export default {
     watch(() => v.loggedIn, () => processPosts().then(data => {
       v.postData.data = data
       BanStore.updateBanNotice(v.postData.data.banned_from_board)
+      v.bannedFromBoard = v.postData.data.banned_from_board
       $route.hash ? highlightPost() : null
     })) // Update on login
 
