@@ -36,9 +36,15 @@ export default {
     /* Provided Data */
     const user = reactive(cachedUser ? cachedUser.data : cloneDeep(emtpyUser))
 
-    BanStore.initBanNotice(user)
-
     /* Provided Methods */
+    const reauthenticate = () => authApi.authenticate()
+      .then(dbUser => {
+        $appCache.set(AUTH_KEY, dbUser)
+        Object.assign(user, dbUser)
+        BanStore.initBanNotice(user)
+        $prefs.fetch()
+      }).catch(() => {})
+
     const login = (username, password, rememberMe) => authApi.login({ username, password, rememberMe })
       .then(dbUser => {
         $appCache.set(AUTH_KEY, dbUser)
@@ -74,11 +80,15 @@ export default {
         // else {}
       }).catch(() => {})
 
+    // Reauthenticate on app init if token is present
+    if (localStorageAuth().data.token) reauthenticate()
+
     /* Provide Store Data */
     return provide(AuthStore, {
       user: readonly(user),
       permissionUtils: new PermissionUtils(user),
       loggedIn: computed(() => !!user.token),
+      reauthenticate,
       login,
       logout,
       register
