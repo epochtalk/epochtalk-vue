@@ -247,7 +247,7 @@ export default {
       return threadsApi.byBoard(params)
       .then(d => next(vm => {
         vm.threadData.data = processThreads(d)
-        BanStore.updateBanNotice(vm.threadData.data.banned_from_board)
+        vm.banned = BanStore.updateBanNotice(vm.threadData.data.banned_from_board)
       }))
     })
   },
@@ -263,7 +263,7 @@ export default {
       params.board_id = boardId
       return threadsApi.byBoard(params).then(d => {
         this.threadData.data = processThreads(d)
-        BanStore.updateBanNotice(this.threadData.data.banned_from_board)
+        this.banned = BanStore.updateBanNotice(this.threadData.data.banned_from_board)
         next()
       })
     })
@@ -336,14 +336,12 @@ export default {
     }
 
     const canSetModerator = () => {
-      // TODO(akinsey): Implement ban status check
-      // if (BanSvc.banStatus()) return false
+      if (v.banned) return false
       return v.permissionUtils.hasPermission('moderators.add.allow') && v.permissionUtils.hasPermission('moderators.remove.allow')
     }
 
     const canCreate = () => {
-      // TODO(akinsey): Implement ban status check
-      // if (BanSvc.banStatus()) return false
+      if (v.banned) return false
       return v.threadData.data?.write_access && v.permissionUtils.hasPermission('threads.create.allow')
     }
 
@@ -359,6 +357,7 @@ export default {
       threadData: { data: {} },
       prefs: $prefs.data,
       loggedIn: $auth.loggedIn,
+      banned: false,
       permissionUtils: $auth.permissionUtils,
       showSetModerators: false,
       defaultAvatar: window.default_avatar,
@@ -387,7 +386,7 @@ export default {
     /* Watched Data */
     watch(() => v.loggedIn, () => getThreads().then(d => {
       v.threadData.data = d
-      BanStore.updateBanNotice(v.threadData.data.banned_from_board)
+      v.banned = BanStore.updateBanNotice(v.threadData.data.banned_from_board)
     })) // Update threads on login
 
     return { ...toRefs(v), canCreate, canSetModerator, loadEditor, watchBoard, setSortField, getSortClass, humanDate, decode, truncate }
