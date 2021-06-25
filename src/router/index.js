@@ -159,7 +159,6 @@ router.beforeEach(to => {
   // Start progress bar
   NProgress.start()
 
-  console.log(localStorageAuth().data)
   BanStore.initBanNotice(localStorageAuth().data)
 
   // Redirect to login page if route has meta.requiresAuth set
