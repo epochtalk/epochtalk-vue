@@ -897,7 +897,6 @@ export default {
       },
       permissionUtils: $auth.permissionUtils,
       // TODO(boka): Implement ban status check
-      banUtils: $auth.banUtils,
       bannedFromBoard: false,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
@@ -913,7 +912,7 @@ export default {
     /* Watched Data */
     watch(() => v.loggedIn, () => processPosts().then(data => {
       v.postData.data = data
-      v.banUtils.update(v.postData.data.banned_from_board)
+      BanStore.updateBanNotice(v.postData.data.banned_from_board)
       $route.hash ? highlightPost() : null
     })) // Update on login
 

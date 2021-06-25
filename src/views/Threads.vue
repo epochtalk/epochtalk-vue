@@ -360,7 +360,6 @@ export default {
       prefs: $prefs.data,
       loggedIn: $auth.loggedIn,
       permissionUtils: $auth.permissionUtils,
-      banUtils: $auth.banUtils,
       showSetModerators: false,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
