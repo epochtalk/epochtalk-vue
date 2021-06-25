@@ -54,12 +54,12 @@ export default {
         $alertStore.success(`Welcome ${user.username}, you have successfully logged in!`)
       }).catch(() => {})
 
-
     const logout = () => authApi.logout()
       .then(() => {
         delete user.token // clear token to invalidate session immediately
         $appCache.delete(AUTH_KEY)
         $prefs.clear()
+        BanStore.clearBanNotice()
         $alertStore.warn(`Goodbye ${user.username}, you have successfully logged out!`)
         // redirect to home on logout
         if ($route.meta.requiresAuth && $route.path !== '/') $router.push({ path: '/' })

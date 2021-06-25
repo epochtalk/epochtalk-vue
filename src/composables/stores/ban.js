@@ -10,8 +10,14 @@ const initBanNotice = user => {
   updateBanNotice()
 }
 
+const clearBanNotice = () => {
+  banNotice.message = null
+  bannedUser = null
+  updateBanNotice()
+}
+
 const updateBanNotice = bannedFromBoard => {
-  const banExpiration = bannedUser.ban_expiration
+  const banExpiration = bannedUser?.ban_expiration
   const boardBanned = bannedFromBoard
   const globallyBanned = !!banExpiration
   // Sets board ban message, ignored if global ban is set
@@ -20,11 +26,8 @@ const updateBanNotice = bannedFromBoard => {
   else if (!boardBanned && globallyBanned) {
     const expirationStr = humanDate(banExpiration, true)
     banNotice.message = `You have been banned ${expirationStr === 'Permanent' ?
-      'Permanently' : 'until' + expirationStr}`
+      'Permanently' : 'until ' + expirationStr}`
   }
-
-  console.log(banNotice.message)
-
   return banNotice.message
 }
 
@@ -32,4 +35,5 @@ export default {
   banNotice: banNotice.message,
   initBanNotice: initBanNotice,
   updateBanNotice: updateBanNotice,
+  clearBanNotice: clearBanNotice
 }
