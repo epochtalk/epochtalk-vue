@@ -5,7 +5,12 @@
       <form name="$parent.form" class="css-form" novalidate>
         <label>Select a board to move this thread to:</label>
         <div class="control-full-width">
-          <select modal-focus="{{PostsParentCtrl.showMoveThreadModal}}" name="boards" id="moveThreadBoards" v-model="newBoard" ng-options="board.name group by board.parent_name for board in PostsParentCtrl.boards | orderBy:board.view_order"></select>
+          <!-- TODO(boka): modal-focus="{{PostsParentCtrl.showMoveThreadModal}}" -->
+          <select name="boards" id="moveThreadBoards" v-model="newBoard">
+            <optgroup v-for="(boards, category) in boardsMovelist" :label="category" :key="category">
+              <option v-for="board in boards" :value="board" :label="board.name" :key="board.name"></option>
+            </optgroup>
+          </select>
         </div>
         <!-- Save Button -->
         <div class="clear">
