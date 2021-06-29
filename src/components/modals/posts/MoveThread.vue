@@ -24,7 +24,7 @@ import { threadsApi } from '@/api'
 
 export default {
   name: 'posts-move-thread-modal',
-  props: ['show', 'threadId', 'boardId', 'boardSlug'],
+  props: ['show', 'threadId'],
   emits: ['close'],
   components: { Modal },
   setup(props, { emit }) {
@@ -37,8 +37,8 @@ export default {
     const $router = useRouter()
 
     /* Template Data */
-    const purgeThread = () => {
-      threadsApi.purge(props.threadId)
+    const moveThread = () => {
+      threadsApi.move(props.threadId, v.newBoardId)
         .then(() => {
           $router.push({ name: 'Threads', params: { boardId: props.boardId, boardSlug: props.boardSlug}})
           close()
@@ -47,10 +47,10 @@ export default {
 
     const v = reactive({
       threadId: props.threadId,
-      focusInput: null
+      newBoardId: null
     })
 
-    return { ...toRefs(v), purgeThread, close }
+    return { ...toRefs(v), moveThread, close }
   }
 }
 </script>
