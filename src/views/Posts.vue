@@ -861,7 +861,7 @@ export default {
       .then(() => v.postData.data.thread.watched = !v.postData.data.thread.watched)
     }
 
-    const openMoveThreadModal = () => console.log('openMoveThreadModal')
+    const openMoveThreadModal = () => v.showMoveThreadModal = true
     const toggleIgnoredPosts = post => {
       const toggleIgnore = post.user._ignored ? usersApi.unignore : usersApi.ignore
       toggleIgnore(post.user)
