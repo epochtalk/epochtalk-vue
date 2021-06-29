@@ -59,7 +59,7 @@ export default {
       newBoard: null
     })
 
-    boardsApi.movelist().then(movelist => v.boardsMovelist = groupBy(movelist, board => board.parent_name))
+    boardsApi.movelist().then(movelist => v.boardsMovelist = groupBy(movelist, 'parent_name'))
 
     return { ...toRefs(v), moveThread, close }
   }
