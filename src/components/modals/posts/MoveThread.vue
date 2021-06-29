@@ -5,7 +5,7 @@
       <form name="$parent.form" class="css-form" novalidate>
         <label>Select a board to move this thread to:</label>
         <div class="control-full-width">
-          <select modal-focus="{{PostsParentCtrl.showMoveThreadModal}}" name="boards" id="moveThreadBoards" ng-model="PostsParentCtrl.moveBoard" ng-options="board.name group by board.parent_name for board in PostsParentCtrl.boards | orderBy:board.view_order"></select>
+          <select modal-focus="{{PostsParentCtrl.showMoveThreadModal}}" name="boards" id="moveThreadBoards" v-model="newBoard" ng-options="board.name group by board.parent_name for board in PostsParentCtrl.boards | orderBy:board.view_order"></select>
         </div>
         <!-- Save Button -->
         <div class="clear">
@@ -40,7 +40,7 @@ export default {
 
     /* Template Data */
     const moveThread = () => {
-      threadsApi.move(props.threadId, v.newBoardId)
+      threadsApi.move(props.threadId, v.newBoard.id)
         .then(() => {
           $router.push({ name: 'Threads', params: { boardId: props.boardId, boardSlug: props.boardSlug}})
           close()
@@ -49,7 +49,7 @@ export default {
 
     const v = reactive({
       threadId: props.threadId,
-      newBoardId: null
+      newBoard: null
     })
 
     return { ...toRefs(v), moveThread, close }
