@@ -362,7 +362,7 @@
 
           <!-- Move Thread -->
           <div class="control" v-if="canMove()">
-            <a href="#" id="moveBoard" :class="{'clicked' : showMoveThreadModal}"
+            <a href="#" id="moveBoard" :class="{'clicked' : showPostsMoveThreadModal}"
               @click.prevent="openMoveThreadModal()" data-balloon="Move Thread">
               <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                 <title></title>
@@ -862,7 +862,7 @@ export default {
       .then(() => v.postData.data.thread.watched = !v.postData.data.thread.watched)
     }
 
-    const openMoveThreadModal = () => v.showMoveThreadModal = true
+    const openMoveThreadModal = () => v.showPostsMoveThreadModal = true
     const toggleIgnoredPosts = post => {
       const toggleIgnore = post.user._ignored ? usersApi.unignore : usersApi.ignore
       toggleIgnore(post.user)
@@ -908,7 +908,7 @@ export default {
       showPostsDeleteModal: false,
       showPostsUndeleteModal: false,
       showPostsReportModal: false,
-      showMoveThreadModal: false
+      showPostsMoveThreadModal: false
     })
 
     /* Watched Data */
