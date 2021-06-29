@@ -1,18 +1,20 @@
 <template>
   <modal :name="$options.name" :show="show" @close="close()">
-    <form name="$parent.form" class="css-form" novalidate>
-      <h3 class="thin-underline">Move Thread</h3>
-      <label>Select a board to move this thread to:</label>
-      <div class="control-full-width">
-        <select modal-focus="{{PostsParentCtrl.showMoveThreadModal}}" name="boards" id="moveThreadBoards" ng-model="PostsParentCtrl.moveBoard" ng-options="board.name group by board.parent_name for board in PostsParentCtrl.boards | orderBy:board.view_order"></select>
-      </div>
-      <!-- Save Button -->
-      <div class="clear">
-        <button class="fill-row" ng-click="PostsParentCtrl.moveThread()">
-          Move Thread
-        </button>
-      </div>
-    </form>
+    <template v-slot:header>Move Thread</template>
+    <template v-slot:body>
+      <form name="$parent.form" class="css-form" novalidate>
+        <label>Select a board to move this thread to:</label>
+        <div class="control-full-width">
+          <select modal-focus="{{PostsParentCtrl.showMoveThreadModal}}" name="boards" id="moveThreadBoards" ng-model="PostsParentCtrl.moveBoard" ng-options="board.name group by board.parent_name for board in PostsParentCtrl.boards | orderBy:board.view_order"></select>
+        </div>
+        <!-- Save Button -->
+        <div class="clear">
+          <button class="fill-row" ng-click="PostsParentCtrl.moveThread()">
+            Move Thread
+          </button>
+        </div>
+      </form>
+    </template>
   </modal>
 </template>
 
