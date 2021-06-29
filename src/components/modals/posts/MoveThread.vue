@@ -22,7 +22,8 @@
 import Modal from '@/components/layout/Modal.vue'
 import { useRouter } from 'vue-router'
 import { reactive, toRefs } from 'vue'
-import { threadsApi } from '@/api'
+import { threadsApi, boardsApi } from '@/api'
+import { groupBy } from 'lodash'
 
 export default {
   name: 'posts-move-thread-modal',
@@ -49,8 +50,11 @@ export default {
 
     const v = reactive({
       threadId: props.threadId,
+      boardsMovelist: [],
       newBoard: null
     })
+
+    boardsApi.movelist().then(movelist => v.boardsMovelist = groupBy(movelist, board => board.parent_name))
 
     return { ...toRefs(v), moveThread, close }
   }
