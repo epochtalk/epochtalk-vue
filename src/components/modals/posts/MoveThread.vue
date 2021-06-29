@@ -42,7 +42,7 @@ export default {
     const moveThread = () => {
       threadsApi.move(props.threadId, v.newBoard.id)
         .then(() => {
-          $router.push({ name: 'Threads', params: { boardId: props.boardId, boardSlug: props.boardSlug}})
+          $router.push({ name: 'Threads', params: { boardId: v.newBoard.id, boardSlug: v.newBoard.slug }})
           close()
         })
     }
