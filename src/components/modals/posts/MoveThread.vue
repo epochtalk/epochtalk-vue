@@ -9,7 +9,7 @@
         </div>
         <!-- Save Button -->
         <div class="clear">
-          <button class="fill-row" ng-click="PostsParentCtrl.moveThread()">
+          <button class="fill-row" @click="moveThread()">
             Move Thread
           </button>
         </div>
