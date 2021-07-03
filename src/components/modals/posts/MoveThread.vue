@@ -7,8 +7,8 @@
         <div class="control-full-width">
           <!-- TODO(boka): modal-focus="{{PostsParentCtrl.showMoveThreadModal}}" -->
           <select name="boards" id="moveThreadBoards" v-model="newBoard">
-            <optgroup v-for="(boards, category) in boardsMovelist" :label="category" :key="category">
-              <option v-for="board in boards" :value="board" :label="board.name" :key="board.name"></option>
+            <optgroup v-for="(boards, parentName) in boardsMovelist" :label="parentName" :key="parentName">
+              <option v-for="board in boards" :value="board" :label="board.name" :key="decode(board.name)"></option>
             </optgroup>
           </select>
         </div>
@@ -25,6 +25,7 @@
 
 <script>
 import Modal from '@/components/layout/Modal.vue'
+import decode from '@/composables/filters/decode'
 import { useRouter } from 'vue-router'
 import { reactive, toRefs } from 'vue'
 import { threadsApi, boardsApi } from '@/api'
@@ -61,7 +62,12 @@ export default {
 
     boardsApi.movelist().then(movelist => v.boardsMovelist = groupBy(movelist, 'parent_name'))
 
-    return { ...toRefs(v), moveThread, close }
+    return {
+      ...toRefs(v),
+      moveThread,
+      close,
+      decode
+    }
   }
 }
 </script>
