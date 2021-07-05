@@ -1,12 +1,15 @@
+import alertStore from '@/composables/stores/alert'
+import auth from '@/composables/stores/auth'
+import { toRefs, reactive } from 'vue'
 const socketcluster = require('socketcluster-client')
 const debug = true
-import alertStore from '@/composables/stores/alert'
 
 // Public channel idenitfier and general options
 let options = { waitForAuth: true }
 let publicChannelKey = JSON.stringify({ type: 'public' })
 let userChannel
-let sessionUser = {}
+let session = reactive({ user: {}, auth: {} })
+        console.log(auth)
 
 // Initiate the connection to the websocket server
 let socket = socketcluster.connect({
@@ -29,10 +32,12 @@ socket.on('subscribe', channelName => {
   else if (JSON.parse(channelName).type === 'user') {
     socket.watch(channelName, d => {
       if (debug) console.log('Received user channel message', d)
-      // if (d.action === 'reauthenticate') Auth.authenticate()
+      if (d.action === 'reauthenticate') session.auth.authenticate()
       else if (d.action === 'logout' && d.sessionId === socket.getAuthToken().sessionId) {
-        // Auth.logout()
-        alertStore.warning('You have been logged out from another window.')
+        console.log(session.auth)
+        session.auth.logout()
+
+        alertStore.warn('You have been logged out from another window.')
       }
       // else if (d.action === 'newMessage') { NotificationSvc.refresh() }
       // else if (d.action === 'refreshMentions') {
@@ -65,12 +70,12 @@ socket.on('authenticate', () => {
   socket.emit('loggedIn')
 
   // subscribe to user channel
-  let userChannelKey = JSON.stringify({ type: 'user', id: sessionUser.id })
+  let userChannelKey = JSON.stringify({ type: 'user', id: session.user.id })
   userChannel = socket.subscribe(userChannelKey, options)
 
   // subscribe to roles channels
-  if (sessionUser.roles) {
-    sessionUser.roles.forEach(role => {
+  if (session.user.roles) {
+    session.user.roles.forEach(role => {
       let channel = JSON.stringify({ type: 'role', id: role })
       socket.subscribe(channel, options)
     })
@@ -90,12 +95,15 @@ socket.on('connect', status => status.isAuthenticated ? socket.emit('loggedIn') 
 
 const login = user => {
   console.log('HERERERERERERERERE');
-  sessionUser = user
+  Object.assign(session.user, user)
   console.log('Socket Login', user)
   socket.authenticate(user.token)
   // NotificationSvc.refresh()
   // NotificationSvc.refreshMentionsList()
 }
+
+const updateUser = user => Object.assign(session.user, user)
+const setAuth = auth => Object.assign(session.auth, auth)
 
 // API Functions
 const watchUserChannel = handler => {
@@ -115,6 +123,9 @@ const isOnline = (user, callback) => {
 const publicChannel = socket.subscribe(publicChannelKey, options)
 
 export default {
+  ...toRefs(session),
+  updateUser: updateUser,
+  setAuth: setAuth,
   socket: socket,
   login: login,
   publicChannel: publicChannel,

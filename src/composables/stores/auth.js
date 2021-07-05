@@ -44,7 +44,8 @@ export default {
         Object.assign(user, dbUser)
         BanStore.initBanNotice(user)
         $prefs.fetch()
-        console.log(Websocket)
+        console.log('reauthenticate', Websocket)
+        Websocket.updateUser(user)
         Websocket.socket.authenticate(user.token)
       }).catch(() => {})
 
@@ -55,7 +56,8 @@ export default {
         BanStore.initBanNotice(user)
         $prefs.fetch()
         $alertStore.success(`Welcome ${user.username}, you have successfully logged in!`)
-        console.log(Websocket)
+        console.log('login', Websocket)
+        Websocket.updateUser(user)
         Websocket.socket.authenticate(user.token)
       }).catch(() => {})
 
@@ -73,6 +75,7 @@ export default {
         Websocket.socket.subscriptions().forEach(channel => {
           if (channel !== Websocket.publicChannelKey) Websocket.socket.unsubscribe(channel)
         })
+        Websocket.updateUser(emtpyUser)
         Websocket.socket.deauthenticate()
         Websocket.socket.emit('loggedOut')
       }).catch(() => {})
@@ -85,6 +88,7 @@ export default {
           Object.assign(user, dbUser)
           $prefs.fetch()
           $alertStore.success(`Welcome ${user.username}, you have successfully registered!`)
+          Websocket.updateUser(user)
           Websocket.socket.authenticate(user.token)
         }
         // TODO(akinsey): implement flow for when email confirmation is enabled
@@ -92,7 +96,10 @@ export default {
       }).catch(() => {})
 
     // Reauthenticate on app init if token is present
-    if (localStorageAuth().data.token) reauthenticate()
+    if (localStorageAuth().data.token){
+      Websocket.setAuth({ login, register, logout, reauthenticate })
+      reauthenticate()
+    }
 
     /* Provide Store Data */
     return provide(AuthStore, {
