@@ -1,6 +1,7 @@
 <template>
   <ProvidePreferences>
-      <ProvideAuth>
+    <ProvideAuth>
+      <ProvideWebsocket>
         <ProvideBreadcrumbs>
           <div id="wrapper">
               <Header></Header>
@@ -11,7 +12,8 @@
             </main>
           </div>
         </ProvideBreadcrumbs>
-      </ProvideAuth>
+      </ProvideWebsocket>
+    </ProvideAuth>
   </ProvidePreferences>
 </template>
 
@@ -19,11 +21,12 @@
 import Header from '@/components/layout/Header.vue'
 import ProvidePreferences from '@/composables/stores/prefs'
 import ProvideAuth from '@/composables/stores/auth'
+import ProvideWebsocket from '@/composables/services/websocket'
 import ProvideBreadcrumbs from '@/composables/stores/breadcrumbs'
 
 export default {
   name: 'Epochtalk',
-  components: { Header, ProvidePreferences, ProvideBreadcrumbs, ProvideAuth }
+  components: { Header, ProvidePreferences, ProvideWebsocket, ProvideBreadcrumbs, ProvideAuth }
 }
 </script>
 

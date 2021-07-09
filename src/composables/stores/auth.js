@@ -2,9 +2,9 @@ import { provide, computed, inject, reactive, readonly } from 'vue'
 import { cloneDeep } from 'lodash'
 import { authApi } from '@/api'
 import { PreferencesStore } from '@/composables/stores/prefs'
+import { updateUser, socket, socketLogout } from '@/composables/services/websocket'
 import PermissionUtils from '@/composables/utils/permissions'
 import BanStore from '@/composables/stores/ban'
-import Websocket from '@/composables/services/websocket'
 import localStorageCache from '@/composables/utils/localStorageCache'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -44,9 +44,9 @@ export default {
         Object.assign(user, dbUser)
         BanStore.initBanNotice(user)
         $prefs.fetch()
-        console.log('reauthenticate', Websocket)
-        Websocket.updateUser(user)
-        Websocket.socket.authenticate(user.token)
+        console.log('reauthenticate', socket)
+        updateUser(user)
+        socket.authenticate(user.token)
       }).catch(() => {})
 
     const login = (username, password, rememberMe) => authApi.login({ username, password, rememberMe })
@@ -56,9 +56,9 @@ export default {
         BanStore.initBanNotice(user)
         $prefs.fetch()
         $alertStore.success(`Welcome ${user.username}, you have successfully logged in!`)
-        console.log('login', Websocket)
-        Websocket.updateUser(user)
-        Websocket.socket.authenticate(user.token)
+        console.log('login',socket)
+        updateUser(user)
+        socket.authenticate(user.token)
       }).catch(() => {})
 
     const logout = () => authApi.logout()
@@ -72,12 +72,7 @@ export default {
         if ($route.meta.requiresAuth && $route.path !== '/') $router.push({ path: '/' })
         // delay clearing reactive user to give css transitions time to complete
         setTimeout(() => Object.assign(user, cloneDeep(emtpyUser)), 500)
-        Websocket.socket.subscriptions().forEach(channel => {
-          if (channel !== Websocket.publicChannelKey) Websocket.socket.unsubscribe(channel)
-        })
-        Websocket.updateUser(emtpyUser)
-        Websocket.socket.deauthenticate()
-        Websocket.socket.emit('loggedOut')
+        socketLogout(emtpyUser)
       }).catch(() => {})
 
     const register = (email, username, password) => authApi.register({ email, username, password })
@@ -88,18 +83,15 @@ export default {
           Object.assign(user, dbUser)
           $prefs.fetch()
           $alertStore.success(`Welcome ${user.username}, you have successfully registered!`)
-          Websocket.updateUser(user)
-          Websocket.socket.authenticate(user.token)
+          updateUser(user)
+          socket.authenticate(user.token)
         }
         // TODO(akinsey): implement flow for when email confirmation is enabled
         // else {}
       }).catch(() => {})
 
     // Reauthenticate on app init if token is present
-    if (localStorageAuth().data.token){
-      Websocket.setAuth({ login, register, logout, reauthenticate })
-      reauthenticate()
-    }
+    if (localStorageAuth().data.token) reauthenticate()
 
     /* Provide Store Data */
     return provide(AuthStore, {
