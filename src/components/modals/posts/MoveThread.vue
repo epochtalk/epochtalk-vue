@@ -56,7 +56,7 @@ export default {
 
     const v = reactive({
       threadId: props.threadId,
-      boardsMovelist: [],
+      boardsMovelist: {},
       newBoard: null
     })
 
