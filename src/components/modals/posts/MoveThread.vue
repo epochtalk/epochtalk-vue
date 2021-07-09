@@ -8,7 +8,7 @@
           <!-- TODO(boka): modal-focus="{{PostsParentCtrl.showMoveThreadModal}}" -->
           <select name="boards" id="moveThreadBoards" v-model="newBoard">
             <optgroup v-for="(boards, parentName) in boardsMovelist" :label="parentName" :key="parentName">
-              <option v-for="board in boards" :value="board" :label="board.name" :key="decode(board.name)"></option>
+              <option v-for="board in boards" :value="board" :key="decode(board.name)">{{decode(board.name)}}</option>
             </optgroup>
           </select>
         </div>
