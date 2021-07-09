@@ -60,7 +60,15 @@ export default {
       newBoard: null
     })
 
-    boardsApi.movelist().then(movelist => v.boardsMovelist = groupBy(movelist, 'parent_name'))
+    boardsApi.movelist()
+      // create options groups by parent name
+      .then(ml => groupBy(ml, 'parent_name'))
+      .then(movelist => {
+        // apply grouped boards for select listing
+        v.boardsMovelist = movelist
+        // select default option (first option in first group)
+        v.newBoard = movelist[Object.keys(movelist)[0]][0]
+      })
 
     return {
       ...toRefs(v),
