@@ -36,7 +36,7 @@ const $http = (path, opts, handleErrors) => {
   if (handleErrors) {
     return reqPromise.catch(err => {
       const msg = get(err, 'response.data.message')
-      if (msg) { alertStore.error(msg) }
+      if (msg && msg !== 'Unauthorized') { alertStore.error(msg) }
       return Promise.reject(err)
     })
   }

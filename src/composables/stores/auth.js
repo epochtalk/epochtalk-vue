@@ -2,7 +2,7 @@ import { provide, computed, inject, reactive, readonly } from 'vue'
 import { cloneDeep } from 'lodash'
 import { authApi } from '@/api'
 import { PreferencesStore } from '@/composables/stores/prefs'
-import { updateUser, socket, socketLogout } from '@/composables/services/websocket'
+import { socketLogout, socketLogin } from '@/composables/services/websocket'
 import PermissionUtils from '@/composables/utils/permissions'
 import BanStore from '@/composables/stores/ban'
 import localStorageCache from '@/composables/utils/localStorageCache'
@@ -20,9 +20,14 @@ const emtpyUser = {
   username: ''
 }
 
+const cachedUser = appCache.get(AUTH_KEY)
+const user = reactive(cachedUser ? cachedUser.data : cloneDeep(emtpyUser))
+
 export const AuthStore = Symbol(AUTH_KEY)
 
 export const localStorageAuth = () => appCache.get(AUTH_KEY) || { data: emtpyUser }
+
+export const clearUser = () => Object.assign(user, cloneDeep(emtpyUser))
 
 export default {
   setup() {
@@ -32,10 +37,6 @@ export default {
     const $prefs = inject(PreferencesStore)
     const $route = useRoute()
     const $router = useRouter()
-    const cachedUser = $appCache.get(AUTH_KEY)
-
-    /* Provided Data */
-    const user = reactive(cachedUser ? cachedUser.data : cloneDeep(emtpyUser))
 
     /* Provided Methods */
     const reauthenticate = () => authApi.authenticate()
@@ -44,9 +45,7 @@ export default {
         Object.assign(user, dbUser)
         BanStore.initBanNotice(user)
         $prefs.fetch()
-        console.log('reauthenticate', socket)
-        updateUser(user)
-        socket.authenticate(user.token)
+        socketLogin(user)
       }).catch(() => {})
 
     const login = (username, password, rememberMe) => authApi.login({ username, password, rememberMe })
@@ -56,9 +55,7 @@ export default {
         BanStore.initBanNotice(user)
         $prefs.fetch()
         $alertStore.success(`Welcome ${user.username}, you have successfully logged in!`)
-        console.log('login',socket)
-        updateUser(user)
-        socket.authenticate(user.token)
+        socketLogin(user)
       }).catch(() => {})
 
     const logout = () => authApi.logout()
@@ -83,8 +80,7 @@ export default {
           Object.assign(user, dbUser)
           $prefs.fetch()
           $alertStore.success(`Welcome ${user.username}, you have successfully registered!`)
-          updateUser(user)
-          socket.authenticate(user.token)
+          socketLogin(user)
         }
         // TODO(akinsey): implement flow for when email confirmation is enabled
         // else {}
