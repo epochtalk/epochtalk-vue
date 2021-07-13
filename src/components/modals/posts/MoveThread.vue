@@ -26,7 +26,6 @@
 <script>
 import Modal from '@/components/layout/Modal.vue'
 import decode from '@/composables/filters/decode'
-import { useRouter } from 'vue-router'
 import { reactive, toRefs } from 'vue'
 import { threadsApi, boardsApi } from '@/api'
 import { groupBy } from 'lodash'
@@ -42,14 +41,10 @@ export default {
       emit('close')
     }
 
-    /* Internal Data */
-    const $router = useRouter()
-
     /* Template Data */
     const moveThread = () => {
       threadsApi.move(props.threadId, v.newBoard.id)
         .then(() => {
-          $router.push({ name: 'Threads', params: { boardId: v.newBoard.id, boardSlug: v.newBoard.slug }})
           close()
         })
     }
