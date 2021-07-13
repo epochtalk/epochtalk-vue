@@ -8,10 +8,9 @@
         <h3 class="thin-underline">Purge Post</h3>
         <p v-if="canReportPosts && canReportUsers && !selectedPost.reported">Which would you like to report?</p>
         <!-- TODO(boka): default radio button choice -->
-        <input v-if="canReportUsers" type="radio" name="reportPost" v-model="offendingId" :value="selectedPost.user.id" id="reportUser" required><label v-if="canReportUsers" for="reportUser">{{selectedPost.user.username}}</label>
+        <input v-if="canReportUsers" type="radio" ref="focusInput" name="reportPost" v-model="offendingId" :value="selectedPost.user.id" id="reportUser" required checked="true"><label v-if="canReportUsers" for="reportUser">{{selectedPost.user.username}}</label>
         <input v-if="canReportPosts" type="radio" name="reportPost" v-model="offendingId" :value="selectedPost.id" id="reportPost" required><label v-if="canReportPosts" for="reportPost">{{selectedPost.user.username}}'s Post</label>
         <label>Reason for Report</label>
-        <!-- TODO(boka): handle focus -->
         <textarea name="reportReason" v-model="reportReason" placeholder="Give a brief reason for your report" rows="4" required maxlength="255"></textarea>
         <div class="clear">
           <button id="report-btn" class="fill-row" type="submit">

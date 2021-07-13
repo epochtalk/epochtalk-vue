@@ -189,7 +189,7 @@ $axios.interceptors.response.use(res => res, err => {
   if(err.response) { // Server still responding, just getting errors from api calls
     switch (err.response.status) {
       case 401:
-        router.push({ name: 'Login'})
+        if (router.currentRoute._value.meta.requiresAuth) router.push({ name: 'Login'})
         break
       case 403:
         if (err.response.statusText === 'Forbidden' || err.response.data.error === 'Forbidden') {
