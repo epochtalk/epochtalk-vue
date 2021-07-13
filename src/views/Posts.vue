@@ -421,7 +421,7 @@
 <script>
 import { useRoute } from 'vue-router'
 import Pagination from '@/components/layout/Pagination.vue'
-import PollViewer from '@/components/posts/PollViewer.vue'
+import PollViewer from '@/components/polls/PollViewer.vue'
 import RankDisplay from '@/components/users/RankDisplay.vue'
 import humanDate from '@/composables/filters/humanDate'
 import dayjs from 'dayjs'
