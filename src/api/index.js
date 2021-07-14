@@ -45,10 +45,12 @@ const $http = (path, opts, handleErrors) => {
 
 export const boardsApi = {
   slugToBoardId: slug => $http(`/api/boards/${slug}/id`),
-  getBoards: stripped => $http(`/api/boards${stripped ? '?stripped=true' : ''}`)
+  getBoards: stripped => $http(`/api/boards${stripped ? '?stripped=true' : ''}`),
+  movelist: () => $http('/api/boards/movelist')
 }
 
 export const threadsApi = {
+  move: (threadId, newBoardId) => $http(`/api/threads/${threadId}/move`, { data: { new_board_id: newBoardId }, method: 'POST'}),
   title: (threadId, title) => $http(`/api/threads/${threadId}`, { data: { title: title }, method: 'POST'}),
   purge: threadId => $http(`/api/threads/${threadId}`, { method: 'DELETE' }),
   lock: threadId => $http(`/api/threads/${threadId}/lock`, { data: { status: true }, method: 'POST'}),

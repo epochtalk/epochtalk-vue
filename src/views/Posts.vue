@@ -362,7 +362,7 @@
 
           <!-- Move Thread -->
           <div class="control" v-if="canMove()">
-            <a href="#" id="moveBoard" :class="{'clicked' : showMoveThreadModal}"
+            <a href="#" id="moveBoard" :class="{'clicked' : showPostsMoveThreadModal}"
               @click.prevent="openMoveThreadModal()" data-balloon="Move Thread">
               <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                 <title></title>
@@ -413,6 +413,7 @@
   <posts-delete-modal :selectedPost="selectedPost" :show="showPostsDeleteModal" @close="showPostsDeleteModal = false; selectedPost = null"/>
   <posts-undelete-modal :selectedPost="selectedPost" :show="showPostsUndeleteModal" @close="showPostsUndeleteModal = false; selectedPost = null"/>
   <posts-purge-post-modal :selectedPost="selectedPost" :selectedPostIndex="selectedPostIndex" :page="postData.data.page" :limit="postData.data.limit" :posts="postData.data?.posts" :show="showPostsPurgePostModal" @close="showPostsPurgePostModal = false; selectedPost = null; selectedPostIndex = 0"/>
+  <posts-move-thread-modal :threadId="postData.data.thread?.id" :show="showPostsMoveThreadModal" @close="showPostsMoveThreadModal = false"/>
   <posts-purge-thread-modal :threadId="postData.data.thread?.id" :boardId="postData.data.board?.id" :boardSlug="postData.data.board?.slug" :show="showPostsPurgeThreadModal" @close="showPostsPurgeThreadModal = false"/>
   <posts-report-modal :selectedPost="selectedPost" :canReportPosts="true" :canReportUsers="true" :show="showPostsReportModal" @close="showPostsReportModal = false; selectedPost = null"/>
 </template>
@@ -420,7 +421,7 @@
 <script>
 import { useRoute } from 'vue-router'
 import Pagination from '@/components/layout/Pagination.vue'
-import PollViewer from '@/components/posts/PollViewer.vue'
+import PollViewer from '@/components/polls/PollViewer.vue'
 import RankDisplay from '@/components/users/RankDisplay.vue'
 import humanDate from '@/composables/filters/humanDate'
 import dayjs from 'dayjs'
@@ -433,6 +434,7 @@ import { PreferencesStore, localStoragePrefs } from '@/composables/stores/prefs'
 import PostsDeleteModal from '@/components/modals/posts/Delete.vue'
 import PostsUndeleteModal from '@/components/modals/posts/Undelete.vue'
 import PostsPurgePostModal from '@/components/modals/posts/PurgePost.vue'
+import PostsMoveThreadModal from '@/components/modals/posts/MoveThread.vue'
 import PostsPurgeThreadModal from '@/components/modals/posts/PurgeThread.vue'
 import PostsReportModal from '@/components/modals/posts/Report.vue'
 import { BreadcrumbStore } from '@/composables/stores/breadcrumbs'
@@ -441,7 +443,7 @@ import BanStore from '@/composables/stores/ban'
 export default {
   name: 'Posts',
   props: ['threadSlug', 'threadId'],
-  components: { Pagination, PostsDeleteModal, PostsUndeleteModal, PostsPurgePostModal, PostsPurgeThreadModal, PostsReportModal, PollViewer, RankDisplay },
+  components: { Pagination, PostsDeleteModal, PostsUndeleteModal, PostsPurgePostModal, PostsMoveThreadModal, PostsPurgeThreadModal, PostsReportModal, PollViewer, RankDisplay },
   beforeRouteEnter(to, from, next) {
     const params = {
       limit: localStoragePrefs().data.posts_per_page,
@@ -861,7 +863,7 @@ export default {
       .then(() => v.postData.data.thread.watched = !v.postData.data.thread.watched)
     }
 
-    const openMoveThreadModal = () => console.log('openMoveThreadModal')
+    const openMoveThreadModal = () => v.showPostsMoveThreadModal = true
     const toggleIgnoredPosts = post => {
       const toggleIgnore = post.user._ignored ? usersApi.unignore : usersApi.ignore
       toggleIgnore(post.user)
@@ -907,7 +909,7 @@ export default {
       showPostsDeleteModal: false,
       showPostsUndeleteModal: false,
       showPostsReportModal: false,
-      showMoveThreadModal: false
+      showPostsMoveThreadModal: false
     })
 
     /* Watched Data */
