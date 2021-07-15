@@ -162,11 +162,18 @@ export const reportsApi = {
 }
 
 export const mentionsApi = {
+  page: params => $http('/api/mentions', { params }),
   pageIgnored: params => $http('/api/mentions/ignored', { params }),
   ignore: data => $http(`/api/mentions/ignore`, { method: 'POST', data }),
   unignore: data => $http(`/api/mentions/unignore`, { method: 'POST', data }),
   settings: () => $http('/api/mentions/settings'),
+  remove: params => $http('/api/mentions', { method: 'DELETE', params }),
   emailNotifications: enabled => $http('/api/mentions/settings', { method: 'PUT', data:{enabled}})
+}
+
+export const notificationsApi = {
+  dismiss: data => $http('/api/notifications/dismiss', { method: 'POST', data }),
+  counts: params => $http('/api/notifications/counts', { params })
 }
 
 export const breadcrumbsApi = {

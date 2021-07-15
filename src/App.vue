@@ -4,11 +4,11 @@
       <ProvideWebsocket>
         <ProvideBreadcrumbs>
           <div id="wrapper">
-              <Header></Header>
-              <main>
-                <div id="public-content">
-                  <router-view />
-                </div>
+            <Header></Header>
+            <main>
+              <div id="public-content">
+                <router-view />
+              </div>
             </main>
           </div>
         </ProvideBreadcrumbs>

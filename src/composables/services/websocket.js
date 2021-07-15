@@ -1,4 +1,5 @@
 import alertStore from '@/composables/stores/alert'
+import notificationsStore from '@/composables/stores/notifications'
 import { clearUser, AuthStore } from '@/composables/stores/auth'
 import { provide, inject, reactive } from 'vue'
 
@@ -26,8 +27,8 @@ export const WebsocketService = Symbol(WEBSOCKET_KEY)
 export const socketLogin = socketUser => {
   Object.assign(session.user, socketUser)
   socket.authenticate(socketUser.token)
-  // NotificationSvc.refresh()
-  // NotificationSvc.refreshMentionsList()
+  notificationsStore.refresh()
+  notificationsStore.refreshMentionsList()
 }
 
 export const socketLogout = socketUser => {
@@ -75,11 +76,11 @@ export default {
            clearUser() // Handles clearing authed user from a out of focus tab
            alertStore.warn('You have been logged out from another window.')
          }
-         // else if (d.action === 'newMessage') { NotificationSvc.refresh() }
-         // else if (d.action === 'refreshMentions') {
-         //   NotificationSvc.refresh()
-         //   NotificationSvc.refreshMentionsList()
-         // }
+         else if (d.action === 'newMessage') { notificationsStore.refresh() }
+         else if (d.action === 'refreshMentions') {
+           notificationsStore.refresh()
+           notificationsStore.refreshMentionsList()
+         }
        })
      }
      else if (JSON.parse(channelName).type === 'public') {
