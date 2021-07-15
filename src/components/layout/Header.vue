@@ -206,10 +206,11 @@ import Breadcrumbs from '@/components/layout/Breadcrumbs.vue'
 import decode from '@/composables/filters/decode'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
-import { reactive, toRefs, onMounted, onUnmounted, inject } from 'vue'
+import { reactive, toRefs, watch, onMounted, onUnmounted, inject } from 'vue'
 import { debounce } from 'lodash'
 import { useRouter } from 'vue-router'
 import BanStore from '@/composables/stores/ban'
+import NotificationsStore from '@/composables/stores/notifications'
 
 export default {
   components: { Breadcrumbs, LoginModal, InviteModal, RegisterModal, Alert },
@@ -236,7 +237,7 @@ export default {
 
     const searchForum = () => $router.push({ name: 'PostSearch', query: { search: v.searchTerms } })
 
-    const dismissNotifications = params => console.log('DISMISS NOTIFICATIONS!', params)
+    const dismissNotifications = params => NotificationsStore.dismiss(params)
 
     const isPatroller = () => v.prefs.patroller_view || $auth.permissionUtils.isPatroller()
 
@@ -268,12 +269,15 @@ export default {
       permissionUtils: $auth.permissionUtils,
       prefs: $prefs.data,
       search: null,
-      notificationMessages: null,
-      notificationMentions: null,
+      notificationMessages: NotificationsStore.messages,
+      notificationMentions: NotificationsStore.mentions,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
       breadcrumbs: [{label:'Home', state: '#', opts: {}}]
     })
+
+    watch(() => NotificationsStore.messages, c => v.notificationMessages = c)
+    watch(() => NotificationsStore.mentions, c => v.notificationMentions = c)
 
     /* Lifecycle Events */
     onMounted(() => {
