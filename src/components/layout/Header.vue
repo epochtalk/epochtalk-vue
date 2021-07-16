@@ -110,7 +110,52 @@
                   <i class="fa fa-users"></i>
                 </router-link>
               </div>
-              <!-- <mentions-tray></mentions-tray> -->
+              <div id="mentions-icon" class="tray-icon" :class="{ 'open': mentionsOpen }" @click="mentionsOpen = true">
+                <div class="hoverable" data-balloon="Mentions" data-balloon-pos="down"></div>
+                <i class="fa fa-at"></i>
+                <div class="count" v-if="notificationMessages" v-html="notificationMessages"></div>
+                <ul id="mentions-dropdown">
+                  <li>
+                    Recent Mentions
+                    <div v-if="mentionsList.length" @click="dismissNotifications({ type: 'mention'})" class="dismiss-all">
+                      <i class="fa fa-book"></i> Mark all read
+                    </div>
+                    <div v-if="mentionsList.length" @click="deleteMention({ type: 'mention'})" class="delete-all">
+                      <i class="fa fa-trash-o"></i> Delete all
+                    </div>
+                  </li>
+                  <li class="centered" v-if="!mentionsList.length">
+                    You currently have no mentions.
+                  </li>
+                  <li v-for="mention in mentionsList" :key="mention.notification_id" :class="{ 'dismissed': mention.viewed }">
+                    <!-- ui-sref="posts.data({ slug: mention.thread_slug, start: mention.post_start, '#': mention.post_id })" ui-sref-opts="{reload: true}" -->
+                    <a href="" @click.prevent="dismissNotifications({ type: 'mention', id: mention.notification_id, viewed: mention.viewed })">
+                      <div class="mention-unread"></div>
+                      <div class="mention-avatar defaultAvatarShape">
+                        <img :src="mention.mentioner_avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" class="avatar" :class="defaultAvatarShape" />
+                      </div>
+                      <div class="mention-content">
+                        <div class="msg"><strong>{{mention.mentioner}}</strong> mentioned you in <strong>{{mention.title}}</strong></div>
+                        <div class="timestamp">{{humanDate(mention.created_at)}}</div>
+                      </div>
+                    </a>
+                    <div class="mention-actions">
+                      <div @click="deleteMention({ id: mention.id, type: 'mention', notification_id: mention.notification_id })" class="delete" data-balloon="Delete" data-balloon-pos="right">
+                        <i class="fa fa-times"></i>
+                      </div>
+                      <div v-if="!mention.viewed" @click="dismissNotifications({ type: 'mention', id: mention.notification_id, viewed: mention.viewed })" class="unmarked" data-balloon="Mark Read" data-balloon-pos="right">
+                        <i class="fa fa-circle-o"></i>
+                      </div>
+                      <div v-if="mention.viewed" class="marked" data-balloon="Read" data-balloon-pos="right">
+                        <i class="fa fa-check-circle-o"></i>
+                      </div>
+                    </div>
+                  </li>
+                  <!--- ui-sref="mentions" ui-sref-opts="{reload: true}" -->
+                  <li><a href="">View all mentions <span ng-bind="vmMentions.unseenMentionsText()"></span></a></li>
+                </ul>
+              </div>
+              <div id="mentions-overlay" v-if="mentionsOpen" @click="mentionsOpen = false"></div>
 
               <router-link :to="{ name: 'Messages' }" @click="dismissNotifications({ type: 'message' })">
                 <div class="tray-icon" data-balloon="Messages" data-balloon-pos="down">
@@ -128,7 +173,7 @@
               <div>
                 <router-link :to="{ path: '/profile/' + currentUser.username.toLowerCase() }">
                   <div class="avatar-wrap">
-                    <img :src="currentUser.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" class="avatar" :class="defaultAvatarShape">
+                    <img :src="currentUser.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" class="avatar" :class="defaultAvatarShape" />
                   </div>
                   <span>{{currentUser.username}}</span>
                 </router-link>
@@ -211,6 +256,7 @@ import { debounce } from 'lodash'
 import { useRouter } from 'vue-router'
 import BanStore from '@/composables/stores/ban'
 import NotificationsStore from '@/composables/stores/notifications'
+import humanDate from '@/composables/filters/humanDate'
 
 export default {
   components: { Breadcrumbs, LoginModal, InviteModal, RegisterModal, Alert },
@@ -239,12 +285,21 @@ export default {
 
     const dismissNotifications = params => NotificationsStore.dismiss(params)
 
+    const deleteMention = params => NotificationsStore.deleteMention(params)
+
     const isPatroller = () => v.prefs.patroller_view || $auth.permissionUtils.isPatroller()
 
     const toggleFocusSearch = () => {
       v.focusSearch = !v.focusSearch
       v.searchExpanded = v.focusSearch
       if (v.searchExpanded) { v.search.focus() }
+    }
+
+    const unseenMentionsText = () => {
+      let unseenInList = 0;
+      v.mentionsList.forEach(mention => { if (!mention.viewed) { unseenInList++ } })
+      let unseenHiddenCount = v.notificationMentions - unseenInList;
+      return unseenHiddenCount > 0 ? '(' + unseenHiddenCount + ' unread)' : '';
     }
 
     /* Internal Data */
@@ -258,6 +313,7 @@ export default {
       focusSearch: false,
       searchExpanded: false,
       searchTerms: '',
+      mentionsOpen: false,
       showInvite: false,
       showRegister: false,
       showLogin: false,
@@ -269,6 +325,7 @@ export default {
       permissionUtils: $auth.permissionUtils,
       prefs: $prefs.data,
       search: null,
+      mentionsList: NotificationsStore.mentionsList,
       notificationMessages: NotificationsStore.messages,
       notificationMentions: NotificationsStore.mentions,
       defaultAvatar: window.default_avatar,
@@ -278,6 +335,7 @@ export default {
 
     watch(() => NotificationsStore.messages, c => v.notificationMessages = c)
     watch(() => NotificationsStore.mentions, c => v.notificationMentions = c)
+    watch(() => NotificationsStore.mentionsList, l => v.mentionsList = l)
 
     /* Lifecycle Events */
     onMounted(() => {
@@ -288,7 +346,7 @@ export default {
       window.removeEventListener('scroll', debounce(scrollHeader, 10))
     })
 
-    return { ...toRefs(v), BanStore, logout, isPatroller, searchForum, dismissNotifications, toggleFocusSearch, decode }
+    return { ...toRefs(v), BanStore, logout, isPatroller, searchForum, dismissNotifications, deleteMention, unseenMentionsText, toggleFocusSearch, decode, humanDate }
   }
 }
 </script>
