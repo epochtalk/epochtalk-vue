@@ -131,7 +131,7 @@
                     <!-- ui-sref="posts.data({ slug: mention.thread_slug, start: mention.post_start, '#': mention.post_id })" ui-sref-opts="{reload: true}" -->
                     <a href="" @click.prevent="dismissNotifications({ type: 'mention', id: mention.notification_id, viewed: mention.viewed })">
                       <div class="mention-unread"></div>
-                      <div class="mention-avatar defaultAvatarShape">
+                      <div class="mention-avatar" :class="defaultAvatarShape">
                         <img :src="mention.mentioner_avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" class="avatar" :class="defaultAvatarShape" />
                       </div>
                       <div class="mention-content">
