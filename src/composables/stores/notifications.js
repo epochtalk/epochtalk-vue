@@ -58,6 +58,7 @@ const dismiss = opts => {
 const deleteMention = opts => {
   return notificationsApi.dismiss({ type: opts.type, id: opts.notification_id })
   .then(() => mentionsApi.remove(opts))
+  .then(() => refreshMentionsList())
   .catch(err => {
     alertStore.error('There was an error dismissing your mentions.')
     console.log(err)
