@@ -113,7 +113,7 @@
               <div id="mentions-icon" class="tray-icon" :class="{ 'open': mentionsOpen }" @click="mentionsOpen = true">
                 <div class="hoverable" data-balloon="Mentions" data-balloon-pos="down"></div>
                 <i class="fa fa-at"></i>
-                <div class="count" v-if="notificationMessages" v-html="notificationMessages"></div>
+                <div class="count" v-if="notificationMentions" v-html="notificationMentions"></div>
                 <ul id="mentions-dropdown">
                   <li>
                     Recent Mentions
@@ -152,7 +152,7 @@
                     </div>
                   </li>
                   <!--- ui-sref="mentions" ui-sref-opts="{reload: true}" -->
-                  <li><a href="">View all mentions <span ng-bind="vmMentions.unseenMentionsText()"></span></a></li>
+                  <li><a href="">View all mentions <span v-html="unseenMentionsText()"></span></a></li>
                 </ul>
               </div>
               <div id="mentions-overlay" v-if="mentionsOpen" @click="mentionsOpen = false"></div>
