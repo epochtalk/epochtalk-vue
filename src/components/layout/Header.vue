@@ -112,7 +112,7 @@
               </div>
               <div id="mentions-icon" class="tray-icon" :class="{ 'open': mentionsOpen }" @click="mentionsOpen = true">
                 <div class="hoverable" data-balloon="Mentions" data-balloon-pos="down"></div>
-                <i class="fa fa-at"></i>
+                <i class="fas fa-at"></i>
                 <div class="count" v-if="notificationMentions" v-html="notificationMentions"></div>
                 <ul id="mentions-dropdown">
                   <li>
@@ -121,7 +121,7 @@
                       <i class="fa fa-book"></i> Mark all read
                     </div>
                     <div v-if="mentionsList.length" @click="deleteMention({ type: 'mention'})" class="delete-all">
-                      <i class="fa fa-trash-o"></i> Delete all
+                      <i class="fas fa-trash-alt"></i> Delete all
                     </div>
                   </li>
                   <li class="centered" v-if="!mentionsList.length">
@@ -141,13 +141,13 @@
                     </a>
                     <div class="mention-actions">
                       <div @click="deleteMention({ id: mention.id, type: 'mention', notification_id: mention.notification_id })" class="delete" data-balloon="Delete" data-balloon-pos="right">
-                        <i class="fa fa-times"></i>
+                        <i class="far fa-times-circle"></i>
                       </div>
                       <div v-if="!mention.viewed" @click="dismissNotifications({ type: 'mention', id: mention.notification_id, viewed: mention.viewed })" class="unmarked" data-balloon="Mark Read" data-balloon-pos="right">
-                        <i class="fa fa-circle-o"></i>
+                        <i class="far fa-circle"></i>
                       </div>
                       <div v-if="mention.viewed" class="marked" data-balloon="Read" data-balloon-pos="right">
-                        <i class="fa fa-check-circle-o"></i>
+                        <i class="far fa-check-circle"></i>
                       </div>
                     </div>
                   </li>
