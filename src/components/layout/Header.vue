@@ -711,6 +711,7 @@ header {
             right: 0;
             cursor: pointer;
             z-index: 9998;
+            height: 100vh;
           }
           .tray-icon {
             @include pad(0 1rem);
@@ -867,6 +868,7 @@ header {
                       margin-top: 0.4rem;
                       line-height: 0.7rem;
                       font-weight: bold;
+                      display: block;
                     }
                   }
                   &.dismissed, .dismissed div {
