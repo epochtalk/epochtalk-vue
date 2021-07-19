@@ -38,7 +38,10 @@
             <i class="fa fa-users" aria-hidden="true"></i>Member Search
           </router-link>
         </li>
-        <!--<mentions-menu></mentions-menu>-->
+        <li @click="HeaderCtrl.showMobileMenu = false" >
+          <a href=""><i class="fas fa-at" aria-hidden="true"></i>Mentions</a>
+          <div class="count" v-if="notificationMentions" v-html="notificationMentions"></div>
+        </li>
         <li @click="showMobileMenu = false" >
           <router-link :to="{ name: 'Messages' }" @click="dismissNotifications({ type: 'message' })">
             <i class="fa fa-envelope" aria-hidden="true"></i>Messages
