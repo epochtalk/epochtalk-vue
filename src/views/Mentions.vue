@@ -78,18 +78,9 @@
       </a>
     </div>
   </div>
-
   <div class="pagination-simple">
-    <!-- ui-sref=".({ page: MentionsCtrl.page - 1, limit: MentionsCtrl.limit })"-->
-    <a v-if="mentionData?.prev" href="">
-      &#10094; Previous
-    </a>
-    <span v-if="!mentionData?.prev">&#10094; Previous</span>
-    &nbsp;&nbsp;&nbsp;
-    <a v-if="mentionData?.next"><!--ui-sref=".({ page: MentionsCtrl.page + 1, limit: MentionsCtrl.limit })"-->
-       Next &#10095;
-    </a>
-    <span v-if="!mentionData?.next">Next &#10095;</span>
+    <button @click="pullPage(-1)" :disabled="!mentionData?.prev">&#10094; Prev</button>
+    <button @click="pullPage(1)" :disabled="!mentionData?.next">Next &#10095;</button>
   </div>
 </template>
 
@@ -152,6 +143,34 @@ export default {
 </script>
 
 <style lang="scss">
+.mentions {
+  .pagination-simple {
+    display: grid;
+    grid-template-columns: 6rem auto auto;
+    -moz-column-gap: .5rem;
+    column-gap: .5rem;
+    justify-content: end;
+  }
+}
+#public-content {
+  .mentions & {
+    grid-template-columns: minmax(0, 3fr) minmax(240px, 1fr);
+    grid-template-areas:
+        "header header"
+        "main sidebar"
+        "main sidebar";
+    grid-gap: 2rem;
+    row-gap: 1rem;
+    margin-bottom: 2rem;
+  }
+}
+.sidebar {
+  .mention-actions {
+    .button {
+      margin: 0 0 1.25rem;
+    }
+  }
+}
 .recent-mentions-header {
   display: flex;
   align-items: center;
