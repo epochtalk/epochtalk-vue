@@ -111,7 +111,7 @@ export default {
       page: to.query.page || 1,
       extended: true
     }
-    next(vm => mentionsApi.page(query).then(d => {vm.mentionData = d; console.log(d)}).catch(() => {}))
+    next(vm => mentionsApi.page(query).then(d => vm.mentionData = d).catch(() => {}))
   },
   beforeRouteUpdate(to, from, next) {
     const query = {
