@@ -8,6 +8,7 @@ import About from '@/views/About.vue'
 import Settings from '@/views/Settings.vue'
 import Patrol from '@/views/Patrol.vue'
 import MemberSearch from '@/views/MemberSearch.vue'
+import Mentions from '@/views/Mentions.vue'
 import Messages from '@/views/Messages.vue'
 import PostSearch from '@/views/PostSearch.vue'
 import Profile from '@/views/Profile.vue'
@@ -97,6 +98,12 @@ const routes = [
     name: 'Messages',
     component: Messages,
     meta: { requiresAuth: true, bodyClass: 'messages' }
+  },
+  {
+    path: '/mentions',
+    name: 'Mentions',
+    component: Mentions,
+    meta: { requiresAuth: true, bodyClass: 'mentions' }
   },
   {
     path: '/search/users',
