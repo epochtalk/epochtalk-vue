@@ -136,7 +136,9 @@ export default {
 
     const v = reactive({
       currentPage: Number($route.query.page) || 1,
-      mentionData: null
+      mentionData: null,
+      defaultAvatar: window.default_avatar,
+      defaultAvatarShape: window.default_avatar_shape,
     })
 
     // nextTick(() => v.searchInput.focus())
