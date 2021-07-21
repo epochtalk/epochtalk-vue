@@ -447,8 +447,8 @@ export default {
   beforeRouteEnter(to, from, next) {
     const params = {
       limit: localStoragePrefs().data.posts_per_page,
-      page: to.query.page || 1,
-      start: to.query.start
+      page: isNaN(to.query.start) ? to.query.page || 1 : undefined,
+      start: isNaN(to.query.start) ? undefined : Number(to.query.start)
     }
     threadsApi.slugToThreadId(to.params.threadSlug).then(t => t.id)
       .then(threadId => {
@@ -465,8 +465,8 @@ export default {
   beforeRouteUpdate(to, from, next) {
     const params = {
       limit: localStoragePrefs().data.posts_per_page,
-      page: to.query.page || 1,
-      start: to.query.start
+      page: isNaN(to.query.start) ? to.query.page || 1 : undefined,
+      start: isNaN(to.query.start) ? undefined : Number(to.query.start)
     }
     threadsApi.slugToThreadId(to.params.threadSlug).then(t => t.id)
       .then(threadId => {
@@ -492,8 +492,8 @@ export default {
         const params = {
           thread_id: threadId,
           limit: v.prefs.posts_per_page,
-          page: $route.query.page || 1,
-          start: $route.query.start
+          page: isNaN($route.query.start) ? $route.query.page || 1 : undefined,
+          start: isNaN($route.query.start) ? undefined : Number($route.query.start)
         }
         return postsApi.byThread(params)
       })
