@@ -79,8 +79,8 @@
     </div>
   </div>
   <div class="pagination-simple">
-    <button @click="pullPage(-1)" :disabled="!mentionData?.prev">&#10094; Prev</button>
-    <button @click="pullPage(1)" :disabled="!mentionData?.next">Next &#10095;</button>
+    <button @click="pageResults(-1)" :disabled="!mentionData?.prev">&#10094; Prev</button>
+    <button @click="pageResults(1)" :disabled="!mentionData?.next">Next &#10095;</button>
   </div>
 </template>
 
@@ -89,8 +89,7 @@ import { reactive, toRefs } from 'vue'
 import { mentionsApi } from '@/api'
 import { localStoragePrefs } from '@/composables/stores/prefs'
 import humanDate from '@/composables/filters/humanDate'
-import { useRoute } from 'vue-router'
-// import { useRoute, useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 // import { usernameHighlight } from '@/composables/utils/userUtils'
 // import decode from '@/composables/filters/decode'
 
@@ -114,16 +113,16 @@ export default {
     next()
   },
   setup() {
-    // const pageResults = inc => {
-    //   const newPage = v.searchData.page + inc
-    //   let query = { ...$route.query, page: newPage }
-    //   if (query.page === 1 || !query.page) delete query.page
-    //   if ($route.query.page !== v.currentPage)
-    //     $router.replace({ name: $route.name, params: $route.params, query: query })
-    // }
+    const pageResults = inc => {
+      const newPage = v.mentionData.page + inc
+      let query = { ...$route.query, page: newPage }
+      if (query.page === 1 || !query.page) delete query.page
+      if ($route.query.page !== v.currentPage)
+        $router.replace({ name: $route.name, params: $route.params, query: query })
+    }
 
     const $route = useRoute()
-    // const $router = useRouter()
+    const $router = useRouter()
 
     const v = reactive({
       currentPage: Number($route.query.page) || 1,
@@ -137,7 +136,7 @@ export default {
     // watch(() => $route.query.search, s => v.search = s)
 
     // return { ...toRefs(v), searchPosts, pageResults, clearSearch, humanDate, usernameHighlight, decode }
-    return { ...toRefs(v), humanDate }
+    return { ...toRefs(v), humanDate, pageResults }
   }
 }
 </script>
