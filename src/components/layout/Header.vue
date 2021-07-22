@@ -39,7 +39,9 @@
           </router-link>
         </li>
         <li @click="HeaderCtrl.showMobileMenu = false" >
-          <a href=""><i class="fas fa-at" aria-hidden="true"></i>Mentions</a>
+          <router-link :to="{ name: 'Mentions' }">
+            <i class="fas fa-at" aria-hidden="true"></i>Mentions
+          </router-link>
           <div class="count" v-if="notificationMentions" v-html="notificationMentions"></div>
         </li>
         <li @click="showMobileMenu = false" >
@@ -132,7 +134,7 @@
                   </li>
                   <li v-for="mention in mentionsList" :key="mention.notification_id" :class="{ 'dismissed': mention.viewed }">
                     <!-- ui-sref="posts.data({ slug: mention.thread_slug, start: mention.post_start, '#': mention.post_id })" ui-sref-opts="{reload: true}" -->
-                    <a href="" @click.prevent="dismissNotifications({ type: 'mention', id: mention.notification_id, viewed: mention.viewed })">
+                    <router-link :to="{ name: 'Posts', params: { threadSlug: mention.thread_slug }, query: { start: mention.post_start }, hash: `#${mention.post_id}` }" @click.prevent="dismissNotifications({ type: 'mention', id: mention.notification_id, viewed: mention.viewed })">
                       <div class="mention-unread"></div>
                       <div class="mention-avatar" :class="defaultAvatarShape">
                         <img :src="mention.mentioner_avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" class="avatar" :class="defaultAvatarShape" />
@@ -141,7 +143,7 @@
                         <div class="msg"><strong>{{mention.mentioner}}</strong> mentioned you in <strong>{{mention.title}}</strong></div>
                         <div class="timestamp">{{humanDate(mention.created_at)}}</div>
                       </div>
-                    </a>
+                    </router-link>
                     <div class="mention-actions">
                       <div @click="deleteMention({ id: mention.id, type: 'mention', notification_id: mention.notification_id })" class="delete" data-balloon="Delete" data-balloon-pos="right">
                         <i class="far fa-times-circle"></i>
@@ -155,7 +157,7 @@
                     </div>
                   </li>
                   <!--- ui-sref="mentions" ui-sref-opts="{reload: true}" -->
-                  <li><a href="">View all mentions <span v-html="unseenMentionsText()"></span></a></li>
+                  <li><router-link :to="{ name: 'Mentions' }">View all mentions <span v-html="unseenMentionsText()"></span></router-link></li>
                 </ul>
               </div>
               <div id="mentions-overlay" v-if="mentionsOpen" @click="mentionsOpen = false"></div>
