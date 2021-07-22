@@ -120,6 +120,12 @@ export default {
         $router.replace({ name: $route.name, params: $route.params, query: query })
     }
 
+    const refreshMentions = () => mentionsApi.page({
+      limit: $route.query.limit || localStoragePrefs().data.posts_per_page,
+      page: $route.query.page || 1,
+      extended: true
+    }).then(d => v.mentionData = d).catch(() => {})
+
     const dismissNotifications = params => NotificationsStore.dismiss(params)
     const deleteMention = params => NotificationsStore.deleteMention(params)
 
@@ -133,9 +139,7 @@ export default {
       defaultAvatarShape: window.default_avatar_shape,
     })
 
-    // nextTick(() => v.searchInput.focus())
-    // // Updates page input when user uses header search
-    // watch(() => $route.query.search, s => v.search = s)
+    watch(() => NotificationsStore.mentionsList, () => refreshMentions())
 
     return { ...toRefs(v), humanDate, pageResults, dismissNotifications, deleteMention }
   }
