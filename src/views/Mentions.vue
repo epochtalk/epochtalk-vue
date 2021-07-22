@@ -85,13 +85,12 @@
 </template>
 
 <script>
-import { reactive, toRefs } from 'vue'
+import { reactive, toRefs, watch } from 'vue'
 import { mentionsApi } from '@/api'
 import { localStoragePrefs } from '@/composables/stores/prefs'
 import humanDate from '@/composables/filters/humanDate'
 import { useRoute, useRouter } from 'vue-router'
-// import { usernameHighlight } from '@/composables/utils/userUtils'
-// import decode from '@/composables/filters/decode'
+import NotificationsStore from '@/composables/stores/notifications'
 
 export default {
   name: 'Mentions',
@@ -121,6 +120,9 @@ export default {
         $router.replace({ name: $route.name, params: $route.params, query: query })
     }
 
+    const dismissNotifications = params => NotificationsStore.dismiss(params)
+    const deleteMention = params => NotificationsStore.deleteMention(params)
+
     const $route = useRoute()
     const $router = useRouter()
 
@@ -135,8 +137,7 @@ export default {
     // // Updates page input when user uses header search
     // watch(() => $route.query.search, s => v.search = s)
 
-    // return { ...toRefs(v), searchPosts, pageResults, clearSearch, humanDate, usernameHighlight, decode }
-    return { ...toRefs(v), humanDate, pageResults }
+    return { ...toRefs(v), humanDate, pageResults, dismissNotifications, deleteMention }
   }
 }
 </script>
