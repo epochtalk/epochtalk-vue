@@ -84,12 +84,13 @@
 </template>
 
 <script>
-import { reactive, toRefs, watch } from 'vue'
+import { reactive, toRefs } from 'vue'
 import { mentionsApi } from '@/api'
 import { localStoragePrefs } from '@/composables/stores/prefs'
 import humanDate from '@/composables/filters/humanDate'
 import { useRoute, useRouter } from 'vue-router'
 import NotificationsStore from '@/composables/stores/notifications'
+import { watchUserChannel, unwatchUserChannel } from '@/composables/services/websocket'
 
 export default {
   name: 'Mentions',
@@ -108,6 +109,10 @@ export default {
       extended: true
     }
     mentionsApi.page(query).then(d => this.mentionData = d).catch(() => {})
+    next()
+  },
+  beforeRouteLeave(to, from, next) {
+    unwatchUserChannel(this.userChannelHandler)
     next()
   },
   setup() {
@@ -138,9 +143,14 @@ export default {
       defaultAvatarShape: window.default_avatar_shape,
     })
 
-    watch(() => NotificationsStore.mentionsList, () => refreshMentions())
+    // Websocket Handling
+    const userChannelHandler = data => data.action === 'refreshMentions' ? refreshMentions() : null
 
-    return { ...toRefs(v), humanDate, pageResults, dismissNotifications, deleteMention }
+    watchUserChannel(userChannelHandler);
+
+    // watch(() => NotificationsStore.mentionsList, () => ())
+
+    return { ...toRefs(v), humanDate, pageResults, dismissNotifications, deleteMention, userChannelHandler }
   }
 }
 </script>
