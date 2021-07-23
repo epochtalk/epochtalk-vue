@@ -6,8 +6,7 @@
   </div>
   <div class="recent-mentions">
     <div class="mention" v-for="mention in mentionData?.data" :key="mention.notification_id" :class="{ 'dismissed': mention.viewed }">
-      <!-- ui-sref="posts.data({ slug: mention.thread_slug, start: mention.post_start, '#': mention.post_id })" ui-sref-opts="{reload: true}"-->
-      <a class="mention-content" @click="dismissNotifications({ type: 'mention', id: mention.notification_id, viewed: mention.viewed })">
+      <router-link class="mention-content" :to="{ name: 'Posts', params: { threadSlug: mention.thread_slug }, query: { start: mention.post_start }, hash: `#${mention.post_id}` }" @click.prevent="dismissNotifications({ type: 'mention', id: mention.notification_id, viewed: mention.viewed })">
         <div class="mention-status" data-balloon="Unread">
           <svg class="unread" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
             <title></title>
@@ -51,7 +50,7 @@
             </svg>
           </div>
         </div>
-      </a>
+      </router-link>
     </div>
   </div>
 
