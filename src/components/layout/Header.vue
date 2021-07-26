@@ -236,7 +236,10 @@
       <div id="ban-notice" v-if="BanStore.updateBanNotice()" v-html="BanStore.updateBanNotice()"></div>
 
       <!-- Message of the Day -->
-      <!-- <motd></motd> -->
+      <!-- style-fix="true" -->
+      <div v-if="motdData && motdData.motd_html.length && !hideAnnnouncement" id="motd-wrap">
+        <div id="motd" v-html="motdData?.motd_html"></div>
+      </div>
 
       <!-- Auth Modals -->
       <login-modal :show="showLogin" @close="showLogin = false" />
@@ -256,31 +259,35 @@ import Breadcrumbs from '@/components/layout/Breadcrumbs.vue'
 import decode from '@/composables/filters/decode'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
-import { reactive, toRefs, watch, onMounted, onUnmounted, inject } from 'vue'
+import { reactive, toRefs, watch, onMounted, onUnmounted, onBeforeMount, inject } from 'vue'
 import { debounce } from 'lodash'
 import { useRouter } from 'vue-router'
 import BanStore from '@/composables/stores/ban'
 import NotificationsStore from '@/composables/stores/notifications'
 import humanDate from '@/composables/filters/humanDate'
+import { motdApi } from '@/api'
 
 export default {
   components: { Breadcrumbs, LoginModal, InviteModal, RegisterModal, Alert },
   setup() {
+    onBeforeMount(() => {
+      motdApi.get().then(d => v.motdData = d).catch(() => {})
+    })
     /* Internal Methods */
     const scrollHeader = () => {
-      let header = document.querySelector('header');
-      let windowY = window.scrollY;
+      let header = document.querySelector('header')
+      let windowY = window.scrollY
       if (windowY >= v.scrollDownPos) {
         // Scrolling DOWN
-        header.classList.add('is-hidden');
-        header.classList.remove('is-visible');
+        header.classList.add('is-hidden')
+        header.classList.remove('is-visible')
       }
       if (windowY === 0 || windowY < v.lastScrollTop) {
         // Scrolling UP
-        header.classList.add('is-visible');
-        header.classList.remove('is-hidden');
+        header.classList.add('is-visible')
+        header.classList.remove('is-hidden')
       }
-      v.lastScrollTop = windowY;
+      v.lastScrollTop = windowY
     }
 
     /* Template Methods */
@@ -322,6 +329,8 @@ export default {
       showInvite: false,
       showRegister: false,
       showLogin: false,
+      hideAnnnouncement: false,
+      motdData: null,
       loggedIn: $auth.loggedIn,
       logo: '',
       scrollDownPos: 95,

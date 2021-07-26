@@ -43,6 +43,11 @@ const $http = (path, opts, handleErrors) => {
   else { return reqPromise }
 }
 
+export const motdApi = {
+  get: () => $http('/api/motd'),
+  save: data => $http('/api/motd', { method: 'PUT', data })
+}
+
 export const boardsApi = {
   slugToBoardId: slug => $http(`/api/boards/${slug}/id`),
   getBoards: stripped => $http(`/api/boards${stripped ? '?stripped=true' : ''}`),
