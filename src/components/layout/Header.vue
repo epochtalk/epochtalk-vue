@@ -245,6 +245,7 @@
       <register-modal :show="showRegister" @close="showRegister = false" />
     </div>
   </header>
+  <div v-if="motdData && motdData.motd_html.length && !hideAnnnouncement" id="motd-spacer"></div>
 </template>
 
 <script>
@@ -1003,8 +1004,10 @@ header {
     border-bottom: 1px solid $breadcrumbs-border-color;
     margin-bottom: $breadcrumbs-bottom-margin;
     max-height: 3.2rem;
-    overflow-y: scroll;
+    overflow-y: auto;
     width: 100%;
+    position: relative;
+    top: -1px;
 
     @include break-mobile-sm {
       font-size: $font-size-sm;
@@ -1022,4 +1025,5 @@ header {
   }
 }
 
+#motd-spacer { height: 1rem; }
 </style>
