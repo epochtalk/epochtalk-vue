@@ -133,7 +133,6 @@
                     You currently have no mentions.
                   </li>
                   <li v-for="mention in mentionsList" :key="mention.notification_id" :class="{ 'dismissed': mention.viewed }">
-                    <!-- ui-sref="posts.data({ slug: mention.thread_slug, start: mention.post_start, '#': mention.post_id })" ui-sref-opts="{reload: true}" -->
                     <router-link :to="{ name: 'Posts', params: { threadSlug: mention.thread_slug }, query: { start: mention.post_start }, hash: `#${mention.post_id}` }" @click.prevent="dismissNotifications({ type: 'mention', id: mention.notification_id, viewed: mention.viewed })">
                       <div class="mention-unread"></div>
                       <div class="mention-avatar" :class="defaultAvatarShape">
@@ -156,7 +155,6 @@
                       </div>
                     </div>
                   </li>
-                  <!--- ui-sref="mentions" ui-sref-opts="{reload: true}" -->
                   <li><router-link :to="{ name: 'Mentions' }">View all mentions <span v-html="unseenMentionsText()"></span></router-link></li>
                 </ul>
               </div>
