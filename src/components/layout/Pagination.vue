@@ -24,6 +24,7 @@ export default {
       const params = { ...$route.params, saveScrollPos: true }
       let query = { ...$route.query, page: v.currentPage }
       if (query.page === 1 || !query.page) delete query.page
+      if (query.start) delete query.start
       if (props.page !== v.currentPage) {
         $router.replace({ name: $route.name, params: params, query: query })
       }

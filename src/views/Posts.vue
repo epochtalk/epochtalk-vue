@@ -450,6 +450,7 @@ export default {
       page: isNaN(to.query.start) ? to.query.page || 1 : undefined,
       start: isNaN(to.query.start) ? undefined : Number(to.query.start)
     }
+    if (params.page && params.start) delete params.page
     threadsApi.slugToThreadId(to.params.threadSlug).then(t => t.id)
       .then(threadId => {
         params.thread_id = threadId
@@ -468,6 +469,7 @@ export default {
       page: isNaN(to.query.start) ? to.query.page || 1 : undefined,
       start: isNaN(to.query.start) ? undefined : Number(to.query.start)
     }
+    if (params.page && params.start) delete params.page
     threadsApi.slugToThreadId(to.params.threadSlug).then(t => t.id)
       .then(threadId => {
         params.thread_id = threadId
@@ -495,6 +497,7 @@ export default {
           page: isNaN($route.query.start) ? $route.query.page || 1 : undefined,
           start: isNaN($route.query.start) ? undefined : Number($route.query.start)
         }
+        if (params.page && params.start) delete params.page
         return postsApi.byThread(params)
       })
     }
