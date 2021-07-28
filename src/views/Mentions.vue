@@ -6,36 +6,39 @@
   </div>
   <div class="recent-mentions">
     <div class="mention" v-for="mention in mentionData?.data" :key="mention.notification_id" :class="{ 'dismissed': mention.viewed }">
-      <router-link class="mention-content" :to="{ name: 'Posts', params: { threadSlug: mention.thread_slug }, query: { start: mention.post_start }, hash: `#${mention.post_id}` }" @click.prevent="dismissNotifications({ type: 'mention', id: mention.notification_id, viewed: mention.viewed })">
-        <div class="mention-status" data-balloon="Unread">
+      <div class="mention-content">
+        <div class="mention-status" v-if="mention.viewed"></div>
+        <div class="mention-status" v-if="!mention.viewed" data-balloon="Unread">
           <svg class="unread" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
             <title></title>
             <circle cx="24" cy="24" r="16"/>
           </svg>
         </div>
 
-        <div class="mention-title">
-          <div class="avatar" :class="defaultAvatarShape">
-            <img :src="mention.mentioner_avatar || defaultAvatar" />
+        <router-link :to="{ name: 'Posts', params: { threadSlug: mention.thread_slug }, query: { start: mention.post_start }, hash: `#${mention.post_id}` }" @click.prevent="dismissNotifications({ type: 'mention', id: mention.notification_id, viewed: mention.viewed })">
+          <div class="mention-title">
+            <div class="avatar" :class="defaultAvatarShape">
+              <img :src="mention.mentioner_avatar || defaultAvatar" />
+            </div>
+
+            <div class="mention-body">
+              <span class="timestamp">{{humanDate(mention.created_at)}}</span>
+              <span class="user">{{mention.mentioner}}</span>
+              mentioned you in
+              <span class="hidden-mobile">
+                <span v-html="mention.board_name" class="boardName"></span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" class="caret-right">
+                  <title></title>
+                  <path d="M24,38.83,4.59,19.41a2,2,0,0,1,2.82-2.82L24,33.17,40.59,16.59a2,2,0,0,1,2.82,2.82Z"/>
+                </svg>
+              </span>
+              <span class="title">{{mention.title}}</span>
+            </div>
           </div>
 
-          <div class="mention-body">
-            <span class="timestamp">{{humanDate(mention.created_at)}}</span>
-            <span class="user">{{mention.mentioner}}</span>
-            mentioned you in
-            <span class="hidden-mobile">
-              <span v-html="mention.board_name" class="boardName"></span>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" class="caret-right">
-                <title></title>
-                <path d="M24,38.83,4.59,19.41a2,2,0,0,1,2.82-2.82L24,33.17,40.59,16.59a2,2,0,0,1,2.82,2.82Z"/>
-              </svg>
-            </span>
-            <span class="title">{{mention.title}}</span>
-          </div>
-        </div>
-
-        <!--post-processing="mention.body_html" style-fix="true"-->
-        <div v-html="mention.body_html" class="mention-reference"></div>
+          <!--post-processing="mention.body_html" style-fix="true"-->
+          <div v-html="mention.body_html" class="mention-reference"></div>
+        </router-link>
 
         <div class="actions">
           <div @click="deleteMention({ id: mention.id, type: 'mention', notification_id: mention.notification_id })" class="action-button delete" data-balloon="Delete" data-balloon-pos="left">
@@ -50,14 +53,13 @@
             </svg>
           </div>
         </div>
-      </router-link>
+      </div>
     </div>
   </div>
 
   <div class="recent-mentions" v-if="mentionData?.data.length <= 0">
     <h4>You currently have no mentions</h4>
   </div>
-
 
   <div class="sidebar">
     <div v-if="mentionData?.data.length" class="mention-actions">
@@ -147,8 +149,6 @@ export default {
     const userChannelHandler = data => data.action === 'refreshMentions' ? refreshMentions() : null
 
     watchUserChannel(userChannelHandler);
-
-    // watch(() => NotificationsStore.mentionsList, () => ())
 
     return { ...toRefs(v), humanDate, pageResults, dismissNotifications, deleteMention, userChannelHandler }
   }
