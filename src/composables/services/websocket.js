@@ -41,11 +41,15 @@ export const socketLogout = socketUser => {
 }
 
 export const watchUserChannel = handler => {
+  if (debug) console.log('Watching user channel.')
   if (userChannel) userChannel.watch(handler)
   else setTimeout(() => watchUserChannel(handler), 1000)
 }
 
-export const unwatchUserChannel = handler => userChannel ? userChannel.unwatch(handler) : null
+export const unwatchUserChannel = handler => {
+  if (debug) console.log('Unwatching user channel.')
+  if (userChannel) userChannel.unwatch(handler)
+}
 
 export const isOnline = (socketUser, callback) => {
   if (socket.state === 'open') socket.emit('isOnline', socketUser, callback)
