@@ -260,7 +260,7 @@ import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
 import { reactive, toRefs, watch, onMounted, onUnmounted, onBeforeMount, inject } from 'vue'
 import { debounce } from 'lodash'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import BanStore from '@/composables/stores/ban'
 import NotificationsStore from '@/composables/stores/notifications'
 import humanDate from '@/composables/filters/humanDate'
@@ -317,6 +317,7 @@ export default {
     const $auth = inject(AuthStore)
     const $prefs = inject(PreferencesStore)
     const $router = useRouter()
+    const $route = useRoute()
 
     /* Template Data */
     const v = reactive({
@@ -346,6 +347,7 @@ export default {
       breadcrumbs: [{label:'Home', state: '#', opts: {}}]
     })
 
+    watch(() => $route.path, p => v.hideAnnnouncement = v.motdData.main_view_only && p !== '' && p !== '/')
     watch(() => NotificationsStore.messages, c => v.notificationMessages = c)
     watch(() => NotificationsStore.mentions, c => v.notificationMentions = c)
     watch(() => NotificationsStore.mentionsList, l => v.mentionsList = l)
