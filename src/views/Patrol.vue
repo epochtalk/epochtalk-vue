@@ -38,7 +38,7 @@
               <router-link :to="{ path: '/profile/' + post.user.username.toLowerCase() }" class="username" :data-balloon="post.user.role_name || 'User'" :style="usernameHighlight(post.user.highlight_color)" v-html="post.user.username"></router-link>
               <div :title="post.user.name" v-if="post.user.name" class="display-name">
                 <!-- TODO(akinsey: port truncate <span v-html="post.user.name | truncate:33"></span> -->
-                <span v-html="post.user.name"></span>
+                <span v-html="truncate(post.user.name, 33)"></span>
                 <span class="hide-mobile">&nbsp;&mdash;&nbsp;</span>
               </div>
               <div :title="post.user.role_name || 'User'" class="user-role" v-html="post.user.role_name || 'User'" :style="userRoleHighlight(post.user.highlight_color)"></div>
@@ -156,6 +156,7 @@ import { reactive, toRefs, inject } from 'vue'
 import { postsApi } from '@/api'
 import { useRoute, useRouter } from 'vue-router'
 import humanDate from '@/composables/filters/humanDate'
+import truncate from '@/composables/filters/truncate'
 import { AuthStore } from '@/composables/stores/auth'
 import { localStoragePrefs } from '@/composables/stores/prefs'
 import { avatarHighlight, usernameHighlight, userRoleHighlight } from '@/composables/utils/userUtils'
@@ -216,7 +217,7 @@ export default {
       }
     })
 
-    return { ...toRefs(v), breadcrumbShim, showEditDate, canPurge, canDelete, canPostLock, canUpdate, pageResults, humanDate, userRoleHighlight, usernameHighlight, avatarHighlight }
+    return { ...toRefs(v), breadcrumbShim, showEditDate, canPurge, canDelete, canPostLock, canUpdate, pageResults, humanDate, userRoleHighlight, usernameHighlight, avatarHighlight, truncate }
   }
 }
 </script>
