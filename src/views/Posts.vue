@@ -154,7 +154,6 @@
           <div v-if="loggedIn && post.user.id !== authedUser.id" class="ignore-directive">
             <a href="" @click.prevent="toggleIgnoredPosts(post)" v-html="post.user._ignored ? 'Unignore Posts' : 'Ignore Posts'"></a>
           </div>
-          <!-- TODO(akinsey): <ignore-posts post="post"></ignore-posts> -->
         </div>
 
         <!-- Post Body Section -->

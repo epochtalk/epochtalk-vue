@@ -37,7 +37,6 @@
             <div class="post-title-user">
               <router-link :to="{ path: '/profile/' + post.user.username.toLowerCase() }" class="username" :data-balloon="post.user.role_name || 'User'" :style="usernameHighlight(post.user.highlight_color)" v-html="post.user.username"></router-link>
               <div :title="post.user.name" v-if="post.user.name" class="display-name">
-                <!-- TODO(akinsey: port truncate <span v-html="post.user.name | truncate:33"></span> -->
                 <span v-html="truncate(post.user.name, 33)"></span>
                 <span class="hide-mobile">&nbsp;&mdash;&nbsp;</span>
               </div>
