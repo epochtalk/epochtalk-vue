@@ -374,7 +374,7 @@
       </div>
 
       <!-- Poll Viewer -->
-      <poll-viewer v-if="postData.data.thread?.poll" :poll="postData.data.thread.poll" :thread="postData.data.thread" :user-priority="postData.data.posts[0].user.priority" :reset="resetPoll"></poll-viewer>
+      <poll-viewer v-if="postData.data.thread?.poll" :poll="postData.data.thread.poll" :thread="postData.data.thread" :user-priority="postData.data.posts[0].user.priority" :reset="resetPoll" :banned-from-board="bannedFromBoard"></poll-viewer>
 
       <pagination v-if="postData.data?.thread" :page="postData.data.page" :limit="postData.data.limit" :count="postData.data.thread.post_count"></pagination>
     </div>

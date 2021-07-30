@@ -132,7 +132,7 @@ import { cloneDeep } from 'lodash'
 import dayjs from 'dayjs'
 
 export default {
-  props: ['poll', 'thread', 'userPriority', 'reset'],
+  props: ['poll', 'thread', 'userPriority', 'reset', 'bannedFromBoard'],
   setup(props) {
     /* Internal Methods */
     const calculatePollPercentage = () => {
@@ -147,8 +147,7 @@ export default {
     }
     const votingEligible = () => {
       if (!$auth.loggedIn) { return false }
-      // TODO(boka): check for banned */
-      // if ($scope.banned) { return false }
+      else if (props.bannedFromBoard) { return false }
       else if (!v.permissionUtils.hasPermission('threads.vote.allow')) { return false }
       else if (v.pollCopy.locked) { return false }
       else if (v.pollCopy.expired) { return false }
@@ -157,8 +156,7 @@ export default {
     /* View Methods */
     const canLock = () => {
       if (!$auth.loggedIn) { return false }
-      // TODO(boka): check for banned */
-      // if ($scope.banned) { return false }
+      if (props.bannedFromBoard) { return false }
       if (!v.permissionUtils.hasPermission('threads.lockPoll.allow')) { return false }
 
       const adminBypass = v.permissionUtils.hasPermission('threads.lockPoll.bypass.owner.admin')
@@ -172,8 +170,7 @@ export default {
     }
     const canEdit = () => {
       if (!$auth.loggedIn) { return false }
-      // TODO(boka): check for banned */
-      // if ($scope.banned) { return false }
+      if (props.bannedFromBoard) { return false }
       if (!v.permissionUtils.hasPermission('threads.editPoll.allow')) { return false }
 
       const adminBypass = v.permissionUtils.hasPermission('threads.editPoll.bypass.owner.admin')
