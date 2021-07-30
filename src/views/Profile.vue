@@ -41,7 +41,7 @@
         <div class="profile-user-activity">
           <div class="user-activity-stat" v-if="user.activity > -1">Activity: <span class="value">{{user.activity}}</span>
           </div>
-           <trust-profile-display v-if="loggedIn" :username="user.username" />
+           <trust-display v-if="loggedIn" :username="user.username" />
         </div>
 
         <div class="user-profile-position">
@@ -169,7 +169,7 @@
 import { reactive, toRefs, inject } from 'vue'
 import dayjs from 'dayjs'
 import humanDate from '@/composables/filters/humanDate'
-import TrustProfileDisplay from '@/components/trust/TrustProfileDisplay.vue'
+import TrustDisplay from '@/components/trust/TrustDisplay.vue'
 import RankDisplay from '@/components/users/RankDisplay.vue'
 import UpdatePasswordModal from '@/components/modals/profile/UpdatePassword.vue'
 import UpdateEmailModal from '@/components/modals/profile/UpdateEmail.vue'
@@ -188,7 +188,7 @@ import { AuthStore } from '@/composables/stores/auth'
 export default {
   name: 'Profile',
   props: [ 'username', 'saveScrollPos' ],
-  components: { TrustProfileDisplay, RankDisplay, UpdateSignatureModal, UpdatePasswordModal, UpdateAvatarModal, UpdateEmailModal, DeleteAccountModal, DeactivateReactivateModal, UpdateProfileModal, QuickMessageModal,ManageBansModal, ModerationNotesModal },
+  components: { TrustDisplay, RankDisplay, UpdateSignatureModal, UpdatePasswordModal, UpdateAvatarModal, UpdateEmailModal, DeleteAccountModal, DeactivateReactivateModal, UpdateProfileModal, QuickMessageModal,ManageBansModal, ModerationNotesModal },
   beforeRouteEnter(to, from, next) {
     usersApi.find(to.params.username).then(u => next(vm => vm.user = u))
   },

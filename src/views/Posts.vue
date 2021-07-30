@@ -144,8 +144,8 @@
           </a>
 
 
-          <div class="user-trust" v-if="loggedIn">
-            <!-- <trust-score user="post.user" visible="postData.data.thread.trust_visible"></trust-score> -->
+          <div class="user-trust" v-if="loggedIn && postData.data.thread.trust_visible">
+            <trust-display :user="post.user" />
           </div>
 
           <div class="user-rank">
@@ -438,11 +438,12 @@ import PostsPurgeThreadModal from '@/components/modals/posts/PurgeThread.vue'
 import PostsReportModal from '@/components/modals/posts/Report.vue'
 import { BreadcrumbStore } from '@/composables/stores/breadcrumbs'
 import BanStore from '@/composables/stores/ban'
+import TrustDisplay from '@/components/trust/TrustDisplay.vue'
 
 export default {
   name: 'Posts',
   props: ['threadSlug', 'threadId'],
-  components: { Pagination, PostsDeleteModal, PostsUndeleteModal, PostsPurgePostModal, PostsMoveThreadModal, PostsPurgeThreadModal, PostsReportModal, PollViewer, RankDisplay },
+  components: { Pagination, PostsDeleteModal, PostsUndeleteModal, PostsPurgePostModal, PostsMoveThreadModal, PostsPurgeThreadModal, PostsReportModal, PollViewer, RankDisplay, TrustDisplay },
   beforeRouteEnter(to, from, next) {
     const params = {
       limit: localStoragePrefs().data.posts_per_page,

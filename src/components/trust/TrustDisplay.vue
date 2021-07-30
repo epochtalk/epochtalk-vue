@@ -1,6 +1,6 @@
 
 <template>
-  <div class="trust-profile">
+  <div class="trust-profile" v-if="username">
     <div v-if="stats">
       <span>Trust:&nbsp;&nbsp;<strong><span class="trust-score" :class="getStyle(stats.score)"><span data-balloon="Trust Score">{{stats.score}}</span> : <span data-balloon="Negative Feedback" :class="{'neg' : stats.neg !== 0 }">-{{stats.neg}}</span> / <span data-balloon="Positive Feedback">+{{stats.pos}}</span></span></strong></span>
     </div>
@@ -11,6 +11,7 @@
       <a href="" class="trust-link">View Trust Feedback</a>
     </div>
   </div>
+  <a v-if="user" href="#trustlink"><span class="trust-score" :class="getStyle(stats.score)">{{stats.score}} : <span :class="negStyle">-{{stats.neg}}</span> / +{{stats.pos}}</span></a>
 </template>
 
 <script>
@@ -18,8 +19,8 @@ import { reactive, toRefs, watch } from 'vue'
 import { usersApi } from '@/api'
 
 export default {
-  name: 'TrustProfileDisplay',
-  props: [ 'username' ],
+  name: 'TrustDisplay',
+  props: [ 'username', 'user' ],
   setup(props) {
 
     const getStyle = score => {
@@ -31,14 +32,20 @@ export default {
 
     let v = reactive({
       stats: null,
+      negStyle: '',
       username: props.username
     })
 
-    const initTrust = u => usersApi.trust.getTrustStats(u).then(stats => v.stats = stats)
+    const initTrustProfile = u => usersApi.trust.getTrustStats(u).then(stats => v.stats = stats)
 
-    initTrust(v.username)
+    const initTrustPost = () => {
+      v.stats = props.user.stats
+      v.negStyle = props.user.stats.neg === 0 ? '' : 'neg'
+    }
 
-    watch(() => props.username, u => initTrust(u))
+    props.username ? initTrustProfile(v.username) : initTrustPost()
+
+    watch(() => props.username, u => initTrustProfile(u))
 
     return { ...toRefs(v), getStyle }
   }
