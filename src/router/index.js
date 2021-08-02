@@ -155,7 +155,7 @@ const router = createRouter({
   scrollBehavior(to) {
     if (to.hash) {
       nextTick(() => {
-       setTimeout(() => document.querySelector(to.hash).scrollIntoView({behavior: 'smooth'}))
+        document.getElementById(to.hash.substring(1)).scrollIntoView({behavior: 'smooth'})
       })
     }
     else if (!to.params.saveScrollPos) document.getElementsByTagName('html')[0].scrollIntoView()
