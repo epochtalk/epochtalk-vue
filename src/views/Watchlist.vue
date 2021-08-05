@@ -1,0 +1,160 @@
+<template>
+<!-- Page Header -->
+<div class="watchlist-section">
+  <h1 class="">Watchlist</h1>
+  <dl class="tabs">
+    <dd class="no-select active" >
+      <a ui-sref="watchlist">Unread</a>
+    </dd>
+    <dd class="no-select">
+      <a ui-sref="watchlist-edit">Edit</a>
+    </dd>
+  </dl>
+</div>
+
+<!-- All Threads -->
+<div class="watchlist-data">
+
+  <!-- All Threads Header -->
+  <table class="watchlist-threads threads-list">
+    <thead>
+      <tr>
+        <th class="subject">Subject</th>
+        <th class="views-replies">
+          <span>Replies</span>
+          <span>Views</span>
+        </th>
+        <th class="last-post">Last Post</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr class="threads-data" ng-repeat="thread in WatchlistCtrl.threads track by thread.id">
+        <td class="subject">
+          <div class="title">
+            <div class="thread-state">
+              <svg class="is-unread" ng-if="thread.has_new_post" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" data-balloon="Unread">
+                <title></title>
+                <g id="icons">
+                  <circle cx="16" cy="16" r="16" />
+                </g>
+              </svg>
+            </div>
+            <a ng-class="{bold: thread.has_new_post}" class="thread-title" ui-sref="posts.data({ slug: thread.slug })"
+              ng-bind-html="thread.title"></a>
+              <div class="thread-state-secondary">
+              <span class="thread-state-locked" ng-if="thread.locked" data-balloon="Locked">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                  <title></title>
+                  <path d="M40,21H37.5V16.48a13.5,13.5,0,0,0-27,0V21H8a2,2,0,0,0-2,2V43a2,2,0,0,0,2,2H40a2,2,0,0,0,2-2V23A2,2,0,0,0,40,21ZM15.5,16.48a8.5,8.5,0,0,1,17,0V21h-17Z"/>
+                </svg>
+              </span>
+              <span class="thread-state-hasPoll" ng-if="thread.poll" data-ballon="Includes a Poll">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                  <path class="cls-1" d="M42,2H6A4,4,0,0,0,2,6V42a4,4,0,0,0,4,4H42a4,4,0,0,0,4-4V6A4,4,0,0,0,42,2ZM13.75,40h-6V32h6Zm9,0h-6V22h6Zm9,0h-6V27h6Zm9,0h-6V12h6Z"/>
+              </svg>
+              </span>
+            </div>
+          </div>
+
+          <div class="started-by">
+            Started by
+            <span ng-if="thread.user.deleted">deleted</span>
+            <a ng-if="!thread.user.deleted" ui-sref="profile.posts({ username: thread.user.username })"
+              ng-bind-html="thread.user.username"></a>
+            <span ng-bind="'on ' + (thread.created_at | humanDate)"></span>
+          </div>
+        </td>
+
+        <td class="views-replies">
+          <span class="replies" ng-bind="(thread.post_count - 1 | number:0) || 0"></span>
+          <span class="views" ng-bind="(thread.view_count | number:0) || 0"></span>
+        </td>
+
+        <td class="last-post">
+          <span ng-if="thread.last_deleted">deleted</span>
+          <img ng-if="!thread.last_deleted" class="avatar-small {{$webConfigs.default_avatar_shape}}"
+            ng-src="{{thread.last_post_avatar || $webConfigs.default_avatar}}" />
+          <a ng-if="!thread.last_deleted" ui-sref="profile.posts({ username: thread.last_post_username })"
+            ng-bind="thread.last_post_username"></a> posted on
+          <a ui-sref="posts.data({ slug: thread.slug, start: thread.last_post_position, '#': thread.last_post_id })"><span ng-bind="thread.last_post_created_at | humanDate"></span>.</a>
+          <span ng-if="thread.has_new_post">
+            <a ui-sref="posts.data({ slug: thread.slug, start: thread.latest_unread_position, '#': thread.latest_unread_post_id })">(Last unread post)</a>
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- No Threads Listed -->
+  <div class-"threads-data" ng-if="WatchlistCtrl.threads.length < 1" class="centered-text">
+    <h5>No Threads Being Watched</h5>
+  </div>
+
+</div>
+
+<div class="actions-bottom">
+  <div class="pagination-simple">
+    <button @click="pageResults(-1)" :disabled="!watchlistData?.prev">&#10094; Prev</button>
+    <button @click="pageResults(1)" :disabled="!watchlistData?.next">Next &#10095;</button>
+  </div>
+</div>
+
+</template>
+
+<script>
+import { reactive, toRefs } from 'vue'
+import { watchlistApi } from '@/api'
+import { localStoragePrefs } from '@/composables/stores/prefs'
+import humanDate from '@/composables/filters/humanDate'
+import { useRoute, useRouter } from 'vue-router'
+import NotificationsStore from '@/composables/stores/notifications'
+
+export default {
+  name: 'Mentions',
+  beforeRouteEnter(to, from, next) {
+    const query = {
+      limit: to.query.limit || localStoragePrefs().data.posts_per_page,
+      page: to.query.page || 1,
+    }
+    next(vm => watchlistApi.unread(query).then(d => vm.watchlistData = d).catch(() => {}))
+  },
+  beforeRouteUpdate(to, from, next) {
+    const query = {
+      limit: to.query.limit || localStoragePrefs().data.posts_per_page,
+      page: to.query.page || 1,
+    }
+    watchlistApi.unread(query).then(d => this.watchlistData = d).catch(() => {})
+    next()
+  },
+  setup() {
+    const pageResults = inc => {
+      const newPage = v.watchlistData.page + inc
+      let query = { ...$route.query, page: newPage }
+      if (query.page === 1 || !query.page) delete query.page
+      if ($route.query.page !== v.currentPage)
+        $router.replace({ name: $route.name, params: $route.params, query: query })
+    }
+
+    const refreshMentions = () => watchlistApi.unread({
+      limit: $route.query.limit || localStoragePrefs().data.posts_per_page,
+      page: $route.query.page || 1
+    }).then(d => v.watchlistData = d).catch(() => {})
+
+    const $route = useRoute()
+    const $router = useRouter()
+
+    const v = reactive({
+      currentPage: Number($route.query.page) || 1,
+      watchlistData: null,
+      defaultAvatar: window.default_avatar,
+      defaultAvatarShape: window.default_avatar_shape,
+    })
+
+    return { ...toRefs(v), humanDate, pageResults }
+  }
+}
+</script>
+
+<style lang="scss">
+</style>
