@@ -155,4 +155,228 @@ export default {
 </script>
 
 <style lang="scss">
+/*-------------- Watchlist Layout --------------- */
+.watchlist-section {
+  display: flex;
+  align-items: flex-end;
+  grid-area: header;
+  margin-bottom: 1rem;
+
+  h1 {
+    color: $secondary-font-color;
+    font-size: $font-size-xl;
+    font-weight: 600;
+    text-transform: none;
+  }
+
+  @include break-mobile-sm {
+    width: 100%;
+
+    .tabs {
+      text-align: right;
+    }
+  }
+}
+
+.watchlist-panel {
+  margin-bottom: 4rem;
+
+  .watchlist-panel-header {
+    display: flex;
+    margin-bottom: 1rem;;
+
+    h2 {
+      color: $secondary-font-color;
+      flex: 1 0 auto;
+      font-size: $font-size-lg;;
+      font-weight: 600;
+      text-transform: none;
+    }
+
+    .pagination-slide {
+      grid-template-columns: 1fr;
+      height: min-content;
+      font-size: $font-size-sm;;
+
+      button {
+        font-size: $font-size-sm;
+      }
+    }
+  }
+
+  @include break-mobile-sm {
+    .watchlist-panel-header {
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .pagination-slide {
+      width: 100%;
+    }
+
+    .pagination-components {
+      justify-self: end;
+    }
+  }
+}
+
+.watchlist-table {
+  table {
+    width: 100%;
+  }
+
+  thead {
+    td {
+      color: $text-gray-med;
+      font-weight: 400;
+      font-size: $font-size-xs;
+      text-transform: uppercase;
+    }
+  }
+
+  td {
+    font-size: 1rem;
+    padding: 0 0 1rem;
+  }
+
+  .threads-views-mobile {
+    display: none;
+  }
+
+  .title {
+    font-weight: 600;
+
+    .parent-board {
+      display: block;
+      font-size: $font-size-sm;
+      font-weight: 400;
+    }
+  }
+
+  .threads,
+  .replies,
+  .views,
+  .actions {
+    text-align: right;
+  }
+
+  @include break-mobile-sm {
+    table {
+      display: flex;
+      flex-direction: column;
+    }
+
+    thead {
+      display: none;
+    }
+
+    tbody,
+    tr {
+      display: contents;
+    }
+
+    td {
+      padding-bottom: 2px;
+
+      &:last-child {
+        padding-bottom: 1.5rem;
+      }
+    }
+
+    .threads-views-mobile {
+      display: flex;
+
+      .value {
+        font-weight: 600;
+      }
+    }
+
+    .threads-views-mobile,
+    .actions {
+      font-size: $font-size-sm;
+    }
+
+    .replies,
+    .views {
+      display: none;
+    }
+
+    .actions {
+      text-align: left;
+    }
+  }
+}
+
+
+
+.watchlist-data {
+  grid-area: main;
+  width: 100%;
+}
+
+.watchlist-threads {
+  font-size: 1rem;
+  display: grid;
+  column-gap: 1.5rem;
+  row-gap: 1rem;
+
+  tr {
+    td {
+      font-size: 1rem;
+      padding: 0;
+    }
+  }
+
+  .views-replies {
+    grid-template-columns: repeat(2, minmax(30px, auto));
+  }
+
+  @include break-mobile-sm {
+    padding-left: 0.5rem;
+    row-gap: 0;
+
+    .thread-state {
+      margin-right: 0;
+    }
+
+    .views-replies {
+      grid-template-columns: repeat(2, max-content);
+    }
+  }
+}
+
+.watchlist-data-edit {
+  .threads-header, .threads-data {
+    .mobile-header { display: none; }
+    // .subject { @include span-columns(9); }
+    // .replies, .views { @include span-columns(1); text-align: center; }
+    // .actions { @include span-columns(1); @include omega; }
+  }
+}
+
+.watchlist-data-spacer { margin-bottom: 2.5rem; }
+
+// @include media($mobile) {
+//   .watchlist-section {
+//     .leftcol {
+//       @include span-columns(8);
+//     }
+//     .rightcol {
+//       @include span-columns(8);
+//       @include omega;
+//       .pagination-slide { @include fill-parent; }
+//     }
+//   }
+//   .watchlist-data-edit {
+//     .threads-header {
+//       .mobile-header { @include span-columns(8); @include omega; display: block; }
+//       .subject, .replies, .views, .actions { display: none; }
+//     }
+//     .threads-data {
+//       .subject { @include span-columns(8); @include omega; }
+//       .subject .mobile-stats { display: block; }
+//       .replies, .views, .actions { display: none; }
+//     }
+//   }
+// }
 </style>
