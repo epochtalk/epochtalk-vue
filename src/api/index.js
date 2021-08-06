@@ -93,7 +93,8 @@ export const pollsApi = {
 }
 
 export const watchlistApi = {
-  unread: params => $http(`/api/watchlist`, { params }),
+  unread: params => $http('/api/watchlist', { params }),
+  edit: params => $http('/api/watchlist/edit', { params }),
   watchBoard: boardId => $http(`/api/watchlist/boards/${boardId}`, { method: 'POST' }),
   unwatchBoard: boardId => $http(`/api/watchlist/boards/${boardId}`, { method: 'DELETE' }),
   watchThread: threadId => $http(`/api/watchlist/threads/${threadId}`, { method: 'POST' }),
