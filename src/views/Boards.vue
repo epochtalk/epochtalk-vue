@@ -7,7 +7,7 @@
       <a href="" class="button" @click.prevent="showLogin = true">Log In</a>
     </div>
     <div v-if="loggedIn" class="dashboard-actions">
-      <a class="button" href="#">Watchlist</a>
+      <router-link :to="{ name: 'Watchlist' }" class="button">Watchlist</router-link>
       <router-link :to="{ name: 'ThreadsPostedIn' }" class="button">Threads Posted In</router-link>
     </div>
 

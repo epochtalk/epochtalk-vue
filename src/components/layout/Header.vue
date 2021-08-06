@@ -51,7 +51,9 @@
           <div class="count" v-if="notificationMessages">{{notificationMessages}}</div>
         </li>
         <li @click="showMobileMenu = false" >
-          <a href="#"><i class="fa fa-eye" aria-hidden="true"></i>Watchlist</a>
+          <router-link :to="{ name: 'Watchlist' }">
+            <i class="fa fa-eye" aria-hidden="true"></i>Watchlist
+          </router-link>
         </li>
         <li @click="showMobileMenu = false"> <!--v-if="canInvite()">-->
           <a @click="showInvite = true">
@@ -205,7 +207,7 @@
                   </router-link>
                 </li>
                 <li>
-                  <a href="#">Watchlist</a>
+                  <router-link :to="{ name: 'Watchlist' }">Watchlist</router-link>
                 </li>
                 <li> <!--v-if="canInvite()">-->
                   <a href="#" @click.prevent="showInvite = true">

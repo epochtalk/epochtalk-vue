@@ -4,7 +4,7 @@
   <h1 class="">Watchlist</h1>
   <dl class="tabs">
     <dd class="no-select active" >
-      <a ui-sref="watchlist">Unread</a>
+      <router-link :to="{ name: 'Watchlist' }">Unread</router-link>
     </dd>
     <dd class="no-select">
       <a ui-sref="watchlist-edit">Edit</a>
