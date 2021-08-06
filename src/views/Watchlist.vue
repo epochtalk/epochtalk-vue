@@ -74,8 +74,7 @@
           <span v-if="thread.last_deleted">deleted</span>
           <img v-if="!thread.last_deleted" class="avatar-small" :class="defaultAvatarShape"
             :src="thread.last_post_avatar || defaultAvatar" />
-          <a v-if="!thread.last_deleted" ui-sref="profile.posts({ username: thread.last_post_username })"
-            v-html="thread.last_post_username"></a> posted on
+          <a v-if="!thread.last_deleted" ui-sref="profile.posts({ username: thread.last_post_username })" v-html="thread.last_post_username"></a> posted on
           <a ui-sref="posts.data({ slug: thread.slug, start: thread.last_post_position, '#': thread.last_post_id })"><span v-html="humanDate(thread.last_post_created_at)"></span>.</a>
           <span v-if="thread.has_new_post">
             <a ui-sref="posts.data({ slug: thread.slug, start: thread.latest_unread_position, '#': thread.latest_unread_post_id })">(Last unread post)</a>
@@ -94,8 +93,8 @@
 
 <div class="actions-bottom">
   <div class="pagination-simple">
-    <button @click="pageResults(-1)" :disabled="!watchlistData?.prev">&#10094; Prev</button>
-    <button @click="pageResults(1)" :disabled="!watchlistData?.next">Next &#10095;</button>
+    <button @click="pageResults(-1)" :disabled="watchlistData?.page === 1">&#10094; Prev</button>
+    <button @click="pageResults(1)" :disabled="!watchlistData?.has_more_threads">Next &#10095;</button>
   </div>
 </div>
 
