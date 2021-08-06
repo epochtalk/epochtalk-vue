@@ -8,6 +8,7 @@ import About from '@/views/About.vue'
 import Settings from '@/views/Settings.vue'
 import Patrol from '@/views/Patrol.vue'
 import MemberSearch from '@/views/MemberSearch.vue'
+import Watchlist from '@/views/Watchlist.vue'
 import Mentions from '@/views/Mentions.vue'
 import Messages from '@/views/Messages.vue'
 import PostSearch from '@/views/PostSearch.vue'
@@ -104,6 +105,12 @@ const routes = [
     name: 'Mentions',
     component: Mentions,
     meta: { requiresAuth: true, bodyClass: 'mentions' }
+  },
+  {
+    path: '/watchlist',
+    name: 'Watchlist',
+    component: Watchlist,
+    meta: { requiresAuth: true, bodyClass: 'watchlist' }
   },
   {
     path: '/search/users',

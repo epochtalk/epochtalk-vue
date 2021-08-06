@@ -29,27 +29,26 @@
     </thead>
     <tbody>
 
-      <tr class="threads-data" ng-repeat="thread in WatchlistCtrl.threads track by thread.id">
+      <tr class="threads-data" v-for="thread in watchlistData?.threads" :key="thread.id">
         <td class="subject">
           <div class="title">
             <div class="thread-state">
-              <svg class="is-unread" ng-if="thread.has_new_post" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" data-balloon="Unread">
+              <svg class="is-unread" v-if="thread.has_new_post" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" data-balloon="Unread">
                 <title></title>
                 <g id="icons">
                   <circle cx="16" cy="16" r="16" />
                 </g>
               </svg>
             </div>
-            <a ng-class="{bold: thread.has_new_post}" class="thread-title" ui-sref="posts.data({ slug: thread.slug })"
-              ng-bind-html="thread.title"></a>
+            <a :class="{ bold: thread.has_new_post }" class="thread-title" ui-sref="posts.data({ slug: thread.slug })" v-html="thread.title"></a>
               <div class="thread-state-secondary">
-              <span class="thread-state-locked" ng-if="thread.locked" data-balloon="Locked">
+              <span class="thread-state-locked" v-if="thread.locked" data-balloon="Locked">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                   <title></title>
                   <path d="M40,21H37.5V16.48a13.5,13.5,0,0,0-27,0V21H8a2,2,0,0,0-2,2V43a2,2,0,0,0,2,2H40a2,2,0,0,0,2-2V23A2,2,0,0,0,40,21ZM15.5,16.48a8.5,8.5,0,0,1,17,0V21h-17Z"/>
                 </svg>
               </span>
-              <span class="thread-state-hasPoll" ng-if="thread.poll" data-ballon="Includes a Poll">
+              <span class="thread-state-hasPoll" v-if="thread.poll" data-ballon="Includes a Poll">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                   <path class="cls-1" d="M42,2H6A4,4,0,0,0,2,6V42a4,4,0,0,0,4,4H42a4,4,0,0,0,4-4V6A4,4,0,0,0,42,2ZM13.75,40h-6V32h6Zm9,0h-6V22h6Zm9,0h-6V27h6Zm9,0h-6V12h6Z"/>
               </svg>
@@ -59,26 +58,26 @@
 
           <div class="started-by">
             Started by
-            <span ng-if="thread.user.deleted">deleted</span>
-            <a ng-if="!thread.user.deleted" ui-sref="profile.posts({ username: thread.user.username })"
-              ng-bind-html="thread.user.username"></a>
-            <span ng-bind="'on ' + (thread.created_at | humanDate)"></span>
+            <span v-if="thread.user.deleted">deleted</span>
+            <a v-if="!thread.user.deleted" ui-sref="profile.posts({ username: thread.user.username })"
+              v-html="thread.user.username"></a>
+            <span v-html="'on ' + humanDate(thread.created_at)"></span>
           </div>
         </td>
 
         <td class="views-replies">
-          <span class="replies" ng-bind="(thread.post_count - 1 | number:0) || 0"></span>
-          <span class="views" ng-bind="(thread.view_count | number:0) || 0"></span>
+          <span class="replies" v-html="(thread.post_count - 1 | 0) || 0"></span>
+          <span class="views" v-html="(thread.view_count | 0) || 0"></span>
         </td>
 
         <td class="last-post">
-          <span ng-if="thread.last_deleted">deleted</span>
-          <img ng-if="!thread.last_deleted" class="avatar-small {{$webConfigs.default_avatar_shape}}"
-            ng-src="{{thread.last_post_avatar || $webConfigs.default_avatar}}" />
-          <a ng-if="!thread.last_deleted" ui-sref="profile.posts({ username: thread.last_post_username })"
-            ng-bind="thread.last_post_username"></a> posted on
-          <a ui-sref="posts.data({ slug: thread.slug, start: thread.last_post_position, '#': thread.last_post_id })"><span ng-bind="thread.last_post_created_at | humanDate"></span>.</a>
-          <span ng-if="thread.has_new_post">
+          <span v-if="thread.last_deleted">deleted</span>
+          <img v-if="!thread.last_deleted" class="avatar-small" :class="defaultAvatarShape"
+            :src="thread.last_post_avatar || defaultAvatar" />
+          <a v-if="!thread.last_deleted" ui-sref="profile.posts({ username: thread.last_post_username })"
+            v-html="thread.last_post_username"></a> posted on
+          <a ui-sref="posts.data({ slug: thread.slug, start: thread.last_post_position, '#': thread.last_post_id })"><span v-html="humanDate(thread.last_post_created_at)"></span>.</a>
+          <span v-if="thread.has_new_post">
             <a ui-sref="posts.data({ slug: thread.slug, start: thread.latest_unread_position, '#': thread.latest_unread_post_id })">(Last unread post)</a>
           </span>
         </td>
@@ -87,7 +86,7 @@
   </table>
 
   <!-- No Threads Listed -->
-  <div class-"threads-data" ng-if="WatchlistCtrl.threads.length < 1" class="centered-text">
+  <div v-if="watchlistData?.threads.length < 1" class="threads-data centered-text">
     <h5>No Threads Being Watched</h5>
   </div>
 
@@ -108,10 +107,9 @@ import { watchlistApi } from '@/api'
 import { localStoragePrefs } from '@/composables/stores/prefs'
 import humanDate from '@/composables/filters/humanDate'
 import { useRoute, useRouter } from 'vue-router'
-import NotificationsStore from '@/composables/stores/notifications'
 
 export default {
-  name: 'Mentions',
+  name: 'Watchlist',
   beforeRouteEnter(to, from, next) {
     const query = {
       limit: to.query.limit || localStoragePrefs().data.posts_per_page,
@@ -136,10 +134,10 @@ export default {
         $router.replace({ name: $route.name, params: $route.params, query: query })
     }
 
-    const refreshMentions = () => watchlistApi.unread({
-      limit: $route.query.limit || localStoragePrefs().data.posts_per_page,
-      page: $route.query.page || 1
-    }).then(d => v.watchlistData = d).catch(() => {})
+    // const refreshMentions = () => watchlistApi.unread({
+    //   limit: $route.query.limit || localStoragePrefs().data.posts_per_page,
+    //   page: $route.query.page || 1
+    // }).then(d => v.watchlistData = d).catch(() => {})
 
     const $route = useRoute()
     const $router = useRouter()
