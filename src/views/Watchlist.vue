@@ -7,7 +7,7 @@
       <router-link :to="{ name: 'Watchlist' }">Unread</router-link>
     </dd>
     <dd class="no-select">
-      <a ui-sref="watchlist-edit">Edit</a>
+      <router-link :to="{ name: 'WatchlistEdit' }">Edit</router-link>
     </dd>
   </dl>
 </div>
