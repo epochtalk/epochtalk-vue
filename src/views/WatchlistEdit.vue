@@ -47,7 +47,7 @@
             </td>
             <td class="replies" v-html="board.thread_count || 0"></td>
             <td class="views" v-html="board.post_count || 0"></td>
-            <td class="actions">
+            <td class="actions pointer">
               <a @click="unwatchBoard(board.id, board.name); board.unwatched = true" v-if="!board.unwatched">
                 Unwatch
               </a>
@@ -103,7 +103,7 @@
             </td>
             <td class="replies" v-html="thread.post_count - 1 || 0"></td>
             <td class="views" v-html="thread.view_count || 0"></td>
-            <td class="actions">
+            <td class="actions pointer">
               <a @click="unwatchThread(thread.id, thread.title); thread.unwatched = true" v-if="!thread.unwatched">
                 Unwatch
               </a>
@@ -127,7 +127,7 @@
 </template>
 
 <script>
-import { reactive, toRefs } from 'vue'
+import { reactive, inject, toRefs } from 'vue'
 import { watchlistApi } from '@/api'
 import { localStoragePrefs } from '@/composables/stores/prefs'
 import humanDate from '@/composables/filters/humanDate'
@@ -237,11 +237,23 @@ export default {
         $router.replace({ name: $route.name, params: $route.params, query: query })
     }
 
-    const watchThread = () => {}
-    const unwatchThread = () => {}
+    const watchBoard = (threadId, title) => watchlistApi.watchBoard(threadId)
+      .then(() => $alertStore.success('Successfully watching board ' + title))
+      .catch(() => $alertStore.error('There was an error watching board ' + title))
+    const unwatchBoard = (threadId, title) => watchlistApi.unwatchBoard(threadId)
+      .then(() => $alertStore.success('Successfully unwatched board ' + title))
+      .catch(() => $alertStore.error('There was an error unwatching board ' + title))
+
+    const watchThread = (threadId, title) => watchlistApi.watchThread(threadId)
+      .then(() => $alertStore.success('Successfully watching thread ' + title))
+      .catch(() => $alertStore.error('There was an error watching thread ' + title))
+    const unwatchThread = (threadId, title) => watchlistApi.unwatchThread(threadId)
+      .then(() => $alertStore.success('Successfully unwatched thread ' + title))
+      .catch(() => $alertStore.error('There was an error unwatching thread ' + title))
 
     const $route = useRoute()
     const $router = useRouter()
+    const $alertStore = inject('$alertStore')
 
     const v = reactive({
       currentPage: Number($route.query.page) || 1,
@@ -256,7 +268,7 @@ export default {
       defaultAvatarShape: window.default_avatar_shape,
     })
 
-    return { ...toRefs(v), humanDate, pageResults, watchThread, unwatchThread }
+    return { ...toRefs(v), humanDate, pageResults, watchThread, unwatchThread, watchBoard, unwatchBoard }
   }
 }
 </script>
