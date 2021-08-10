@@ -151,8 +151,9 @@ export default {
         vm.has_more_threads = d.has_more_threads
       })
       .then(() => {
-        console.log('WTF', Number(to.query.page) > 1 || to.query.limit)
         if (Number(to.query.page) > 1) {
+          query.page = to.query.page
+          query.limit = to.query.limit
           return watchlistApi.pageBoards(query)
           .then(d => {
             vm.currentPage = d.page
@@ -161,9 +162,9 @@ export default {
             vm.has_more_boards = d.has_more_boards
           })
         }
+        else vm.currentPage = 1
       })
       .then(() => {
-        console.log('FTW', Number(to.query.tpage) > 1 || to.query.tlimit)
         if (Number(to.query.tpage) > 1 || to.query.tlimit) {
           query.page = to.query.tpage
           query.limit = to.query.tlimit
@@ -175,6 +176,7 @@ export default {
             vm.has_more_threads = d.has_more_threads
           })
         }
+        else vm.currentTPage = 1
       })
       .catch(() => {})
     )
@@ -195,6 +197,8 @@ export default {
     })
     .then(() => {
       if (Number(to.query.page) > 1) {
+        query.page = to.query.page
+        query.limit = to.query.limit
         return watchlistApi.pageBoards(query)
         .then(d => {
           this.currentPage = d.page
@@ -203,6 +207,7 @@ export default {
           this.has_more_boards = d.has_more_boards
         })
       }
+      else this.currentPage = 1
     })
     .then(() => {
       if (Number(to.query.tpage) > 1 || to.query.tlimit) {
@@ -216,6 +221,7 @@ export default {
           this.has_more_threads = d.has_more_threads
         })
       }
+      else this.currentTPage = 1
     })
     .catch(() => {})
     next()
@@ -227,7 +233,6 @@ export default {
       else query.page = v.currentPage + inc
       if (query.tpage === 1 || !query.tpage) delete query.tpage
       if (query.page === 1 || !query.page) delete query.page
-        console.log('WAT', query, $route.query.page !== v.currentPage || $route.query.tpage !== v.currentTPage)
       if ($route.query.page !== v.currentPage || $route.query.tpage !== v.currentTPage)
         $router.replace({ name: $route.name, params: $route.params, query: query })
     }
