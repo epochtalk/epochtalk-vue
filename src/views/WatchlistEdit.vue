@@ -38,7 +38,7 @@
         <tbody>
           <tr v-for="board in boards" :key="board.id">
             <td class="title">
-              <a ui-sref="threads.data({ boardSlug: board.slug })" v-html="board.name"></a>
+             <router-link :to="{ name: 'Threads', params: { boardSlug: board.slug, boardId: board.id } }" v-html="board.name"></router-link>
             </td>
             <td class="threads-views-mobile">
               <span class="value" v-html="board.thread_count || 0"></span>&nbsp;threads, &nbsp;
