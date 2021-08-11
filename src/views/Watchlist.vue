@@ -40,7 +40,7 @@
                 </g>
               </svg>
             </div>
-            <a :class="{ bold: thread.has_new_post }" class="thread-title" ui-sref="posts.data({ slug: thread.slug })" v-html="thread.title"></a>
+            <router-link :class="{ 'bold': thread.has_new_post }" class="thread-title" :title="decode(thread.title)" :to="{ name: 'Posts', params: { threadSlug: thread.slug, threadId: thread.id } }">{{decode(thread.title)}}</router-link>
               <div class="thread-state-secondary">
               <span class="thread-state-locked" v-if="thread.locked" data-balloon="Locked">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -106,6 +106,7 @@ import { watchlistApi } from '@/api'
 import { localStoragePrefs } from '@/composables/stores/prefs'
 import humanDate from '@/composables/filters/humanDate'
 import { useRoute, useRouter } from 'vue-router'
+import decode from '@/composables/filters/decode'
 
 export default {
   name: 'Watchlist',
@@ -148,7 +149,7 @@ export default {
       defaultAvatarShape: window.default_avatar_shape,
     })
 
-    return { ...toRefs(v), humanDate, pageResults }
+    return { ...toRefs(v), humanDate, decode, pageResults }
   }
 }
 </script>
