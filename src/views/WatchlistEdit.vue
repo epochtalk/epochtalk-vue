@@ -94,7 +94,7 @@
         <tbody>
           <tr v-for="thread in threads" :key="thread.id">
             <td class="title">
-              <a ui-sref="posts.data({ slug: thread.slug })" v-html="thread.title"></a>
+              <router-link :to="{ name: 'Posts', params: { threadSlug: thread.slug, threadId: thread.id } }" v-html="thread.title"></router-link>
               <span class="parent-board">In Board: <strong><span v-html="thread.board_name"></span></strong></span>
             </td>
             <td class="threads-views-mobile">
