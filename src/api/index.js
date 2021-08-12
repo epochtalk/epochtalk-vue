@@ -68,7 +68,8 @@ export const threadsApi = {
   notifications: () => $http('api/threadnotifications'),
   removeSubscriptions: () => $http('/api/threadnotifications', { method: 'DELETE' }),
   disableNotifications: () => $http('/api/threadnotifications', { data: { enabled: false }, method: 'PUT' }),
-  enableNotifications: () => $http('/api/threadnotifications', { data: { enabled: true }, method: 'PUT' })
+  enableNotifications: () => $http('/api/threadnotifications', { data: { enabled: true }, method: 'PUT' }),
+  viewed: threadId => $http(`/api/threads/${threadId}/viewed`, { method: 'POST' })
 }
 
 export const postsApi = {
