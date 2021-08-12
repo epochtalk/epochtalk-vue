@@ -454,6 +454,7 @@ export default {
     threadsApi.slugToThreadId(to.params.threadSlug).then(t => t.id)
       .then(threadId => {
         params.thread_id = threadId
+        threadsApi.viewed(threadId)
         return postsApi.byThread(params)
         .then(data => next(vm => {
           vm.postData.data = data
@@ -473,6 +474,7 @@ export default {
     threadsApi.slugToThreadId(to.params.threadSlug).then(t => t.id)
       .then(threadId => {
         params.thread_id = threadId
+        threadsApi.viewed(threadId)
         return postsApi.byThread(params).then(data => {
           this.postData.data = data
           BanStore.updateBanNotice(this.postData.data.banned_from_board)
