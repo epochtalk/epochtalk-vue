@@ -77,7 +77,7 @@
                 </a>
               </li>
               <li v-if="canPostLock(post) && !post.locked">
-                <a href="" class="post-action-icon" data-balloon="Lock Post" @click.prevent="() => {}">
+                <a href="" class="post-action-icon" data-balloon="Lock Post" @click.prevent="lockPost(post)">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                     <title></title>
                     <path
@@ -86,7 +86,7 @@
                 </a>
               </li>
               <li v-if="canPostLock(post) && post.locked">
-                <a href="" class="post-action-icon selected" data-balloon="Unlock Post" @click.prevent="() => {}">
+                <a href="" class="post-action-icon selected" data-balloon="Unlock Post" @click.prevent="unlockPost(post)">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                     <title></title>
                     <path
@@ -198,7 +198,19 @@ export default {
         $router.replace({ name: $route.name, params: $route.params, query: query })
     }
 
+    const lockPost = post => postsApi.lock(post.id)
+    .then(() => {
+      $alertStore.success('Successfully locked post!')
+      post.locked = true
+    })
+    const unlockPost = post => postsApi.unlock(post.id)
+    .then(() => {
+      $alertStore.success('Successfully unlocked post!')
+      post.locked = false
+    })
+
     const $auth = inject(AuthStore)
+    const $alertStore = inject('$alertStore')
     const $route = useRoute()
     const $router = useRouter()
 
@@ -216,7 +228,7 @@ export default {
       }
     })
 
-    return { ...toRefs(v), breadcrumbShim, showEditDate, canPurge, canDelete, canPostLock, canUpdate, pageResults, humanDate, userRoleHighlight, usernameHighlight, avatarHighlight, truncate }
+    return { ...toRefs(v), breadcrumbShim, showEditDate, canPurge, canDelete, canPostLock, canUpdate, pageResults, humanDate, userRoleHighlight, usernameHighlight, avatarHighlight, truncate, lockPost, unlockPost }
   }
 }
 </script>
