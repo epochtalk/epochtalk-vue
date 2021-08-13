@@ -48,15 +48,11 @@ export default {
             close()
           })
       }
-      else if(v.offendingId === props.selectedPost.user.id) {
-        reportsApi.reportUser(props.selectedPost.user.id, v.reportReason)
+      else {
+        reportsApi.reportUser(props.selectedPost?.user?.id || v.focusInput.value, v.reportReason)
           .then(() => {
             close()
           })
-      }
-      else {
-        console.log('DEBUG: No user or post id selected.  offendingId:', v.offendingId, v.reportReason)
-        close()
       }
     }
 
