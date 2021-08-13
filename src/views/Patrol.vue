@@ -95,7 +95,7 @@
                 </a>
               </li>
               <li v-if="loggedIn && post.user.id !== authedUser.id && (reportControlAccess.reportPosts || reportControlAccess.reportUsers)">
-                <a href="" data-balloon="Report" @click.prevent="() => {}">
+                <a href="" data-balloon="Report" @click.prevent="selectedPost = post; showPostsReportModal = true">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                     <title></title>
                     <path
@@ -148,6 +148,9 @@
       </div>
     </div>
   </div>
+
+  <posts-report-modal :selectedPost="selectedPost" :canReportPosts="true" :canReportUsers="true" :show="showPostsReportModal" @close="showPostsReportModal = false; selectedPost = null"/>
+
 </template>
 
 <script>
@@ -159,9 +162,11 @@ import truncate from '@/composables/filters/truncate'
 import { AuthStore } from '@/composables/stores/auth'
 import { localStoragePrefs } from '@/composables/stores/prefs'
 import { avatarHighlight, usernameHighlight, userRoleHighlight } from '@/composables/utils/userUtils'
+import PostsReportModal from '@/components/modals/posts/Report.vue'
 
 export default {
   name: 'Patrol',
+  components: { PostsReportModal },
   beforeRouteEnter(to, from, next) {
     const query = {
       limit: to.query.limit || localStoragePrefs().data.posts_per_page,
@@ -219,6 +224,8 @@ export default {
       authedUser: $auth.user,
       currentPage: Number($route.query.page) || 1,
       patrolData: null,
+      showPostsReportModal: false,
+      selectedPost: null,
       posting: { post: { body_html: '', body: '' } },
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
