@@ -25,7 +25,7 @@ import { postsApi } from '@/api'
 export default {
   name: 'posts-purge-post-modal',
   props: ['show', 'selectedPost', 'selectedPostIndex', 'posts', 'page', 'limit'],
-  emits: ['close'],
+  emits: ['close', 'success'],
   components: { Modal },
   setup(props, { emit }) {
     /* Template Methods */
@@ -40,8 +40,9 @@ export default {
     const purgePost = () => {
       postsApi.purge(props.selectedPost.id)
         .then(() => {
+          if (!props.posts) emit('success')
           // if current post is the only one on the page
-          if (props.posts.length === 1) {
+          else if (props.posts.length === 1) {
             // redirect to previous page
             $router.push({ name: 'Posts', query: { page: props.page - 1, limit: props.limit }, hash: '#last' })
           }
