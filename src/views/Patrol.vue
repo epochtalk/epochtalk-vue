@@ -195,7 +195,7 @@ export default {
       'threads.data': 'Threads'
     }
 
-    const showEditDate = () => true
+    const showEditDate = post => new Date(post.created_at) < new Date(post.updated_at)
     const canPurge = () => true
     const canDelete = () => true
     const canPostLock = () => true
