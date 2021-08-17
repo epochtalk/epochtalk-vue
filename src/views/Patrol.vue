@@ -196,7 +196,32 @@ export default {
     }
 
     const showEditDate = post => new Date(post.created_at) < new Date(post.updated_at)
-    const canPurge = () => true
+    const canPurge = post => {
+      if (!v.loggedIn) return false
+      // TODO(boka): check for banned
+      // if (BanSvc.banStatus()) return false
+      if (!v.permissionUtils.hasPermission('posts.purge.allow')) return false
+
+      const adminBypass = v.permissionUtils.hasPermission('posts.purge.bypass.purge.admin')
+      const modBypass = v.permissionUtils.hasPermission('posts.purge.bypass.purge.mod')
+      const postUserPriority = post.user.priority
+      const postUserId = post.user.id
+      const sessionUserPriority = v.permissionUtils.getPriority()
+      const sessionUserId = v.authedUser.id
+
+      // admins can purge
+      if (adminBypass) return true
+      // if user is a mod and moderates this board and...
+      else if (modBypass && post.authed_user_is_mod) {
+        // ...if any of the following conditions are met, allow purge
+        // user created the post
+        return postUserId === sessionUserId ||
+          // user has priority
+          sessionUserPriority < postUserPriority
+      }
+      else return false
+    }
+
     const canDelete = () => true
     const canPostLock = () => true
     const canUpdate = () => true
@@ -231,6 +256,7 @@ export default {
 
     const v = reactive({
       loggedIn: $auth.loggedIn,
+      permissionUtils: $auth.permissionUtils,
       authedUser: $auth.user,
       currentPage: Number($route.query.page) || 1,
       patrolData: null,
