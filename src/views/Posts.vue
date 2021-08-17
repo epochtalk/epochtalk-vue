@@ -586,8 +586,7 @@ export default {
     const canPurgePost = (post) => {
       if (!v.postData.data?.write_access) return false
       if (!v.loggedIn) return false
-      // TODO(boka): check for banned
-      // if (BanSvc.banStatus()) return false
+      if (v.bannedFromBoard) return false
       if (!v.permissionUtils.hasPermission('threads.purge.allow')) return false
 
       const adminBypass = v.permissionUtils.hasPermission('posts.purge.bypass.purge.admin')
@@ -679,8 +678,7 @@ export default {
       if (!v.postData.data?.write_access) return false
       if (!v.loggedIn) return false
       if (!v.permissionUtils.hasPermission('posts.update.allow')) return false
-      // TODO(boka): check for banned
-      // if (BanSvc.banStatus()) return false
+      if (v.bannedFromBoard) return false
 
       // check if post edit is disabled
       var elevatedPrivileges = adminOwnerBypass || modOwnerBypass || priorityOwnerBypass
@@ -728,8 +726,7 @@ export default {
     const canPostLock = (post) => {
       if (!v.postData.data?.write_access) return false
       if (!v.loggedIn) return false
-      // TODO(boka): check for banned
-      // if (BanSvc.banStatus()) return false
+      if (v.bannedFromBoard) return false
       if (!v.permissionUtils.hasPermission('posts.lock.allow')) return false
 
       const moderators = v.postData.data.board.moderators.map((data) => data.id)
@@ -756,8 +753,7 @@ export default {
     const canDelete = (post) => {
       if (!v.postData.data?.write_access) return false
       if (!v.loggedIn) return false
-      // TODO(boka): check for banned
-      // if (BanSvc.banStatus()) return false
+      if (v.bannedFromBoard) return false
       if (!v.permissionUtils.hasPermission('posts.delete.allow')) return false
 
       const moderators = v.postData.data.board.moderators.map((data) => data.id)
