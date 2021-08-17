@@ -198,8 +198,6 @@ export default {
     const showEditDate = post => new Date(post.created_at) < new Date(post.updated_at)
     const canPurge = post => {
       if (!v.loggedIn) return false
-      // TODO(boka): check for banned
-      // if (BanSvc.banStatus()) return false
       if (!v.permissionUtils.hasPermission('posts.purge.allow')) return false
 
       const adminBypass = v.permissionUtils.hasPermission('posts.purge.bypass.purge.admin')
@@ -222,7 +220,24 @@ export default {
       else return false
     }
 
-    const canDelete = () => true
+    const canDelete = post => {
+      if (!v.loggedIn) return false
+      if (!v.permissionUtils.hasPermission('posts.delete.allow')) return false
+
+      // if thread is locked
+      if (post.user.id === v.authedUser.id) return true
+      else if (v.permissionUtils.hasPermission('posts.delete.bypass.owner.admin')) return true
+      // if user is a mod
+      else if (v.permissionUtils.hasPermission('posts.delete.bypass.owner.mod') && post.authed_user_is_mod) {
+        if (v.permissionUtils.getPriority() < post.user.priority) return true
+        else return false
+      }
+      else if (v.permissionUtils.hasPermission('posts.delete.bypass.owner.priority')) {
+        if (v.permissionUtils.getPriority() < post.user.priority) return true
+        else return false
+      }
+      else return false
+    }
     const canPostLock = () => true
     const canUpdate = () => true
     const pageResults = inc => {
