@@ -219,7 +219,6 @@ export default {
       }
       else return false
     }
-
     const canDelete = post => {
       if (!v.loggedIn) return false
       if (!v.permissionUtils.hasPermission('posts.delete.allow')) return false
@@ -238,8 +237,61 @@ export default {
       }
       else return false
     }
-    const canPostLock = () => true
-    const canUpdate = () => true
+    const canPostLock = post => {
+      if (!v.loggedIn) return false
+      if (!v.permissionUtils.hasPermission('posts.lock.allow')) return false
+
+      // if thread is locked
+      if (post.user.id === v.authedUser.id) return true
+      else if (v.permissionUtils.hasPermission('posts.lock.bypass.owner.admin')) return true
+      // if user is a mod
+      else if (v.permissionUtils.hasPermission('posts.lock.bypass.owner.mod') && post.authed_user_is_mod) {
+        if (v.permissionUtils.getPriority() < post.user.priority) return true
+        else return false
+      }
+      else if (v.permissionUtils.hasPermission('posts.lock.bypass.owner.priority')) {
+        if (v.permissionUtils.getPriority() < post.user.priority) return true
+        else return false
+      }
+      else return false
+    }
+    const canUpdate = post => {
+      const adminOwnerBypass = v.permissionUtils.hasPermission('posts.update.bypass.owner.admin')
+      const adminDeletedBypass = v.permissionUtils.hasPermission('posts.update.bypass.deleted.admin')
+      const modOwnerBypass = v.permissionUtils.hasPermission('posts.update.bypass.owner.mod')
+      const modDeletedBypass = v.permissionUtils.hasPermission('posts.update.bypass.deleted.mod')
+      const priorityOwnerBypass = v.permissionUtils.hasPermission('posts.update.bypass.owner.priority')
+      const priorityDeletedBypass = v.permissionUtils.hasPermission('posts.update.bypass.deleted.priority')
+      const moderatesBoard = post.authed_user_is_mod
+      const authedUserPriority = v.permissionUtils.getPriority()
+      if (!v.loggedIn) return false
+      if (!v.permissionUtils.hasPermission('posts.update.allow')) return false
+
+      // developer note: avoid unreachable code
+      // ensure that all if blocks end with else
+      // defaults to return false
+
+      if (post.deleted) {
+        if (adminDeletedBypass) return true
+        else if (modDeletedBypass) {
+          if (moderatesBoard && authedUserPriority < post.user.priority) return true
+          else return false
+        }
+        else if (priorityDeletedBypass && authedUserPriority < post.user.priority) return true
+        else return false
+      }
+      else {
+        if (adminOwnerBypass) return true
+        else if (post.user.id === v.authedUser.id) return true
+        else if (modOwnerBypass) {
+          if (moderatesBoard && authedUserPriority < post.user.priority) return true
+          else return false
+        }
+        else if (priorityOwnerBypass && authedUserPriority < post.user.priority) return true
+        else return false
+      }
+    }
+
     const pageResults = inc => {
       const newPage = v.patrolData.page + inc
       let query = { ...$route.query, page: newPage }
