@@ -50,7 +50,7 @@
 
             <ul class="post-action">
               <li v-if="canPurge(post) && post.position !== 1">
-                <a href="" class="post-action-icon" data-balloon="Purge" @click.prevent="() => {}">
+                <a href="" class="post-action-icon" data-balloon="Purge" @click.prevent="selectedPost = post; showPostsPurgePostModal = true">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                     <title></title>
                     <path
@@ -61,7 +61,7 @@
                 </a>
               </li>
               <li v-if="canDelete(post) && !post.deleted && post.position !== 1">
-                <a href="" class="post-action-icon" data-balloon="Delete" @click.prevent="() => {}">
+                <a href="" class="post-action-icon" data-balloon="Delete" @click.prevent="selectedPost = post; showPostsDeleteModal = true">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                     <title></title>
                     <path d="M39.22,15.68l-3.64,5.2A12.36,12.36,0,0,1,36,24,12,12,0,0,1,25,36l-1.6,2.28.57,0C36.7,38.25,48,24,48,24A51.61,51.61,0,0,0,39.22,15.68Z"/><path d="M34.18,4.65l-4.25,6.08a19.49,19.49,0,0,0-5.93-1C11.3,9.75,0,24,0,24A49.75,49.75,0,0,0,12.93,35l-4.7,6.71,4.91,3.45,26-37.08ZM12,24A12,12,0,0,1,24,12a11.86,11.86,0,0,1,4.43.87l-1.78,2.54a8.62,8.62,0,0,0-5.71.16,3.93,3.93,0,1,1-5.37,5.37,8.8,8.8,0,0,0,1.26,8.49L15.05,32A12,12,0,0,1,12,24Z"/><path d="M33,24.6l-5.34,7.63A9,9,0,0,0,33,24.6Z"/>
@@ -69,7 +69,7 @@
                 </a>
               </li>
               <li v-if="canDelete(post) && post.deleted">
-                <a href="" class="post-action-icon selected" data-balloon="Undelete" @click.prevent="() => {}">
+                <a href="" class="post-action-icon selected" data-balloon="Undelete" @click.prevent="selectedPost = post; showPostsUndeleteModal = true">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                     <title></title>
                     <path d="M24,9.75C11.3,9.75,0,24,0,24S11.3,38.25,24,38.25,48,24,48,24,36.7,9.75,24,9.75ZM24,36A12,12,0,1,1,36,24,12,12,0,0,1,24,36Z"/><path d="M24,15a8.89,8.89,0,0,0-3.06.57,3.93,3.93,0,1,1-5.37,5.37A8.89,8.89,0,0,0,15,24a9,9,0,1,0,9-9Z"/>
@@ -149,8 +149,10 @@
     </div>
   </div>
 
-  <posts-report-modal :selectedPost="selectedPost" :canReportPosts="true" :canReportUsers="true" :show="showPostsReportModal" @close="showPostsReportModal = false; selectedPost = null"/>
-
+  <posts-report-modal :selectedPost="selectedPost" :canReportPosts="true" :canReportUsers="true" :show="showPostsReportModal" @close="showPostsReportModal = false; selectedPost = null" />
+  <posts-delete-modal :selectedPost="selectedPost" :show="showPostsDeleteModal" @close="showPostsDeleteModal = false; selectedPost = null" />
+  <posts-undelete-modal :selectedPost="selectedPost" :show="showPostsUndeleteModal" @close="showPostsUndeleteModal = false; selectedPost = null" />
+  <posts-purge-post-modal :selectedPost="selectedPost" :show="showPostsPurgePostModal" @close="showPostsPurgePostModal = false; selectedPost = null" @success="refreshPosts()" />
 </template>
 
 <script>
@@ -163,10 +165,13 @@ import { AuthStore } from '@/composables/stores/auth'
 import { localStoragePrefs } from '@/composables/stores/prefs'
 import { avatarHighlight, usernameHighlight, userRoleHighlight } from '@/composables/utils/userUtils'
 import PostsReportModal from '@/components/modals/posts/Report.vue'
+import PostsDeleteModal from '@/components/modals/posts/Delete.vue'
+import PostsUndeleteModal from '@/components/modals/posts/Undelete.vue'
+import PostsPurgePostModal from '@/components/modals/posts/PurgePost.vue'
 
 export default {
   name: 'Patrol',
-  components: { PostsReportModal },
+  components: { PostsReportModal, PostsDeleteModal, PostsUndeleteModal, PostsPurgePostModal },
   beforeRouteEnter(to, from, next) {
     const query = {
       limit: to.query.limit || localStoragePrefs().data.posts_per_page,
@@ -203,6 +208,11 @@ export default {
         $router.replace({ name: $route.name, params: $route.params, query: query })
     }
 
+    const refreshPosts = () => postsApi.byNewbie({
+      limit: $route.query.limit || localStoragePrefs().data.posts_per_page,
+      page: $route.query.page || 1
+    }).then(d => v.patrolData = d).catch(() => {})
+
     const lockPost = post => postsApi.lock(post.id)
     .then(() => {
       $alertStore.success('Successfully locked post!')
@@ -225,6 +235,9 @@ export default {
       currentPage: Number($route.query.page) || 1,
       patrolData: null,
       showPostsReportModal: false,
+      showPostsDeleteModal: false,
+      showPostsUndeleteModal: false,
+      showPostsPurgePostModal: false,
       selectedPost: null,
       posting: { post: { body_html: '', body: '' } },
       defaultAvatar: window.default_avatar,
@@ -235,7 +248,7 @@ export default {
       }
     })
 
-    return { ...toRefs(v), breadcrumbShim, showEditDate, canPurge, canDelete, canPostLock, canUpdate, pageResults, humanDate, userRoleHighlight, usernameHighlight, avatarHighlight, truncate, lockPost, unlockPost }
+    return { ...toRefs(v), breadcrumbShim, showEditDate, canPurge, canDelete, canPostLock, canUpdate, pageResults, humanDate, userRoleHighlight, usernameHighlight, avatarHighlight, truncate, lockPost, unlockPost, refreshPosts }
   }
 }
 </script>
