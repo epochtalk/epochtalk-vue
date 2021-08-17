@@ -241,15 +241,14 @@ export default {
       if (!v.loggedIn) return false
       if (!v.permissionUtils.hasPermission('posts.lock.allow')) return false
 
-      // if thread is locked
       if (post.user.id === v.authedUser.id) return true
-      else if (v.permissionUtils.hasPermission('posts.lock.bypass.owner.admin')) return true
+      else if (v.permissionUtils.hasPermission('posts.lock.bypass.lock.admin')) return true
       // if user is a mod
-      else if (v.permissionUtils.hasPermission('posts.lock.bypass.owner.mod') && post.authed_user_is_mod) {
+      else if (v.permissionUtils.hasPermission('posts.lock.bypass.lock.mod') && post.authed_user_is_mod) {
         if (v.permissionUtils.getPriority() < post.user.priority) return true
         else return false
       }
-      else if (v.permissionUtils.hasPermission('posts.lock.bypass.owner.priority')) {
+      else if (v.permissionUtils.hasPermission('posts.lock.bypass.lock.priority')) {
         if (v.permissionUtils.getPriority() < post.user.priority) return true
         else return false
       }
