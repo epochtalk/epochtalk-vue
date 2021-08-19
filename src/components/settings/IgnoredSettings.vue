@@ -1,7 +1,7 @@
 <template>
   <div id="ignored-users-posts-settings">
     <h3 class="thin-underline">Ignored User</h3>
-    <div class="tabs">
+    <div class="settings-tabs">
       <a class="button" :class="{ 'selected': selectedTab === 'posts' }" @click.prevent="selectedTab = 'posts'">Posts</a>
       <a class="button" :class="{ 'selected': selectedTab === 'messages' }" @click.prevent="selectedTab = 'messages'">Messages</a>
       <a class="button" :class="{ 'selected': selectedTab === 'mentions' }" @click.prevent="selectedTab = 'mentions'">Mentions</a>
@@ -105,7 +105,7 @@ export default {
 </script>
 
 <style lang="scss">
-.tabs {
+.settings-tabs {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   column-gap: .5rem;
