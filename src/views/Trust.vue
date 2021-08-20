@@ -8,10 +8,10 @@
 
     <div class="trust-section">
       <h2 class="section-header">Trusted feedback</h2 >
-      <span v-if="!userFeedback.trusted.length">
+      <span v-if="!userFeedback?.trusted?.length">
         {{user.username}} has no trusted feedback.
       </span>
-      <table width="100%" class="striped" v-if="userFeedback.trusted.length">
+      <table width="100%" class="striped" v-if="userFeedback?.trusted?.length">
         <thead>
           <tr>
             <th>Type</th>
@@ -47,11 +47,11 @@
 
       <p>These ratings are from people who are not in your trust network. They may be totally inaccurate.</p>
 
-      <span v-if="!userFeedback.untrusted.length">
+      <span v-if="!userFeedback?.untrusted?.length">
         {{user.username}} has no untrusted feedback.
       </span>
-      <a href="" v-if="userFeedback.untrusted.length && !showUntrusted" @click.prevent="showUntrusted = true">Show untrusted feedback</a>
-      <a href="" v-if="userFeedback.untrusted.length && showUntrusted" @click.prevent="showUntrusted = false">Hide untrusted feedback</a>
+      <a href="" v-if="userFeedback?.untrusted?.length && !showUntrusted" @click.prevent="showUntrusted = true">Show untrusted feedback</a>
+      <a href="" v-if="userFeedback?.untrusted?.length && showUntrusted" @click.prevent="showUntrusted = false">Hide untrusted feedback</a>
 
       <div v-if="showUntrusted">
         <br />
@@ -91,9 +91,9 @@
     <div class="trust-section">
       <h2 class="section-header">Sent feedback</h2>
 
-      <span v-if="!userFeedback.sent.length">{{user.username}} hasn't sent any feedback.</span>
+      <span v-if="!userFeedback.sent?.length">{{user.username}} hasn't sent any feedback.</span>
 
-      <table v-if="userFeedback.sent.length" width="100%" class="striped">
+      <table v-if="userFeedback.sent?.length" width="100%" class="striped">
         <thead>
           <tr>
             <th>Type</th>
@@ -134,46 +134,51 @@
 </template>
 
 <script>
-import { reactive, toRefs } from 'vue'
-import { trustApi } from '@/api'
+import { reactive, toRefs, inject } from 'vue'
+import { usersApi } from '@/api'
 // import { useRoute, useRouter } from 'vue-router'
 import humanDate from '@/composables/filters/humanDate'
 import TrustDisplay from '@/components/trust/TrustDisplay.vue'
+import { AuthStore } from '@/composables/stores/auth'
 
 export default {
   name: 'Trust',
   components: { TrustDisplay },
+  props: [ 'username' ],
   beforeRouteEnter(to, from, next) {
-    const query = {
-      limit: 10,
-      page: to.query.page || 1,
-      field: to.query.field,
-      desc: to.query.desc,
-      search: to.query.search
-    }
-    next(vm => usersApi.memberSearch(query).then(d => vm.searchData = d).catch(() => {}))
+    next(vm => usersApi.find(to.params.username)
+      .then(u => vm.user = u)
+      .then(() => usersApi.trust.getTrustFeedback(to.params.username))
+      .then(f => vm.userFeedback = f)
+      .catch(() => {})
+    )
   },
   beforeRouteUpdate(to, from, next) {
-    const query = {
-      limit: 10,
-      page: to.query.page || 1,
-      field: to.query.field,
-      desc: to.query.desc,
-      search: to.query.search
-    }
-    usersApi.memberSearch(query).then(d => this.searchData = d).catch(() => {})
+    usersApi.find(to.params.username)
+      .then(u => this.user = u)
+      .then(() => usersApi.trust.getTrustFeedback(to.params.username))
+      .then(f => this.userFeedback = f)
+      .catch(() => {})
     next()
   },
   setup() {
     // const $route = useRoute()
     // const $router = useRouter()
+    const $auth = inject(AuthStore)
 
     const v = reactive({
+      loggedIn: $auth.loggedIn,
+      user: {},
+      userFeedback: {},
+      hideAddFeedback: true,
+      showUntrusted: false,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
     })
 
-    return { ...toRefs(v) }
+    v.hideAddFeedback = ($auth.user.id === v.user.id) || !$auth.user.permissions.userTrust || ($auth.user.permissions.userTrust && !$auth.user.permissions.userTrust.addTrustFeedback)
+
+    return { ...toRefs(v), humanDate }
   }
 }
 </script>
