@@ -7,6 +7,7 @@ import Posts from '@/views/Posts.vue'
 import About from '@/views/About.vue'
 import Settings from '@/views/Settings.vue'
 import Patrol from '@/views/Patrol.vue'
+import Trust from '@/views/Trust.vue'
 import MemberSearch from '@/views/MemberSearch.vue'
 import Watchlist from '@/views/Watchlist.vue'
 import WatchlistEdit from '@/views/WatchlistEdit.vue'
@@ -82,6 +83,13 @@ const routes = [
     component: UserPosts,
     props: true,
     meta: { requiresAuth: true, bodyClass: 'user-posts' }
+  },
+  {
+    path: '/profile/:username/trust',
+    name: 'Trust',
+    component: Trust,
+    props: true,
+    meta: { requiresAuth: true, bodyClass: 'trust' }
   },
   {
     path: '/settings',
