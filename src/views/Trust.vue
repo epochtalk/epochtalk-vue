@@ -183,7 +183,6 @@ export default {
 
 <style lang="scss">
 .trust main #public-content { grid-template-areas: 'header header' 'main sidebar' 'main sidebar'; }
-.trust-summary { grid-area: main; }
 .sidebar {
   grid-area: sidebar;
 
@@ -193,4 +192,60 @@ export default {
     top: $header-offset;
   }
 }
+
+.trust-summary {
+  grid-area: main;
+  h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: none;
+  }
+}
+
+.trust-section {
+  margin-bottom: 1rem;
+  .trust-select {
+    background: none;
+    height: 18rem;
+    width: 100%;
+  }
+  .remove-active, .remove-inactive {
+    font-size: 0.825rem;
+    height: 1rem;
+    display: inline-block;
+    line-height: 1.65rem;
+  }
+  .remove-inactive { color: $secondary-font-color; }
+  ul.depth-tree {
+    list-style-position: outside;
+    margin-bottom: 1rem;
+    margin-left: 1.25rem;
+    ul { margin-left: 2rem; }
+  }
+  select { margin-bottom: 0; }
+  .trust-button {
+    margin-top: 1.25rem;
+    margin-bottom: 0;
+    @include break-mobile-sm {
+      margin: 0;
+      width: 100%;
+    }
+  }
+}
+
+.trust-score {
+  color: $text-gray-med;
+
+  &.unknown { color: #FA8072; }
+  &.low { color: #DC143C; }
+  &.mid { color: #74C365; }
+  &.high { color: #008000; }
+  .neg { color: orange; }
+}
+td .trust-score { float: right; margin-left: 1rem; }
+
+.pos-feedback { color: #008000; }
+.neu-feedback { color: orange; }
+.neg-feedback { color: #FF0000; }
+
 </style>
