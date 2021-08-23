@@ -11,7 +11,7 @@
       <a href="" class="trust-link">View Trust Feedback</a>
     </div>
   </div>
-  <a v-if="user" href="#trustlink"><span class="trust-score" :class="getStyle(stats.score)">{{stats.score}} : <span :class="negStyle">-{{stats.neg}}</span> / +{{stats.pos}}</span></a>
+  <router-link v-if="user" :to="{ name: 'Trust', params: { username: user.username.toLowerCase() }}"><span class="trust-score" :class="getStyle(stats.score)">{{stats.score}} : <span :class="negStyle">-{{stats.neg}}</span> / +{{stats.pos}}</span></router-link>
 </template>
 
 <script>

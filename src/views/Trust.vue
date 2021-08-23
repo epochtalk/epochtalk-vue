@@ -29,7 +29,7 @@
                 <i class="fa" :class="{'fa-plus-circle pos-feedback': feedback.scammer === false, 'fa-circle neu-feedback': feedback.scammer === null, 'fa-minus-circle neg-feedback': feedback.scammer === true}"></i>
               </span>
             </td>
-            <td><a ui-sref="profile.posts({ username: feedback.reporter.username })">{{feedback.reporter.username}}</a> <trust-display :username="feedback.reporter" /></td>
+            <td><a ui-sref="profile.posts({ username: feedback.reporter.username })">{{feedback.reporter.username}}</a> <trust-display :user="feedback.reporter" /></td>
             <td v-html="humanDate(feedback.created_at, false, 'MM/DD/YYYY, h:mm A')"></td>
             <td v-html="feedback.risked_btc"></td>
             <td class="centered-text">
@@ -73,7 +73,7 @@
                   <i class="fa" :class="{'fa-plus-circle pos-feedback': feedback.scammer === false, 'fa-circle neu-feedback': feedback.scammer === null, 'fa-minus-circle neg-feedback': feedback.scammer === true}"></i>
                 </span>
               </td>
-              <td><a ui-sref="profile.posts({ username: feedback.reporter.username })">{{feedback.reporter.username}}</a> <trust-display :username="feedback.reporter" /></td>
+              <td><a ui-sref="profile.posts({ username: feedback.reporter.username })">{{feedback.reporter.username}}</a> <trust-display :user="feedback.reporter" /></td>
               <td v-html="humanDate(feedback.created_at, false, 'MM/DD/YYYY, h:mm A')"></td>
               <td v-html="feedback.risked_btc"></td>
               <td class="centered-text">
@@ -111,7 +111,7 @@
                 <i class="fa" :class="{'fa-plus-circle pos-feedback': feedback.scammer === false, 'fa-circle neu-feedback': feedback.scammer === null, 'fa-minus-circle neg-feedback': feedback.scammer === true}"></i>
               </span>
             </td>
-            <td><a ui-sref="profile.posts({ username: feedback.reporter.username })">{{feedback.user.username}}</a> <trust-display :username="feedback.user" /></td>
+            <td><a ui-sref="profile.posts({ username: feedback.user.username })">{{feedback.user.username}}</a> <trust-display :user="feedback.user" /></td>
             <td v-html="humanDate(feedback.created_at, false, 'MM/DD/YYYY, h:mm A')"></td>
             <td v-html="feedback.risked_btc"></td>
             <td class="centered-text">
@@ -126,7 +126,7 @@
   </div>
   <div class="sidebar">
     <div class="trust-section" v-if="loggedIn">
-      <a v-if="!hideAddFeedback" class="button" href="#" @click.prevent="showFeedbackModal = true">Leave feedback for {{user.username}}</a>
+      <a v-if="!((authedUser.id === user.id) || !authedUser.permissions.userTrust || (authedUser.permissions.userTrust && !authedUser.permissions.userTrust.addTrustFeedback))" class="button" href="#" @click.prevent="showFeedbackModal = true">Leave feedback for {{user.username}}</a>
 
       <a class="" ui-sref="trust-settings"><i class="fa fa-cog"></i> Edit My Trust Settings</a>
     </div>
@@ -168,15 +168,13 @@ export default {
 
     const v = reactive({
       loggedIn: $auth.loggedIn,
+      authedUser: $auth.user,
       user: {},
       userFeedback: {},
-      hideAddFeedback: true,
       showUntrusted: false,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
     })
-
-    v.hideAddFeedback = ($auth.user.id === v.user.id) || !$auth.user.permissions.userTrust || ($auth.user.permissions.userTrust && !$auth.user.permissions.userTrust.addTrustFeedback)
 
     return { ...toRefs(v), humanDate }
   }
