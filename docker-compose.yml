@@ -10,6 +10,7 @@ services:
     image: quay.io/epochtalk/epochtalk:ui-refactor-2020
     ports:
       - "8080:8080"
+      - "23958:23958"
     depends_on:
       - redis
       - postgres
