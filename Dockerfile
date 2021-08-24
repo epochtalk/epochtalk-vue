@@ -4,6 +4,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN yarn install
 COPY . .
+COPY src/docker-config.json src/config.json
 RUN yarn run build
 
 # production stage
