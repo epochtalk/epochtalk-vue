@@ -8,7 +8,7 @@
       <span class="trust-score" :class="getStyle(stats.score)">Warning: Trade with extreme caution!</span>
     </div>
     <div>
-      <a href="" class="trust-link">View Trust Feedback</a>
+      <router-link class="trust-link" :to="{ name: 'Trust', params: { username: username.toLowerCase() }}">View Trust Feedback</router-link>
     </div>
   </div>
   <router-link v-if="user" :to="{ name: 'Trust', params: { username: user.username.toLowerCase() }}"><span class="trust-score" :class="getStyle(stats.score)">{{stats.score}} : <span :class="negStyle">-{{stats.neg}}</span> / +{{stats.pos}}</span></router-link>
