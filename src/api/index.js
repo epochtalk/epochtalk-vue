@@ -2,9 +2,10 @@ import axios from 'axios'
 import { get } from 'lodash'
 import localStorageCache from '@/composables/utils/localStorageCache'
 import alertStore from '@/composables/stores/alert'
+import config from '@/config.json'
 
 export const $axios = axios.create({
-  baseURL: process.env.BASE_URL || 'http://localhost:8080',
+  baseURL: config.BASE_URL,
   timeout: 3000,
   crossDomain: true
 })
