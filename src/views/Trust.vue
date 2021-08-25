@@ -127,7 +127,6 @@
   <div class="sidebar">
     <div class="trust-section" v-if="loggedIn">
       <a v-if="!((authedUser.id === user.id) || !authedUser.permissions.userTrust || (authedUser.permissions.userTrust && !authedUser.permissions.userTrust.addTrustFeedback))" class="button" href="#" @click.prevent="showFeedbackModal = true">Leave feedback for {{user.username}}</a>
-
       <a class="" ui-sref="trust-settings"><i class="fa fa-cog"></i> Edit My Trust Settings</a>
     </div>
   </div>
@@ -136,7 +135,6 @@
 <script>
 import { reactive, toRefs, inject } from 'vue'
 import { usersApi } from '@/api'
-// import { useRoute, useRouter } from 'vue-router'
 import humanDate from '@/composables/filters/humanDate'
 import TrustDisplay from '@/components/trust/TrustDisplay.vue'
 import { AuthStore } from '@/composables/stores/auth'
@@ -162,8 +160,6 @@ export default {
     next()
   },
   setup() {
-    // const $route = useRoute()
-    // const $router = useRouter()
     const $auth = inject(AuthStore)
 
     const v = reactive({
@@ -171,9 +167,7 @@ export default {
       authedUser: $auth.user,
       user: {},
       userFeedback: {},
-      showUntrusted: false,
-      defaultAvatar: window.default_avatar,
-      defaultAvatarShape: window.default_avatar_shape,
+      showUntrusted: false
     })
 
     return { ...toRefs(v), humanDate }
@@ -204,6 +198,7 @@ export default {
 
 .trust-section {
   margin-bottom: 1rem;
+  .button { margin-bottom: 1rem; }
   .trust-select {
     background: none;
     height: 18rem;
