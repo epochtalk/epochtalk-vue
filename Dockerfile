@@ -14,6 +14,9 @@ RUN yarn run build
 
 # production stage
 FROM nginx:stable-alpine as production-stage
+ENV JSFOLDER=/usr/share/nginx/html/js/*.js
+COPY ./start-nginx.sh /usr/bin/start-nginx.sh
+RUN chmod +x /usr/bin/start-nginx.sh
 COPY --from=build-stage /app/dist /usr/share/nginx/html
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+ENTRYPOINT [ "start-nginx.sh" ]
