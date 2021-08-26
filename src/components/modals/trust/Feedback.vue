@@ -1,8 +1,4 @@
 <template>
-  <modal show="TrustCtrl.showFeedbackModal" on-close="TrustCtrl.closeFeedback()">
-
-</modal>
-
   <modal :name="$options.name" :show="show" @close="close()" :focusInput="focusInput">
     <template v-slot:header>Quick Message</template>
 
@@ -11,7 +7,7 @@
         <h3 class="thin-underline">Leave trust feedback for {{user.username}}</h3>
         <label>
           Risked BTC
-          <input ref="focusInput" type="number" v-model="feedback.risked_btc" step="any" value="0.0000" required />
+          <input ref="focusInput" type="number" v-model="feedback.risked_btc" step="any" required />
         </label>
         <label>
           Reference Link
@@ -21,15 +17,15 @@
           Feedback Type
         </label>
         <label>
-          <input type="radio" v-model="feedback.scammer" name="scammer" :value="0" required />
+          <input type="radio" v-model="feedback.scammer" name="scammer" value="0" required />
           Positive &mdash; You trust this person or had a successful trade
         </label>
         <label>
-          <input type="radio" v-model="feedback.scammer" name="scammer" :value="-1" required />
+          <input type="radio" v-model="feedback.scammer" name="scammer" value="-1" required />
           Neutral &mdash; Your rating will not affect this user's trust score
         </label>
         <label>
-          <input type="radio" v-model="feedback.scammer" name="scammer" :value="1" required />
+          <input type="radio" v-model="feedback.scammer" name="scammer" value="1" required />
           Negative &mdash; You were scammed or you strongly believe that this user is a scammer
         </label>
         <label>
@@ -38,6 +34,7 @@
         </label>
 
         <!-- Save Button -->
+        {{feedback}}
         <div class="modal-actions split-column">
           <button class="fill-row" :disabled="feedback.scammer === undefined || feedback.comments === undefined || feedbackSubmitted || !urlValid()" @click.prevent="addTrustFeedback()" v-html="submitFeedbackBtnLabel"></button>
           <button @click.prevent="reset()" class="outline">
@@ -52,8 +49,8 @@
 
 <script>
 import Modal from '@/components/layout/Modal.vue'
-import { reactive, toRefs, inject } from 'vue'
-import { messagesApi } from '@/api'
+import { reactive, toRefs } from 'vue'
+// import { messagesApi } from '@/api'
 
 export default {
   name: 'trust-feedback-modal',
@@ -63,25 +60,13 @@ export default {
   setup(props, { emit }) {
     /* Template Methods */
     const addTrustFeedback = () => {
-      // const newMessage = {
-      //   receiver_ids: [ props.user.id ],
-      //   content: {
-      //     subject: v.subject,
-      //     body: v.body
-      //   }
-      // }
-      // messagesApi.convos.create(newMessage)
-      // .then(() => $alertStore.success(`Message successfully sent to ${props.user.username}`))
-      // .then(() => reset())
-      // .then(() => close())
-      // .catch(() => {
-      //   v.errorMessage = 'Error: There was an issue sending your message, please try again later'
-      // })
+      console.log(v.feedback)
     }
 
+    const urlValid = () => true
+
     const reset = () => {
-      // v.subject = ''
-      // v.body = ''
+      v.feedback = { risked_btc: '0.000' }
       v.focusInput.focus()
     }
 
@@ -91,17 +76,19 @@ export default {
     }
 
     /* Internal Data */
-    const $alertStore = inject('$alertStore')
+    // const $alertStore = inject('$alertStore')
 
     /* Template Data */
     const v = reactive({
-      feedback: {},
+      feedback: { risked_btc: '0.0000' },
       userReactive: props.user,
+      submitFeedbackBtnLabel: 'Leave Feedback',
+      feedbackSubmitted: false,
       focusInput: null,
       errorMessage: ''
     })
 
-    return { ...toRefs(v), sendMessage, reset, close }
+    return { ...toRefs(v), addTrustFeedback, urlValid, reset, close }
   }
 }
 </script>

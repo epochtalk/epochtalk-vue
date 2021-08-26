@@ -126,10 +126,12 @@
   </div>
   <div class="sidebar">
     <div class="trust-section" v-if="loggedIn">
-      <a v-if="!((authedUser.id === user.id) || !authedUser.permissions.userTrust || (authedUser.permissions.userTrust && !authedUser.permissions.userTrust.addTrustFeedback))" class="button" href="#" @click.prevent="showFeedbackModal = true">Leave feedback for {{user.username}}</a>
+      <a v-if="!((authedUser.id === user.id) || !authedUser.permissions.userTrust || (authedUser.permissions.userTrust && !authedUser.permissions.userTrust.addTrustFeedback))" class="button" href="#" @click.prevent="showTrustFeedbackModal = true">Leave feedback for {{user.username}}</a>
       <a class="" ui-sref="trust-settings"><i class="fa fa-cog"></i> Edit My Trust Settings</a>
     </div>
   </div>
+
+  <trust-feedback-modal :user="user" :show="showTrustFeedbackModal" @close="showTrustFeedbackModal = false;" />
 </template>
 
 <script>
@@ -138,10 +140,11 @@ import { usersApi } from '@/api'
 import humanDate from '@/composables/filters/humanDate'
 import TrustDisplay from '@/components/trust/TrustDisplay.vue'
 import { AuthStore } from '@/composables/stores/auth'
+import TrustFeedbackModal from '@/components/modals/trust/Feedback.vue'
 
 export default {
   name: 'Trust',
-  components: { TrustDisplay },
+  components: { TrustDisplay, TrustFeedbackModal },
   props: [ 'username' ],
   beforeRouteEnter(to, from, next) {
     next(vm => usersApi.find(to.params.username)
@@ -167,7 +170,8 @@ export default {
       authedUser: $auth.user,
       user: {},
       userFeedback: {},
-      showUntrusted: false
+      showUntrusted: false,
+      showTrustFeedbackModal: false
     })
 
     return { ...toRefs(v), humanDate }
