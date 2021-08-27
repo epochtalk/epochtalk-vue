@@ -6,4 +6,5 @@ for file in /tmp/*.js;
 do
   cat $file | envsubst $EXISTING_VARS | tee $JSFOLDER/$(basename $file)
 done
+rm /tmp/*.js
 nginx -g 'daemon off;'
