@@ -36,7 +36,7 @@
         <!-- Save Button -->
         {{feedback}}
         <div class="modal-actions split-column">
-          <button class="fill-row" :disabled="feedback.scammer === undefined || feedback.comments === undefined || feedbackSubmitted || !urlValid()" @click.prevent="addTrustFeedback()" v-html="submitFeedbackBtnLabel"></button>
+          <button class="fill-row" :disabled="feedback.scammer === undefined || feedback.comments.length < 3 || feedbackSubmitted || !urlValid()" @click.prevent="addTrustFeedback()" v-html="submitFeedbackBtnLabel"></button>
           <button @click.prevent="reset()" class="outline">
             Reset
           </button>
@@ -49,8 +49,8 @@
 
 <script>
 import Modal from '@/components/layout/Modal.vue'
-import { reactive, toRefs } from 'vue'
-// import { messagesApi } from '@/api'
+import { reactive, toRefs, inject } from 'vue'
+import { usersApi } from '@/api'
 import { websiteUrlRegex } from '@/composables/utils/globalRegex'
 
 export default {
@@ -61,28 +61,42 @@ export default {
   setup(props, { emit }) {
     /* Template Methods */
     const addTrustFeedback = () => {
-      console.log(v.feedback)
+      v.feedbackSubmitted = true
+      v.submitFeedbackBtnLabel = 'Loading...'
+      usersApi.trust.addTrustFeedback({
+        ...v.feedback,
+        scammer: Number(v.feedback.scammer) === -1 ? null : Number(v.feedback.scammer) !== 0,
+        risked_btc: Number(v.feedback.risked_btc),
+        user_id: props.user.id
+      })
+      .then(() => {
+        $alertStore.success('Successfully left trust feedback for ' + props.user.username)
+        close()
+      })
+      .catch(() => v.errorMessage = 'There was an error leaving feedback for ' + props.user.username)
+      .finally(() => v.submitFeedbackBtnLabel = 'Leave Feedback')
     }
 
     const urlValid = () => websiteUrlRegex.test(v.feedback.reference) || !v.feedback.reference
 
     const reset = () => {
       v.feedback = { risked_btc: '0.000' }
+      v.errorMessage = null
       v.focusInput.focus()
     }
 
     const close = () => {
+      v.feedback = { risked_btc: '0.000' }
       v.errorMessage = null
       emit('close')
     }
 
     /* Internal Data */
-    // const $alertStore = inject('$alertStore')
+    const $alertStore = inject('$alertStore')
 
     /* Template Data */
     const v = reactive({
       feedback: { risked_btc: '0.0000' },
-      userReactive: props.user,
       submitFeedbackBtnLabel: 'Leave Feedback',
       feedbackSubmitted: false,
       focusInput: null,
