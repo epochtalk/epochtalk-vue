@@ -12,7 +12,7 @@ RUN yarn install && yarn run build
 
 # production stage
 FROM nginx:stable-alpine as production-stage
-ENV JSFOLDER=/usr/share/nginx/html/js/*.js
+ENV JSFOLDER=/usr/share/nginx/html/js
 COPY ./start-nginx.sh /usr/bin/start-nginx.sh
 RUN chmod +x /usr/bin/start-nginx.sh
 WORKDIR /usr/share/nginx/html
