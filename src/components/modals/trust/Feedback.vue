@@ -7,11 +7,11 @@
         <h3 class="thin-underline">Leave trust feedback for {{user.username}}</h3>
         <label>
           Risked BTC
-          <input ref="focusInput" type="number" v-model="feedback.risked_btc" step="any" required />
+          <input ref="focusInput" type="number" v-model="feedback.risked_btc" step="0.0001" required />
         </label>
         <label>
           Reference Link
-          <input type="text" placeholder="Reference link to back up your feedback" ng-pattern="TrustCtrl.urlRegex" v-model="feedback.reference" />
+          <input type="text" placeholder="Reference link to back up your feedback" v-model="feedback.reference" />
         </label>
         <label>
           Feedback Type
@@ -51,6 +51,7 @@
 import Modal from '@/components/layout/Modal.vue'
 import { reactive, toRefs } from 'vue'
 // import { messagesApi } from '@/api'
+import { websiteUrlRegex } from '@/composables/utils/globalRegex'
 
 export default {
   name: 'trust-feedback-modal',
@@ -63,7 +64,7 @@ export default {
       console.log(v.feedback)
     }
 
-    const urlValid = () => true
+    const urlValid = () => websiteUrlRegex.test(v.feedback.reference) || !v.feedback.reference
 
     const reset = () => {
       v.feedback = { risked_btc: '0.000' }
