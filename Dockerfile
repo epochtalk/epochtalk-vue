@@ -5,12 +5,10 @@ RUN wget --no-check-certificate https://github.com/stedolan/jq/releases/download
 RUN cp /tmp/jq-linux64 /usr/bin/jq
 RUN chmod +x /usr/bin/jq
 WORKDIR /app
-COPY package*.json ./
-RUN yarn install
 COPY . .
 COPY src/docker-config.json src/config.json
 RUN jq 'to_entries | map_values({ (.key) : ("$" + .key) }) | reduce .[] as $item ({}; . + $item)' ./src/config.json > ./src/config.tmp.json && mv ./src/config.tmp.json ./src/config.json
-RUN yarn run build
+RUN yarn install && yarn run build
 
 # production stage
 FROM nginx:stable-alpine as production-stage
