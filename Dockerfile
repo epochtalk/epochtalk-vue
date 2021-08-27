@@ -18,5 +18,4 @@ ENV JSFOLDER=/usr/share/nginx/html/js/*.js
 COPY ./start-nginx.sh /usr/bin/start-nginx.sh
 RUN chmod +x /usr/bin/start-nginx.sh
 COPY --from=build-stage /app/dist /usr/share/nginx/html
-EXPOSE 80
 ENTRYPOINT [ "start-nginx.sh" ]
