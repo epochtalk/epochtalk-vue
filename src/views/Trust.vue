@@ -131,7 +131,7 @@
     </div>
   </div>
 
-  <trust-feedback-modal :user="user" :show="showTrustFeedbackModal" @close="showTrustFeedbackModal = false;" />
+  <trust-feedback-modal :user="user" :show="showTrustFeedbackModal" @close="showTrustFeedbackModal = false;" @success="refreshTrustData()" />
 </template>
 
 <script>
@@ -162,7 +162,13 @@ export default {
       .catch(() => {})
     next()
   },
-  setup() {
+  setup(props) {
+    const refreshTrustData = () => usersApi.find(props.username)
+      .then(u => v.user = u)
+      .then(() => usersApi.trust.getTrustFeedback(props.username))
+      .then(f => v.userFeedback = f)
+      .catch(() => {})
+
     const $auth = inject(AuthStore)
 
     const v = reactive({
@@ -174,7 +180,7 @@ export default {
       showTrustFeedbackModal: false
     })
 
-    return { ...toRefs(v), humanDate }
+    return { ...toRefs(v), refreshTrustData, humanDate }
   }
 }
 </script>

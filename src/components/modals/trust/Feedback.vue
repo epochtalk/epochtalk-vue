@@ -34,7 +34,6 @@
         </label>
 
         <!-- Save Button -->
-        {{feedback}}
         <div class="modal-actions split-column">
           <button class="fill-row" :disabled="feedback.scammer === undefined || feedback.comments.length < 3 || feedbackSubmitted || !urlValid()" @click.prevent="addTrustFeedback()" v-html="submitFeedbackBtnLabel"></button>
           <button @click.prevent="reset()" class="outline">
@@ -56,7 +55,7 @@ import { websiteUrlRegex } from '@/composables/utils/globalRegex'
 export default {
   name: 'trust-feedback-modal',
   props: ['show', 'user'],
-  emits: ['close'],
+  emits: ['close', 'success'],
   components: { Modal },
   setup(props, { emit }) {
     /* Template Methods */
@@ -70,11 +69,15 @@ export default {
         user_id: props.user.id
       })
       .then(() => {
+        emit('success')
         $alertStore.success('Successfully left trust feedback for ' + props.user.username)
         close()
       })
       .catch(() => v.errorMessage = 'There was an error leaving feedback for ' + props.user.username)
-      .finally(() => v.submitFeedbackBtnLabel = 'Leave Feedback')
+      .finally(() => {
+        v.submitFeedbackBtnLabel = 'Leave Feedback'
+        v.feedbackSubmitted = false
+      })
     }
 
     const urlValid = () => websiteUrlRegex.test(v.feedback.reference) || !v.feedback.reference
@@ -88,6 +91,7 @@ export default {
     const close = () => {
       v.feedback = { risked_btc: '0.000' }
       v.errorMessage = null
+      v.feedbackSubmitted = false
       emit('close')
     }
 
