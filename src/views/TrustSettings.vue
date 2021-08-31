@@ -2,7 +2,7 @@
   <div class="trust-main">
     <h1 class="view-title">Trust Settings for {{authedUser.username}}</h1>
 
-    <!-- <trust-list callback="TrustSettingsCtrl.trustListCallback"></trust-list> -->
+    <trust-list :success="trustListCallback()" :trust-list="trustData.trustList" :untrust-list="trustData.untrustList" :max="trustData.maxDepth"></trust-list>
 
     <div class="trust-section">
       <div class="trust-network-section">
@@ -12,14 +12,16 @@
         <a class="remove-active right" href="#" @click="changeTrustView()"><i class="fa fa-retweet"></i> Change to {{!hierarchy ? 'Hierarchical' : 'Depth'}} View</a>
       </div>
 
-        <ul v-if="!hierarchy" class="depth-tree" v-for="level in trustTree" :key="level">
-          <li><h3 class="">Depth {{level.depth}}</h3></li>
-          <ul>
-            <li v-for="user in level.users" :key="user.username">
-              {{user.username}} ({{user.level_trust}})
-            </li>
+        <span v-if="!hierarchy">
+          <ul class="depth-tree" v-for="level in trustTree" :key="level">
+            <li><h3 class="">Depth {{level.depth}}</h3></li>
+            <ul>
+              <li v-for="user in level.users" :key="user.username">
+                {{user.username}} ({{user.level_trust}})
+              </li>
+            </ul>
           </ul>
-        </ul>
+        </span>
 
         <div v-if="hierarchy">
 <!--           <script type="text/ng-template" id="trustTree">
@@ -43,42 +45,41 @@
 
 <script>
 import { reactive, toRefs, inject } from 'vue'
-// import { usersApi } from '@/api'
+import { usersApi } from '@/api'
 // import TrustDisplay from '@/components/trust/TrustDisplay.vue'
-// import { AuthStore } from '@/composables/stores/auth'
+import { AuthStore } from '@/composables/stores/auth'
 // import TrustFeedbackModal from '@/components/modals/trust/Feedback.vue'
+import TrustList from '@/components/trust/TrustList.vue'
 
 export default {
-  name: 'TrustList',
-  // components: { TrustDisplay, TrustFeedbackModal },
+  name: 'TrustSettings',
+  components: { TrustList },
   beforeRouteEnter(to, from, next) {
-    next(vm => usersApi.find(to.params.username)
-      .then(u => vm.user = u)
-      .then(() => usersApi.trust.getTrustFeedback(to.params.username))
-      .then(f => vm.userFeedback = f)
+    next(vm => usersApi.trust.getTrustList()
+      .then(d => vm.trustData = d)
       .catch(() => {})
     )
   },
   beforeRouteUpdate(to, from, next) {
-    usersApi.find(to.params.username)
-      .then(u => this.user = u)
-      .then(() => usersApi.trust.getTrustFeedback(to.params.username))
-      .then(f => this.userFeedback = f)
+    usersApi.trust.getTrustList()
+      .then(d => this.trustData = d)
       .catch(() => {})
     next()
   },
-  setup(props) {
+  setup() {
     const changeTrustView = () => console.log('changeTrustView')
+    const trustListCallback = () => console.log('trustListCallback')
 
     const $auth = inject(AuthStore)
 
     const v = reactive({
       authedUser: $auth.user,
+      trustData: {},
       trustTree: [],
       hierarchy: false
     })
 
-    return { ...toRefs(v), changeTrustView }
+    return { ...toRefs(v), changeTrustView, trustListCallback }
   }
 }
 </script>
