@@ -8,6 +8,7 @@ import About from '@/views/About.vue'
 import Settings from '@/views/Settings.vue'
 import Patrol from '@/views/Patrol.vue'
 import Trust from '@/views/Trust.vue'
+import TrustSettings from '@/views/TrustSettings.vue'
 import MemberSearch from '@/views/MemberSearch.vue'
 import Watchlist from '@/views/Watchlist.vue'
 import WatchlistEdit from '@/views/WatchlistEdit.vue'
@@ -96,6 +97,12 @@ const routes = [
     name: 'Settings',
     component: Settings,
     meta: { requiresAuth: true, bodyClass: 'settings' }
+  },
+  {
+    path: '/settings/trust',
+    name: 'TrustSettings',
+    component: TrustSettings,
+    meta: { requiresAuth: true, bodyClass: 'trust' }
   },
   {
     path: '/patrol',
