@@ -145,6 +145,7 @@ export const usersApi = {
   ignore: user => $http(`/api/ignoreUsers/ignore/${user.id}`, { method: 'POST' }),
   unignore: user => $http(`/api/ignoreUsers/unignore/${user.id}`, { method: 'POST' }),
   trust: {
+    getTrustList: () => $http('/api/trustlist'),
     getTrustStats: username => $http(`/api/trust/${username}`),
     getTrustFeedback: username => $http(`/api/trustfeedback/${username}`),
     addTrustFeedback: data => $http('/api/trust', { method: 'POST', data })
