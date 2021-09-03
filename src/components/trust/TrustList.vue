@@ -10,10 +10,10 @@
  -->
     <div class="trust-section">
       <div class="half-column">
-        <button class="fill-row" @click="addToTrustList()" :disabled="!userToTrust.user_id_trusted || trustedUserExists()">Add to Trusted Users</button>
+        <button class="fill-row" @click="addToTrustList()" :disabled="trustedUserExists()">Add to Trusted Users</button>
       </div>
       <div class="half-column">
-        <button class="fill-row" @click="addToUntrustList()" :disabled="!userToTrust.user_id_trusted || untrustedUserExists()">Add to Untrusted Users</button>
+        <button class="fill-row" @click="addToUntrustList()" :disabled="untrustedUserExists()">Add to Untrusted Users</button>
       </div>
     </div>
     <div class="trust-section">
@@ -74,8 +74,15 @@ export default {
     const addToUntrustList = () => console.log('addToUntrustList')
     const removeSelectedTrust = () => console.log('removeSelectedTrust')
     const removeSelectedUntrust = () => console.log('removeSelectedUntrust')
-    const trustedUserExists = () => true
-    const untrustedUserExists = () => true
+    const trustedUserExists = () => {
+      if (v.trustUserInput.value.length < 1) return true
+      return v.trustUserInput.value.length !== v.trustUserInput.value.filter(u => !v.trustList.find(o => o.username_trusted === u)).length
+    }
+    const untrustedUserExists = () => {
+      if (v.trustUserInput.value.length < 1) return true
+      return v.trustUserInput.value.length !== v.trustUserInput.value.filter(u => !v.untrustList.find(o => o.username_trusted === u)).length
+    }
+
     let v = reactive({
       admin: props.admin,
       userToTrust: {},
