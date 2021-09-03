@@ -4,6 +4,8 @@
       <span class="info-tooltip" data-balloon="Manages the trust list which all users will inherit for their default trust settings. Trust is important to prevent scamming when there are forums for selling goods and services" data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
     </h5>
 
+    <Multiselect v-model="trustUserInput.value" v-bind="trustUserInput" />
+
 <!--     <autocomplete-user-id admin="admin" user-id="vm.userToTrust.user_id_trusted" username="vm.userToTrust.username_trusted" input-placeholder="Type username to add to trust/untrust list"></autocomplete-user-id>
  -->
     <div class="trust-section">
@@ -57,11 +59,14 @@
 
 <script>
 import { reactive, toRefs, watch } from 'vue'
+import Multiselect from '@vueform/multiselect'
+import { usersApi } from '@/api'
 
 export default {
   name: 'TrustList',
   props: [ 'admin', 'trustList', 'untrustList', 'max' ],
   emits: ['success'],
+  components: { Multiselect },
   setup(props) {
 
     const editTrustList = () => console.log('editTrustList')
@@ -78,7 +83,23 @@ export default {
       untrustList: props?.untrustList || [],
       maxDepth: props.max,
       selectedTrustedUsers: [],
-      selectedUntrustedUsers: []
+      selectedUntrustedUsers: [],
+      trustUserInput: {
+        mode: 'tags',
+        value: [],
+        placeholder: 'Type username of user(s) to trust/untrust',
+        noOptionsText: 'Enter a username to start lookup...',
+        minChars: 1,
+        resolveOnLoad: false,
+        delay: 0,
+        searchable: true,
+        maxHeight: 100,
+        options: async q => {
+          return await usersApi.search(q)
+          // convert array into array of objects
+          .then(d => d.reduce((o, k) => (o[k] = k, o), {}))
+        }
+      }
     })
 
     watch(() => props.max, m => v.maxDepth = m)
