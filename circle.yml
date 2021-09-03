@@ -1,0 +1,18 @@
+version: 2.1
+jobs:
+  release:
+    docker:
+      - image: circleci/node:12.14.1
+    steps:
+      - checkout
+      - run: yarn install
+      - run:
+          command: npx semantic-release
+          no_output_timeout: 5m
+orbs:
+  slack: circleci/slack@3.4.2
+workflows:
+  version: 2
+  release:
+    jobs:
+      - release:
