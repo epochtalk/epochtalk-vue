@@ -8,7 +8,7 @@ jobs:
       - run: yarn install
       - run:
           command: npx semantic-release
-          no_output_timeout: 5m
+          no_output_timeout: 20m
 workflows:
   release:
     jobs:
