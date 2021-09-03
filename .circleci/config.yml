@@ -12,5 +12,4 @@ jobs:
 workflows:
   version: 2
   release:
-    jobs:
-      - release:
+      - release
