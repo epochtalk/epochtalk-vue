@@ -9,10 +9,7 @@ jobs:
       - run:
           command: npx semantic-release
           no_output_timeout: 5m
-orbs:
-  slack: circleci/slack@3.4.2
 workflows:
-  version: 2
   release:
     jobs:
-      - release:
+      - release
