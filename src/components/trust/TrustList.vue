@@ -38,7 +38,7 @@
         </select>
       </div>
     </div>
-    <div class="trust-section split-column">
+    <div class="trust-section split-column align-bottom">
       <div>
         <label v-if="!admin" for="maxdepth">Trust Depth (max 4): </label>
         <input v-if="!admin" id="maxdepth" name="maxdepth" placeholder="Trust Depth (max 4)" type="number" min="0" max="4" v-model="maxDepth" />
@@ -142,7 +142,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.trust-section { margin-bottom: .5rem; }
+.trust-section { margin-bottom: 1rem; }
 .split-column {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -155,4 +155,12 @@ export default {
 .trust-button {
   margin-top: 1rem;
 }
+.align-bottom {
+  align-items: flex-end;
+  justify-content: flex-end;
+  input {
+    margin-bottom: 0;
+  }
+}
+.trust-select { margin-bottom: 0; }
 </style>
