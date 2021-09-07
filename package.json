@@ -7,6 +7,17 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
+  "release": {
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/github"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/epochtalk/epochtalk-vue"
+  },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.1",
     "@vueform/multiselect": "^1.2.5",
