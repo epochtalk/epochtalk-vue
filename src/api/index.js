@@ -149,7 +149,9 @@ export const usersApi = {
     getTrustList: () => $http('/api/trustlist'),
     getTrustStats: username => $http(`/api/trust/${username}`),
     getTrustFeedback: username => $http(`/api/trustfeedback/${username}`),
-    addTrustFeedback: data => $http('/api/trust', { method: 'POST', data })
+    addTrustFeedback: data => $http('/api/trust', { method: 'POST', data }),
+    editDefaultTrustList: data => $http('/api/admin/trustlist', { method: 'POST', data }),
+    editTrustList: data => $http('/api/trustlist', { method: 'POST', data })
   }
 }
 
