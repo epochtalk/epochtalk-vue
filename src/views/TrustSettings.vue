@@ -55,14 +55,21 @@ export default {
   name: 'TrustSettings',
   components: { TrustList },
   beforeRouteEnter(to, from, next) {
-    next(vm => usersApi.trust.getTrustList()
+    next(vm => {
+      usersApi.trust.getTrustList()
       .then(d => vm.trustData = d)
       .catch(() => {})
-    )
+      usersApi.trust.getTrustTree()
+      .then(d => vm.trustTree = d)
+      .catch(() => {})
+    })
   },
   beforeRouteUpdate(to, from, next) {
     usersApi.trust.getTrustList()
       .then(d => this.trustData = d)
+      .catch(() => {})
+    usersApi.trust.getTrustTree()
+      .then(d => this.trustTree = d)
       .catch(() => {})
     next()
   },
