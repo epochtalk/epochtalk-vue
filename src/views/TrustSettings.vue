@@ -50,34 +50,45 @@ import { usersApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 // import TrustFeedbackModal from '@/components/modals/trust/Feedback.vue'
 import TrustList from '@/components/trust/TrustList.vue'
+import { useRoute, useRouter } from 'vue-router'
 
 export default {
   name: 'TrustSettings',
   components: { TrustList },
   beforeRouteEnter(to, from, next) {
     next(vm => {
+      vm.hierarchy = to.query.hierarchy
       usersApi.trust.getTrustList()
       .then(d => vm.trustData = d)
       .catch(() => {})
-      usersApi.trust.getTrustTree()
+      usersApi.trust.getTrustTree({ hierarchy: to.query.hierarchy })
       .then(d => vm.trustTree = d)
       .catch(() => {})
     })
   },
   beforeRouteUpdate(to, from, next) {
+    this.hierarchy = to.query.hierarchy
     usersApi.trust.getTrustList()
       .then(d => this.trustData = d)
       .catch(() => {})
-    usersApi.trust.getTrustTree()
+    usersApi.trust.getTrustTree({ hierarchy: to.query.hierarchy })
       .then(d => this.trustTree = d)
       .catch(() => {})
     next()
   },
   setup() {
-    const changeTrustView = () => console.log('changeTrustView')
+    const changeTrustView = () => {
+      let query = { hierarchy: v.hierarchy }
+      if (query.hierarchy) delete query.hierarchy
+      else query.hierarchy = true
+      $router.replace({ name: $route.name, params: $route.params, query })
+    }
+
     const trustListCallback = () => console.log('trustListCallback')
 
     const $auth = inject(AuthStore)
+    const $router = useRouter()
+    const $route = useRoute()
 
     const v = reactive({
       authedUser: $auth.user,
