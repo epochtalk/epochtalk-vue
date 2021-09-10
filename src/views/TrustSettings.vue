@@ -31,10 +31,12 @@
               <li ng-repeat="user in user.trusted" ng-include="'trustTree'"></li>
             </ul>
           </script>
-          <ul class="depth-tree">
             <li ng-repeat="user in TrustSettingsCtrl.trustTree" ng-include="'trustTree'">
             </li>
           </ul> -->
+          <ul class="depth-tree">
+            <trust-hierarchy-partial :trust-tree="trustTree" />
+          </ul>
         </div>
 
     </div>
@@ -50,11 +52,12 @@ import { usersApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 // import TrustFeedbackModal from '@/components/modals/trust/Feedback.vue'
 import TrustList from '@/components/trust/TrustList.vue'
+import TrustHierarchyPartial from '@/components/trust/TrustHierarchyPartial.vue'
 import { useRoute, useRouter } from 'vue-router'
 
 export default {
   name: 'TrustSettings',
-  components: { TrustList },
+  components: { TrustList, TrustHierarchyPartial },
   beforeRouteEnter(to, from, next) {
     next(vm => {
       vm.hierarchy = to.query.hierarchy
@@ -81,7 +84,7 @@ export default {
       let query = { hierarchy: v.hierarchy }
       if (query.hierarchy) delete query.hierarchy
       else query.hierarchy = true
-      $router.replace({ name: $route.name, params: $route.params, query })
+      $router.replace({ name: $route.name, params: { ...$route.params, saveScrollPos: true }, query })
     }
 
     const trustListCallback = () => console.log('trustListCallback')
