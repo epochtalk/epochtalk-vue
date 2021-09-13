@@ -160,7 +160,7 @@ export default {
 </script>
 
 <style lang="scss">
-main #public-content { grid-template-areas: 'header header' 'main main' 'main main'; }
+.boards main #public-content { grid-template-areas: 'header header' 'main main' 'main main'; }
 
 img.avatar-small {
   border-radius: 100px;
