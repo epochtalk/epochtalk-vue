@@ -127,7 +127,7 @@
   <div class="sidebar">
     <div class="trust-section" v-if="loggedIn">
       <a v-if="!((authedUser.id === user.id) || !authedUser.permissions.userTrust || (authedUser.permissions.userTrust && !authedUser.permissions.userTrust.addTrustFeedback))" class="button" href="#" @click.prevent="showTrustFeedbackModal = true">Leave feedback for {{user.username}}</a>
-      <a class="" ui-sref="trust-settings"><i class="fa fa-cog"></i> Edit My Trust Settings</a>
+      <router-link :to="{ name: 'TrustSettings' }"><i class="fa fa-cog"></i> Edit My Trust Settings</router-link>
     </div>
   </div>
 
