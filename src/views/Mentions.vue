@@ -367,12 +367,11 @@ $avatar-small: 2rem;
 $columnGap-small: 0.5rem;
 
 @media screen and (max-width: 767px) {
-  main #public-content {
+  .mentions #public-content {
     grid-template-areas:
-      "header"
-      "sidebar"
-      "main"
-      "footer";
+      "header header"
+      "sidebar sidebar"
+      "main main";
   }
 
   .recent-mentions {
