@@ -38,7 +38,7 @@
             <i class="fa fa-users" aria-hidden="true"></i>Member Search
           </router-link>
         </li>
-        <li @click="HeaderCtrl.showMobileMenu = false" >
+        <li @click="showMobileMenu = false" >
           <router-link :to="{ name: 'Mentions' }">
             <i class="fas fa-at" aria-hidden="true"></i>Mentions
           </router-link>
