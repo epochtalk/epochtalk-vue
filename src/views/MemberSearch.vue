@@ -151,6 +151,14 @@ export default {
 
 <style lang="scss">
 .member-search main #public-content { grid-template-areas: 'header header' 'main sidebar' 'main sidebar'; }
+@media screen and (max-width: 767px) {
+  .member-search main #public-content {
+    grid-template-areas:
+      "header header"
+      "main main"
+      "sidebar sidebar";
+  }
+}
 .user-search { grid-area: main; }
 .sidebar {
   grid-area: sidebar;
