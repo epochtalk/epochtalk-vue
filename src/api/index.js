@@ -49,6 +49,10 @@ export const motdApi = {
   save: data => $http('/api/motd', { method: 'PUT', data })
 }
 
+export const imagesApi = {
+  imagePolicy: data => $http('/api/images/policy', { method: 'POST', data })
+}
+
 export const boardsApi = {
   slugToBoardId: slug => $http(`/api/boards/${slug}/id`),
   getBoards: stripped => $http(`/api/boards${stripped ? '?stripped=true' : ''}`),
