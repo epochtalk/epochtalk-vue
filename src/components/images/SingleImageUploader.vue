@@ -1,13 +1,17 @@
 <template>
     <input type="file" name="fileInput" id="fileInput" @change="uploadFile()" ref="fileInput" multiple><br>
-    <progress ref="progressBar" value="0" max="100"></progress>
+    <progress ref="progressBar" style="width: 100%" :value="imagesProgress" max="100"></progress>
     <h3 ref="status"></h3>
     <p ref="amountUploaded"></p>
 </template>
 
 <script>
 import { reactive, toRefs } from 'vue'
-import { policy } from '@/composables/services/image-upload'
+import { policy, upload } from '@/composables/services/image-upload'
+
+Promise.each = async function(arr, fn) { // take an array and a function
+   for(const item of arr) await fn(item);
+}
 
 export default {
   name: 'single-image-uploader',
@@ -15,15 +19,14 @@ export default {
   setup(props) { //, { emit }) {
     /* View Methods */
     const uploadFile = () => {
-      var images = []
       for (var i = 0; i < v.fileInput.files.length; i++) {
         var file = v.fileInput.files[i]
         if (!file.type.match(/image.*/)) continue
-        images.push(file)
+        v.images.push(file)
       }
-      if (props.purpose === 'avatar' || props.purpose === 'logo' || props.purpose === 'favicon') { images = [images[0]] }
+      if (props.purpose === 'avatar' || props.purpose === 'logo' || props.purpose === 'favicon') { v.images = [v.images[0]] }
 
-      if (images.length > 0) {
+      if (v.images.length > 0) {
         // if (v.fileInput.files.length > 10) {
         //   return $timeout(function() { Alert.error('Error: Exceeded 10 images.'); });
         // }
@@ -52,15 +55,11 @@ export default {
             status: 'Initializing',
             progress: 0
           }
-          if (fsImage.size > maxImageSize) {
-            errImages.push(fsImage.name)
-          }
-          else {
-            v.currentImages.push(image)
-          }
+          if (fsImage.size > maxImageSize) errImages.push(fsImage.name)
+          else v.currentImages.push(image)
         })
 
-        // let warningMsg = 'Some images exceeded the max image upload size(' + maxImageSize + ' bytes): [' + errImages.join(', ') + ']'
+        let warningMsg = 'Some images exceeded the max image upload size(' + maxImageSize + ' bytes): [' + errImages.join(', ') + ']'
 
         if (!v.currentImages.length) {
           v.imagesUploading = false
@@ -69,8 +68,81 @@ export default {
         // the number of images that are still being uploaded
         v.uploadingImages = v.currentImages.length
 
-        console.log(policy(v.currentImages))
+        return policy(v.currentImages)
+        // upload each image
+        .then(images => {
+          let index = 0
+          return Promise.each(images, image => {
+            v.currentImages[index].status = 'Starting'
+            return Promise.resolve(upload(image).progress(p => updateImagesUploading(index, p))
+            .error(err => {
+              updateImagesUploading(index)
+              var message = 'Image upload failed for: ' + image.name + '. '
+              if (err.status === 429) { message += 'Exceeded 10 images in batch upload.' }
+              else if (err.message) { console.log(err) }
+              else { message += 'Error: ' + err.message }
+              console.log(message)
+              // Alert.error(message);
+            })
+            .success(url => {
+              updateImagesUploading(index, 100, url)
+              // if ($scope.onDone) { $scope.onDone({data: url}); }
+              if (props.purpose === 'avatar' || props.purpose === 'logo' || props.purpose === 'favicon') { v.model = url }
+              else { v.images.push(image) }
+            })
+            .catch(function(err) {
+              updateImagesUploading(index)
+              var message = 'Image upload failed for: ' + image.name + '. '
+              if (err.status === 429) { message += 'Exceeded 10 images in batch upload.' }
+              else { message += 'Error: ' + err.message }
+              // Alert.error(message);
+              console.log(message)
+
+            }))
+            .finally(() => index++)
+          })
+          .then(function() {
+            // log error images after all uploads finish
+            if (errImages.length) {
+              console.log(warningMsg)
+              // return $timeout(function() { Alert.warning(warningMsg); })
+            }
+          });
+        })
       }
+    }
+
+    // update loading status
+    function updateImagesUploading(index, percent, url) {
+      // on successful update
+      if (percent) {
+        // update images' progress sum
+        // (subtract old value and add new value)
+        v.imagesProgressSum = v.imagesProgressSum - v.currentImages[index].progress + percent
+        // update the image's progress
+        v.currentImages[index].progress = percent
+        // update the image's properties
+        if (percent === 100 && url) {
+          // on complete, with url populated
+          // set the image URL
+          // and remove from currentlyUploadingImages
+          v.currentImages[index].status = 'Complete'
+          v.currentImages[index].url = url
+          v.uploadingImages--
+        }
+        else v.currentImages[index].status = 'Uploading'
+      }
+      // on upload error or failure
+      else {
+        v.imagesProgressSum = v.imagesProgressSum - v.currentImages[index].progress
+        v.currentImages[index].progress = '--'
+        v.currentImages[index].status = 'Failed'
+        v.uploadingImages--
+      }
+
+      v.imagesProgress = v.imagesProgressSum / v.currentImages.length
+
+      if (v.uploadingImages <= 0) v.imagesUploading = false
     }
 
     // const progressHandler = e => {
@@ -102,8 +174,12 @@ export default {
       progressBar: null,
       amountUploaded: null,
       currentImages: [],
+      images: [],
       imagesUploading: false,
+      imagesProgress: 0,
+      imagesProgressSum: 0,
       uploadingImages: 0,
+      model: null,
       status: null
     })
 

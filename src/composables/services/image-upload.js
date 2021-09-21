@@ -34,6 +34,7 @@ export const upload = image => {
   var signature = image.policy.signature
   var accessKey = image.policy.accessKey
   var url = image.policy.uploadUrl
+  console.log(url)
   var key = image.policy.key
   var imageUrl = image.policy.imageUrl
   var storageType = image.policy.storageType
@@ -63,7 +64,7 @@ export const upload = image => {
   xhr.upload.addEventListener('error', deferred.reject, false)
 
   // Send the file
-  xhr.open('POST', url, true);
+  xhr.open('POST', 'http://localhost:8080' + url, true)
   if (storageType === 'local') {
     xhr.setRequestHeader('Authorization', 'Bearer ' + token)
   }
