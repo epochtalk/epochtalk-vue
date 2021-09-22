@@ -4,7 +4,7 @@ const AUTH_KEY = 'auth'
 import { imagesApi } from '@/api'
 
 export const policy = images => {
-  console.log(images)
+  if (!images.length) return Promise.reject()
   // get all the image filenames
   var names = []
   images.forEach(image => names.push(image.name))
@@ -34,7 +34,6 @@ export const upload = image => {
   var signature = image.policy.signature
   var accessKey = image.policy.accessKey
   var url = image.policy.uploadUrl
-  console.log(url)
   var key = image.policy.key
   var imageUrl = image.policy.imageUrl
   var storageType = image.policy.storageType

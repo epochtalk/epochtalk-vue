@@ -12,8 +12,10 @@
           <input type="text" id="avatar" name="avatar" v-model="userCopy.avatar" ref="focusInput" />
           <div class="input-info">Hotlinked images will receive a new url</div>
 
-          <single-image-uploader />
-          <!-- <image-uploader model="vmProfile.editAvatarUser.avatar" purpose="avatar"></image-uploader> -->
+          <image-uploader purpose="avatar" @upload-success="uploadSuccess" @upload-error="uploadError" />
+        </div>
+        <div class="profile-avatar-container" :class="defaultAvatarShape">
+          <img :src="userCopy.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
         </div>
 
         <!-- Save Button -->
@@ -29,7 +31,7 @@
 </template>
 
 <script>
-import SingleImageUploader from '@/components/images/SingleImageUploader.vue'
+import ImageUploader from '@/components/images/ImageUploader.vue'
 import Modal from '@/components/layout/Modal.vue'
 import { reactive, toRefs, inject } from 'vue'
 import { usersApi } from '@/api'
@@ -39,7 +41,7 @@ export default {
   name: 'update-avatar-modal',
   props: ['show', 'user'],
   emits: ['close'],
-  components: { Modal, SingleImageUploader },
+  components: { Modal, ImageUploader },
   setup(props, { emit }) {
     /* Template Methods */
     const updateAvatar = () => {
@@ -63,18 +65,36 @@ export default {
       emit('close')
     }
 
+    const uploadSuccess = url => v.userCopy.avatar = url
+    const uploadError = err => v.errorMessage = err
     /* Internal Data */
     const $alertStore = inject('$alertStore')
 
     /* Template Data */
     const v = reactive({
       userCopy: cloneDeep(props.user),
+      defaultAvatar: window.default_avatar,
+      defaultAvatarShape: window.default_avatar_shape,
       userReactive: props.user,
       focusInput: null,
       errorMessage: ''
     })
 
-    return { ...toRefs(v), updateAvatar, close }
+    return { ...toRefs(v), updateAvatar, uploadSuccess, uploadError, close }
   }
 }
 </script>
+
+<style lang="scss">
+  .profile-avatar-container {
+    width: 100%; height: 100%;
+    text-align: center;
+    &.rect {
+      img { height: 80px; width: 120px; object-fit: cover;}
+    }
+    &.circle {
+      img { height: 120px; width: 120px; border-radius: 100%; object-fit: cover; }
+    }
+  }
+
+</style>

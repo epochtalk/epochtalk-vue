@@ -1,8 +1,7 @@
 <template>
-    <input type="file" name="fileInput" id="fileInput" @change="uploadFile()" ref="fileInput" multiple><br>
+    <input type="file" name="fileInput" id="fileInput" @change="uploadFile()" ref="fileInput" :multiple="multiple"><br>
     <progress ref="progressBar" style="width: 100%" :value="imagesProgress" max="100"></progress>
-    <h3 ref="status"></h3>
-    <p ref="amountUploaded"></p>
+    <div class="error" v-if="purpose === 'avatar'">{{warningMsg}}</div>
 </template>
 
 <script>
@@ -14,9 +13,9 @@ Promise.each = async function(arr, fn) { // take an array and a function
 }
 
 export default {
-  name: 'single-image-uploader',
+  name: 'image-uploader',
   props: ['onUpload-success', 'onUpload-error', 'purpose'],
-  setup(props) { //, { emit }) {
+  setup(props, { emit }) { //, { emit }) {
     /* View Methods */
     const uploadFile = () => {
       for (var i = 0; i < v.fileInput.files.length; i++) {
@@ -24,7 +23,10 @@ export default {
         if (!file.type.match(/image.*/)) continue
         v.images.push(file)
       }
+      console.log(props.purpose)
       if (props.purpose === 'avatar' || props.purpose === 'logo' || props.purpose === 'favicon') { v.images = [v.images[0]] }
+
+        console.log(v.images)
 
       if (v.images.length > 0) {
         // if (v.fileInput.files.length > 10) {
@@ -48,7 +50,7 @@ export default {
          *   url: {string} The url where the image is hosted (upon upload completion)
          */
          // prep each image
-        v.fileInput.files.forEach(fsImage => {
+        v.images.forEach(fsImage => {
           let image = {
             name: fsImage.name,
             file: fsImage,
@@ -59,7 +61,9 @@ export default {
           else v.currentImages.push(image)
         })
 
-        let warningMsg = 'Some images exceeded the max image upload size(' + maxImageSize + ' bytes): [' + errImages.join(', ') + ']'
+        if (errImages.length) {
+          v.warningMsg = 'Some images exceeded the max image upload size(' + maxImageSize + ' bytes): [' + errImages.join(', ') + ']'
+        }
 
         if (!v.currentImages.length) {
           v.imagesUploading = false
@@ -67,7 +71,6 @@ export default {
         }
         // the number of images that are still being uploaded
         v.uploadingImages = v.currentImages.length
-
         return policy(v.currentImages)
         // upload each image
         .then(images => {
@@ -81,14 +84,19 @@ export default {
               if (err.status === 429) { message += 'Exceeded 10 images in batch upload.' }
               else if (err.message) { console.log(err) }
               else { message += 'Error: ' + err.message }
-              console.log(message)
+              emit('upload-error', message)
               // Alert.error(message);
             })
             .success(url => {
               updateImagesUploading(index, 100, url)
               // if ($scope.onDone) { $scope.onDone({data: url}); }
-              if (props.purpose === 'avatar' || props.purpose === 'logo' || props.purpose === 'favicon') { v.model = url }
-              else { v.images.push(image) }
+              if (props.purpose === 'avatar' || props.purpose === 'logo' || props.purpose === 'favicon') {
+                v.model = url
+                emit('upload-success', 'http://localhost:8080' + url)
+              }
+              else {
+                v.images.push(image)
+              }
             })
             .catch(function(err) {
               updateImagesUploading(index)
@@ -96,7 +104,7 @@ export default {
               if (err.status === 429) { message += 'Exceeded 10 images in batch upload.' }
               else { message += 'Error: ' + err.message }
               // Alert.error(message);
-              console.log(message)
+              emit('upload-error', message)
 
             }))
             .finally(() => index++)
@@ -104,10 +112,13 @@ export default {
           .then(function() {
             // log error images after all uploads finish
             if (errImages.length) {
-              console.log(warningMsg)
-              // return $timeout(function() { Alert.warning(warningMsg); })
+              emit('upload-error', v.warningMsg)
+              // TODO(akinsey) return $timeout(function() { Alert.warning(warningMsg); })
             }
-          });
+          })
+          .catch(function() {
+            emit('upload-error', v.warningMsg)
+          })
         })
       }
     }
@@ -171,6 +182,7 @@ export default {
 
     const v = reactive({
       fileInput: null,
+      multiple: !props.purpose,
       progressBar: null,
       amountUploaded: null,
       currentImages: [],
@@ -179,6 +191,7 @@ export default {
       imagesProgress: 0,
       imagesProgressSum: 0,
       uploadingImages: 0,
+      warningMsg: '',
       model: null,
       status: null
     })
