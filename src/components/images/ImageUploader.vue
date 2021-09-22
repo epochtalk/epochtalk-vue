@@ -1,7 +1,6 @@
 <template>
     <input type="file" name="fileInput" id="fileInput" @change="uploadFile()" ref="fileInput" :multiple="multiple"><br>
     <progress ref="progressBar" style="width: 100%" :value="imagesProgress" max="100"></progress>
-    <div class="error" v-if="purpose === 'avatar'">{{warningMsg}}</div>
 </template>
 
 <script>
@@ -116,9 +115,9 @@ export default {
               // TODO(akinsey) return $timeout(function() { Alert.warning(warningMsg); })
             }
           })
-          .catch(function() {
-            emit('upload-error', v.warningMsg)
-          })
+        })
+        .catch(() => {
+          emit('upload-error', v.warningMsg)
         })
       }
     }
