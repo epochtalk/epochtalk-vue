@@ -1,6 +1,7 @@
 <template>
+    <label v-if="purpose === 'avatar'" for="fileInput">Avatar URL</label>
     <input type="file" name="fileInput" id="fileInput" @change="uploadFile" ref="fileInput" :multiple="multiple"><br>
-    <progress ref="progressBar" style="width: 100%" :value="imagesProgress" max="100"></progress>
+    <progress v-if="!purpose" ref="progressBar" style="width: 100%" :value="imagesProgress" max="100"></progress>
 </template>
 
 <script>
@@ -205,3 +206,9 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+  #fileInput {
+    height: auto;
+  }
+</style>
