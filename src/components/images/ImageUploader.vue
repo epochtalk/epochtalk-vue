@@ -1,5 +1,5 @@
 <template>
-    <input type="file" name="fileInput" id="fileInput" @change="uploadFile()" ref="fileInput" :multiple="multiple"><br>
+    <input type="file" name="fileInput" id="fileInput" @change="uploadFile" ref="fileInput" :multiple="multiple"><br>
     <progress ref="progressBar" style="width: 100%" :value="imagesProgress" max="100"></progress>
 </template>
 
@@ -16,18 +16,22 @@ export default {
   props: ['onUpload-success', 'onUpload-error', 'purpose'],
   setup(props, { emit }) { //, { emit }) {
     /* View Methods */
-    const uploadFile = () => {
-      for (var i = 0; i < v.fileInput.files.length; i++) {
-        var file = v.fileInput.files[i]
+    const uploadFile = (e) => {
+      emit('upload-error', null) // clear previous errors
+
+      let files = e.target.files || e.dataTransfer.files
+      let images = []
+      for (var i = 0; i < files.length; i++) {
+        let file = files[i]
         if (!file.type.match(/image.*/)) continue
-        v.images.push(file)
+        images.push(file)
       }
       console.log(props.purpose)
-      if (props.purpose === 'avatar' || props.purpose === 'logo' || props.purpose === 'favicon') { v.images = [v.images[0]] }
+      if (props.purpose === 'avatar' || props.purpose === 'logo' || props.purpose === 'favicon') { images = [images[0]] }
 
-        console.log(v.images)
+        console.log(images)
 
-      if (v.images.length > 0) {
+      if (images.length > 0) {
         // if (v.fileInput.files.length > 10) {
         //   return $timeout(function() { Alert.error('Error: Exceeded 10 images.'); });
         // }
@@ -49,7 +53,7 @@ export default {
          *   url: {string} The url where the image is hosted (upon upload completion)
          */
          // prep each image
-        v.images.forEach(fsImage => {
+        images.forEach(fsImage => {
           let image = {
             name: fsImage.name,
             file: fsImage,
@@ -103,23 +107,25 @@ export default {
               if (err.status === 429) { message += 'Exceeded 10 images in batch upload.' }
               else { message += 'Error: ' + err.message }
               // Alert.error(message);
-              emit('upload-error', message)
-
+              handleError(message)
             }))
             .finally(() => index++)
           })
           .then(function() {
             // log error images after all uploads finish
             if (errImages.length) {
-              emit('upload-error', v.warningMsg)
+              handleError(v.warningMsg)
               // TODO(akinsey) return $timeout(function() { Alert.warning(warningMsg); })
             }
           })
         })
-        .catch(() => {
-          emit('upload-error', v.warningMsg)
-        })
+        .catch(() => handleError(v.warningMsg))
       }
+    }
+
+    const handleError = msg => {
+      v.currentImages = []
+      emit('upload-error', msg)
     }
 
     // update loading status
