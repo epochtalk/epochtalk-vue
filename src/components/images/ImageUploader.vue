@@ -1,6 +1,6 @@
 <template>
     <label v-if="purpose === 'avatar'" for="fileInput">Avatar URL</label>
-    <input type="file" name="fileInput" id="fileInput" @change="uploadFile" ref="fileInput" :multiple="multiple"><br>
+    <input type="file" name="fileInput" id="fileInput" @change="uploadFile" ref="fileInput" :multiple="multiple" @drop="uploadFile" @dragenter.prevent @dragover.prevent><br>
     <progress v-if="!purpose" ref="progressBar" style="width: 100%" :value="imagesProgress" max="100"></progress>
 </template>
 
@@ -21,6 +21,8 @@ export default {
       emit('upload-error', null) // clear previous errors
 
       let files = e.target.files || e.dataTransfer.files
+      if (!files.length) return
+      console.log(e.target.files)
       let images = []
       for (var i = 0; i < files.length; i++) {
         let file = files[i]
@@ -185,6 +187,32 @@ export default {
     //   v.status.innerHTML = 'Upload Aborted'
     //   emit('upload-error')
     // }
+
+    // var cancelEvent = function(e) {
+    //   e.stopPropagation();
+    //   e.preventDefault();
+    // };
+
+    // var removeDrag = function(e) {
+    //   e.stopPropagation();
+    //   e.preventDefault();
+    // };
+
+    // var dropEvent = function(e) {
+    //   removeDrag(e);
+    //   uploadFile(e)
+    // };
+
+    // $parent.on('dragenter', cancelEvent);
+    // $parent.on('dragover', cancelEvent);
+    // $dragZone.on('dragenter', cancelEvent);
+    // $dragZone.on('dragover', cancelEvent);
+    // $dragZone.on('dragend', removeDrag);
+    // $dragZone.on('dragexit', removeDrag);
+    // $dragZone.on('dragleave', removeDrag);
+
+    // $parent.on('drop', dropEvent);
+    // $dragZone.on('drop', dropEvent);
 
     const v = reactive({
       fileInput: null,
