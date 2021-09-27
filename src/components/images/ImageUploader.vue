@@ -1,5 +1,5 @@
 <template>
-    <label v-if="purpose === 'avatar'" for="fileInput">Avatar URL</label>
+    <label v-if="purpose === 'avatar'" for="fileInput">Choose Image File</label>
     <input type="file" name="fileInput" id="fileInput" @change="uploadFile" ref="fileInput" :multiple="multiple" @drop="uploadFile" @dragenter.prevent @dragover.prevent><br>
     <progress v-if="!purpose" ref="progressBar" style="width: 100%" :value="imagesProgress" max="100"></progress>
 </template>
