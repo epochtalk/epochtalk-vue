@@ -36,6 +36,7 @@ import Modal from '@/components/layout/Modal.vue'
 import { reactive, toRefs, inject } from 'vue'
 import { usersApi } from '@/api'
 import { cloneDeep } from 'lodash'
+import { AuthStore } from '@/composables/stores/auth'
 
 export default {
   name: 'update-avatar-modal',
@@ -55,6 +56,7 @@ export default {
         v.userCopy.avatar = data.avatar
         $alertStore.success(`Successfully updated avatar for user ${params.username}`)
         Object.assign(v.userReactive, v.userCopy)
+        $auth.reauthenticate()
       })
       .catch(() => v.errorMessage = 'There was an error updating avatar.')
       .finally(() => v.errorMessage ? null : close())
@@ -69,6 +71,7 @@ export default {
     const uploadError = err => v.errorMessage = err
     /* Internal Data */
     const $alertStore = inject('$alertStore')
+    const $auth = inject(AuthStore)
 
     /* Template Data */
     const v = reactive({

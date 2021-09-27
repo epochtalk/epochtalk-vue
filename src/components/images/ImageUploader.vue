@@ -122,7 +122,7 @@ export default {
     }
 
     // update loading status
-    function updateImagesUploading(index, percent, url) {
+    const updateImagesUploading = (index, percent, url) => {
       // on successful update
       if (percent) {
         // update images' progress sum

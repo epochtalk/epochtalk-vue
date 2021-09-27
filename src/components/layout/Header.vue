@@ -349,6 +349,7 @@ export default {
       breadcrumbs: [{label:'Home', state: '#', opts: {}}]
     })
 
+    watch(() => $auth.user, u => v.currentUser = u, { deep: true })
     watch(() => $route.path, p => v.hideAnnnouncement = v.motdData?.main_view_only && p !== '' && p !== '/')
     watch(() => NotificationsStore.messages, c => v.notificationMessages = c)
     watch(() => NotificationsStore.mentions, c => v.notificationMentions = c)
