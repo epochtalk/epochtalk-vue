@@ -8,9 +8,7 @@
 import { reactive, toRefs } from 'vue'
 import { policy, upload } from '@/composables/services/image-upload'
 
-Promise.each = async function(arr, fn) { // take an array and a function
-   for(const item of arr) await fn(item);
-}
+Promise.each = async (arr, fn) => { for(const item of arr) await fn(item) }
 
 export default {
   name: 'image-uploader',
