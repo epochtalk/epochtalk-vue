@@ -20,30 +20,21 @@ export default {
 
       let files = e.target.files || e.dataTransfer.files
       if (!files.length) return
-      console.log(e.target.files)
       let images = []
-      for (var i = 0; i < files.length; i++) {
+      for (let i = 0; i < files.length; i++) {
         let file = files[i]
         if (!file.type.match(/image.*/)) continue
         images.push(file)
       }
-      console.log(props.purpose)
       if (props.purpose === 'avatar' || props.purpose === 'logo' || props.purpose === 'favicon') { images = [images[0]] }
 
-        console.log(images)
-
-      if (images.length > 0) {
-        // if (v.fileInput.files.length > 10) {
-        //   return $timeout(function() { Alert.error('Error: Exceeded 10 images.'); });
-        // }
-
+      if (images.length > 10) return handleError('Error: Exceeded 10 images.')
+      else if (images.length > 0) {
         // (re)prime loading and progress variables
         v.imagesUploading = true
         // let imagesProgress = 0
         // let imagesProgressSum = 0
         let errImages = []
-        let maxImageSize = props.purpose === 'avatar' ? 102400 : 10485760 // TODO(akinsey): forumData.max_image_size;
-
         /**
          * Image = {
          *   name: {string} The filename of the string (provided by host computer),
@@ -215,6 +206,7 @@ export default {
       imagesProgress: 0,
       imagesProgressSum: 0,
       uploadingImages: 0,
+      maxImageSize: props.purpose === 'avatar' ? window.max_avatar_size : window.max_image_size,
       warningMsg: '',
       model: null,
       status: null
