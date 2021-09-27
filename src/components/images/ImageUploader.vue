@@ -61,17 +61,17 @@ export default {
             status: 'Initializing',
             progress: 0
           }
-          if (fsImage.size > maxImageSize) errImages.push(fsImage.name)
+          if (fsImage.size > v.maxImageSize) errImages.push(fsImage.name)
           else v.currentImages.push(image)
         })
 
         if (errImages.length) {
-          v.warningMsg = 'Some images exceeded the max image upload size(' + maxImageSize + ' bytes): [' + errImages.join(', ') + ']'
+          v.warningMsg = 'Some images exceeded the max image upload size(' + v.maxImageSize + ' bytes): [' + errImages.join(', ') + ']'
         }
 
         if (!v.currentImages.length) {
           v.imagesUploading = false
-          // return $timeout(function() { Alert.warning(warningMsg); });
+          return handleError(v.warningMsg)
         }
         // the number of images that are still being uploaded
         v.uploadingImages = v.currentImages.length
@@ -81,44 +81,36 @@ export default {
           let index = 0
           return Promise.each(images, image => {
             v.currentImages[index].status = 'Starting'
-            return Promise.resolve(upload(image).progress(p => updateImagesUploading(index, p))
+            return Promise.resolve(upload(image)
+            .progress(p => updateImagesUploading(index, p))
             .error(err => {
               updateImagesUploading(index)
-              var message = 'Image upload failed for: ' + image.name + '. '
+              let message = 'Image upload failed for: ' + image.name + '. '
               if (err.status === 429) { message += 'Exceeded 10 images in batch upload.' }
               else if (err.message) { console.log(err) }
               else { message += 'Error: ' + err.message }
               emit('upload-error', message)
-              // Alert.error(message);
             })
             .success(url => {
               updateImagesUploading(index, 100, url)
-              // if ($scope.onDone) { $scope.onDone({data: url}); }
+              // TODO(akinsey): if ($scope.onDone) { $scope.onDone({data: url}); }
               if (props.purpose === 'avatar' || props.purpose === 'logo' || props.purpose === 'favicon') {
                 v.model = url
                 emit('upload-success', 'http://localhost:8080' + url)
               }
-              else {
-                v.images.push(image)
-              }
+              else v.images.push(image)
             })
             .catch(function(err) {
               updateImagesUploading(index)
-              var message = 'Image upload failed for: ' + image.name + '. '
+              let message = 'Image upload failed for: ' + image.name + '. '
               if (err.status === 429) { message += 'Exceeded 10 images in batch upload.' }
               else { message += 'Error: ' + err.message }
-              // Alert.error(message);
               handleError(message)
             }))
             .finally(() => index++)
           })
-          .then(function() {
-            // log error images after all uploads finish
-            if (errImages.length) {
-              handleError(v.warningMsg)
-              // TODO(akinsey) return $timeout(function() { Alert.warning(warningMsg); })
-            }
-          })
+          // log error images after all uploads finish
+          .then(() => { if (errImages.length) handleError(v.warningMsg) })
         })
         .catch(() => handleError(v.warningMsg))
       }
