@@ -5,6 +5,7 @@ window.logo = undefined
 window.default_avatar = '/images/avatar.png'
 window.default_avatar_shape = 'circle'
 window.favicon = '/favicon.ico'
+window.images_local_root = 'http://localhost:8080'
 window.websocket_host = 'localhost'
 window.websocket_port = '23958'
 window.post_max_length = 10000
