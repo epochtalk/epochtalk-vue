@@ -63,7 +63,8 @@ export const upload = image => {
   xhr.upload.addEventListener('error', deferred.reject, false)
 
   // Send the file
-  xhr.open('POST', 'http://localhost:8080' + url, true)
+  let imageRoot = storageType === 'local' ? window.images_local_root : ''
+  xhr.open('POST', imageRoot + url, true)
   if (storageType === 'local') {
     xhr.setRequestHeader('Authorization', 'Bearer ' + token)
   }

@@ -87,7 +87,9 @@ export default {
               // TODO(akinsey): if ($scope.onDone) { $scope.onDone({data: url}); }
               if (props.purpose === 'avatar' || props.purpose === 'logo' || props.purpose === 'favicon') {
                 v.model = url
-                emit('upload-success', 'http://localhost:8080' + url)
+
+                let imageRoot = image.policy.storageType === 'local' ? window.images_local_root : ''
+                emit('upload-success', imageRoot + url)
               }
               else v.images.push(image)
             })
