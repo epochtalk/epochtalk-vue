@@ -292,7 +292,7 @@
   <div class="sidebar">
     <div class="sidebar-block">
       <div v-if="canPost()" class="sidebar-actions">
-        <!-- <a class="button" @click.prevent="loadEditor()" v-if="PostsParentCtrl.canPost()">Post Reply</a> -->
+        <a class="button" @click.prevent="loadEditor()" v-if="canPost()">Post Reply</a>
 
         <!-- Post Tools -->
         <div class="post-tools">
@@ -415,6 +415,7 @@
   <posts-move-thread-modal v-if="canMove()" :threadId="postData.data.thread?.id" :show="showPostsMoveThreadModal" @close="showPostsMoveThreadModal = false"/>
   <posts-purge-thread-modal :threadId="postData.data.thread?.id" :boardId="postData.data.board?.id" :boardSlug="postData.data.board?.slug" :show="showPostsPurgeThreadModal" @close="showPostsPurgeThreadModal = false"/>
   <posts-report-modal :selectedPost="selectedPost" :canReportPosts="true" :canReportUsers="true" :show="showPostsReportModal" @close="showPostsReportModal = false; selectedPost = null"/>
+  <editor :showEditor="showEditor" @close="showEditor = false" postEditorMode="true" :thread="postData.data?.thread" />
 </template>
 
 <script>
@@ -439,11 +440,12 @@ import PostsReportModal from '@/components/modals/posts/Report.vue'
 import { BreadcrumbStore } from '@/composables/stores/breadcrumbs'
 import BanStore from '@/composables/stores/ban'
 import TrustDisplay from '@/components/trust/TrustDisplay.vue'
+import Editor from '@/components/layout/Editor.vue'
 
 export default {
   name: 'Posts',
   props: ['threadSlug', 'threadId'],
-  components: { Pagination, PostsDeleteModal, PostsUndeleteModal, PostsPurgePostModal, PostsMoveThreadModal, PostsPurgeThreadModal, PostsReportModal, PollViewer, RankDisplay, TrustDisplay },
+  components: { Pagination, PostsDeleteModal, PostsUndeleteModal, PostsPurgePostModal, PostsMoveThreadModal, PostsPurgeThreadModal, PostsReportModal, PollViewer, RankDisplay, TrustDisplay, Editor },
   beforeRouteEnter(to, from, next) {
     const params = {
       limit: localStoragePrefs().data.posts_per_page,
@@ -844,7 +846,10 @@ export default {
     const unlockPost = (post) => {
       postsApi.unlock(post.id).then(() => post.locked = false)
     }
-    const loadEditor = (post) => console.log(post, 'loadEditor')
+    const loadEditor = (post) => {
+      v.showEditor = true
+      console.log(post, 'loadEditor')
+    }
     const addQuote = (post) => console.log(post, 'addQuote')
     const copyQuote = (post) => console.log(post, 'copyQuote')
     const showUserControls = () => (v.loggedIn && (!v.postData.data.thread.watched || canCreatePoll()))
@@ -905,6 +910,7 @@ export default {
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
       disableSignature: false,
+      showEditor: false,
       showPostsPurgePostModal: false,
       showPostsPurgeThreadModal: false,
       showPostsDeleteModal: false,

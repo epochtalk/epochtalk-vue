@@ -148,6 +148,7 @@
   <delete-conversation-modal :show="showDeleteConversationModal" :conversation-id="selectedDeletedConvoId" @close="showDeleteConversationModal = false" @success="reload()" />
   <delete-message-modal :show="showDeleteMessageModal" :message-id="selectedMessageId" @close="showDeleteMessageModal = false" @success="deleteMessageSuccess()" />
   <report-message-modal :show="showReportMessageModal" :message-id="selectedMessageId" @close="showReportMessageModal = false" @success="showReportMessageModal = false" />
+  <editor :showEditor="showEditor" @close="showEditor = false" editorConvoMode="true" />
 </template>
 
 <script>
@@ -160,11 +161,12 @@ import { localStoragePrefs } from '@/composables/stores/prefs'
 import DeleteConversationModal from '@/components/modals/messages/DeleteConversation.vue'
 import DeleteMessageModal from '@/components/modals/messages/DeleteMessage.vue'
 import ReportMessageModal from '@/components/modals/messages/ReportMessage.vue'
+import Editor from '@/components/layout/Editor.vue'
 // import { avatarHighlight, usernameHighlight, userRoleHighlight } from '@/composables/utils/userUtils'
 
 export default {
   name: 'Messages',
-  components: { DeleteConversationModal, DeleteMessageModal, ReportMessageModal },
+  components: { DeleteConversationModal, DeleteMessageModal, ReportMessageModal, Editor },
   beforeRouteEnter(to, from, next) {
     const query = {
       limit: to.query.limit || localStoragePrefs().data.posts_per_page,

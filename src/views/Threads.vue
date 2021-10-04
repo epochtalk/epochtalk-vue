@@ -214,6 +214,7 @@
     <pagination v-if="threadData.data?.board" :page="threadData.data.page" :limit="threadData.data.limit" :count="threadData.data.board.thread_count"></pagination>
   </div>
   <set-moderators-modal v-if="threadData.data?.board" :board="threadData.data.board" :show="showSetModerators" @close="showSetModerators = false"></set-moderators-modal>
+  <editor :showEditor="showEditor" @close="showEditor = false" threadEditorMode="true" :thread="{ title: '' }" />
 </template>
 
 <script>
@@ -229,11 +230,12 @@ import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore, localStoragePrefs } from '@/composables/stores/prefs'
 import { processThreads } from '@/composables/utils/boardUtils'
 import BanStore from '@/composables/stores/ban'
+import Editor from '@/components/layout/Editor.vue'
 
 export default {
   name: 'Threads',
   props: ['boardSlug', 'boardId'],
-  components: { Pagination, SetModeratorsModal },
+  components: { Pagination, SetModeratorsModal, Editor },
   beforeRouteEnter(to, from, next) {
     const params = {
       limit: localStoragePrefs().data.threads_per_page,
@@ -290,7 +292,7 @@ export default {
     }
 
     /* View Methods */
-    const loadEditor = () => console.log('loadEditor()')
+    const loadEditor = () => v.showEditor = true
 
     const watchBoard = () => {
       if (v.threadData.data.board.watched) {
@@ -355,6 +357,7 @@ export default {
     /* View Data */
     const v = reactive({
       threadData: { data: {} },
+      showEditor: false,
       prefs: $prefs.data,
       loggedIn: $auth.loggedIn,
       banned: false,
