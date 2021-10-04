@@ -3,6 +3,7 @@
 // grid layout
 $view-maxWidth: 1300px;
 $sidebarWidth: 240px;
+$max-width: 960px;
 
 // Posts layout variables
 $postUserWidth: 80px;
@@ -133,7 +134,8 @@ $border-quote: 2px solid rgba($border-color, 0.5);
 $tablet:  767px;
 $desktop: 960px;
 $medium: 1024px;
-$large:   1280px;
+$large:  1280px;
+$xlarge: 1400px;
 
 @import 'mixins';
 @import 'vendor/vendor';
