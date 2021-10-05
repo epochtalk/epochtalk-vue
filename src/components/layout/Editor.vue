@@ -1,6 +1,6 @@
 <template>
   <div class="messages-wrap">
-    <div :class="editorPosition" v-if="showEditor">
+    <div :class="fullscreen ? 'editor-full-screen' : 'editor-fixed-right'" v-if="showEditor">
       <!-- Editor Container-->
       <div class="editor-container" :class="{ 'new-message' : editorConvoMode, 'new-thread' : threadEditorMode, 'add-poll' : threadCopy?.addPoll }">
         <!-- Draft Alert -->
@@ -155,10 +155,10 @@
             <a :class="{'selected': preview }" tabindex="-1" @click="preview = true">Preview</a>
           </div>
 
-          <div class="editor-body">
+          <div class="editor-body" @dragenter.prevent="showDropzone = true" @dragover.prevent="showDropzone = true">
             <div class="editor-column-input" :class="{ 'hidden': preview }">
               <textarea class="editor-input" :class="{ 'rtl': rtl }" placeholder="Enter your reply here. (BTW, you can drag and drop images directly into the editor panel)" :maxlength="postMaxLength || 10000"></textarea>
-              <div class="editor-drag-container">
+              <div class="editor-drag-container" :class="{ 'visible': showDropzone}">
                 <div class="editor-drag">
                   <div class="editor-drag-text">Drag and Drop Images</div>
                 </div>
@@ -170,9 +170,10 @@
             </div>
           </div>
 
-<!--             <image-uploader class="editor-image-uploader" purpose="editor" reset="resetImages" on-done="insertImageUrl(data)"></image-uploader> -->
           <div class="editor-footer">
-            <span>&nbsp;</span>
+            <div class="editor-image-uploader">
+              <image-uploader purpose="editor" @upload-success="() => {}" @upload-error="() => {}" :show-dropzone="showDropzone" @hover-stop="showDropzone = false" />
+            </div>
           </div>
           <!-- END EDITOR -->
         </form>
@@ -180,7 +181,7 @@
         <div class="editor-tools">
           <div class="tools">
             <a data-balloon="Formatting Help" @click="showFormatting = true"><i class="fa fa-code"></i></a>
-            <a :data-balloon="isMinimized ? 'Expand Editor' : 'Minimize Editor'" @click="fullscreen()"><i class="fa expand" :class="{ 'fa-expand': isMinimized, 'fa-compress': !isMinimized }"></i></a>
+            <a :data-balloon="isMinimized ? 'Expand Editor' : 'Minimize Editor'" @click="fullscreen = !fullscreen"><i class="fa expand" :class="{ 'fa-expand': isMinimized, 'fa-compress': !isMinimized }"></i></a>
           </div>
         </div>
 
@@ -230,10 +231,12 @@
 <script>
 import { reactive, toRefs } from 'vue'
 // import { useRoute, useRouter } from 'vue-router'
+import ImageUploader from '@/components/images/ImageUploader.vue'
 
 export default {
   props: ['editorConvoMode', 'threadEditorMode', 'postEditorMode', 'createAction', 'updateAction', 'showEditor', 'thread' ],
   emits: ['close'],
+  components: { ImageUploader },
   setup(props, { emit }) {
 
     const canCreate = () => true
@@ -241,7 +244,6 @@ export default {
     const canSticky = () => true
     const canModerate = () => true
     const canCreatePoll = () => true
-    const fullscreen = () => console.log('fullscreen')
     const cancel = () => emit('close')
     const closeEditor = () => emit('close')
     /* Internal Data */
@@ -252,10 +254,11 @@ export default {
     const v = reactive({
       isMinimized: true,
       threadCopy: props.thread,
-      editorPosition: 'editor-fixed-right',
+      fullscreen: false,
       showFormatting: false,
       preview: false,
       showEditor: props.showEditor,
+      showDropzone: false,
       draftStatus: null,
       receivers: [],
       postMaxLength: window.post_max_length,
@@ -265,7 +268,7 @@ export default {
       rtl: false
     })
 
-    return { ...toRefs(v), canLock, canCreate, canSticky, canModerate, canCreatePoll, fullscreen, cancel, closeEditor }
+    return { ...toRefs(v), canLock, canCreate, canSticky, canModerate, canCreatePoll, cancel, closeEditor }
   }
 }
 </script>

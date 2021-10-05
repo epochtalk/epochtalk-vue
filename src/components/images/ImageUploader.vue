@@ -1,24 +1,53 @@
 <template>
-    <label v-if="purpose === 'avatar'" for="fileInput">Choose Image File</label>
-    <input type="file" name="fileInput" id="fileInput" @change="uploadFile" ref="fileInput" :multiple="multiple" @drop="uploadFile" @dragenter.prevent @dragover.prevent><br>
-    <progress v-if="!purpose" ref="progressBar" style="width: 100%" :value="imagesProgress" max="100"></progress>
+  <div class="input-container" @dragend.prevent.self="hover=false;" @dragexit.prevent.self="hover=false" @dragleave.prevent.self="hover=false">
+    <div>
+      <label v-if="purpose !== 'editor'" for="fileInput" class="input-label" :class="{ 'hidden': hover }">Choose Image File or Drag and Drop</label>
+      <input type="file" name="fileInput" id="fileInput" @change="uploadFile" ref="fileInput" :multiple="multiple" @dragenter.prevent.self.stop="hover=true" @dragover.prevent.self.stop="hover=true" :disabled="hover" :class="{ 'hidden': hover }" :hidden="purpose === 'editor' ? 'hidden' : null">
+      <div class="progress-container" :class="{ 'hidden': hover }">
+        <div class="progress" :class="{ 'progress-editor': purpose === 'editor'}">
+          <span class="meter" :style="{ width: imagesProgress + '%' }"></span>
+        </div>
+      </div>
+      <div v-if="purpose !== 'editor'" class="input-info">Images should not exceed 100kB</div>
+    </div>
+    <div :class="{'visible': hover, 'hidden': !hover, 'editorMode': showDropzone }" id="dropzone" @drop.stop.prevent="uploadFile" @dragenter.prevent.self="hover=true" @dragover.prevent.self="hover=true" @dragend.prevent.self="hover=false" @dragexit.prevent.self="hover=false" @dragleave.prevent.self="hover=false">
+      Drop Image{{ purpose === 'editor' ? 's' : ''}} Here
+    </div>
+  </div>
+
+  <div v-if="purpose === 'editor'" class="upload-editor">
+    <a href="#" data-balloon="Upload Images" @click.prevent="fileInput.click()"><i class="far fa-images" aria-hidden="true"></i></a>
+    <span v-if="images.length > 0 && purpose === 'editor'">
+      (<a href="#" @click.prevent="openImageModal()">
+        <span v-if="images.length === 1">
+          view <span v-html="images.length"></span> image
+        </span>
+        <span v-if="images.length > 1">
+          view <span v-html="images.length"></span> images
+        </span>
+      </a>)
+    </span>
+  </div>
+
+
 </template>
 
 <script>
-import { reactive, toRefs } from 'vue'
+import { reactive, toRefs, watch } from 'vue'
 import { policy, upload } from '@/composables/services/image-upload'
 
 Promise.each = async (arr, fn) => { for(const item of arr) await fn(item) }
 
 export default {
   name: 'image-uploader',
-  props: ['onUpload-success', 'onUpload-error', 'purpose'],
+  props: ['onUpload-success', 'onUpload-error', 'onHover-stop', 'purpose', 'showDropzone'],
   setup(props, { emit }) { //, { emit }) {
     /* View Methods */
     const uploadFile = (e) => {
+      v.hover = false
       emit('upload-error', null) // clear previous errors
-
       let files = e.target.files || e.dataTransfer.files
+      v.fileInput.files = files
       if (!files.length) return
       let images = []
       for (let i = 0; i < files.length; i++) {
@@ -26,7 +55,12 @@ export default {
         if (!file.type.match(/image.*/)) continue
         images.push(file)
       }
-      if (props.purpose === 'avatar' || props.purpose === 'logo' || props.purpose === 'favicon') { images = [images[0]] }
+      if (props.purpose === 'avatar' || props.purpose === 'logo' || props.purpose === 'favicon') {
+        images = [images[0]]
+        const dataTransfer = new DataTransfer()
+        dataTransfer.items.add(images[0])
+        v.fileInput.files = dataTransfer.files
+       }
 
       if (images.length > 10) return handleError('Error: Exceeded 10 images.')
       else if (images.length > 0) {
@@ -68,9 +102,9 @@ export default {
         v.uploadingImages = v.currentImages.length
         return policy(v.currentImages)
         // upload each image
-        .then(images => {
+        .then(imagesToUpload => {
           let index = 0
-          return Promise.each(images, image => {
+          return Promise.each(imagesToUpload, image => {
             v.currentImages[index].status = 'Starting'
             return Promise.resolve(upload(image)
             .progress(p => updateImagesUploading(index, p))
@@ -84,7 +118,6 @@ export default {
             })
             .success(url => {
               updateImagesUploading(index, 100, url)
-              // TODO(akinsey): if ($scope.onDone) { $scope.onDone({data: url}); }
               if (props.purpose === 'avatar' || props.purpose === 'logo' || props.purpose === 'favicon') {
                 v.model = url
 
@@ -106,11 +139,17 @@ export default {
           .then(() => { if (errImages.length) handleError(v.warningMsg) })
         })
         .catch(() => handleError(v.warningMsg))
+        .finally(() => {
+          v.currentImages = []
+          if (props.purpose === 'editor') setTimeout(() => v.imagesProgress = 0, 500)
+        })
       }
     }
 
     const handleError = msg => {
       v.currentImages = []
+      v.image = []
+      v.imagesProgress = 0
       emit('upload-error', msg)
     }
 
@@ -147,61 +186,15 @@ export default {
       if (v.uploadingImages <= 0) v.imagesUploading = false
     }
 
-    // const progressHandler = e => {
-    //   v.amountUploaded.innerHTML = 'Uploaded ' + e.loaded + ' bytes of ' + e.total
-    //   var percent = (e.loaded / e.total) * 100
-    //   v.progressBar.value = Math.round(percent)
-    //   v.status.innerHTML = Math.round(percent) + '% uploaded... please wait'
-    // }
-
-    // const completeHandler = e => {
-    //   v.status.innerHTML = e.target.responseText
-    //   emit('upload-success')
-    //   v.progressBar.value = 0
-    // }
-
-    // const errorHandler = e => {
-    //   v.status.innerHTML = 'Upload Failed'
-    //   v.status.innerHTML = e.target.responseText
-    //   emit('upload-error')
-    // }
-
-    // const abortHandler = () => {
-    //   v.status.innerHTML = 'Upload Aborted'
-    //   emit('upload-error')
-    // }
-
-    // var cancelEvent = function(e) {
-    //   e.stopPropagation();
-    //   e.preventDefault();
-    // };
-
-    // var removeDrag = function(e) {
-    //   e.stopPropagation();
-    //   e.preventDefault();
-    // };
-
-    // var dropEvent = function(e) {
-    //   removeDrag(e);
-    //   uploadFile(e)
-    // };
-
-    // $parent.on('dragenter', cancelEvent);
-    // $parent.on('dragover', cancelEvent);
-    // $dragZone.on('dragenter', cancelEvent);
-    // $dragZone.on('dragover', cancelEvent);
-    // $dragZone.on('dragend', removeDrag);
-    // $dragZone.on('dragexit', removeDrag);
-    // $dragZone.on('dragleave', removeDrag);
-
-    // $parent.on('drop', dropEvent);
-    // $dragZone.on('drop', dropEvent);
+    const openImageModal = () => console.log('open image modal')
 
     const v = reactive({
+      hover: false,
       fileInput: null,
-      multiple: !props.purpose,
+      multiple: props.purpose === 'editor',
       progressBar: null,
       amountUploaded: null,
+      showDropzone: props.showDropzone,
       currentImages: [],
       images: [],
       imagesUploading: false,
@@ -214,13 +207,67 @@ export default {
       status: null
     })
 
-    return { ...toRefs(v), uploadFile }
+    watch(() => v.hover, a => a ? null : emit('hover-stop'))
+
+    return { ...toRefs(v), uploadFile, openImageModal }
   }
 }
 </script>
 
 <style lang="scss">
+  .input-container { position: relative; height: 4.625rem; }
+  .input-section label.hidden { opacity: .1; }
+
   #fileInput {
-    height: auto;
+    height: 4.625rem;
+    &.hidden {
+      opacity: .1;
+      border: 1px solid transparent;
+    }
   }
+  #dropzone {
+    position: absolute;
+    float: left;
+    border: 3px dashed $color-primary;
+    border-radius: 3px;
+    box-shadow: none;
+    margin-bottom: 0;
+    padding-top: 2rem;
+    padding-bottom: 1rem;
+    height: 4.625rem;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.5rem;
+    line-height: .5rem;
+    color: $base-background-color;
+    width: 100%;
+    &.visible {
+      display: block;
+      z-index: 99999;
+      background-color: $color-primary-transparent;
+      margin-top: -6.5625rem;
+    }
+    &.hidden { display: none; }
+    &.editorMode {
+      display: block;
+      height: 150vh;
+      bottom: 0;
+      z-index: 99999;
+      border: 0;
+      background-color: transparent;
+    }
+  }
+
+  .progress-container {
+    text-align: center;
+    margin-bottom: 0.625rem;
+    margin-top: -.3125rem;
+    &.hidden { opacity: .1; }
+    .progress {
+      height: .25rem;
+      border-radius: 3px;
+      .meter { background: $color-primary; height: 100%; display: block; border-radius: 3px; }
+    }
+  }
+
 </style>

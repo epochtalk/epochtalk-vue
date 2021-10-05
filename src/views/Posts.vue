@@ -293,7 +293,7 @@
     <div class="sidebar-block">
       <div v-if="canPost()" class="sidebar-actions">
         <a class="button" @click.prevent="loadEditor()" v-if="canPost()">Post Reply</a>
-
+        <br />
         <!-- Post Tools -->
         <div class="post-tools">
           <!-- Watch Thread -->
