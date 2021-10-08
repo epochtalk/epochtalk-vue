@@ -18,7 +18,7 @@
   <div v-if="purpose === 'editor'" class="upload-editor">
     <a href="#" data-balloon="Upload Images" @click.prevent="fileInput.click()"><i class="far fa-images" aria-hidden="true"></i></a>
     <span v-if="images.length > 0 && purpose === 'editor'">
-      (<a href="#" @click.prevent="openImageModal()">
+      (<a href="#" @click.prevent="showImageModal = true">
         <span v-if="images.length === 1">
           view <span v-html="images.length"></span> image
         </span>
@@ -29,18 +29,50 @@
     </span>
   </div>
 
+  <modal :name="$options.name" :show="showImageModal" @close="showImageModal = false" :focusInput="focusInput">
+    <template v-slot:header>Image Picker</template>
+
+    <template v-slot:body>
+      <ul :class="images.length > 1 ? 'two-col' : 'one-col'" class="img-picker-list">
+        <li v-for="image in images" :key="image.url">
+          <div class="image-picker-cell">
+            <!-- image picker header -->
+            <div class="header" :class="{ 'added': image.added }" >
+              (<span v-html="image.progress"></span>%):
+              <a :href="image.url" target="_blank" v-if="image.url">
+                <span v-html="image.name"></span>
+              </a>
+              <span v-html="image.status" v-if="!image.url"></span>
+            </div>
+            <!-- image picker body -->
+            <div class="picker-body">
+              <img :src="image.url" @click="fireDone(image)"/>
+              <a class="after" v-if="image.url" @click="fireDone(image)">
+                <div>
+                  <span class="stroke" v-if="!image.added">Add to Editor</span>
+                  <span v-if="image.added"><strong>Added!</strong></span>
+                </div>
+              </a>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </template>
+  </modal>
 
 </template>
 
 <script>
 import { reactive, toRefs, watch } from 'vue'
 import { policy, upload } from '@/composables/services/image-upload'
+import Modal from '@/components/layout/Modal.vue'
 
 Promise.each = async (arr, fn) => { for(const item of arr) await fn(item) }
 
 export default {
   name: 'image-uploader',
   props: ['onUpload-success', 'onUpload-error', 'onHover-stop', 'purpose', 'showDropzone'],
+  components: { Modal },
   setup(props, { emit }) { //, { emit }) {
     /* View Methods */
     const uploadFile = (e) => {
@@ -186,7 +218,7 @@ export default {
       if (v.uploadingImages <= 0) v.imagesUploading = false
     }
 
-    const openImageModal = () => console.log('open image modal')
+    const fireDone = () => console.log('done')
 
     const v = reactive({
       hover: false,
@@ -195,6 +227,8 @@ export default {
       progressBar: null,
       amountUploaded: null,
       showDropzone: props.showDropzone,
+      showImageModal: false,
+      focusInput: null,
       currentImages: [],
       images: [],
       imagesUploading: false,
@@ -209,7 +243,7 @@ export default {
 
     watch(() => v.hover, a => a ? null : emit('hover-stop'))
 
-    return { ...toRefs(v), uploadFile, openImageModal }
+    return { ...toRefs(v), uploadFile, fireDone }
   }
 }
 </script>
@@ -267,6 +301,58 @@ export default {
       height: .25rem;
       border-radius: 3px;
       .meter { background: $color-primary; height: 100%; display: block; border-radius: 3px; }
+    }
+  }
+  .img-picker-list {
+    margin-left: 0;
+    list-style-type: none;
+    display: grid;
+    &.one-col {
+      grid-template-columns: 100%;
+      li {
+        overflow-wrap: break-word;
+      }
+
+      .image-picker-cell {
+        .picker-body {
+          img {
+            height: initial;
+          }
+        }
+      }
+
+    }
+    &.two-col {
+      grid-template-columns: 50% 50%;
+      li {
+        overflow-wrap: break-word;
+      }
+    }
+    .image-picker-cell {
+      margin-bottom: 1rem;
+      // border: 2px solid $border-color;
+
+      .header {
+        color: $base-font-color;
+        padding-left: 0.3125rem;
+        padding-bottom: 0.25rem;
+        font-size: 0.8125rem;
+        transition: background-color 1s;
+
+        &.added {
+          background-color: $color-primary;
+        }
+      }
+
+      .picker-body {
+        // height: 8rem;
+        position: relative;
+
+        img {
+          height: 10rem;
+          object-fit: cover;
+        }
+      }
     }
   }
 

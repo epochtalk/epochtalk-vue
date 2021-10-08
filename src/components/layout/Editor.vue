@@ -710,17 +710,6 @@ export default {
       object-fit: cover;
     }
   }
-  .picker-body .after {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    top: 0;
-    right: 0;
-    color: #FFF;
-    padding: 45px;
-    text-align: center;
-    background: rgba(0, 0, 0, .6);
-  }
 
   .thread-editor-container {
     position: relative;
