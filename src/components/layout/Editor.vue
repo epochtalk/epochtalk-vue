@@ -180,8 +180,8 @@
 
         <div class="editor-tools">
           <div class="tools">
-            <a data-balloon="Formatting Help" @click="showFormatting = true"><i class="fa fa-code"></i></a>
-            <a :data-balloon="isMinimized ? 'Expand Editor' : 'Minimize Editor'" @click="fullscreen = !fullscreen"><i class="fa expand" :class="{ 'fa-expand': isMinimized, 'fa-compress': !isMinimized }"></i></a>
+            <a href="#" data-balloon="Formatting Help" @click.prevent="showFormatting = !showFormatting"><i class="fa fa-code"></i></a>
+            <a href="#" :data-balloon="fullscreen ? 'Minimize' : 'Fullscreen'" @click.prevent="fullscreen = !fullscreen"><i class="fa expand" :class="{ 'fa-expand': !fullscreen, 'fa-compress': fullscreen }"></i></a>
           </div>
         </div>
 
