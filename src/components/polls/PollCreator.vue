@@ -8,7 +8,7 @@
 
       <!-- Poll Answers -->
       <label for="answer-1" class="poll-answers">Answers:</label>
-      <div class="answer-row" ng-repeat="answer in poll.answers track by $index">
+      <div class="answer-row" v-for="(answer, index) in poll.answers" :key="index">
         <div class="field-inline-action">
           <input type="text" :id="'answer-' + index" v-model="poll.answers[index]" maxlength="255">
           <button v-if="index > 1" tabindex="-1" @click="removePollAnswer(index)" class="inline-action secondary small"><i class="fa fa-minus-circle"></i></button>
