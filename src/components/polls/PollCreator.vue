@@ -45,7 +45,7 @@
         <div class="">
           <label>Show poll results: </label>
           <label for="displayAlways">
-            <input type="radio" id="displayAlways" v-model="poll.display_mode"value="always">
+            <input type="radio" id="displayAlways" v-model="poll.display_mode" value="always">
             Always shown
           </label>
           <label for="displayVoted">
