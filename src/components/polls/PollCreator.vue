@@ -84,4 +84,6 @@ export default {
       pollAnswers: [],
       pollCopy: { ...cloneDeep(props.poll), expired: props.poll.expiration ? new Date(props.poll.expiration) < Date.now() : false }
     })
+  }
+}
 </script>
