@@ -11,12 +11,12 @@
       <div class="answer-row" ng-repeat="answer in poll.answers track by $index">
         <div class="field-inline-action">
           <input type="text" :id="'answer-' + index" v-model="poll.answers[index]" maxlength="255">
-          <button ng-if="$index > 1" tabindex="-1" ng-click="removePollAnswer($index)" class="inline-action secondary small"><i class="fa fa-minus-circle"></i></button>
+          <button v-if="index > 1" tabindex="-1" @click="removePollAnswer(index)" class="inline-action secondary small"><i class="fa fa-minus-circle"></i></button>
         </div>
       </div>
       <!-- Add Answer Button -->
       <div class="actions">
-        <button ng-click="addPollAnswer()" ng-disabled="poll.answers.length > 19" class="secondary small">Add an Answer</button>
+        <button @click="addPollAnswer()" :disabled="poll.answers.length > 19" class="secondary small">Add an Answer</button>
       </div>
     </div>
 
