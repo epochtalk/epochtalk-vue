@@ -61,3 +61,27 @@
     </div>
   </div>
 </template>
+<script>
+import { reactive, toRefs } from 'vue'
+import humanDate from '@/composables/filters/humanDate'
+
+export default {
+  props: ['poll', 'thread', 'userPriority', 'reset', 'bannedFromBoard'],
+  setup(props) {
+    /* View Data */
+    const v = reactive({
+      permissionUtils: $auth.permissionUtils,
+      options: {
+        expiration: props.poll.expiration || undefined,
+        change_vote: props.poll.change_vote,
+        max_answers: props.poll.max_answers,
+        display_mode: props.poll.display_mode,
+        // used in view to track date and time from input field
+        expiration_date: props.poll.expiration ? dayjs(props.poll.expiration).format('YYYY-MM-DD') : undefined,
+        expiration_time: props.poll.expiration ? dayjs(props.poll.expiration).format('HH:mm') : undefined
+      },
+      editPoll: false,
+      pollAnswers: [],
+      pollCopy: { ...cloneDeep(props.poll), expired: props.poll.expiration ? new Date(props.poll.expiration) < Date.now() : false }
+    })
+</script>
