@@ -32,7 +32,7 @@
         <label for="pollExpirationDate" class="fieldgroup-container">
           <span class="fieldgroup-label">Poll expires at -- {{humanDate(poll.expiration) || '(No Expiration)'}}</span>
           <div class="fieldgroup">
-            <input type="date" id="pollExpirationDate" ng-model="poll.expiration_date" ng-change="calcExpiration()">
+            <input type="date" id="pollExpirationDate" v-model="poll.expiration_date" @change="calcExpiration()">
             <input type="time" v-model="poll.expiration_time" v-change="calcExpiration()">
           </div>
         </label>
