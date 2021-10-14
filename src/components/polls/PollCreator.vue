@@ -66,7 +66,7 @@ import { reactive, toRefs } from 'vue'
 import humanDate from '@/composables/filters/humanDate'
 
 export default {
-  props: ['poll', 'thread'],
+  props: ['poll', 'valid'],
   setup(props) {
     /* View Data */
     const v = reactive({
