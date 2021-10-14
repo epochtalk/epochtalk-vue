@@ -92,12 +92,12 @@
     </div>
 
 
-    <!-- Polls -->
+    <!-- Poll Creator -->
     <div class="fill-row" v-if="addPoll">
       <!-- <poll-creator poll="PostsParentCtrl.poll" valid="PostsParentCtrl.pollValid"></poll-creator> -->
+      <poll-creator :poll="newPoll" :valid="pollValid"></poll-creator>
       <button class="fill-row" :disabled="!pollValid" @click.prevent="createPoll()">Create Poll</button>
     </div>
-    <!-- <poll-viewer thread="PostsParentCtrl.thread" user-priority="PostsParentCtrl.posts[0].user.priority" reset="PostsParentCtrl.resetPoll"></poll-viewer> -->
 
     <!-- <pagination page-count="PostsParentCtrl.pageCount" page="PostsParentCtrl.page"></pagination> -->
 
@@ -422,6 +422,7 @@
 import { useRoute } from 'vue-router'
 import Pagination from '@/components/layout/Pagination.vue'
 import PollViewer from '@/components/polls/PollViewer.vue'
+import PollCreator from '@/components/polls/PollCreator.vue'
 import RankDisplay from '@/components/users/RankDisplay.vue'
 import humanDate from '@/composables/filters/humanDate'
 import dayjs from 'dayjs'
@@ -445,7 +446,7 @@ import Editor from '@/components/layout/Editor.vue'
 export default {
   name: 'Posts',
   props: ['threadSlug', 'threadId'],
-  components: { Pagination, PostsDeleteModal, PostsUndeleteModal, PostsPurgePostModal, PostsMoveThreadModal, PostsPurgeThreadModal, PostsReportModal, PollViewer, RankDisplay, TrustDisplay, Editor },
+  components: { Pagination, PostsDeleteModal, PostsUndeleteModal, PostsPurgePostModal, PostsMoveThreadModal, PostsPurgeThreadModal, PostsReportModal, PollViewer, PollCreator, RankDisplay, TrustDisplay, Editor },
   beforeRouteEnter(to, from, next) {
     const params = {
       limit: localStoragePrefs().data.posts_per_page,
@@ -900,6 +901,7 @@ export default {
       postData: {data: {}},
       editThread: false,
       addPoll: false,
+      newPoll: false,
       pollValid: false,
       resetPoll: false,
       posting: {
