@@ -70,7 +70,6 @@ export default {
   setup(props) {
     /* View Data */
     const v = reactive({
-      permissionUtils: $auth.permissionUtils,
       options: {
         expiration: props.poll.expiration || undefined,
         change_vote: props.poll.change_vote,
