@@ -33,7 +33,7 @@
           <span class="fieldgroup-label">Poll expires at -- {{humanDate(pollCopy.expiration) || '(No Expiration)'}}</span>
           <div class="fieldgroup">
             <input type="date" id="pollExpirationDate" v-model="pollCopy.expiration_date" @change="calcExpiration()">
-            <input type="time" v-model="pollCopy.expiration_time" v-change="calcExpiration()">
+            <input type="time" v-model="pollCopy.expiration_time" @change="calcExpiration()">
           </div>
         </label>
       </div>
