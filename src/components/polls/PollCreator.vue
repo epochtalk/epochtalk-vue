@@ -68,17 +68,31 @@ import dayjs from 'dayjs'
 
 export default {
   setup() {
+    /* View Methods */
+    const calcExpiration = () => {
+      if (v.poll.expiration_date) {
+        // parse expiration date
+        const expiration = dayjs(v.poll.expiration_date)
+
+        // parse expiration time
+        if (v.poll.expiration_time) {
+          const time = dayjs.duration(v.poll.expiration_time)
+          expiration.add(time)
+        }
+
+        // set expiration from time and date
+        v.poll.expiration = expiration
+        if (v.poll.expiration < Date.now()) { v.poll.expiration = undefined }
+      }
+      else { v.poll.expiration = undefined }
+
+      if (!v.poll.expiration && v.poll.display_mode === 'expired') {
+        v.poll.display_mode = 'always'
+      }
+    }
+
     /* View Data */
     const v = reactive({
-      options: {
-        expiration: props.poll.expiration || undefined,
-        change_vote: props.poll.change_vote,
-        max_answers: props.poll.max_answers,
-        display_mode: props.poll.display_mode,
-        // used in view to track date and time from input field
-        expiration_date: props.poll.expiration ? dayjs(props.poll.expiration).format('YYYY-MM-DD') : undefined,
-        expiration_time: props.poll.expiration ? dayjs(props.poll.expiration).format('HH:mm') : undefined
-      },
       editPoll: false,
       pollAnswers: [],
       poll: {
@@ -92,6 +106,7 @@ export default {
 
     return {
       ...toRefs(v),
+      calcExpiration,
       humanDate
     }
   }
