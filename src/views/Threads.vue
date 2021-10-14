@@ -200,7 +200,7 @@
 
   <div class="board-sidebar">
     <div class="board-actions" v-if="loggedIn">
-      <a v-if="canCreate()" class="button secondary" href="#" @click="loadEditor()">
+      <a v-if="canCreate()" class="button secondary" href="#" @click.prevent="showEditor = true">
         <i class="icon-epoch-add"></i>Start a New Thread
       </a>
       <a class="button secondary" @click="watchBoard()" v-if="threadData && threadData.data && threadData.data.board">
@@ -292,8 +292,6 @@ export default {
     }
 
     /* View Methods */
-    const loadEditor = () => v.showEditor = true
-
     const watchBoard = () => {
       if (v.threadData.data.board.watched) {
         watchlistApi.unwatchBoard(v.threadData.data.board.id)
@@ -392,7 +390,7 @@ export default {
       v.banned = BanStore.updateBanNotice(v.threadData.data.banned_from_board)
     })) // Update threads on login
 
-    return { ...toRefs(v), canCreate, canSetModerator, loadEditor, watchBoard, setSortField, getSortClass, humanDate, decode, truncate }
+    return { ...toRefs(v), createThread, canCreate, canSetModerator, watchBoard, setSortField, getSortClass, humanDate, decode, truncate }
   }
 }
 </script>
