@@ -163,6 +163,7 @@ export const usersApi = {
 }
 
 export const messagesApi = {
+  create: data => $http('/api/messages', { method: 'POST', data }),
   page: params => $http('/api/messages', { params }),
   pageIgnored: params => $http('/api/messages/ignored', { params }),
   ignore: data => $http('/api/messages/ignore', { method: 'POST', data }),
