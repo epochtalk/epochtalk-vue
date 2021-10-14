@@ -157,7 +157,7 @@
 
           <div class="editor-body" @dragenter.prevent="showDropzone = true" @dragover.prevent="showDropzone = true">
             <div class="editor-column-input" :class="{ 'hidden': preview }">
-              <textarea class="editor-input" :class="{ 'rtl': rtl }" placeholder="Enter your reply here. (BTW, you can drag and drop images directly into the editor panel)" :maxlength="postMaxLength || 10000"></textarea>
+              <textarea class="editor-input" v-model="posting.post.body" :class="{ 'rtl': rtl }" placeholder="Enter your reply here. (BTW, you can drag and drop images directly into the editor panel)" :maxlength="postMaxLength || 10000"></textarea>
               <div class="editor-drag-container" :class="{ 'visible': showDropzone}">
                 <div class="editor-drag">
                   <div class="editor-drag-text">Drag and Drop Images</div>
@@ -262,7 +262,7 @@ export default {
       draftStatus: null,
       receivers: [],
       postMaxLength: window.post_max_length,
-      posting: {},
+      posting: { post: { title: '', body: '', thread_id: props?.thread?.id }},
       newMessage: { content: { subject: '', body: '' } },
       rightToLeft: false,
       rtl: false
