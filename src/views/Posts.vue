@@ -94,8 +94,7 @@
 
     <!-- Poll Creator -->
     <div class="fill-row" v-if="addPoll">
-      <!-- <poll-creator poll="PostsParentCtrl.poll" valid="PostsParentCtrl.pollValid"></poll-creator> -->
-      <poll-creator :poll="newPoll" :valid="pollValid"></poll-creator>
+      <poll-creator></poll-creator>
       <button class="fill-row" :disabled="!pollValid" @click.prevent="createPoll()">Create Poll</button>
     </div>
 
