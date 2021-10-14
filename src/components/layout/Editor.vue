@@ -205,7 +205,7 @@
           <button class="inverted-button cancel" @click="cancel()">
             Cancel
           </button>
-          <button class="send" @click="createAction().then(closeEditor);" :disabled="!canCreate()">
+          <button class="send" @click="createAction(posting.post).then(closeEditor);" :disabled="!canCreate()">
             <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;{{ posting?.post?.id ? 'Edit Post' : 'Send Reply' }}
           </button>
 
@@ -217,7 +217,7 @@
           <button class="inverted-button cancel" @click="cancel()">
             Cancel
           </button>
-          <button class="send" @click="createAction().then(closeEditor);" @disabled="!threadCopy?.title.length || !canCreate() || (threadCopy.addPoll && !threadCopy.pollValid)">
+          <button class="send" @click="createAction(posting.post).then(closeEditor);" @disabled="!threadCopy?.title.length || !canCreate() || (threadCopy.addPoll && !threadCopy.pollValid)">
             <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;Start Thread
           </button>
 
@@ -229,7 +229,7 @@
 </template>
 
 <script>
-import { reactive, toRefs } from 'vue'
+import { reactive, toRefs, watch } from 'vue'
 // import { useRoute, useRouter } from 'vue-router'
 import ImageUploader from '@/components/images/ImageUploader.vue'
 
@@ -266,6 +266,11 @@ export default {
       newMessage: { content: { subject: '', body: '' } },
       rightToLeft: false,
       rtl: false
+    })
+
+    watch(() => props.thread, t => {
+      v.posting.post.thread_id = t.id
+      v.posting.post.title = t.title
     })
 
     return { ...toRefs(v), canLock, canCreate, canSticky, canModerate, canCreatePoll, cancel, closeEditor }
