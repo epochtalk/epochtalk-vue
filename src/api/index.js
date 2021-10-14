@@ -78,6 +78,7 @@ export const threadsApi = {
 }
 
 export const postsApi = {
+  create: data => $http('/api/posts', { method: 'POST', data }),
   delete: (postId, lock) => $http(`/api/posts/${postId}`, { method: 'DELETE', params: { locked: lock }}),
   undelete: postId => $http(`/api/posts/${postId}/undelete`, { method: 'POST' }),
   purge: postId => $http(`/api/posts/${postId}/purge`, { method: 'DELETE' }),
