@@ -40,7 +40,7 @@
 
       <div class="poll-options-answers">
         <label for="pollMaxVote">Maximum answers per vote:</label>
-        <input type="number" id="pollMaxVote" min="1" :max="poll.answers.length" value="1" v-model="poll.max_answers">
+        <input type="number" id="pollMaxVote" min="1" :max="poll.answers.length" v-model="poll.max_answers">
 
         <div class="">
           <label>Show poll results: </label>
@@ -66,7 +66,7 @@ import { reactive, toRefs } from 'vue'
 import humanDate from '@/composables/filters/humanDate'
 
 export default {
-  props: ['poll', 'thread', 'userPriority', 'reset', 'bannedFromBoard'],
+  props: ['poll', 'thread'],
   setup(props) {
     /* View Data */
     const v = reactive({
