@@ -67,8 +67,7 @@ import humanDate from '@/composables/filters/humanDate'
 import dayjs from 'dayjs'
 
 export default {
-  props: ['poll', 'valid'],
-  setup(props) {
+  setup() {
     /* View Data */
     const v = reactive({
       options: {
