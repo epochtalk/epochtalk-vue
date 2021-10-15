@@ -214,7 +214,7 @@
     <pagination v-if="threadData.data?.board" :page="threadData.data.page" :limit="threadData.data.limit" :count="threadData.data.board.thread_count"></pagination>
   </div>
   <set-moderators-modal v-if="threadData.data?.board" :board="threadData.data.board" :show="showSetModerators" @close="showSetModerators = false"></set-moderators-modal>
-  <editor :showEditor="showEditor" @close="showEditor = false" threadEditorMode="true" :thread="{ title: '' }" />
+  <editor v-if="threadData.data?.board" :showEditor="showEditor" @close="showEditor = false" threadEditorMode="true" :thread="{ title: '', board_id: threadData?.data?.board.id }" :createAction="createThread" />
 </template>
 
 <script>
@@ -231,6 +231,7 @@ import { PreferencesStore, localStoragePrefs } from '@/composables/stores/prefs'
 import { processThreads } from '@/composables/utils/boardUtils'
 import BanStore from '@/composables/stores/ban'
 import Editor from '@/components/layout/Editor.vue'
+import slugify from 'slugify'
 
 export default {
   name: 'Threads',
@@ -345,6 +346,16 @@ export default {
       return v.threadData.data?.write_access && v.permissionUtils.hasPermission('threads.create.allow')
     }
 
+    const createThread = thread => {
+      // slugify title
+      let slug = slugify(slugify(thread.title, { remove: /[*'"~!@)(+.:]/g, lower: true }))
+      // Handles slugs of foreign languages, these will get a random hash for their slug
+      if (slug === '') slug = Math.random().toString(36).substring(6)
+      thread.slug = slug
+      return threadsApi.create(thread)
+        .then(getThreads)
+        .then(data => v.threadData.data = data)
+    }
     /* Internal Data */
     const $route = useRoute()
     const $router = useRouter()
