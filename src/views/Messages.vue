@@ -148,7 +148,7 @@
   <delete-conversation-modal :show="showDeleteConversationModal" :conversation-id="selectedDeletedConvoId" @close="showDeleteConversationModal = false" @success="reload()" />
   <delete-message-modal :show="showDeleteMessageModal" :message-id="selectedMessageId" @close="showDeleteMessageModal = false" @success="deleteMessageSuccess()" />
   <report-message-modal :show="showReportMessageModal" :message-id="selectedMessageId" @close="showReportMessageModal = false" @success="showReportMessageModal = false" />
-  <editor :showEditor="showEditor" @close="showEditor = false" editorConvoMode="true" />
+  <editor :showEditor="showEditor" @close="showEditor = false" :editorConvoMode="editorConvoMode"  />
 </template>
 
 <script>

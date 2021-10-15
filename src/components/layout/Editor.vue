@@ -157,8 +157,9 @@
 
           <div class="editor-body" @dragenter.prevent="showDropzone = true" @dragover.prevent="showDropzone = true">
             <div class="editor-column-input" :class="{ 'hidden': preview }">
-              <textarea class="editor-input" v-if="threadEditorMode" v-model="threadCopy.body" :class="{ 'rtl': rtl }" placeholder="Enter your reply here. (BTW, you can drag and drop images directly into the editor panel)" :maxlength="postMaxLength || 10000"></textarea>
+              <textarea class="editor-input" v-if="threadEditorMode" v-model="threadCopy.body" :class="{ 'rtl': rtl }" placeholder="Write someting interesting! (BTW, you can drag and drop images directly into the editor panel)" :maxlength="postMaxLength || 10000"></textarea>
               <textarea class="editor-input" v-if="postEditorMode" v-model="posting.post.body" :class="{ 'rtl': rtl }" placeholder="Enter your reply here. (BTW, you can drag and drop images directly into the editor panel)" :maxlength="postMaxLength || 10000"></textarea>
+              <textarea class="editor-input" v-if="editorConvoMode || (!threadEditorMode && !editorConvoMode && !postEditorMode)" v-model="newMessage.content.body" :class="{ 'rtl': rtl }" :placeholder="editorConvoMode ? 'Enter your message here. (BTW, you can drag and drop images directly into the editor panel)' : 'Enter your reply here. (BTW, you can drag and drop images directly into the editor panel)'" :maxlength="postMaxLength || 10000"></textarea>
               <div class="editor-drag-container" :class="{ 'visible': showDropzone}">
                 <div class="editor-drag">
                   <div class="editor-drag-text">Drag and Drop Images</div>
@@ -191,10 +192,10 @@
           <button class="inverted-button cancel" @click="cancel()">
             Cancel
           </button>
-          <button class="no-animate send" v-if="editorConvoMode" @click="createAction().then(closeEditor);" :disabled="!canCreate() || !newMessage.content.body.length || !newMessage.content.subject.length || !receivers.length">
+          <button class="no-animate send" v-if="editorConvoMode" @click.prevent="createAction().then(closeEditor);" :disabled="!canCreate() || !newMessage.content.body.length || !newMessage.content.subject.length || !receivers.length">
             <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;Send
           </button>
-          <button class="no-animate send" v-if="!editorConvoMode" @click="updateAction().then(closeEditor);" :disabled="!canUpdate() || !newMessage.content.body.length">
+          <button class="no-animate send" v-if="!editorConvoMode" @click.prevent="updateAction().then(closeEditor);" :disabled="!canUpdate() || !newMessage.content.body.length">
             <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;Send Reply
           </button>
 
@@ -206,7 +207,7 @@
           <button class="inverted-button cancel" @click="cancel()">
             Cancel
           </button>
-          <button class="send" @click="createAction(posting.post).then(closeEditor);" :disabled="!canCreate()">
+          <button class="send" @click.prevent="createAction(posting.post).then(closeEditor);" :disabled="!canCreate()">
             <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;{{ posting?.post?.id ? 'Edit Post' : 'Send Reply' }}
           </button>
 
@@ -218,7 +219,7 @@
           <button class="inverted-button cancel" @click="cancel()">
             Cancel
           </button>
-          <button class="send" @click="createAction(threadCopy).then(closeEditor);" @disabled="!threadCopy?.title.length || !canCreate() || (threadCopy.addPoll && !threadCopy.pollValid)">
+          <button class="send" @click.prevent="createAction(threadCopy).then(closeEditor);" @disabled="!threadCopy?.title.length || !canCreate() || (threadCopy.addPoll && !threadCopy.pollValid)">
             <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;Start Thread
           </button>
 
@@ -241,6 +242,7 @@ export default {
   setup(props, { emit }) {
 
     const canCreate = () => true
+    const canUpdate = () => true
     const canLock = () => true
     const canSticky = () => true
     const canModerate = () => true
@@ -274,7 +276,7 @@ export default {
       v.posting.post.title = t.title
     })
 
-    return { ...toRefs(v), canLock, canCreate, canSticky, canModerate, canCreatePoll, cancel, closeEditor }
+    return { ...toRefs(v), canLock, canCreate, canUpdate, canSticky, canModerate, canCreatePoll, cancel, closeEditor }
   }
 }
 </script>
