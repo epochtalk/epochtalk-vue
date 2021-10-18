@@ -50,13 +50,13 @@
           <div v-if="editorConvoMode">
             <!-- Select User -->
             <label>To</label>
-            <input type="text" />
-           <!--  <tags-input min-length="1" placeholder="Type username(s) to message" add-from-autocomplete-only="true" replace-spaces-with-dashes="false" display-property="username" allow-leftover-text="false" ng-model="receivers" modal-focus="{{showEditor && editorConvoMode}}">
+            <Multiselect v-model="msgTagsInput.value" v-bind="msgTagsInput" />
+            <label>Subject</label>
+            <input type="text" v-model="newMessage.content.subject" minlength="1" maxlength="255" />
+            <!--  <tags-input min-length="1" placeholder="Type username(s) to message" add-from-autocomplete-only="true" replace-spaces-with-dashes="false" display-property="username" allow-leftover-text="false" ng-model="receivers" modal-focus="{{showEditor && editorConvoMode}}">
                 <auto-complete min-length="1" debounce-delay="250" source="loadTags($query)"></auto-complete>
               </tags-input> -->
             <!-- Subject -->
-            <label>Subject</label>
-            <input type="text" v-model="newMessage.content.subject" minlength="1" maxlength="255" />
           </div>
 
           <!--  Post Editor Mode -->
@@ -234,11 +234,13 @@
 import { reactive, toRefs, watch } from 'vue'
 // import { useRoute, useRouter } from 'vue-router'
 import ImageUploader from '@/components/images/ImageUploader.vue'
+import Multiselect from '@vueform/multiselect'
+import { usersApi } from '@/api'
 
 export default {
   props: ['editorConvoMode', 'threadEditorMode', 'postEditorMode', 'createAction', 'updateAction', 'showEditor', 'thread' ],
   emits: ['close'],
-  components: { ImageUploader },
+  components: { ImageUploader, Multiselect },
   setup(props, { emit }) {
 
     const canCreate = () => true
@@ -268,7 +270,24 @@ export default {
       posting: { post: { title: '', body: '', thread_id: props?.thread?.id }},
       newMessage: { content: { subject: '', body: '' } },
       rightToLeft: false,
-      rtl: false
+      rtl: false,
+      msgTagsInput: {
+        mode: 'tags',
+        value: [],
+        placeholder: 'Type username(s) to message',
+        noOptionsText: 'Enter a username to start lookup...',
+        minChars: 1,
+        resolveOnLoad: false,
+        delay: 0,
+        searchable: true,
+        maxHeight: 100,
+        options: async q => {
+          return await usersApi.lookup(q, { restricted: true })
+          // convert array into array of objects
+          .then(d => d.map(u =>{ return { label: u.username, value: { username: u.username, user_id: u.id } } }))
+          .catch(() => { return [] })
+        }
+      }
     })
 
     watch(() => props.thread, t => {
