@@ -93,6 +93,7 @@ export const postsApi = {
   byNewbie: params => $http('/api/posts/patrol', { params })
 }
 export const pollsApi = {
+  create: (threadId, params) => $http(`/api/threads/${threadId}/polls`, { method: 'POST', data: params }),
   vote: (threadId, pollId, answerIds) => $http(`/api/threads/${threadId}/polls/${pollId}/vote`, { method: 'POST', data: { answer_ids: answerIds }}),
   removeVote: (threadId, pollId) => $http(`/api/threads/${threadId}/polls/${pollId}/vote`, { method: 'DELETE' }),
   editPoll: (threadId, pollId, options) => $http(`/api/threads/${threadId}/polls/${pollId}`, { method: 'PUT', data: options }),
