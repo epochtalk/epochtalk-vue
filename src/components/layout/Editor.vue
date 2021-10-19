@@ -50,7 +50,7 @@
           <div v-if="editorConvoMode">
             <!-- Select User -->
             <label>To</label>
-            <Multiselect v-model="msgTagsInput.value" v-bind="msgTagsInput" />
+            <Multiselect v-model="msgTagsInput.value" v-bind="msgTagsInput" ref="messageReceiverEl" />
             <label>Subject</label>
             <input type="text" v-model="newMessage.content.subject" minlength="1" maxlength="255" />
             <!--  <tags-input min-length="1" placeholder="Type username(s) to message" add-from-autocomplete-only="true" replace-spaces-with-dashes="false" display-property="username" allow-leftover-text="false" ng-model="receivers" modal-focus="{{showEditor && editorConvoMode}}">
@@ -157,9 +157,9 @@
 
           <div class="editor-body" @dragenter.prevent="showDropzone = true" @dragover.prevent="showDropzone = true">
             <div class="editor-column-input" :class="{ 'hidden': preview }">
-              <textarea class="editor-input" v-if="threadEditorMode" v-model="threadCopy.body" :class="{ 'rtl': rtl }" placeholder="Write someting interesting! (BTW, you can drag and drop images directly into the editor panel)" :maxlength="postMaxLength || 10000"></textarea>
-              <textarea class="editor-input" v-if="postEditorMode" v-model="posting.post.body" :class="{ 'rtl': rtl }" placeholder="Enter your reply here. (BTW, you can drag and drop images directly into the editor panel)" :maxlength="postMaxLength || 10000"></textarea>
-              <textarea class="editor-input" v-if="editorConvoMode || (!threadEditorMode && !editorConvoMode && !postEditorMode)" v-model="newMessage.content.body" :class="{ 'rtl': rtl }" :placeholder="editorConvoMode ? 'Enter your message here. (BTW, you can drag and drop images directly into the editor panel)' : 'Enter your reply here. (BTW, you can drag and drop images directly into the editor panel)'" :maxlength="postMaxLength || 10000"></textarea>
+              <textarea class="editor-input" v-if="threadEditorMode" v-model="threadCopy.body" :class="{ 'rtl': rightToLeft }" placeholder="Write someting interesting! (BTW, you can drag and drop images directly into the editor panel)" :maxlength="postMaxLength || 10000"></textarea>
+              <textarea class="editor-input" v-if="postEditorMode" v-model="posting.post.body" :class="{ 'rtl': rightToLeft }" placeholder="Enter your reply here. (BTW, you can drag and drop images directly into the editor panel)" :maxlength="postMaxLength || 10000" ref="postEditorEl"></textarea>
+              <textarea class="editor-input" v-if="editorConvoMode || (!threadEditorMode && !editorConvoMode && !postEditorMode)" v-model="newMessage.content.body" :class="{ 'rtl': rightToLeft }" :placeholder="editorConvoMode ? 'Enter your message here. (BTW, you can drag and drop images directly into the editor panel)' : 'Enter your reply here. (BTW, you can drag and drop images directly into the editor panel)'" :maxlength="postMaxLength || 10000" ref="messageEditorEl"></textarea>
               <div class="editor-drag-container" :class="{ 'visible': showDropzone}">
                 <div class="editor-drag">
                   <div class="editor-drag-text">Drag and Drop Images</div>
@@ -231,7 +231,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, watch } from 'vue'
+import { reactive, toRefs, watch, nextTick } from 'vue'
 // import { useRoute, useRouter } from 'vue-router'
 import ImageUploader from '@/components/images/ImageUploader.vue'
 import Multiselect from '@vueform/multiselect'
@@ -270,6 +270,7 @@ export default {
       posting: { post: { title: '', body: '', thread_id: props?.thread?.id }},
       newMessage: { content: { subject: '', body: '' } },
       rightToLeft: false,
+      threadTitleEl: null,
       msgTagsInput: {
         mode: 'tags',
         value: [],
@@ -292,6 +293,11 @@ export default {
     watch(() => props.thread, t => {
       v.posting.post.thread_id = t.id
       v.posting.post.title = t.title
+    })
+
+    watch(() => props.showEditor, visible => {
+      console.log(visible, props.threadEditorMode)
+      if (visible && props.threadEditorMode) nextTick(() => v.threadTitleEl.focus())
     })
 
     return { ...toRefs(v), canLock, canCreate, canUpdate, canSticky, canModerate, canCreatePoll, cancel, closeEditor }
