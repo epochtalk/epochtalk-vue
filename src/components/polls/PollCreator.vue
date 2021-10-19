@@ -112,8 +112,6 @@ export default {
 
     /* View Data */
     const v = reactive({
-      editPoll: false,
-      pollAnswers: [],
       valid: false,
       poll: {
         question: '',
