@@ -109,6 +109,8 @@ export default {
         v.poll.display_mode = 'always'
       }
     }
+    const addPollAnswer = () => { v.poll.answers.push('') }
+    const removePollAnswer = index => { v.poll.answers.splice(index, 1) }
 
     /* View Data */
     const v = reactive({
@@ -128,6 +130,8 @@ export default {
     return {
       ...toRefs(v),
       calcExpiration,
+      addPollAnswer,
+      removePollAnswer,
       humanDate
     }
   }
