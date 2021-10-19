@@ -291,8 +291,6 @@
   <div class="sidebar">
     <div class="sidebar-block">
       <div v-if="canPost()" class="sidebar-actions">
-        <a class="button" @click.prevent="loadEditor()" v-if="canPost()">Post Reply</a>
-        <br />
         <!-- Post Tools -->
         <div class="post-tools">
           <!-- Watch Thread -->
@@ -413,8 +411,8 @@
   <posts-purge-post-modal :selectedPost="selectedPost" :selectedPostIndex="selectedPostIndex" :page="postData.data.page" :limit="postData.data.limit" :posts="postData.data?.posts" :show="showPostsPurgePostModal" @close="showPostsPurgePostModal = false; selectedPost = null; selectedPostIndex = 0"/>
   <posts-move-thread-modal v-if="canMove()" :threadId="postData.data.thread?.id" :show="showPostsMoveThreadModal" @close="showPostsMoveThreadModal = false"/>
   <posts-purge-thread-modal :threadId="postData.data.thread?.id" :boardId="postData.data.board?.id" :boardSlug="postData.data.board?.slug" :show="showPostsPurgeThreadModal" @close="showPostsPurgeThreadModal = false"/>
-  <posts-report-modal :selectedPost="selectedPost" :canReportPosts="true" :canReportUsers="true" :show="showPostsReportModal" @close="showPostsReportModal = false; selectedPost = null"/>
-  <editor :showEditor="showEditor" @close="showEditor = false" postEditorMode="true" :thread="postData.data?.thread" />
+  <posts-report-modal :selectedPost="selectedPost" :canReportPosts="true" :canReportUsers="true" :show="showPostsReportModal" @close="showPostsReportModal = false; selectedPost = null" />
+  <editor :showEditor="showEditor" @close="showEditor = false" :postEditorMode="true" :thread="postData.data?.thread" :createAction="createPost" />
 </template>
 
 <script>
@@ -883,6 +881,10 @@ export default {
       })
     }
 
+    const createPost = post => postsApi.create(post)
+    .then(processPosts)
+    .then(data => v.postData.data = data)
+
     /* Internal Data */
     const $route = useRoute()
     const $prefs = inject(PreferencesStore)
@@ -932,6 +934,7 @@ export default {
 
     return {
       ...toRefs(v),
+      createPost,
       canEditTitle,
       canPost,
       canSave,

@@ -16,7 +16,7 @@
               <div class="fill-row">
                 <label>Thread Title</label>
                 <!-- modal-focus="{{showEditor && threadEditorMode}}" -->
-                <input type="text" id="threadTitle" v-model="threadCopy.title" :class="{ 'rtl': rightToLeft }">
+                <input type="text" id="threadTitle" v-model="threadCopy.title" :class="{ 'rtl': rightToLeft }" ref="threadTitleEl">
               </div>
             </div>
             <!-- Thread Options -->
@@ -50,13 +50,13 @@
           <div v-if="editorConvoMode">
             <!-- Select User -->
             <label>To</label>
-            <input type="text" />
-           <!--  <tags-input min-length="1" placeholder="Type username(s) to message" add-from-autocomplete-only="true" replace-spaces-with-dashes="false" display-property="username" allow-leftover-text="false" ng-model="receivers" modal-focus="{{showEditor && editorConvoMode}}">
+            <Multiselect v-model="msgTagsInput.value" v-bind="msgTagsInput" ref="messageReceiverEl" />
+            <label>Subject</label>
+            <input type="text" v-model="newMessage.content.subject" minlength="1" maxlength="255" />
+            <!--  <tags-input min-length="1" placeholder="Type username(s) to message" add-from-autocomplete-only="true" replace-spaces-with-dashes="false" display-property="username" allow-leftover-text="false" ng-model="receivers" modal-focus="{{showEditor && editorConvoMode}}">
                 <auto-complete min-length="1" debounce-delay="250" source="loadTags($query)"></auto-complete>
               </tags-input> -->
             <!-- Subject -->
-            <label>Subject</label>
-            <input type="text" v-model="newMessage.content.subject" minlength="1" maxlength="255" />
           </div>
 
           <!--  Post Editor Mode -->
@@ -157,7 +157,9 @@
 
           <div class="editor-body" @dragenter.prevent="showDropzone = true" @dragover.prevent="showDropzone = true">
             <div class="editor-column-input" :class="{ 'hidden': preview }">
-              <textarea class="editor-input" :class="{ 'rtl': rtl }" placeholder="Enter your reply here. (BTW, you can drag and drop images directly into the editor panel)" :maxlength="postMaxLength || 10000"></textarea>
+              <textarea class="editor-input" v-if="threadEditorMode" v-model="threadCopy.body" :class="{ 'rtl': rightToLeft }" placeholder="Write someting interesting! (BTW, you can drag and drop images directly into the editor panel)" :maxlength="postMaxLength || 10000"></textarea>
+              <textarea class="editor-input" v-if="postEditorMode" v-model="posting.post.body" :class="{ 'rtl': rightToLeft }" placeholder="Enter your reply here. (BTW, you can drag and drop images directly into the editor panel)" :maxlength="postMaxLength || 10000" ref="postEditorEl"></textarea>
+              <textarea class="editor-input" v-if="editorConvoMode || (!threadEditorMode && !editorConvoMode && !postEditorMode)" v-model="newMessage.content.body" :class="{ 'rtl': rightToLeft }" :placeholder="editorConvoMode ? 'Enter your message here. (BTW, you can drag and drop images directly into the editor panel)' : 'Enter your reply here. (BTW, you can drag and drop images directly into the editor panel)'" :maxlength="postMaxLength || 10000" ref="messageEditorEl"></textarea>
               <div class="editor-drag-container" :class="{ 'visible': showDropzone}">
                 <div class="editor-drag">
                   <div class="editor-drag-text">Drag and Drop Images</div>
@@ -166,7 +168,7 @@
             </div>
             <div class="editor-column-preview"  :class="{ 'hidden': !preview }">
               <!-- TODO(akinsey): post-processing="bodyHtml" style-fix="false" -->
-              <div class="editor-preview" :class="{ 'rtl': rtl }" ></div>
+              <div class="editor-preview" :class="{ 'rtl': rightToLeft }" ></div>
             </div>
           </div>
 
@@ -180,8 +182,8 @@
 
         <div class="editor-tools">
           <div class="tools">
-            <a data-balloon="Formatting Help" @click="showFormatting = true"><i class="fa fa-code"></i></a>
-            <a :data-balloon="isMinimized ? 'Expand Editor' : 'Minimize Editor'" @click="fullscreen = !fullscreen"><i class="fa expand" :class="{ 'fa-expand': isMinimized, 'fa-compress': !isMinimized }"></i></a>
+            <a href="#" data-balloon="Formatting Help" @click.prevent="showFormatting = !showFormatting"><i class="fa fa-code"></i></a>
+            <a href="#" :data-balloon="fullscreen ? 'Minimize' : 'Fullscreen'" @click.prevent="fullscreen = !fullscreen"><i class="fa expand" :class="{ 'fa-expand': !fullscreen, 'fa-compress': fullscreen }"></i></a>
           </div>
         </div>
 
@@ -190,10 +192,10 @@
           <button class="inverted-button cancel" @click="cancel()">
             Cancel
           </button>
-          <button class="no-animate send" v-if="editorConvoMode" @click="createAction().then(closeEditor);" :disabled="!canCreate() || !newMessage.content.body.length || !newMessage.content.subject.length || !receivers.length">
+          <button class="no-animate send" v-if="editorConvoMode" @click.prevent="createAction().then(closeEditor);" :disabled="!canCreate() || !newMessage.content.body.length || !newMessage.content.subject.length || !receivers.length">
             <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;Send
           </button>
-          <button class="no-animate send" v-if="!editorConvoMode" @click="updateAction().then(closeEditor);" :disabled="!canUpdate() || !newMessage.content.body.length">
+          <button class="no-animate send" v-if="!editorConvoMode" @click.prevent="updateAction().then(closeEditor);" :disabled="!canUpdate() || !newMessage.content.body.length">
             <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;Send Reply
           </button>
 
@@ -205,7 +207,7 @@
           <button class="inverted-button cancel" @click="cancel()">
             Cancel
           </button>
-          <button class="send" @click="createAction().then(closeEditor);" :disabled="!canCreate()">
+          <button class="send" @click.prevent="createAction(posting.post).then(closeEditor);" :disabled="!canCreate()">
             <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;{{ posting?.post?.id ? 'Edit Post' : 'Send Reply' }}
           </button>
 
@@ -217,7 +219,7 @@
           <button class="inverted-button cancel" @click="cancel()">
             Cancel
           </button>
-          <button class="send" @click="createAction().then(closeEditor);" @disabled="!threadCopy?.title.length || !canCreate() || (threadCopy.addPoll && !threadCopy.pollValid)">
+          <button class="send" @click.prevent="createAction(threadCopy).then(closeEditor);" @disabled="!threadCopy?.title.length || !canCreate() || (threadCopy.addPoll && !threadCopy.pollValid)">
             <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;Start Thread
           </button>
 
@@ -229,17 +231,20 @@
 </template>
 
 <script>
-import { reactive, toRefs } from 'vue'
+import { reactive, toRefs, watch, nextTick } from 'vue'
 // import { useRoute, useRouter } from 'vue-router'
 import ImageUploader from '@/components/images/ImageUploader.vue'
+import Multiselect from '@vueform/multiselect'
+import { usersApi } from '@/api'
 
 export default {
   props: ['editorConvoMode', 'threadEditorMode', 'postEditorMode', 'createAction', 'updateAction', 'showEditor', 'thread' ],
   emits: ['close'],
-  components: { ImageUploader },
+  components: { ImageUploader, Multiselect },
   setup(props, { emit }) {
 
     const canCreate = () => true
+    const canUpdate = () => true
     const canLock = () => true
     const canSticky = () => true
     const canModerate = () => true
@@ -262,13 +267,40 @@ export default {
       draftStatus: null,
       receivers: [],
       postMaxLength: window.post_max_length,
-      posting: {},
+      posting: { post: { title: '', body: '', thread_id: props?.thread?.id }},
       newMessage: { content: { subject: '', body: '' } },
       rightToLeft: false,
-      rtl: false
+      threadTitleEl: null,
+      msgTagsInput: {
+        mode: 'tags',
+        value: [],
+        placeholder: 'Type username(s) to message',
+        noOptionsText: 'Enter a username to start lookup...',
+        minChars: 1,
+        resolveOnLoad: false,
+        delay: 0,
+        searchable: true,
+        maxHeight: 100,
+        options: async q => {
+          return await usersApi.lookup(q, { restricted: true })
+          // convert array into array of objects
+          .then(d => d.map(u =>{ return { label: u.username, value: { username: u.username, user_id: u.id } } }))
+          .catch(() => { return [] })
+        }
+      }
     })
 
-    return { ...toRefs(v), canLock, canCreate, canSticky, canModerate, canCreatePoll, cancel, closeEditor }
+    watch(() => props.thread, t => {
+      v.posting.post.thread_id = t.id
+      v.posting.post.title = t.title
+    })
+
+    watch(() => props.showEditor, visible => {
+      console.log(visible, props.threadEditorMode)
+      if (visible && props.threadEditorMode) nextTick(() => v.threadTitleEl.focus())
+    })
+
+    return { ...toRefs(v), canLock, canCreate, canUpdate, canSticky, canModerate, canCreatePoll, cancel, closeEditor }
   }
 }
 </script>
@@ -279,14 +311,13 @@ export default {
     display: flex;
     flex-direction: column;
   }
-
   .editor-fixed-bottom {
     width: 100%;
     position: fixed;
     bottom: 0;
     left: 0;
-    z-index: 1000; }
-
+    z-index: 1000;
+  }
   .editor-fixed-right {
     position: fixed;
     top: 0;
@@ -294,11 +325,7 @@ export default {
     height: 100vh;
     width: calc(((100vw - 1300px)/2) + 240px);
     z-index: 5000;
-
-    @include break-max-xlarge {
-      width: calc(#{$sidebarWidth} + #{$base-grid-padding});
-    }
-
+    @include break-max-xlarge { width: calc(#{$sidebarWidth} + #{$base-grid-padding}); }
     @include break-mobile-sm {
       top: initial;
       left: 0;
@@ -311,7 +338,6 @@ export default {
       z-index: 5000;
     }
   }
-
   .editor-full-screen {
     width: calc(100vw - 4rem);
     position: fixed;
@@ -319,7 +345,6 @@ export default {
     top: 0;
     right: 0;
     // z-index: 3000;
-
     @include break-mobile-sm {
       top: initial;
       left: 0;
@@ -339,7 +364,6 @@ export default {
     right: 1.25rem;
     z-index: 10;
     margin: 0;
-
     li {
       color: #fff;
       background-color: $color-primary;
@@ -351,7 +375,6 @@ export default {
       -moz-border-radius:     1.5625rem;
       border-radius:          1.5625rem;
       box-shadow: 0px 0.3125rem 0.625rem rgba(0, 0, 0, 0.1);
-
       span {
         font-weight: bold;
         font-size: 1.25rem;
@@ -364,16 +387,11 @@ export default {
     display: flex;
     position: relative;
     height: 100vh;
-    // max-width: calc(100vw - 4rem);
-    // margin: 0 auto;
     border: 1px solid $border-color;
     border-bottom: 0;
     box-shadow: 0 0 20px rgba(0,0,0,0.2);
     z-index: 5000;
-
-    @include break-mobile-sm {
-      height: 100%;
-    }
+    @include break-mobile-sm { height: 100%; }
   }
 
   .editor-container-bar {
@@ -395,12 +413,6 @@ export default {
   }
 
   .editor-top-bar {
-    background-color: $sub-header-color;
-    div:first-child {
-      padding-left: 0.5rem;
-      // text-align: right;
-    }
-
     .toolbar-title {
       font-size: $font-size-xs;
       width: 90%;
@@ -412,7 +424,6 @@ export default {
       .underline { text-decoration: underline; }
       a { color: $color-primary; }
     }
-
     button {
       height: 25px;
       padding: 2px 10px;
@@ -448,22 +459,18 @@ export default {
     flex: 3 0 auto;
     display: flex;
     flex-direction: column;
-
     label {
       color: $secondary-font-color-light;
       margin-top: 0;
     }
-
     .editor-body {
       width: 100%;
       flex: 1 0 auto;
       display: flex;
-
       .editor-column-input {
         flex: 1 0 auto;
         height: auto;
       }
-
       input[type],
       .editor-input,
       .editor-preview {
@@ -487,7 +494,6 @@ export default {
         text-align: center;
         height: 100%;
         margin: 0rem;
-
         &.visible { display: block; }
         .editor-drag {
           position: relative;
@@ -514,42 +520,35 @@ export default {
       height: 100%;
       &.hidden { display: none; }
     }
-
     .editor-input {
       white-space: pre-wrap;
       overflow: auto;
       height: 100%;
-
       p { margin: 0; }
       span {
         font-family: inherit;
         font-size: 1rem;
-        line-height: 1.6; }
+        line-height: 1.6;
+      }
     }
-
     .editor-preview {
       white-space: pre-wrap;
       overflow: auto;
       height: 100%;
       word-wrap: break-word;
-
       p { margin: 0; }
     }
-
     .editor-footer {
       color: $secondary-font-color-light;
       font-size: .875rem;
       position: absolute;
       bottom: 0px;
-      // left: -50px;
       width: 100%;
       background-color: $base-background-color;
       height: 3rem;
       border-top: 1px solid $border-color;
       .upload-editor {
         text-align: left;
-        // width: $max-width / 2;
-        // margin-left: 50px;
         padding-left: 1rem;
         position: absolute;
         top: -1.35rem;
@@ -560,20 +559,17 @@ export default {
         }
       }
     }
-
     .editor-images-container {
       height: 100%;
       padding-left: 0px;
       padding-right: 5px;
       line-height: 3rem;
     }
-
     .editor-image-uploader {
       display: block;
       width: 100%;
       text-align: center;
     }
-
     .editor-images {
       height: 100%;
       width: 100%;
@@ -585,43 +581,31 @@ export default {
     }
   }
 
-
-
   .editor-button-container.admin {
     padding-left: $base-grid-padding;
     padding-right: $base-grid-padding;
   }
 
-    .editor-form.admin .editor-footer {
-      left: 0;
-      width: 100%;
-
-      .progress-editor {
-        margin-left: 0;
-        @include break-mobile-sm {
-          margin-left: 0;
-        }
-      }
-      .upload-editor {
-        margin-left: 0;
-      }
+  .editor-form.admin .editor-footer {
+    left: 0;
+    width: 100%;
+    .progress-editor {
+      margin-left: 0;
+      @include break-mobile-sm { margin-left: 0; }
     }
-
-  .child-elements {
-     pointer-events: none;
+    .upload-editor { margin-left: 0; }
   }
+  .child-elements { pointer-events: none; }
   .editor-tools {
     color: $secondary-font-color-dark;
     flex: 0 0 auto;
     padding: 0 1rem;
     line-height: 1.5rem;
-
     a {
       color: $secondary-font-color-dark;
       &:hover { color: $secondary-font-color; }
     }
     .tools {
-      // @include span-columns(12);
       width: 100%;
       text-align: right;
       .expand { margin-left: 1rem; }
@@ -633,36 +617,27 @@ export default {
     line-height: 1;
     padding: 0.25rem 0.5rem 0.375rem;
     font-size: 0.6875rem;
-    margin: 0; }
-
+    margin: 0;
+  }
   .editor-button-container {
     flex: 0 0 auto;
     padding: 0.5rem 1rem;
     height: 3rem;
     text-align: right;
     width: 100%;
-
     button {
-      // float: right;
       margin-right: 1.9%;
       padding: 0.35rem 1rem;
-
-      &:last-child {
-        margin-right: 0;
-      }
-
+      &:last-child { margin-right: 0; }
       &.send { display: inline-block; border: 1px solid transparent; }
       &.cancel {
         background-color: transparent;
         color: $secondary-font-color;
         display: inline-block;
-        &:hover {
-          color: $color-primary;
-        }
+        &:hover { color: $color-primary; }
       }
     }
   }
-
   .editor-form.new-thread {
     .editor-header a {
       line-height: 1rem;
@@ -686,11 +661,8 @@ export default {
         }
       }
     }
-    .editor-body {
-      bottom: 2rem;
-    }
+    .editor-body { bottom: 2rem; }
   }
-
   .image-picker {
     .header {
       background-color: #4b4b4b;
@@ -710,26 +682,13 @@ export default {
       object-fit: cover;
     }
   }
-  .picker-body .after {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    top: 0;
-    right: 0;
-    color: #FFF;
-    padding: 45px;
-    text-align: center;
-    background: rgba(0, 0, 0, .6);
-  }
-
   .thread-editor-container {
     position: relative;
     background-color: $base-background-color;
-    height: 500px; }
+    height: 500px;
+  }
   .thread-editor-container > .editor-form { top: 0px; }
   .editor-preview .imageContainer { display: inline; }
-
-  // Bourbon/Neat Grid
   .editor-header {
     a {
       font-size: $font-size-xs;
@@ -745,9 +704,6 @@ export default {
     }
   }
   .editor-header, .editor-body, .editor-footer, .editor-top-bar {
-    // @include fill-parent;
-    // @include pad(0);
-    // @include row;
     width: 100%;
     padding: 0;
     .editor-column-input {
@@ -760,11 +716,7 @@ export default {
       // @include omega;
     }
   }
-
-  .editor-header {
-    flex: 0 0 auto;
-  }
-
+  .editor-header { flex: 0 0 auto; }
   @include break-mobile-sm {
     .editor-form .editor-body {
       bottom: 5rem;
@@ -786,9 +738,7 @@ export default {
         height: 100%;
         display: inline-block;
         padding: 0 0.5rem;
-        &:last-child {
-          margin-right: -0.5rem;
-        }
+        &:last-child { margin-right: -0.5rem; }
       }
       .tools {
         float: none;
@@ -797,8 +747,6 @@ export default {
       }
     }
     .editor-button-container {
-      // @include row;
-      // @include pad(0 $base-grid-padding);
       padding: 0 $base-grid-padding;
       height: 2.5rem;
       padding-top: 0.425rem;
@@ -830,7 +778,6 @@ export default {
       }
     }
   }
-
   .thread-editor-container {
     .editor-form {
       position: absolute;
@@ -850,7 +797,6 @@ export default {
       .editor-form .editor-body { bottom: 2.5rem; top: 2.7rem; }
     }
   }
-
   .editor-fixed-bottom, .editor-full-screen {
     // .editor-images-container { @include span-columns(6); @include pad(0); }
     .editor-button-container {
@@ -867,7 +813,6 @@ export default {
       .editor-formatting h4 { display: inline-block; }
     }
   }
-
   .post-editor-overlay {
     background: rgba(0, 0, 0, 0.15);
     position: fixed;
@@ -877,15 +822,12 @@ export default {
     bottom: 0;
     z-index: 999;
   }
-
-
   .messages-wrap {
     position: relative;
     z-index: 5000;
     .new-thread.add-poll .editor-form { top: 49.4375rem; }
     .editor-button-container { padding: 0.5rem;}
     .progress-editor { margin-left: 0; }
-
     .editor-footer {
       left: 0;
       width: 100%;
@@ -894,16 +836,11 @@ export default {
         padding-left: 1rem;
       }
     }
-
     .new-message .editor-top-bar {
       flex: 0 0 auto;
       height: auto;
       padding: 1rem;
       padding-bottom: 0;
-      div:first-child {
-        padding: 0;
-        text-align: left;
-      }
     }
     .new-thread .editor-top-bar {
       padding: 1rem;
@@ -913,5 +850,4 @@ export default {
       }
     }
   }
-
 </style>

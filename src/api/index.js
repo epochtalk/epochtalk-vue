@@ -60,6 +60,7 @@ export const boardsApi = {
 }
 
 export const threadsApi = {
+  create: data => $http('/api/threads', { method: 'POST', data }),
   move: (threadId, newBoardId) => $http(`/api/threads/${threadId}/move`, { data: { new_board_id: newBoardId }, method: 'POST'}),
   title: (threadId, title) => $http(`/api/threads/${threadId}`, { data: { title: title }, method: 'POST'}),
   purge: threadId => $http(`/api/threads/${threadId}`, { method: 'DELETE' }),
@@ -78,6 +79,7 @@ export const threadsApi = {
 }
 
 export const postsApi = {
+  create: data => $http('/api/posts', { method: 'POST', data }),
   delete: (postId, lock) => $http(`/api/posts/${postId}`, { method: 'DELETE', params: { locked: lock }}),
   undelete: postId => $http(`/api/posts/${postId}/undelete`, { method: 'POST' }),
   purge: postId => $http(`/api/posts/${postId}/purge`, { method: 'DELETE' }),
@@ -161,6 +163,7 @@ export const usersApi = {
 }
 
 export const messagesApi = {
+  create: data => $http('/api/messages', { method: 'POST', data }),
   page: params => $http('/api/messages', { params }),
   pageIgnored: params => $http('/api/messages/ignored', { params }),
   ignore: data => $http('/api/messages/ignore', { method: 'POST', data }),
