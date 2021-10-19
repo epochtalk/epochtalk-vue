@@ -16,7 +16,7 @@
               <div class="fill-row">
                 <label>Thread Title</label>
                 <!-- modal-focus="{{showEditor && threadEditorMode}}" -->
-                <input type="text" id="threadTitle" v-model="threadCopy.title" :class="{ 'rtl': rightToLeft }">
+                <input type="text" id="threadTitle" v-model="threadCopy.title" :class="{ 'rtl': rightToLeft }" ref="threadTitleEl">
               </div>
             </div>
             <!-- Thread Options -->
@@ -168,7 +168,7 @@
             </div>
             <div class="editor-column-preview"  :class="{ 'hidden': !preview }">
               <!-- TODO(akinsey): post-processing="bodyHtml" style-fix="false" -->
-              <div class="editor-preview" :class="{ 'rtl': rtl }" ></div>
+              <div class="editor-preview" :class="{ 'rtl': rightToLeft }" ></div>
             </div>
           </div>
 
@@ -270,7 +270,6 @@ export default {
       posting: { post: { title: '', body: '', thread_id: props?.thread?.id }},
       newMessage: { content: { subject: '', body: '' } },
       rightToLeft: false,
-      rtl: false,
       msgTagsInput: {
         mode: 'tags',
         value: [],
