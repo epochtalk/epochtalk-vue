@@ -145,7 +145,7 @@
         </div>
 
         <!-- Poll Creator -->
-<!--         <poll-creator poll="thread.poll" valid="thread.pollValid" ng-if="thread.addPoll"></poll-creator> -->
+        <poll-creator @poll-validation="onPollValidation"></poll-creator>
 
         <!-- Editor -->
         <form name="form" class="editor-form" novalidate>
@@ -234,13 +234,14 @@
 import { reactive, toRefs, watch, nextTick } from 'vue'
 // import { useRoute, useRouter } from 'vue-router'
 import ImageUploader from '@/components/images/ImageUploader.vue'
+import PollCreator from '@/components/polls/PollCreator.vue'
 import Multiselect from '@vueform/multiselect'
 import { usersApi } from '@/api'
 
 export default {
   props: ['editorConvoMode', 'threadEditorMode', 'postEditorMode', 'createAction', 'updateAction', 'showEditor', 'thread' ],
   emits: ['close'],
-  components: { ImageUploader, Multiselect },
+  components: { ImageUploader, PollCreator, Multiselect },
   setup(props, { emit }) {
 
     const canCreate = () => true
