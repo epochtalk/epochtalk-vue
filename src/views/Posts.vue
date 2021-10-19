@@ -94,7 +94,7 @@
 
     <!-- Poll Creator -->
     <div class="fill-row" v-if="addPoll">
-      <poll-creator @poll-valid="pollValid"></poll-creator>
+      <poll-creator @poll-validation="onPollValidation"></poll-creator>
     </div>
 
     <!-- <pagination page-count="PostsParentCtrl.pageCount" page="PostsParentCtrl.page"></pagination> -->
@@ -815,7 +815,10 @@ export default {
         })
         .catch(() => $alertStore.error('Error changing thread title'))
     }
-    const pollValid = ({ valid, poll }) => console.log('posts pollvalid', valid, poll)
+    const onPollValidation = ({ valid, poll }) => {
+      v.pollValid = valid
+      v.newPoll = poll
+    }
     const createPoll = () => console.log('createPoll')
     const showEditDate = (post) => dayjs(post.updated_at).isAfter(dayjs(post.created_at))
     const openPostsPurgePostModal = (post, postIndex) => {
@@ -903,6 +906,7 @@ export default {
       editThread: false,
       addPoll: false,
       newPoll: false,
+      pollValid: false,
       resetPoll: false,
       posting: {
         post: {}
@@ -951,7 +955,7 @@ export default {
       updateThreadSticky,
       updateThreadTitle,
       closeEditThread,
-      pollValid,
+      onPollValidation,
       createPoll,
       truncate,
       humanDate,

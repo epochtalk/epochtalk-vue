@@ -68,7 +68,7 @@ import { debounce } from 'lodash'
 import dayjs from 'dayjs'
 
 export default {
-  emits: ['poll-valid'],
+  emits: ['poll-validation'],
   setup(props, { emit }) {
     /* Internal Methods */
     const validatePoll = async () => {
@@ -84,7 +84,7 @@ export default {
       if (v.poll.expiration && v.poll.expiration < Date.now()) { valid = false }
       if (v.poll.display_mode !== 'always' && v.poll.display_mode !== 'voted' && v.poll.display_mode !== 'expired') { valid = false }
       v.valid = valid
-      emit('poll-valid', { valid: v.valid, poll: v.poll })
+      emit('poll-validation', { valid: v.valid, poll: v.poll })
     }
 
     /* View Methods */
