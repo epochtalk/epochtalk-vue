@@ -303,7 +303,7 @@ export default {
     })
 
     // invalidate poll when closing poll creator
-    watch(() => v.threadCopy.addPoll, () => { if (!v.threadCopy.addPoll) { v.threadCopy.pollValid = false }})
+    watch(() => v.threadCopy?.addPoll, () => { if (!v.threadCopy.addPoll) { v.threadCopy.pollValid = false }})
 
     watch(() => props.showEditor, visible => {
       console.log(visible, props.threadEditorMode)
