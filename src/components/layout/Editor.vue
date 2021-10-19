@@ -219,7 +219,7 @@
           <button class="inverted-button cancel" @click="cancel()">
             Cancel
           </button>
-          <button class="send" @click.prevent="createAction(threadCopy).then(closeEditor);" @disabled="!threadCopy?.title.length || !canCreate() || (threadCopy.addPoll && !threadCopy.pollValid)">
+          <button class="send" @click.prevent="createAction(threadCopy).then(closeEditor);" :disabled="!threadCopy?.title.length || !canCreate() || (threadCopy.addPoll && !threadCopy.pollValid)">
             <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;Start Thread
           </button>
 
