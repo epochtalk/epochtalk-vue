@@ -243,7 +243,7 @@ export default {
   emits: ['close'],
   components: { ImageUploader, PollCreator, Multiselect },
   setup(props, { emit }) {
-
+    /* Internal Methods */
     const canCreate = () => true
     const canUpdate = () => true
     const canLock = () => true
