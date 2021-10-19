@@ -302,6 +302,9 @@ export default {
       v.posting.post.title = t.title
     })
 
+    // invalidate poll when closing poll creator
+    watch(() => v.threadCopy.addPoll, () => { if (!v.threadCopy.addPoll) { v.threadCopy.pollValid = false }})
+
     watch(() => props.showEditor, visible => {
       console.log(visible, props.threadEditorMode)
       if (visible && props.threadEditorMode) nextTick(() => v.threadTitleEl.focus())
