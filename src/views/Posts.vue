@@ -829,7 +829,15 @@ export default {
         change_vote: v.newPoll.change_vote,
         display_mode: v.newPoll.display_mode
       }
-      pollsApi.create(v.postData.data.thread.id, params).then(poll => v.postData.data.thread.poll = poll)
+      pollsApi.create(v.postData.data.thread.id, params).then(poll => {
+        // set this thread's poll
+        v.postData.data.thread.poll = poll
+        // set poll and validation to defaults
+        v.newPoll = false
+        v.pollValid = false
+        // close poll-creator
+        v.addPoll = false
+      })
     }
     const showEditDate = (post) => dayjs(post.updated_at).isAfter(dayjs(post.created_at))
     const openPostsPurgePostModal = (post, postIndex) => {
