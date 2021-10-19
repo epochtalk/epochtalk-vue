@@ -68,6 +68,22 @@ import dayjs from 'dayjs'
 
 export default {
   setup() {
+    /* Internal Methods */
+    const validatePoll = async () => {
+      var valid = true
+      if (v.poll.question.length === 0) { valid = false }
+      if (v.poll.answers.length < 2) { valid = false }
+      if (v.poll.answers.length > 21) { valid = false }
+      v.poll.answers.map(function(a) { if (a.length === 0) { valid = false } })
+      if (!v.poll.max_answers || v.poll.max_answers < 1) { valid = false }
+      if (v.poll.max_answers > v.poll.answers.length) { valid = false }
+      if (v.poll.expiration_date && !v.poll.expiration) { valid = false }
+      if (v.poll.expiration_time && !v.poll.expiration_date) { valid = false }
+      if (v.poll.expiration && v.poll.expiration < Date.now()) { valid = false }
+      if (v.poll.display_mode !== 'always' && v.poll.display_mode !== 'voted' && v.poll.display_mode !== 'expired') { valid = false }
+      v.valid = valid
+    }
+
     /* View Methods */
     const calcExpiration = () => {
       if (v.poll.expiration_date) {
@@ -95,6 +111,7 @@ export default {
     const v = reactive({
       editPoll: false,
       pollAnswers: [],
+      valid: false,
       poll: {
         question: '',
         answers: ['', ''],
@@ -103,6 +120,9 @@ export default {
         display_mode: 'always'
       }
     })
+
+    /* Watched Data */
+    watch(() => v.poll, debounce(validatePoll, 500), { deep: true })
 
     return {
       ...toRefs(v),
