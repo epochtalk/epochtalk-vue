@@ -311,14 +311,13 @@ export default {
     display: flex;
     flex-direction: column;
   }
-
   .editor-fixed-bottom {
     width: 100%;
     position: fixed;
     bottom: 0;
     left: 0;
-    z-index: 1000; }
-
+    z-index: 1000;
+  }
   .editor-fixed-right {
     position: fixed;
     top: 0;
@@ -326,11 +325,7 @@ export default {
     height: 100vh;
     width: calc(((100vw - 1300px)/2) + 240px);
     z-index: 5000;
-
-    @include break-max-xlarge {
-      width: calc(#{$sidebarWidth} + #{$base-grid-padding});
-    }
-
+    @include break-max-xlarge { width: calc(#{$sidebarWidth} + #{$base-grid-padding}); }
     @include break-mobile-sm {
       top: initial;
       left: 0;
@@ -343,7 +338,6 @@ export default {
       z-index: 5000;
     }
   }
-
   .editor-full-screen {
     width: calc(100vw - 4rem);
     position: fixed;
@@ -351,7 +345,6 @@ export default {
     top: 0;
     right: 0;
     // z-index: 3000;
-
     @include break-mobile-sm {
       top: initial;
       left: 0;
@@ -371,7 +364,6 @@ export default {
     right: 1.25rem;
     z-index: 10;
     margin: 0;
-
     li {
       color: #fff;
       background-color: $color-primary;
@@ -383,7 +375,6 @@ export default {
       -moz-border-radius:     1.5625rem;
       border-radius:          1.5625rem;
       box-shadow: 0px 0.3125rem 0.625rem rgba(0, 0, 0, 0.1);
-
       span {
         font-weight: bold;
         font-size: 1.25rem;
@@ -396,16 +387,11 @@ export default {
     display: flex;
     position: relative;
     height: 100vh;
-    // max-width: calc(100vw - 4rem);
-    // margin: 0 auto;
     border: 1px solid $border-color;
     border-bottom: 0;
     box-shadow: 0 0 20px rgba(0,0,0,0.2);
     z-index: 5000;
-
-    @include break-mobile-sm {
-      height: 100%;
-    }
+    @include break-mobile-sm { height: 100%; }
   }
 
   .editor-container-bar {
@@ -427,12 +413,6 @@ export default {
   }
 
   .editor-top-bar {
-    background-color: $sub-header-color;
-    div:first-child {
-      padding-left: 0.5rem;
-      // text-align: right;
-    }
-
     .toolbar-title {
       font-size: $font-size-xs;
       width: 90%;
@@ -444,7 +424,6 @@ export default {
       .underline { text-decoration: underline; }
       a { color: $color-primary; }
     }
-
     button {
       height: 25px;
       padding: 2px 10px;
@@ -480,22 +459,18 @@ export default {
     flex: 3 0 auto;
     display: flex;
     flex-direction: column;
-
     label {
       color: $secondary-font-color-light;
       margin-top: 0;
     }
-
     .editor-body {
       width: 100%;
       flex: 1 0 auto;
       display: flex;
-
       .editor-column-input {
         flex: 1 0 auto;
         height: auto;
       }
-
       input[type],
       .editor-input,
       .editor-preview {
@@ -519,7 +494,6 @@ export default {
         text-align: center;
         height: 100%;
         margin: 0rem;
-
         &.visible { display: block; }
         .editor-drag {
           position: relative;
@@ -546,42 +520,35 @@ export default {
       height: 100%;
       &.hidden { display: none; }
     }
-
     .editor-input {
       white-space: pre-wrap;
       overflow: auto;
       height: 100%;
-
       p { margin: 0; }
       span {
         font-family: inherit;
         font-size: 1rem;
-        line-height: 1.6; }
+        line-height: 1.6;
+      }
     }
-
     .editor-preview {
       white-space: pre-wrap;
       overflow: auto;
       height: 100%;
       word-wrap: break-word;
-
       p { margin: 0; }
     }
-
     .editor-footer {
       color: $secondary-font-color-light;
       font-size: .875rem;
       position: absolute;
       bottom: 0px;
-      // left: -50px;
       width: 100%;
       background-color: $base-background-color;
       height: 3rem;
       border-top: 1px solid $border-color;
       .upload-editor {
         text-align: left;
-        // width: $max-width / 2;
-        // margin-left: 50px;
         padding-left: 1rem;
         position: absolute;
         top: -1.35rem;
@@ -592,20 +559,17 @@ export default {
         }
       }
     }
-
     .editor-images-container {
       height: 100%;
       padding-left: 0px;
       padding-right: 5px;
       line-height: 3rem;
     }
-
     .editor-image-uploader {
       display: block;
       width: 100%;
       text-align: center;
     }
-
     .editor-images {
       height: 100%;
       width: 100%;
@@ -617,43 +581,31 @@ export default {
     }
   }
 
-
-
   .editor-button-container.admin {
     padding-left: $base-grid-padding;
     padding-right: $base-grid-padding;
   }
 
-    .editor-form.admin .editor-footer {
-      left: 0;
-      width: 100%;
-
-      .progress-editor {
-        margin-left: 0;
-        @include break-mobile-sm {
-          margin-left: 0;
-        }
-      }
-      .upload-editor {
-        margin-left: 0;
-      }
+  .editor-form.admin .editor-footer {
+    left: 0;
+    width: 100%;
+    .progress-editor {
+      margin-left: 0;
+      @include break-mobile-sm { margin-left: 0; }
     }
-
-  .child-elements {
-     pointer-events: none;
+    .upload-editor { margin-left: 0; }
   }
+  .child-elements { pointer-events: none; }
   .editor-tools {
     color: $secondary-font-color-dark;
     flex: 0 0 auto;
     padding: 0 1rem;
     line-height: 1.5rem;
-
     a {
       color: $secondary-font-color-dark;
       &:hover { color: $secondary-font-color; }
     }
     .tools {
-      // @include span-columns(12);
       width: 100%;
       text-align: right;
       .expand { margin-left: 1rem; }
@@ -665,36 +617,27 @@ export default {
     line-height: 1;
     padding: 0.25rem 0.5rem 0.375rem;
     font-size: 0.6875rem;
-    margin: 0; }
-
+    margin: 0;
+  }
   .editor-button-container {
     flex: 0 0 auto;
     padding: 0.5rem 1rem;
     height: 3rem;
     text-align: right;
     width: 100%;
-
     button {
-      // float: right;
       margin-right: 1.9%;
       padding: 0.35rem 1rem;
-
-      &:last-child {
-        margin-right: 0;
-      }
-
+      &:last-child { margin-right: 0; }
       &.send { display: inline-block; border: 1px solid transparent; }
       &.cancel {
         background-color: transparent;
         color: $secondary-font-color;
         display: inline-block;
-        &:hover {
-          color: $color-primary;
-        }
+        &:hover { color: $color-primary; }
       }
     }
   }
-
   .editor-form.new-thread {
     .editor-header a {
       line-height: 1rem;
@@ -718,11 +661,8 @@ export default {
         }
       }
     }
-    .editor-body {
-      bottom: 2rem;
-    }
+    .editor-body { bottom: 2rem; }
   }
-
   .image-picker {
     .header {
       background-color: #4b4b4b;
@@ -742,15 +682,13 @@ export default {
       object-fit: cover;
     }
   }
-
   .thread-editor-container {
     position: relative;
     background-color: $base-background-color;
-    height: 500px; }
+    height: 500px;
+  }
   .thread-editor-container > .editor-form { top: 0px; }
   .editor-preview .imageContainer { display: inline; }
-
-  // Bourbon/Neat Grid
   .editor-header {
     a {
       font-size: $font-size-xs;
@@ -766,9 +704,6 @@ export default {
     }
   }
   .editor-header, .editor-body, .editor-footer, .editor-top-bar {
-    // @include fill-parent;
-    // @include pad(0);
-    // @include row;
     width: 100%;
     padding: 0;
     .editor-column-input {
@@ -781,11 +716,7 @@ export default {
       // @include omega;
     }
   }
-
-  .editor-header {
-    flex: 0 0 auto;
-  }
-
+  .editor-header { flex: 0 0 auto; }
   @include break-mobile-sm {
     .editor-form .editor-body {
       bottom: 5rem;
@@ -807,9 +738,7 @@ export default {
         height: 100%;
         display: inline-block;
         padding: 0 0.5rem;
-        &:last-child {
-          margin-right: -0.5rem;
-        }
+        &:last-child { margin-right: -0.5rem; }
       }
       .tools {
         float: none;
@@ -818,8 +747,6 @@ export default {
       }
     }
     .editor-button-container {
-      // @include row;
-      // @include pad(0 $base-grid-padding);
       padding: 0 $base-grid-padding;
       height: 2.5rem;
       padding-top: 0.425rem;
@@ -851,7 +778,6 @@ export default {
       }
     }
   }
-
   .thread-editor-container {
     .editor-form {
       position: absolute;
@@ -871,7 +797,6 @@ export default {
       .editor-form .editor-body { bottom: 2.5rem; top: 2.7rem; }
     }
   }
-
   .editor-fixed-bottom, .editor-full-screen {
     // .editor-images-container { @include span-columns(6); @include pad(0); }
     .editor-button-container {
@@ -888,7 +813,6 @@ export default {
       .editor-formatting h4 { display: inline-block; }
     }
   }
-
   .post-editor-overlay {
     background: rgba(0, 0, 0, 0.15);
     position: fixed;
@@ -898,15 +822,12 @@ export default {
     bottom: 0;
     z-index: 999;
   }
-
-
   .messages-wrap {
     position: relative;
     z-index: 5000;
     .new-thread.add-poll .editor-form { top: 49.4375rem; }
     .editor-button-container { padding: 0.5rem;}
     .progress-editor { margin-left: 0; }
-
     .editor-footer {
       left: 0;
       width: 100%;
@@ -915,16 +836,11 @@ export default {
         padding-left: 1rem;
       }
     }
-
     .new-message .editor-top-bar {
       flex: 0 0 auto;
       height: auto;
       padding: 1rem;
       padding-bottom: 0;
-      div:first-child {
-        padding: 0;
-        text-align: left;
-      }
     }
     .new-thread .editor-top-bar {
       padding: 1rem;
@@ -934,5 +850,4 @@ export default {
       }
     }
   }
-
 </style>
