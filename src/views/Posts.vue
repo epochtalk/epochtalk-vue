@@ -95,6 +95,7 @@
     <!-- Poll Creator -->
     <div class="fill-row" v-if="addPoll">
       <poll-creator @poll-validation="onPollValidation"></poll-creator>
+      <button class="fill-row" :disabled="!pollValid" @click.prevent="createPoll()">Create Poll</button>
     </div>
 
     <!-- <pagination page-count="PostsParentCtrl.pageCount" page="PostsParentCtrl.page"></pagination> -->
