@@ -426,7 +426,7 @@ import dayjs from 'dayjs'
 import { userRoleHighlight } from '@/composables/utils/userUtils'
 import truncate from '@/composables/filters/truncate'
 import { inject, reactive, watch, toRefs } from 'vue'
-import { postsApi, threadsApi, usersApi, watchlistApi } from '@/api'
+import { postsApi, pollsApi, threadsApi, usersApi, watchlistApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore, localStoragePrefs } from '@/composables/stores/prefs'
 import PostsDeleteModal from '@/components/modals/posts/Delete.vue'
@@ -820,7 +820,17 @@ export default {
       v.pollValid = valid
       v.newPoll = poll
     }
-    const createPoll = () => console.log('createPoll')
+    const createPoll = () => {
+      const params = {
+        question: v.newPoll.question,
+        answers: v.newPoll.answers,
+        max_answers: v.newPoll.max_answers,
+        expiration: v.newPoll.expiration,
+        change_vote: v.newPoll.change_vote,
+        display_mode: v.newPoll.display_mode
+      }
+      pollsApi.create(v.postData.data.thread.id, params).then(poll => v.postData.data.thread.poll = poll)
+    }
     const showEditDate = (post) => dayjs(post.updated_at).isAfter(dayjs(post.created_at))
     const openPostsPurgePostModal = (post, postIndex) => {
       v.selectedPost = post
