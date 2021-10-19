@@ -254,6 +254,10 @@ export default {
     const canCreatePoll = () => true
     const cancel = () => emit('close')
     const closeEditor = () => emit('close')
+    const onPollValidation = ({ valid, poll }) => {
+      v.threadCopy.pollValid = valid
+      v.threadCopy.poll = poll
+    }
     /* Internal Data */
     // const $route = useRoute()
     // const $router = useRouter()
@@ -303,7 +307,7 @@ export default {
       if (visible && props.threadEditorMode) nextTick(() => v.threadTitleEl.focus())
     })
 
-    return { ...toRefs(v), canLock, canCreate, canUpdate, canSticky, canModerate, canCreatePoll, cancel, closeEditor }
+    return { ...toRefs(v), canLock, canCreate, canUpdate, canSticky, canModerate, canCreatePoll, cancel, closeEditor, onPollValidation }
   }
 }
 </script>
