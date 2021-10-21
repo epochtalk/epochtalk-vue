@@ -192,7 +192,7 @@
           <button class="inverted-button cancel" @click="cancel()">
             Cancel
           </button>
-          <button class="no-animate send" v-if="editorConvoMode" @click.prevent="createAction().then(closeEditor);" :disabled="!canCreate() || !newMessage.content.body.length || !newMessage.content.subject.length || !receivers.length">
+          <button class="no-animate send" v-if="editorConvoMode" @click.prevent="createAction(newMessage).then(closeEditor);" :disabled="!canCreate() || !newMessage.content.body.length || !newMessage.content.subject.length || !newMessage.receivers.length">
             <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;Send
           </button>
           <button class="no-animate send" v-if="!editorConvoMode" @click.prevent="updateAction().then(closeEditor);" :disabled="!canUpdate() || !newMessage.content.body.length">
@@ -265,10 +265,9 @@ export default {
       showEditor: props.showEditor,
       showDropzone: false,
       draftStatus: null,
-      receivers: [],
       postMaxLength: window.post_max_length,
       posting: { post: { title: '', body: '', thread_id: props?.thread?.id }},
-      newMessage: { content: { subject: '', body: '' } },
+      newMessage: { receivers: [], content: { subject: '', body: '' } },
       rightToLeft: false,
       threadTitleEl: null,
       msgTagsInput: {
@@ -284,11 +283,13 @@ export default {
         options: async q => {
           return await usersApi.lookup(q, { restricted: true })
           // convert array into array of objects
-          .then(d => d.map(u =>{ return { label: u.username, value: { username: u.username, user_id: u.id } } }))
+          .then(d => d.map(u =>{ return { label: u.username, value: u.id } }))
           .catch(() => { return [] })
         }
       }
     })
+
+    watch(() => v.msgTagsInput.value, receivers => v.newMessage.receivers = receivers)
 
     watch(() => props.thread, t => {
       v.posting.post.thread_id = t.id

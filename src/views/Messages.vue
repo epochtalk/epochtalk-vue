@@ -148,7 +148,7 @@
   <delete-conversation-modal :show="showDeleteConversationModal" :conversation-id="selectedDeletedConvoId" @close="showDeleteConversationModal = false" @success="reload()" />
   <delete-message-modal :show="showDeleteMessageModal" :message-id="selectedMessageId" @close="showDeleteMessageModal = false" @success="deleteMessageSuccess()" />
   <report-message-modal :show="showReportMessageModal" :message-id="selectedMessageId" @close="showReportMessageModal = false" @success="showReportMessageModal = false" />
-  <editor :showEditor="showEditor" @close="showEditor = false" :editorConvoMode="editorConvoMode"  />
+  <editor :showEditor="showEditor" @close="showEditor = false" :editorConvoMode="editorConvoMode" :create-action="createConversation" />
 </template>
 
 <script>
@@ -297,6 +297,7 @@ export default {
     const canDeleteMessage = () => true
     const canCreateConversation = () => true
     const canCreateMessage = () => true
+    const createConversation = convo => console.log(convo)
 
     const listMessageReceivers = message => {
       let receiverNames = []
@@ -341,7 +342,7 @@ export default {
       }
     })
 
-    return { ...toRefs(v), reload, loadRecentMessages, preloadConversation, loadConversation, loadMoreMessages, canDeleteConversation, canDeleteMessage, addQuote, canCreateConversation, canCreateMessage, deleteMessageSuccess, listMessageReceivers, humanDate }
+    return { ...toRefs(v), reload, createConversation, loadRecentMessages, preloadConversation, loadConversation, loadMoreMessages, canDeleteConversation, canDeleteMessage, addQuote, canCreateConversation, canCreateMessage, deleteMessageSuccess, listMessageReceivers, humanDate }
   }
 }
 </script>
