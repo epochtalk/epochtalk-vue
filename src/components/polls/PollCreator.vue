@@ -1,4 +1,5 @@
 <template>
+  <div class="poll-creator">
   <div class="polls poll-form">
     <div class="section-poll-questions">
       <span class="section-header">Create a Poll</span>
@@ -59,6 +60,7 @@
         </div>
       </div>
     </div>
+  </div>
   </div>
 </template>
 <script>
@@ -137,3 +139,9 @@ export default {
   }
 }
 </script>
+<style>
+.poll-creator {
+  display: flex;
+  flex-direction: column;
+}
+</style>

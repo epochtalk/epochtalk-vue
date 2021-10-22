@@ -341,11 +341,6 @@ export default {
 }
 </script>
 <style scoped lang="scss">
-poll-creator {
-  display: flex;
-  flex-direction: column;
-}
-
 .poll-edit {
   overflow: hidden;
   height: auto;
