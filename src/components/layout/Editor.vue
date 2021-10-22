@@ -192,7 +192,7 @@
           <button class="inverted-button cancel" @click="cancel()">
             Cancel
           </button>
-          <button class="no-animate send" v-if="editorConvoMode" @click.prevent="createAction(newMessage).then(closeEditor);" :disabled="!canCreate() || !newMessage.content.body.length || !newMessage.content.subject.length || !newMessage.receivers.length">
+          <button class="no-animate send" v-if="editorConvoMode" @click.prevent="createAction(newMessage).then(closeEditor);" :disabled="!canCreate() || !newMessage.content.body.length || !newMessage.content.subject.length || !newMessage.receiver_ids.length">
             <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;Send
           </button>
           <button class="no-animate send" v-if="!editorConvoMode" @click.prevent="updateAction().then(closeEditor);" :disabled="!canUpdate() || !newMessage.content.body.length">
@@ -267,7 +267,7 @@ export default {
       draftStatus: null,
       postMaxLength: window.post_max_length,
       posting: { post: { title: '', body: '', thread_id: props?.thread?.id }},
-      newMessage: { receivers: [], content: { subject: '', body: '' } },
+      newMessage: { receiver_ids: [], content: { subject: '', body: '' } },
       rightToLeft: false,
       threadTitleEl: null,
       msgTagsInput: {
@@ -289,7 +289,7 @@ export default {
       }
     })
 
-    watch(() => v.msgTagsInput.value, receivers => v.newMessage.receivers = receivers)
+    watch(() => v.msgTagsInput.value, receivers => v.newMessage.receiver_ids = receivers)
 
     watch(() => props.thread, t => {
       v.posting.post.thread_id = t.id
