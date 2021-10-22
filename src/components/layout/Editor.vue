@@ -145,9 +145,7 @@
         </div>
 
         <!-- Poll Creator -->
-        <div class="fill-row" v-if="threadCopy.addPoll">
-          <poll-creator @poll-validation="onPollValidation"></poll-creator>
-        </div>
+        <poll-creator v-if="threadCopy.addPoll" @poll-validation="onPollValidation"></poll-creator>
 
         <!-- Editor -->
         <form name="form" class="editor-form" novalidate>
