@@ -297,7 +297,7 @@ export default {
     const canDeleteMessage = () => true
     const canCreateConversation = () => true
     const canCreateMessage = () => true
-    const createConversation = convo => messagesApi.convos.create(convo)
+    const createConversation = convo => messagesApi.convos.create(convo).then(reload)
 
     const listMessageReceivers = message => {
       let receiverNames = []

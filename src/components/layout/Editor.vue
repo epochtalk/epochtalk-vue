@@ -250,7 +250,12 @@ export default {
     const canModerate = () => true
     const canCreatePoll = () => true
     const cancel = () => emit('close')
-    const closeEditor = () => emit('close')
+    const closeEditor = () => {
+      v.posting = { post: { title: '', body: '', thread_id: props?.thread?.id } }
+      v.newMessage = { receiver_ids: [], content: { subject: '', body: '' } }
+      v.threadCopy = { title: '', board_id: v.threadCopy?.data?.board.id }
+      emit('close')
+    }
     /* Internal Data */
     // const $route = useRoute()
     // const $router = useRouter()
@@ -266,7 +271,7 @@ export default {
       showDropzone: false,
       draftStatus: null,
       postMaxLength: window.post_max_length,
-      posting: { post: { title: '', body: '', thread_id: props?.thread?.id }},
+      posting: { post: { title: '', body: '', thread_id: props?.thread?.id } },
       newMessage: { receiver_ids: [], content: { subject: '', body: '' } },
       rightToLeft: false,
       threadTitleEl: null,
