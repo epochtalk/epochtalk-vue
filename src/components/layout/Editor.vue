@@ -421,6 +421,10 @@ export default {
   }
 
   .editor-top-bar {
+    label {
+      height: auto;
+      padding: 0;
+    }
     .toolbar-title {
       font-size: $font-size-xs;
       width: 90%;
