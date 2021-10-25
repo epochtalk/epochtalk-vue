@@ -195,7 +195,7 @@
           <button class="no-animate send" v-if="editorConvoMode" @click.prevent="createAction(newMessage).then(closeEditor);" :disabled="!canCreate() || !newMessage.content.body.length || !newMessage.content.subject.length || !newMessage.receiver_ids.length">
             <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;Send
           </button>
-          <button class="no-animate send" v-if="!editorConvoMode" @click.prevent="updateAction().then(closeEditor);" :disabled="!canUpdate() || !newMessage.content.body.length">
+          <button class="no-animate send" v-if="!editorConvoMode" @click.prevent="updateAction(newMessage).then(closeEditor);" :disabled="!canUpdate() || !newMessage.content.body.length">
             <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;Send Reply
           </button>
 
@@ -238,7 +238,7 @@ import Multiselect from '@vueform/multiselect'
 import { usersApi } from '@/api'
 
 export default {
-  props: ['editorConvoMode', 'threadEditorMode', 'postEditorMode', 'createAction', 'updateAction', 'showEditor', 'thread' ],
+  props: ['editorConvoMode', 'threadEditorMode', 'postEditorMode', 'createAction', 'updateAction', 'showEditor', 'thread', 'currentMessage' ],
   emits: ['close'],
   components: { ImageUploader, Multiselect },
   setup(props, { emit }) {
@@ -272,7 +272,7 @@ export default {
       draftStatus: null,
       postMaxLength: window.post_max_length,
       posting: { post: { title: '', body: '', thread_id: props?.thread?.id } },
-      newMessage: { receiver_ids: [], content: { subject: '', body: '' } },
+      newMessage: { receiver_ids: [], conversation_id: null, content: { subject: '', body: '' } },
       rightToLeft: false,
       threadTitleEl: null,
       msgTagsInput: {
@@ -304,6 +304,10 @@ export default {
     watch(() => props.showEditor, visible => {
       console.log(visible, props.threadEditorMode)
       if (visible && props.threadEditorMode) nextTick(() => v.threadTitleEl.focus())
+      if (visible && props.currentMessage) {
+        v.newMessage = props.currentMessage
+        console.log(v.newMessage)
+      }
     })
 
     return { ...toRefs(v), canLock, canCreate, canUpdate, canSticky, canModerate, canCreatePoll, cancel, closeEditor }
