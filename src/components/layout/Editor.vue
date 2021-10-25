@@ -615,7 +615,8 @@ export default {
     line-height: 1.5rem;
     a {
       color: $secondary-font-color-dark;
-      &:hover { color: $secondary-font-color; }
+      &:visited { color: $secondary-font-color-dark; }
+      &:hover, &:active, &:focus { color: $secondary-font-color; }
     }
     .tools {
       width: 100%;
