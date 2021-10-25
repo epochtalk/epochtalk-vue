@@ -423,6 +423,8 @@ export default {
   }
 
   .editor-top-bar {
+    background-color: $sub-header-color;
+    .multiselect-input { background-color: $base-background-color; }
     .toolbar-title {
       font-size: $font-size-xs;
       width: 90%;
