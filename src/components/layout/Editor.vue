@@ -145,7 +145,7 @@
         </div>
 
         <!-- Poll Creator -->
-        <poll-creator v-if="threadCopy.addPoll" @poll-validation="onPollValidation"></poll-creator>
+        <poll-creator v-if="threadCopy?.addPoll" @poll-validation="onPollValidation"></poll-creator>
 
         <!-- Editor -->
         <form name="form" class="editor-form" novalidate>
@@ -219,7 +219,7 @@
           <button class="inverted-button cancel" @click="cancel()">
             Cancel
           </button>
-          <button class="send" @click.prevent="createAction(threadCopy).then(closeEditor);" :disabled="!threadCopy?.title.length || !canCreate() || (threadCopy.addPoll && !threadCopy.pollValid)">
+          <button class="send" @click.prevent="createAction(threadCopy).then(closeEditor);" :disabled="!threadCopy?.title.length || !canCreate() || (threadCopy?.addPoll && !threadCopy.pollValid)">
             <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;Start Thread
           </button>
 
