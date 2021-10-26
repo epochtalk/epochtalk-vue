@@ -875,6 +875,7 @@ input[disabled].toggle-switch:checked + label:after { background-color: lighten(
 
     .poll-options-expiration {
       margin-bottom: 1rem;
+      label { height: auto; }
 
       .fieldgroup {
         display: grid;
