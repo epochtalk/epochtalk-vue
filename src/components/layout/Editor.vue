@@ -145,7 +145,7 @@
         </div>
 
         <!-- Poll Creator -->
-<!--         <poll-creator poll="thread.poll" valid="thread.pollValid" ng-if="thread.addPoll"></poll-creator> -->
+        <poll-creator v-if="threadCopy.addPoll" @poll-validation="onPollValidation"></poll-creator>
 
         <!-- Editor -->
         <form name="form" class="editor-form" novalidate>
@@ -219,7 +219,7 @@
           <button class="inverted-button cancel" @click="cancel()">
             Cancel
           </button>
-          <button class="send" @click.prevent="createAction(threadCopy).then(closeEditor);" @disabled="!threadCopy?.title.length || !canCreate() || (threadCopy.addPoll && !threadCopy.pollValid)">
+          <button class="send" @click.prevent="createAction(threadCopy).then(closeEditor);" :disabled="!threadCopy?.title.length || !canCreate() || (threadCopy.addPoll && !threadCopy.pollValid)">
             <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;Start Thread
           </button>
 
@@ -234,15 +234,16 @@
 import { reactive, toRefs, watch, nextTick } from 'vue'
 // import { useRoute, useRouter } from 'vue-router'
 import ImageUploader from '@/components/images/ImageUploader.vue'
+import PollCreator from '@/components/polls/PollCreator.vue'
 import Multiselect from '@vueform/multiselect'
 import { usersApi } from '@/api'
 
 export default {
   props: ['editorConvoMode', 'threadEditorMode', 'postEditorMode', 'createAction', 'updateAction', 'showEditor', 'thread', 'currentMessage' ],
   emits: ['close'],
-  components: { ImageUploader, Multiselect },
+  components: { ImageUploader, PollCreator, Multiselect },
   setup(props, { emit }) {
-
+    /* Internal Methods */
     const canCreate = () => true
     const canUpdate = () => true
     const canLock = () => true
@@ -255,6 +256,10 @@ export default {
       v.newMessage = { receiver_ids: [], content: { subject: '', body: '' } }
       v.threadCopy = { title: '', board_id: v.threadCopy?.data?.board.id }
       emit('close')
+    }
+    const onPollValidation = ({ valid, poll }) => {
+      v.threadCopy.pollValid = valid
+      v.threadCopy.poll = poll
     }
     /* Internal Data */
     // const $route = useRoute()
@@ -304,6 +309,9 @@ export default {
       v.posting.post.title = t.title
     })
 
+    // invalidate poll when closing poll creator
+    watch(() => v.threadCopy?.addPoll, () => { if (!v.threadCopy.addPoll) { v.threadCopy.pollValid = false }})
+
     watch(() => props.showEditor, visible => {
       console.log(visible, props.threadEditorMode)
       if (visible && props.threadEditorMode) nextTick(() => v.threadTitleEl.focus())
@@ -318,7 +326,7 @@ export default {
       }
     })
 
-    return { ...toRefs(v), canLock, canCreate, canUpdate, canSticky, canModerate, canCreatePoll, cancel, closeEditor }
+    return { ...toRefs(v), canLock, canCreate, canUpdate, canSticky, canModerate, canCreatePoll, cancel, closeEditor, onPollValidation }
   }
 }
 </script>
@@ -431,6 +439,10 @@ export default {
   }
 
   .editor-top-bar {
+    label {
+      height: auto;
+      padding: 0;
+    }
     background-color: $sub-header-color;
     .multiselect-input { background-color: $base-background-color; }
     .toolbar-title {

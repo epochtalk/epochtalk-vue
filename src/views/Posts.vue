@@ -92,12 +92,11 @@
     </div>
 
 
-    <!-- Polls -->
+    <!-- Poll Creator -->
     <div class="fill-row" v-if="addPoll">
-      <!-- <poll-creator poll="PostsParentCtrl.poll" valid="PostsParentCtrl.pollValid"></poll-creator> -->
+      <poll-creator @poll-validation="onPollValidation"></poll-creator>
       <button class="fill-row" :disabled="!pollValid" @click.prevent="createPoll()">Create Poll</button>
     </div>
-    <!-- <poll-viewer thread="PostsParentCtrl.thread" user-priority="PostsParentCtrl.posts[0].user.priority" reset="PostsParentCtrl.resetPoll"></poll-viewer> -->
 
     <!-- <pagination page-count="PostsParentCtrl.pageCount" page="PostsParentCtrl.page"></pagination> -->
 
@@ -420,13 +419,14 @@
 import { useRoute } from 'vue-router'
 import Pagination from '@/components/layout/Pagination.vue'
 import PollViewer from '@/components/polls/PollViewer.vue'
+import PollCreator from '@/components/polls/PollCreator.vue'
 import RankDisplay from '@/components/users/RankDisplay.vue'
 import humanDate from '@/composables/filters/humanDate'
 import dayjs from 'dayjs'
 import { userRoleHighlight } from '@/composables/utils/userUtils'
 import truncate from '@/composables/filters/truncate'
 import { inject, reactive, watch, toRefs } from 'vue'
-import { postsApi, threadsApi, usersApi, watchlistApi } from '@/api'
+import { postsApi, pollsApi, threadsApi, usersApi, watchlistApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore, localStoragePrefs } from '@/composables/stores/prefs'
 import PostsDeleteModal from '@/components/modals/posts/Delete.vue'
@@ -443,7 +443,7 @@ import Editor from '@/components/layout/Editor.vue'
 export default {
   name: 'Posts',
   props: ['threadSlug', 'threadId'],
-  components: { Pagination, PostsDeleteModal, PostsUndeleteModal, PostsPurgePostModal, PostsMoveThreadModal, PostsPurgeThreadModal, PostsReportModal, PollViewer, RankDisplay, TrustDisplay, Editor },
+  components: { Pagination, PostsDeleteModal, PostsUndeleteModal, PostsPurgePostModal, PostsMoveThreadModal, PostsPurgeThreadModal, PostsReportModal, PollViewer, PollCreator, RankDisplay, TrustDisplay, Editor },
   beforeRouteEnter(to, from, next) {
     const params = {
       limit: localStoragePrefs().data.posts_per_page,
@@ -816,7 +816,29 @@ export default {
         })
         .catch(() => $alertStore.error('Error changing thread title'))
     }
-    const createPoll = () => console.log('createPoll')
+    const onPollValidation = ({ valid, poll }) => {
+      v.pollValid = valid
+      v.newPoll = poll
+    }
+    const createPoll = () => {
+      const params = {
+        question: v.newPoll.question,
+        answers: v.newPoll.answers,
+        max_answers: v.newPoll.max_answers,
+        expiration: v.newPoll.expiration,
+        change_vote: v.newPoll.change_vote,
+        display_mode: v.newPoll.display_mode
+      }
+      pollsApi.create(v.postData.data.thread.id, params).then(poll => {
+        // set this thread's poll
+        v.postData.data.thread.poll = poll
+        // set poll and validation to defaults
+        v.newPoll = false
+        v.pollValid = false
+        // close poll-creator
+        v.addPoll = false
+      })
+    }
     const showEditDate = (post) => dayjs(post.updated_at).isAfter(dayjs(post.created_at))
     const openPostsPurgePostModal = (post, postIndex) => {
       v.selectedPost = post
@@ -902,6 +924,7 @@ export default {
       postData: {data: {}},
       editThread: false,
       addPoll: false,
+      newPoll: false,
       pollValid: false,
       resetPoll: false,
       posting: {
@@ -951,6 +974,7 @@ export default {
       updateThreadSticky,
       updateThreadTitle,
       closeEditThread,
+      onPollValidation,
       createPoll,
       truncate,
       humanDate,
