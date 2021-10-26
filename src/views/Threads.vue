@@ -353,8 +353,8 @@ export default {
       if (slug === '') slug = Math.random().toString(36).substring(6)
       thread.slug = slug
       return threadsApi.create(thread)
-        .then(getThreads)
-        .then(data => v.threadData.data = data)
+        .then(t => $router.push({ name: 'Posts', params: { threadSlug: t.slug } }))
+        .catch(err => console.log(err))
     }
     /* Internal Data */
     const $route = useRoute()
