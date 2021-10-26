@@ -50,7 +50,7 @@
           <div v-if="editorConvoMode">
             <!-- Select User -->
             <label>To</label>
-            <Multiselect v-model="msgTagsInput.value" v-bind="msgTagsInput" ref="messageReceiverEl" />
+            <Multiselect v-model="msgTagsInput.value" v-bind="msgTagsInput" ref="messageReceiverEl" @keydown="messageReceiverEl.openDropdown()" />
             <label>Subject</label>
             <input type="text" v-model="newMessage.content.subject" minlength="1" maxlength="255" />
             <!--  <tags-input min-length="1" placeholder="Type username(s) to message" add-from-autocomplete-only="true" replace-spaces-with-dashes="false" display-property="username" allow-leftover-text="false" ng-model="receivers" modal-focus="{{showEditor && editorConvoMode}}">
@@ -192,10 +192,10 @@
           <button class="inverted-button cancel" @click="cancel()">
             Cancel
           </button>
-          <button class="no-animate send" v-if="editorConvoMode" @click.prevent="createAction().then(closeEditor);" :disabled="!canCreate() || !newMessage.content.body.length || !newMessage.content.subject.length || !receivers.length">
+          <button class="no-animate send" v-if="editorConvoMode" @click.prevent="createAction(newMessage).then(closeEditor);" :disabled="!canCreate() || !newMessage.content.body.length || !newMessage.content.subject.length || !newMessage.receiver_ids.length">
             <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;Send
           </button>
-          <button class="no-animate send" v-if="!editorConvoMode" @click.prevent="updateAction().then(closeEditor);" :disabled="!canUpdate() || !newMessage.content.body.length">
+          <button class="no-animate send" v-if="!editorConvoMode" @click.prevent="updateAction(newMessage).then(closeEditor);" :disabled="!canUpdate() || !newMessage.content.body.length">
             <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;Send Reply
           </button>
 
@@ -239,7 +239,7 @@ import Multiselect from '@vueform/multiselect'
 import { usersApi } from '@/api'
 
 export default {
-  props: ['editorConvoMode', 'threadEditorMode', 'postEditorMode', 'createAction', 'updateAction', 'showEditor', 'thread' ],
+  props: ['editorConvoMode', 'threadEditorMode', 'postEditorMode', 'createAction', 'updateAction', 'showEditor', 'thread', 'currentMessage' ],
   emits: ['close'],
   components: { ImageUploader, PollCreator, Multiselect },
   setup(props, { emit }) {
@@ -251,7 +251,12 @@ export default {
     const canModerate = () => true
     const canCreatePoll = () => true
     const cancel = () => emit('close')
-    const closeEditor = () => emit('close')
+    const closeEditor = () => {
+      v.posting = { post: { title: '', body: '', thread_id: props?.thread?.id } }
+      v.newMessage = { receiver_ids: [], content: { subject: '', body: '' } }
+      v.threadCopy = { title: '', board_id: v.threadCopy?.data?.board.id }
+      emit('close')
+    }
     const onPollValidation = ({ valid, poll }) => {
       v.threadCopy.pollValid = valid
       v.threadCopy.poll = poll
@@ -270,12 +275,14 @@ export default {
       showEditor: props.showEditor,
       showDropzone: false,
       draftStatus: null,
-      receivers: [],
       postMaxLength: window.post_max_length,
-      posting: { post: { title: '', body: '', thread_id: props?.thread?.id }},
-      newMessage: { content: { subject: '', body: '' } },
+      posting: { post: { title: '', body: '', thread_id: props?.thread?.id } },
+      newMessage: { receiver_ids: [], conversation_id: null, content: { subject: '', body: '' } },
       rightToLeft: false,
       threadTitleEl: null,
+      postEditorEl: null,
+      messageReceiverEl: null,
+      messageEditorEl: null,
       msgTagsInput: {
         mode: 'tags',
         value: [],
@@ -289,11 +296,13 @@ export default {
         options: async q => {
           return await usersApi.lookup(q, { restricted: true })
           // convert array into array of objects
-          .then(d => d.map(u =>{ return { label: u.username, value: { username: u.username, user_id: u.id } } }))
+          .then(d => d.map(u =>{ return { label: u.username, value: u.id } }))
           .catch(() => { return [] })
         }
       }
     })
+
+    watch(() => v.msgTagsInput.value, receivers => v.newMessage.receiver_ids = receivers)
 
     watch(() => props.thread, t => {
       v.posting.post.thread_id = t.id
@@ -306,6 +315,15 @@ export default {
     watch(() => props.showEditor, visible => {
       console.log(visible, props.threadEditorMode)
       if (visible && props.threadEditorMode) nextTick(() => v.threadTitleEl.focus())
+      else if (visible && props.postEditorMode) nextTick(() => v.postEditorEl.focus())
+      else if (visible && props.currentMessage) {
+        v.newMessage = props.currentMessage
+        if (props.editorConvoMode) nextTick(() => {
+          v.messageReceiverEl.focusSearch()
+          v.messageReceiverEl.closeDropdown()
+        })
+        else nextTick(() => v.messageEditorEl.focus())
+      }
     })
 
     return { ...toRefs(v), canLock, canCreate, canUpdate, canSticky, canModerate, canCreatePoll, cancel, closeEditor, onPollValidation }
@@ -425,6 +443,8 @@ export default {
       height: auto;
       padding: 0;
     }
+    background-color: $sub-header-color;
+    .multiselect-input { background-color: $base-background-color; }
     .toolbar-title {
       font-size: $font-size-xs;
       width: 90%;
@@ -615,7 +635,8 @@ export default {
     line-height: 1.5rem;
     a {
       color: $secondary-font-color-dark;
-      &:hover { color: $secondary-font-color; }
+      &:visited { color: $secondary-font-color-dark; }
+      &:hover, &:active, &:focus { color: $secondary-font-color; }
     }
     .tools {
       width: 100%;
