@@ -50,7 +50,7 @@
           <div v-if="editorConvoMode">
             <!-- Select User -->
             <label>To</label>
-            <Multiselect v-model="msgTagsInput.value" v-bind="msgTagsInput" ref="messageReceiverEl" />
+            <Multiselect v-model="msgTagsInput.value" v-bind="msgTagsInput" ref="messageReceiverEl" @keydown="messageReceiverEl.openDropdown()" />
             <label>Subject</label>
             <input type="text" v-model="newMessage.content.subject" minlength="1" maxlength="255" />
             <!--  <tags-input min-length="1" placeholder="Type username(s) to message" add-from-autocomplete-only="true" replace-spaces-with-dashes="false" display-property="username" allow-leftover-text="false" ng-model="receivers" modal-focus="{{showEditor && editorConvoMode}}">
@@ -275,6 +275,9 @@ export default {
       newMessage: { receiver_ids: [], conversation_id: null, content: { subject: '', body: '' } },
       rightToLeft: false,
       threadTitleEl: null,
+      postEditorEl: null,
+      messageReceiverEl: null,
+      messageEditorEl: null,
       msgTagsInput: {
         mode: 'tags',
         value: [],
@@ -304,9 +307,14 @@ export default {
     watch(() => props.showEditor, visible => {
       console.log(visible, props.threadEditorMode)
       if (visible && props.threadEditorMode) nextTick(() => v.threadTitleEl.focus())
-      if (visible && props.currentMessage) {
+      else if (visible && props.postEditorMode) nextTick(() => v.postEditorEl.focus())
+      else if (visible && props.currentMessage) {
         v.newMessage = props.currentMessage
-        console.log(v.newMessage)
+        if (props.editorConvoMode) nextTick(() => {
+          v.messageReceiverEl.focusSearch()
+          v.messageReceiverEl.closeDropdown()
+        })
+        else nextTick(() => v.messageEditorEl.focus())
       }
     })
 

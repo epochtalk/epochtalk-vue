@@ -6,7 +6,7 @@
         <div class="inbox" @click="reload()">
           <i class="fa fa-envelope"></i> Inbox
         </div>
-        <div class="add" v-if="canCreateConversation()" @click="showEditor = true; editorConvoMode = true;">
+        <div class="add" v-if="canCreateConversation()" @click="showEditor = false; showEditor = true; editorConvoMode = true;">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
             <path d="M24,4A20,20,0,1,1,4,24,20,20,0,0,1,24,4m0-2A22,22,0,1,0,46,24,22,22,0,0,0,24,2Z"/><path d="M36,25.71H25.71V36H22.29V25.71H12V22.29H22.29V12h3.42V22.29H36Z"/>
           </svg> New Message
@@ -66,7 +66,7 @@
               <router-link :to="{ path: '/profile/' + name.toLowerCase() }">{{name}}</router-link>{{ i !== receiverNames.length - 1 ? ', ' : '' }}
             </span>
           </h4>
-          <a class="to__reply no-select" v-if="canCreateMessage()" @click="showEditor = true; editorConvoMode = false;">
+          <a class="to__reply no-select" v-if="canCreateMessage()" @click="showEditor = false; showEditor = true; editorConvoMode = false;">
             <i class="fa fa-reply"></i> Reply
           </a>
         </div>
@@ -139,7 +139,7 @@
         <div class="empty-message"><strong>Your inbox is currently empty.</strong> Message someone to get started!</div>
 
         <div>
-          <button v-if='canCreateConversation() ' @click="showEditor = true; editorConvoMode = true;">Start a Conversation</button>
+          <button v-if='canCreateConversation()' @click="showEditor = false; showEditor = true; editorConvoMode = true;">Start a Conversation</button>
         </div>
       </div>
     </div>
