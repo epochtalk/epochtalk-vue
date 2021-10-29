@@ -239,7 +239,7 @@ import Multiselect from '@vueform/multiselect'
 import { usersApi } from '@/api'
 
 export default {
-  props: ['editorConvoMode', 'threadEditorMode', 'postEditorMode', 'createAction', 'updateAction', 'showEditor', 'thread', 'currentMessage' ],
+  props: ['editorConvoMode', 'threadEditorMode', 'postEditorMode', 'createAction', 'updateAction', 'showEditor', 'thread', 'currentMessage', 'post' ],
   emits: ['close'],
   components: { ImageUploader, PollCreator, Multiselect },
   setup(props, { emit }) {

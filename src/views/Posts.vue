@@ -412,7 +412,7 @@
   <posts-move-thread-modal v-if="canMove()" :threadId="postData.data.thread?.id" :show="showPostsMoveThreadModal" @close="showPostsMoveThreadModal = false"/>
   <posts-purge-thread-modal :threadId="postData.data.thread?.id" :boardId="postData.data.board?.id" :boardSlug="postData.data.board?.slug" :show="showPostsPurgeThreadModal" @close="showPostsPurgeThreadModal = false"/>
   <posts-report-modal :selectedPost="selectedPost" :canReportPosts="true" :canReportUsers="true" :show="showPostsReportModal" @close="showPostsReportModal = false; selectedPost = null" />
-  <editor :showEditor="showEditor" @close="showEditor = false" :postEditorMode="true" :thread="postData.data?.thread" :createAction="createPost" />
+  <editor :showEditor="showEditor" @close="showEditor = false" :postEditorMode="true" :thread="postData.data?.thread" :post="editPost" :createAction="createPost" />
 </template>
 
 <script>
@@ -867,6 +867,7 @@ export default {
       postsApi.unlock(post.id).then(() => post.locked = false)
     }
     const loadEditor = (post) => {
+      v.editPost = post
       v.showEditor = true
       console.log(post, 'loadEditor')
     }
@@ -922,6 +923,7 @@ export default {
       prefs: $prefs.data,
       loggedIn: $auth.loggedIn,
       postData: {data: {}},
+      editPost: null,
       editThread: false,
       addPoll: false,
       newPoll: false,
