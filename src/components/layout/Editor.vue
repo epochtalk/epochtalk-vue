@@ -250,11 +250,15 @@ export default {
     const canSticky = () => true
     const canModerate = () => true
     const canCreatePoll = () => true
-    const cancel = () => emit('close')
+    const cancel = () => {
+      if (props.postEditorMode && props.post) closeEditor()
+      else emit('close')
+    }
     const closeEditor = () => {
       v.posting = { post: { title: '', body: '', thread_id: props?.thread?.id } }
       v.newMessage = { receiver_ids: [], content: { subject: '', body: '' } }
       v.threadCopy = { title: '', board_id: v.threadCopy?.data?.board.id }
+      if (props.postEditorMode) v.threadCopy.title = props?.thread?.title
       emit('close')
     }
     const onPollValidation = ({ valid, poll }) => {
