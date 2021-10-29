@@ -268,7 +268,7 @@ export default {
     /* View Data */
     const v = reactive({
       isMinimized: true,
-      threadCopy: props.thread,
+      threadCopy: props.thread || {},
       fullscreen: false,
       showFormatting: false,
       preview: false,
@@ -307,6 +307,7 @@ export default {
     watch(() => props.thread, t => {
       v.posting.post.thread_id = t.id
       v.posting.post.title = t.title
+      if (t) nextTick(() => Object.assign(v.threadCopy, t))
     })
 
     // invalidate poll when closing poll creator
