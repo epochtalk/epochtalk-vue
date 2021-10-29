@@ -314,11 +314,14 @@ export default {
       if (t) nextTick(() => Object.assign(v.threadCopy, t))
     })
 
+    watch(() => props.post, p => {
+      if (p) nextTick(() => Object.assign(v.posting.post, p))
+    })
+
     // invalidate poll when closing poll creator
     watch(() => v.threadCopy?.addPoll, () => { if (!v.threadCopy.addPoll) { v.threadCopy.pollValid = false }})
 
     watch(() => props.showEditor, visible => {
-      console.log(visible, props.threadEditorMode)
       if (visible && props.threadEditorMode) nextTick(() => v.threadTitleEl.focus())
       else if (visible && props.postEditorMode) nextTick(() => v.postEditorEl.focus())
       else if (visible && props.currentMessage) {
