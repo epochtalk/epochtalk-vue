@@ -412,11 +412,11 @@
   <posts-move-thread-modal v-if="canMove()" :threadId="postData.data.thread?.id" :show="showPostsMoveThreadModal" @close="showPostsMoveThreadModal = false"/>
   <posts-purge-thread-modal :threadId="postData.data.thread?.id" :boardId="postData.data.board?.id" :boardSlug="postData.data.board?.slug" :show="showPostsPurgeThreadModal" @close="showPostsPurgeThreadModal = false"/>
   <posts-report-modal :selectedPost="selectedPost" :canReportPosts="true" :canReportUsers="true" :show="showPostsReportModal" @close="showPostsReportModal = false; selectedPost = null" />
-  <editor :showEditor="showEditor" @close="showEditor = false" :postEditorMode="true" :thread="postData.data?.thread" :post="editPost" :createAction="createPost" />
+  <editor :showEditor="showEditor" @close="showEditor = false" :postEditorMode="true" :thread="postData.data?.thread" :post="editPost" :createAction="createPost" :updateAction="updatePost" />
 </template>
 
 <script>
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import Pagination from '@/components/layout/Pagination.vue'
 import PollViewer from '@/components/polls/PollViewer.vue'
 import PollCreator from '@/components/polls/PollCreator.vue'
@@ -905,11 +905,15 @@ export default {
     }
 
     const createPost = post => postsApi.create(post)
+    .then(p => $router.push({ path: $route.path, query: $route.query, hash: `#${p.id}` }))
+
+    const updatePost = post => postsApi.update(post)
     .then(processPosts)
     .then(data => v.postData.data = data)
 
     /* Internal Data */
     const $route = useRoute()
+    const $router = useRouter()
     const $prefs = inject(PreferencesStore)
     const $auth = inject(AuthStore)
     const $breadcrumbs = inject(BreadcrumbStore)
@@ -959,6 +963,7 @@ export default {
     return {
       ...toRefs(v),
       createPost,
+      updatePost,
       canEditTitle,
       canPost,
       canSave,

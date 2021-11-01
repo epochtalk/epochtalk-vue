@@ -207,7 +207,7 @@
           <button class="inverted-button cancel" @click="cancel()">
             Cancel
           </button>
-          <button class="send" @click.prevent="createAction(posting.post).then(closeEditor);" :disabled="!canCreate()">
+          <button class="send" @click.prevent="post?.id ? updateAction(posting.post).then(closeEditor) : createAction(posting.post).then(closeEditor)" :disabled="!canCreate()">
             <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;{{ posting?.post?.id ? 'Edit Post' : 'Send Reply' }}
           </button>
 
@@ -255,7 +255,7 @@ export default {
       else emit('close')
     }
     const closeEditor = () => {
-      v.posting = { post: { title: '', body: '', thread_id: props?.thread?.id } }
+      v.posting = { post: { title: 'RE: ' + props?.thread?.title, body: '', thread_id: props?.thread?.id } }
       v.newMessage = { receiver_ids: [], content: { subject: '', body: '' } }
       v.threadCopy = { title: '', board_id: v.threadCopy?.data?.board.id }
       if (props.postEditorMode) v.threadCopy.title = props?.thread?.title
