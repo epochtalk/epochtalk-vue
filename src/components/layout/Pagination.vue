@@ -59,7 +59,7 @@ export default {
     /* Watch - this handles when query data changes, (e.g. query string for search changes) */
     watch(() => props.count, () => {
       v.currentPage = props.page
-      updatePageDisplay(v.rangeInput, v.currentPage)
+       nextTick(() => updatePageDisplay(v.rangeInput, v.currentPage))
     })
 
     return { ...toRefs(v), smoothThumbDrag, updatePageDisplay }
