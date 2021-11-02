@@ -425,7 +425,7 @@ import humanDate from '@/composables/filters/humanDate'
 import dayjs from 'dayjs'
 import { userRoleHighlight } from '@/composables/utils/userUtils'
 import truncate from '@/composables/filters/truncate'
-import { inject, reactive, watch, toRefs } from 'vue'
+import { inject, reactive, watch, toRefs, nextTick } from 'vue'
 import { postsApi, pollsApi, threadsApi, usersApi, watchlistApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore, localStoragePrefs } from '@/composables/stores/prefs'
@@ -905,7 +905,17 @@ export default {
     }
 
     const createPost = post => postsApi.create(post)
-    .then(p => $router.push({ path: $route.path, query: $route.query, hash: `#${p.id}` }))
+    .then(p => {
+      const limit = localStoragePrefs().data.posts_per_page
+      if (v.postData.data.posts.length === limit) {
+        const postCount = v.postData.data.thread.post_count + 1
+        const lastPage = Math.ceil(postCount / limit)
+        Object.assign(v.postData.data.thread.post_count, postCount)
+        Object.assign(v.postData.data.page, lastPage)
+        nextTick(() => $router.push({ path: $route.path, query: { ...$route.query, page: lastPage }, hash: `#${p.id}` }))
+      }
+      else $router.push({ path: $route.path, query: $route.query, hash: `#${p.id}` })
+    })
 
     const updatePost = post => postsApi.update(post)
     .then(processPosts)
