@@ -249,7 +249,7 @@
                 </a>
               </li>
               <li v-if="canPost()">
-                <a href="" class="post-action-icon" @click.prevent="addQuote(post)" data-balloon="Quote">
+                <a href="" class="post-action-icon" @click.prevent="addQuote({ id: post.id, body: post.body, body_html: post.body_html, created_at: post.created_at, thread_slug: threadSlug, user: { username: post.user.username }})" data-balloon="Quote">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                     <title></title>
                     <path
@@ -412,7 +412,7 @@
   <posts-move-thread-modal v-if="canMove()" :threadId="postData.data.thread?.id" :show="showPostsMoveThreadModal" @close="showPostsMoveThreadModal = false"/>
   <posts-purge-thread-modal :threadId="postData.data.thread?.id" :boardId="postData.data.board?.id" :boardSlug="postData.data.board?.slug" :show="showPostsPurgeThreadModal" @close="showPostsPurgeThreadModal = false"/>
   <posts-report-modal :selectedPost="selectedPost" :canReportPosts="true" :canReportUsers="true" :show="showPostsReportModal" @close="showPostsReportModal = false; selectedPost = null" />
-  <editor :showEditor="showEditor" @close="showEditor = false" :postEditorMode="true" :thread="postData.data?.thread" :post="editPost" :createAction="createPost" :updateAction="updatePost" />
+  <editor :showEditor="showEditor" @close="showEditor = false" :postEditorMode="true" :thread="postData.data?.thread" :quote="quote" :post="editPost" :createAction="createPost" :updateAction="updatePost" />
 </template>
 
 <script>
@@ -869,9 +869,23 @@ export default {
     const loadEditor = (post) => {
       v.editPost = post
       v.showEditor = true
-      console.log(post, 'loadEditor')
     }
-    const addQuote = (post) => console.log(post, 'addQuote')
+    const addQuote = (post) => {
+      v.quote = null
+      let quote = '[quote author=' + post.user.username
+      if (post.thread_slug) {
+        quote += ' link='
+        quote += '/threads/' + post.thread_slug + '/posts?page=' + v.postData.data.page + '#' + post.id
+      }
+      quote += ' date=' + new Date(post.created_at).getTime() + ']'
+      quote += post.body || post.body_html
+      quote += '[/quote]'
+      console.log(quote)
+      v.quote = post
+      v.quote.body = quote
+      delete v.quote.id
+      v.showEditor = true
+    }
     const copyQuote = (post) => console.log(post, 'copyQuote')
     const showUserControls = () => (v.loggedIn && (!v.postData.data.thread.watched || canCreatePoll()))
     const highlightPost = () => {
@@ -946,6 +960,7 @@ export default {
       posting: {
         post: {}
       },
+      quote: null,
       permissionUtils: $auth.permissionUtils,
       bannedFromBoard: false,
       defaultAvatar: window.default_avatar,

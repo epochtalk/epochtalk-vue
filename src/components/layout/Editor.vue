@@ -208,7 +208,7 @@
             Cancel
           </button>
           <button class="send" @click.prevent="post?.id ? updateAction(posting.post).then(closeEditor) : createAction(posting.post).then(closeEditor)" :disabled="!canCreate()">
-            <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;{{ posting?.post?.id ? 'Edit Post' : 'Send Reply' }}
+            <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;{{ posting?.post?.id ? 'Edit Post' : 'Create Reply' }}
           </button>
 
           <span class="label alert" v-if="posting.error" v-html="posting.error.message"></span>
@@ -239,7 +239,7 @@ import Multiselect from '@vueform/multiselect'
 import { usersApi } from '@/api'
 
 export default {
-  props: ['editorConvoMode', 'threadEditorMode', 'postEditorMode', 'createAction', 'updateAction', 'showEditor', 'thread', 'currentMessage', 'post' ],
+  props: ['editorConvoMode', 'threadEditorMode', 'postEditorMode', 'createAction', 'updateAction', 'showEditor', 'thread', 'currentMessage', 'post', 'quote' ],
   emits: ['close'],
   components: { ImageUploader, PollCreator, Multiselect },
   setup(props, { emit }) {
@@ -315,6 +315,10 @@ export default {
     })
 
     watch(() => props.post, p => {
+      if (p) nextTick(() => Object.assign(v.posting.post, p))
+    })
+
+    watch(() => props.quote, p => {
       if (p) nextTick(() => Object.assign(v.posting.post, p))
     })
 
