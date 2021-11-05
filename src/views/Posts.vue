@@ -1036,6 +1036,66 @@ export default {
 /*-------------- Posts (Thread View) Layout -------------- */
 
 $postWidth__mobile: calc(100vw - 2rem);
+.post-body {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  .imageContainer.loaded { background: none; }
+  .imageContainer { background: url('/static/img/loading.gif') no-repeat center; display: inline;}
+  ul, ol { @include pad(0 0 0 1.15rem); }
+  ul { white-space: normal }
+  img.loaded { opacity: 1; }
+  img { @include transition(opacity 0.5s ease-in); opacity: 0; }
+  & table {
+    display: block;
+    overflow-x: scroll;
+  }
+  .video-wrap {
+    position: relative;
+    padding-bottom: 56.25%;
+    padding-top: 1.875rem;
+    height: 0;
+    width: 100%;
+    overflow:hidden;
+  }
+  .video-wrap iframe, .video-wrap object, .video-wrap embed {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  pre {
+    overflow-x: scroll;
+    word-wrap: normal;
+  }
+}
+.quoteHeader {
+  border-left: $border-quote;
+  color: $secondary-font-color;
+  font-size: $font-size-sm;
+  margin: 0 0 0 1rem;
+  padding: 0 0.625rem 0;
+}
+.quote {
+  color: $secondary-font-color;
+  margin: 0 0 0rem 1rem;
+  padding: 0 0.625rem 0;
+  border-left: $border-quote;
+  ul, ol { margin-left: 1.625rem }
+  &>br:first-child,
+  &>br:last-child,
+  &+br { display: none; }
+}
+.rtl .quote {
+  border-left: 0;
+  border-right: $border-quote;
+}
+.rtl .quoteHeader {
+  border-left: 0;
+  border-right: 4px solid RGB(221, 221, 221);
+}
 
 #public-content {
   .posts & {
