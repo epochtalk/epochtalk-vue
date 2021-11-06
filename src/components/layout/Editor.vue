@@ -309,17 +309,22 @@ export default {
     watch(() => v.msgTagsInput.value, receivers => v.newMessage.receiver_ids = receivers)
 
     watch(() => props.thread, t => {
-      v.posting.post.thread_id = t.id
-      v.posting.post.title = t.title
-      if (t) nextTick(() => Object.assign(v.threadCopy, t))
+      if (t) {
+        v.posting.post.thread_id = t.id
+        v.posting.post.title = 'RE:' + props.thread.title
+        nextTick(() => v.threadCopy = t)
+      }
     })
 
     watch(() => props.post, p => {
-      if (p) nextTick(() => Object.assign(v.posting.post, p))
+      if (p) {
+        p.title = 'RE:' + props.thread.title
+        nextTick(() => v.posting.post = p)
+      }
     })
 
     watch(() => props.quote, p => {
-      if (p) nextTick(() => Object.assign(v.posting.post, p))
+      if (p) nextTick(() => v.posting.post = { title: 'RE:' + props.thread, body: p.body, thread_id: props.thread.id})
     })
 
     // invalidate poll when closing poll creator

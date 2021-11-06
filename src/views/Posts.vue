@@ -258,7 +258,7 @@
                 </a>
               </li>
               <li v-if="loggedIn && postData.data.thread.locked">
-                <a href="" @click.prevent="copyQuote(post)" data-balloon="Quote">
+                <a href="" @click.prevent="copyQuote({ id: post.id, body: post.body, body_html: post.body_html, created_at: post.created_at, thread_slug: threadSlug, user: { username: post.user.username }})" data-balloon="Quote">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                     <title></title>
                     <path
@@ -422,6 +422,7 @@ import PollViewer from '@/components/polls/PollViewer.vue'
 import PollCreator from '@/components/polls/PollCreator.vue'
 import RankDisplay from '@/components/users/RankDisplay.vue'
 import humanDate from '@/composables/filters/humanDate'
+import decode from '@/composables/filters/decode'
 import dayjs from 'dayjs'
 import { userRoleHighlight } from '@/composables/utils/userUtils'
 import truncate from '@/composables/filters/truncate'
@@ -867,11 +868,17 @@ export default {
       postsApi.unlock(post.id).then(() => post.locked = false)
     }
     const loadEditor = (post) => {
+      v.showEditor = false
+      v.editPost = null
+      v.quote = null
       v.editPost = post
+      if (post?.id) $router.push({ path: $route.path, query: $route.query, hash: `#${post.id}` })
       v.showEditor = true
     }
-    const addQuote = (post) => {
+    const addQuote = post => {
+      v.showEditor = false
       v.quote = null
+      v.editPost = null
       let quote = '[quote author=' + post.user.username
       if (post.thread_slug) {
         quote += ' link='
@@ -880,13 +887,42 @@ export default {
       quote += ' date=' + new Date(post.created_at).getTime() + ']'
       quote += post.body || post.body_html
       quote += '[/quote]'
-      console.log(quote)
       v.quote = post
       v.quote.body = quote
+      $router.push({ path: $route.path, query: $route.query, hash: `#${post.id}` })
       delete v.quote.id
       v.showEditor = true
     }
-    const copyQuote = (post) => console.log(post, 'copyQuote')
+    const copyQuote = post => {
+      let quote = '[quote author=' + post.user.username
+      if (post.thread_slug) {
+        quote += ' link='
+        quote += '/threads/' + post.thread_slug + '/posts?page=' + v.postData.data.page + '#' + post.id
+      }
+      quote += ' date=' + new Date(post.created_at).getTime() + ']'
+      quote += post.body || post.body_html
+      quote += '[/quote]'
+      $router.push({ path: $route.path, query: $route.query, hash: `#${post.id}` })
+      let copyText = decode(quote)
+
+      // create temp element
+      let copyElement = document.createElement('span')
+      copyElement.appendChild(document.createTextNode(copyText))
+      copyElement.id = 'tempCopyToClipboard'
+      document.body.append(copyElement)
+
+      // select the text
+      let range = document.createRange()
+      range.selectNode(copyElement)
+      window.getSelection().removeAllRanges()
+      window.getSelection().addRange(range)
+
+      // copy & cleanup
+      document.execCommand('copy')
+      window.getSelection().removeAllRanges()
+      copyElement.remove()
+      $alertStore.success('Quote successfully copied to clipboard')
+    }
     const showUserControls = () => (v.loggedIn && (!v.postData.data.thread.watched || canCreatePoll()))
     const highlightPost = () => {
       if ($route.hash) {
