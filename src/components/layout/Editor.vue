@@ -324,7 +324,9 @@ export default {
     })
 
     watch(() => props.quote, p => {
-      if (p) nextTick(() => v.posting.post = { title: 'RE:' + props.thread, body: p.body, thread_id: props.thread.id})
+      if (p && v.posting?.post?.body) nextTick(() => v.posting.post = { title: 'RE:' + props.thread, body: v.posting.post.body + p.body, thread_id: props.thread.id})
+      else if (p) nextTick(() => v.posting.post = { title: 'RE:' + props.thread, body: p.body, thread_id: props.thread.id})
+      nextTick(() => v.postEditorEl.focus())
     })
 
     // invalidate poll when closing poll creator
