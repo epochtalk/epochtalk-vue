@@ -250,7 +250,7 @@ export default {
     const canModerate = () => true
     const canCreatePoll = () => true
     const cancel = () => {
-      if (props.postEditorMode && props.post) closeEditor()
+      if (props.postEditorMode && (props.post || props.quote)) closeEditor()
       else emit('close')
     }
     const closeEditor = () => {
