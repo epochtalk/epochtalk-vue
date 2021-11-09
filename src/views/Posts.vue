@@ -889,7 +889,7 @@ export default {
       quote += '[/quote]'
       v.quote = post
       v.quote.body = quote
-      $router.push({ path: $route.path, query: $route.query, hash: `#${post.id}` })
+      $router.replace({ name: $route.name, query: $route.query, hash: `#${post.id}`, params: { ...$route.params, saveScrollPos: true } })
       delete v.quote.id
       v.showEditor = true
     }
@@ -902,7 +902,7 @@ export default {
       quote += ' date=' + new Date(post.created_at).getTime() + ']'
       quote += post.body || post.body_html
       quote += '[/quote]'
-      $router.push({ path: $route.path, query: $route.query, hash: `#${post.id}` })
+      $router.replace({ name: $route.name, query: $route.query, hash: `#${post.id}`, params: { ...$route.params, saveScrollPos: true } })
       let copyText = decode(quote)
 
       // create temp element

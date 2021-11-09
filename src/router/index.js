@@ -182,7 +182,7 @@ const router = createRouter({
   history: createWebHistory(),
   routes,
   scrollBehavior(to) {
-    if (to.hash) {
+    if (to.hash && !to.params.saveScrollPos) {
       nextTick(() => {
         document.getElementById(to.hash.substring(1)).scrollIntoView({behavior: 'smooth'})
       })
