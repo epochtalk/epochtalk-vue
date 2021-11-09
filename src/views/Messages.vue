@@ -148,7 +148,7 @@
   <delete-conversation-modal :show="showDeleteConversationModal" :conversation-id="selectedDeletedConvoId" @close="showDeleteConversationModal = false" @success="reload()" />
   <delete-message-modal :show="showDeleteMessageModal" :message-id="selectedMessageId" @close="showDeleteMessageModal = false" @success="deleteMessageSuccess()" />
   <report-message-modal :show="showReportMessageModal" :message-id="selectedMessageId" @close="showReportMessageModal = false" @success="showReportMessageModal = false" />
-  <editor :showEditor="showEditor" @close="showEditor = false" :editorConvoMode="editorConvoMode" :current-message="{ conversation_id: newMessage?.conversation_id, receiver_ids: newMessage?.receiver_ids, content: { body: newMessage?.content?.body } }" :create-action="createConversation" :update-action="createMessage" />
+  <editor :showEditor="showEditor" @close="showEditor = false" :editorConvoMode="editorConvoMode" :current-message="{ conversation_id: newMessage?.conversation_id, receiver_ids: newMessage?.receiver_ids, content: { body: newMessage?.content?.body } }" :create-action="createConversation" :update-action="createMessage" :can-create="canCreateConversation" :can-update="canCreateMessage" />
 </template>
 
 <script>

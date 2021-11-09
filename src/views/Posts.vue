@@ -412,7 +412,7 @@
   <posts-move-thread-modal v-if="canMove()" :threadId="postData.data.thread?.id" :show="showPostsMoveThreadModal" @close="showPostsMoveThreadModal = false"/>
   <posts-purge-thread-modal :threadId="postData.data.thread?.id" :boardId="postData.data.board?.id" :boardSlug="postData.data.board?.slug" :show="showPostsPurgeThreadModal" @close="showPostsPurgeThreadModal = false"/>
   <posts-report-modal :selectedPost="selectedPost" :canReportPosts="true" :canReportUsers="true" :show="showPostsReportModal" @close="showPostsReportModal = false; selectedPost = null" />
-  <editor :showEditor="showEditor" @close="showEditor = false" :postEditorMode="true" :thread="postData.data?.thread" :quote="quote" :post="editPost" :createAction="createPost" :updateAction="updatePost" />
+  <editor :showEditor="showEditor" @close="showEditor = false" :postEditorMode="true" :thread="postData.data?.thread" :quote="quote" :post="editPost" :createAction="createPost" :updateAction="updatePost" :canCreate="canPost" />
 </template>
 
 <script>

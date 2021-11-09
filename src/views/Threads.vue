@@ -214,7 +214,7 @@
     <pagination v-if="threadData.data?.board" :page="threadData.data.page" :limit="threadData.data.limit" :count="threadData.data.board.thread_count"></pagination>
   </div>
   <set-moderators-modal v-if="threadData.data?.board" :board="threadData.data.board" :show="showSetModerators" @close="showSetModerators = false"></set-moderators-modal>
-  <editor v-if="threadData.data?.board" :showEditor="showEditor" @close="showEditor = false" :threadEditorMode="true" :thread="{ title: '', board_id: threadData?.data?.board.id }" :createAction="createThread" />
+  <editor v-if="threadData.data?.board" :showEditor="showEditor" @close="showEditor = false" :threadEditorMode="true" :thread="{ title: '', board_id: threadData?.data?.board.id }" :createAction="createThread" :canCreate="canCreate" />
 </template>
 
 <script>
