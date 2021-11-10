@@ -239,15 +239,11 @@ import Multiselect from '@vueform/multiselect'
 import { usersApi } from '@/api'
 
 export default {
-  props: ['editorConvoMode', 'threadEditorMode', 'postEditorMode', 'createAction', 'updateAction', 'showEditor', 'thread', 'currentMessage', 'post', 'quote', 'canCreate', 'canUpdate'],
+  props: ['editorConvoMode', 'threadEditorMode', 'postEditorMode', 'createAction', 'updateAction', 'showEditor', 'thread', 'currentMessage', 'post', 'quote', 'canCreate', 'canUpdate', 'canLock', 'canSticky', 'canModerate', 'canCreatePoll'],
   emits: ['close'],
   components: { ImageUploader, PollCreator, Multiselect },
   setup(props, { emit }) {
     /* Internal Methods */
-    const canLock = () => true
-    const canSticky = () => true
-    const canModerate = () => true
-    const canCreatePoll = () => true
     const cancel = () => {
       if (props.postEditorMode && (props.post || props.quote)) closeEditor()
       else emit('close')
@@ -343,7 +339,7 @@ export default {
       }
     })
 
-    return { ...toRefs(v), canLock, canSticky, canModerate, canCreatePoll, cancel, closeEditor, onPollValidation }
+    return { ...toRefs(v), cancel, closeEditor, onPollValidation }
   }
 }
 </script>

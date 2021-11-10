@@ -214,7 +214,7 @@
     <pagination v-if="threadData.data?.board" :page="threadData.data.page" :limit="threadData.data.limit" :count="threadData.data.board.thread_count"></pagination>
   </div>
   <set-moderators-modal v-if="threadData.data?.board" :board="threadData.data.board" :show="showSetModerators" @close="showSetModerators = false"></set-moderators-modal>
-  <editor v-if="threadData.data?.board" :showEditor="showEditor" @close="showEditor = false" :threadEditorMode="true" :thread="{ title: '', board_id: threadData?.data?.board.id }" :createAction="createThread" :canCreate="canCreate" />
+  <editor v-if="threadData.data?.board" :showEditor="showEditor" @close="showEditor = false" :threadEditorMode="true" :thread="{ title: '', board_id: threadData?.data?.board.id }" :createAction="createThread" :canCreate="canCreate" :canLock="canLock" :canSticky="canSticky" :canModerate="canModerate" :canCreatePoll="canCreatePoll" />
 </template>
 
 <script>
@@ -346,6 +346,28 @@ export default {
       return v.threadData.data?.write_access && v.permissionUtils.hasPermission('threads.create.allow')
     }
 
+    const canLock = () => {
+      if (v.banned) return false
+      return v.threadData.data?.write_access && v.permissionUtils.hasPermission('threads.lock.allow')
+    }
+
+    const canSticky = () => {
+      if (v.banned) return false
+      return v.threadData.data?.write_access && v.permissionUtils.hasPermission('threads.sticky.allow')
+    }
+
+    const canCreatePoll = () => {
+      if (v.banned) return false
+      return v.threadData.data?.write_access && v.permissionUtils.hasPermission('threads.createPoll.allow')
+    }
+
+    const canModerate = () => {
+      if (v.banned) return false
+      console.log(v.threadData?.data?.board, v.threadData?.data?.board?.disable_selfmod)
+      if (v.threadData?.data?.board?.disable_selfmod) return false
+      return v.threadData.data?.write_access && v.permissionUtils.hasPermission('threads.moderated.allow')
+    }
+
     const createThread = thread => {
       // slugify title
       let slug = slugify(slugify(thread.title, { remove: /[*'"~!@)(+.:]/g, lower: true }))
@@ -401,7 +423,7 @@ export default {
       v.banned = BanStore.updateBanNotice(v.threadData.data.banned_from_board)
     })) // Update threads on login
 
-    return { ...toRefs(v), createThread, canCreate, canSetModerator, watchBoard, setSortField, getSortClass, humanDate, decode, truncate }
+    return { ...toRefs(v), createThread, canCreate, canSetModerator, canLock, canSticky, canModerate, canCreatePoll, watchBoard, setSortField, getSortClass, humanDate, decode, truncate }
   }
 }
 </script>
