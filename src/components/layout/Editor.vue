@@ -207,7 +207,7 @@
           <button class="inverted-button cancel" @click="cancel()">
             Cancel
           </button>
-          <button class="send" @click.prevent="post?.id ? updateAction(posting.post).then(closeEditor) : createAction(posting.post).then(closeEditor)" :disabled="!canCreate()">
+          <button class="send" @click.prevent="post?.id ? updateAction(posting.post).then(closeEditor) : createAction(posting.post).then(closeEditor)" :disabled="post?.id ? !canUpdate(post) : !canCreate()">
             <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;{{ posting?.post?.id ? 'Edit Post' : 'Create Reply' }}
           </button>
 
@@ -239,12 +239,11 @@ import Multiselect from '@vueform/multiselect'
 import { usersApi } from '@/api'
 
 export default {
-  props: ['editorConvoMode', 'threadEditorMode', 'postEditorMode', 'createAction', 'updateAction', 'showEditor', 'thread', 'currentMessage', 'post', 'quote', 'canCreate' ],
+  props: ['editorConvoMode', 'threadEditorMode', 'postEditorMode', 'createAction', 'updateAction', 'showEditor', 'thread', 'currentMessage', 'post', 'quote', 'canCreate', 'canUpdate'],
   emits: ['close'],
   components: { ImageUploader, PollCreator, Multiselect },
   setup(props, { emit }) {
     /* Internal Methods */
-    const canUpdate = () => true
     const canLock = () => true
     const canSticky = () => true
     const canModerate = () => true
@@ -344,7 +343,7 @@ export default {
       }
     })
 
-    return { ...toRefs(v), canLock, canUpdate, canSticky, canModerate, canCreatePoll, cancel, closeEditor, onPollValidation }
+    return { ...toRefs(v), canLock, canSticky, canModerate, canCreatePoll, cancel, closeEditor, onPollValidation }
   }
 }
 </script>
