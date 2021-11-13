@@ -91,7 +91,9 @@ export const postsApi = {
   startedByUser: params => $http(`/api/posts/user/${params.username}/started`, { params }),
   slugToPostId: slug => $http(`/api/posts/${slug}/id`),
   postSearch: params => $http('/api/search/posts', { params }),
-  byNewbie: params => $http('/api/posts/patrol', { params })
+  byNewbie: params => $http('/api/posts/patrol', { params }),
+  getPostDraft: () => $http('/api/posts/draft'),
+  updatePostDraft: draft => $http('/api/posts/draft', { method: 'PUT', data: { draft } })
 }
 export const pollsApi = {
   create: (threadId, params) => $http(`/api/threads/${threadId}/polls`, { method: 'POST', data: params }),
