@@ -192,10 +192,10 @@
           <button class="inverted-button cancel" @click="cancel()">
             Cancel
           </button>
-          <button class="no-animate send" v-if="editorConvoMode" @click.prevent="createAction(newMessage).then(closeEditor);" :disabled="!canCreate() || !newMessage.content.body.length || !newMessage.content.subject.length || !newMessage.receiver_ids.length">
+          <button class="no-animate send" v-if="editorConvoMode" @click.prevent="createAction(newMessage).then(closeEditor)" :disabled="!canCreate() || !newMessage.content.body.length || !newMessage.content.subject.length || !newMessage.receiver_ids.length">
             <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;Send
           </button>
-          <button class="no-animate send" v-if="!editorConvoMode" @click.prevent="updateAction(newMessage).then(closeEditor);" :disabled="!canUpdate() || !newMessage.content.body.length">
+          <button class="no-animate send" v-if="!editorConvoMode" @click.prevent="updateAction(newMessage).then(closeEditor)" :disabled="!canUpdate() || !newMessage.content.body.length">
             <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;Send Reply
           </button>
 
