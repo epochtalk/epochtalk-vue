@@ -232,11 +232,10 @@
 
 <script>
 import { reactive, toRefs, watch, nextTick } from 'vue'
-// import { useRoute, useRouter } from 'vue-router'
 import ImageUploader from '@/components/images/ImageUploader.vue'
 import PollCreator from '@/components/polls/PollCreator.vue'
 import Multiselect from '@vueform/multiselect'
-import { usersApi } from '@/api'
+import { usersApi, postsApi, messagesApi } from '@/api'
 
 export default {
   props: ['editorConvoMode', 'threadEditorMode', 'postEditorMode', 'createAction', 'updateAction', 'showEditor', 'thread', 'currentMessage', 'post', 'quote', 'canCreate', 'canUpdate', 'canLock', 'canSticky', 'canModerate', 'canCreatePoll'],
@@ -249,6 +248,11 @@ export default {
       else emit('close')
     }
     const closeEditor = () => {
+      if (v.draftTimeout) {
+        clearTimeout(v.draftTimeout)
+        v.draftTimeout = null
+        saveDraft(true)
+      }
       v.posting = { post: { title: 'RE: ' + props?.thread?.title, body: '', thread_id: props?.thread?.id } }
       v.newMessage = { receiver_ids: [], content: { subject: '', body: '' } }
       v.threadCopy = { title: '', board_id: v.threadCopy?.data?.board.id }
@@ -259,9 +263,44 @@ export default {
       v.threadCopy.pollValid = valid
       v.threadCopy.poll = poll
     }
-    /* Internal Data */
-    // const $route = useRoute()
-    // const $router = useRouter()
+    const saveDraft = clear => {
+      let rawText = v.posting.post.body || v.threadCopy.body || v.newMessage.content.body
+      v.draftTimeout = setTimeout(() => saveDraft(), 10000)
+      if (clear || rawText.length && v.oldDraft !== rawText) {
+        let draftPromise
+        if (props.postEditorMode || props.threadEditorMode) {
+          draftPromise = postsApi.updatePostDraft
+        }
+        else draftPromise = messagesApi.updateMessageDraft
+        draftPromise(clear ? null : rawText)
+        .then(draft => {
+          v.draftStatus = 'Draft saved...'
+          v.oldDraft = rawText
+          setTimeout(() => v.draftStatus = '', 5000)
+          return draft
+        })
+        .catch(err => {
+          console.log(err)
+          v.draftStatus = 'Error saving draft!'
+          setTimeout(() => v.draftStatus = '', 5000)
+        })
+      }
+    }
+
+    const loadDraft = () => {
+      let draftPromise
+      if (props.postEditorMode || props.threadEditorMode) {
+        draftPromise = postsApi.getPostDraft
+      }
+      else draftPromise = messagesApi.getMessageDraft
+      draftPromise().then(data => {
+        if (data.draft  && confirm('Load Draft?')) {
+          if (props.postEditorMode) v.posting.post.body = data.draft
+          else if (props.threadEditorMode) v.threadCopy.body = data.draft
+          else v.newMessage.content.body = data.draft
+        }
+      });
+    };
 
     /* View Data */
     const v = reactive({
@@ -272,7 +311,9 @@ export default {
       preview: false,
       showEditor: props.showEditor,
       showDropzone: false,
+      oldDraft: null,
       draftStatus: null,
+      draftTimeout: null,
       postMaxLength: window.post_max_length,
       posting: { post: { title: '', body: '', thread_id: props?.thread?.id } },
       newMessage: { receiver_ids: [], conversation_id: null, content: { subject: '', body: '' } },
@@ -336,6 +377,13 @@ export default {
           v.messageReceiverEl.closeDropdown()
         })
         else nextTick(() => v.messageEditorEl.focus())
+      }
+
+      if (visible && !props.quote && !v.posting.post.body.lenth) {
+        nextTick(() => {
+          loadDraft()
+          saveDraft()
+        })
       }
     })
 
