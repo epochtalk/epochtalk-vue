@@ -244,6 +244,8 @@ export default {
   setup(props, { emit }) {
     /* Internal Methods */
     const cancel = () => {
+      v.quoteMode = false
+      v.editMode = false
       if (props.postEditorMode && (props.post || props.quote)) closeEditor()
       else emit('close')
     }
@@ -257,6 +259,8 @@ export default {
       v.newMessage = { receiver_ids: [], content: { subject: '', body: '' } }
       v.threadCopy = { title: '', board_id: v.threadCopy?.data?.board.id }
       if (props.postEditorMode) v.threadCopy.title = props?.thread?.title
+      v.quoteMode = false
+      v.editMode = false
       emit('close')
     }
     const onPollValidation = ({ valid, poll }) => {
@@ -264,6 +268,7 @@ export default {
       v.threadCopy.poll = poll
     }
     const saveDraft = clear => {
+      if (v.editMode || v.quoteMode) return
       let rawText = v.posting.post.body || v.threadCopy.body || v.newMessage.content.body
       v.draftTimeout = setTimeout(() => saveDraft(), 10000)
       if (clear || rawText.length && v.oldDraft !== rawText) {
@@ -288,6 +293,7 @@ export default {
     }
 
     const loadDraft = () => {
+      if (v.editMode || v.quoteMode) return
       let draftPromise
       if (props.postEditorMode || props.threadEditorMode) {
         draftPromise = postsApi.getPostDraft
@@ -305,6 +311,8 @@ export default {
     /* View Data */
     const v = reactive({
       isMinimized: true,
+      quoteMode: false,
+      editMode: false,
       threadCopy: props.thread || {},
       fullscreen: false,
       showFormatting: false,
@@ -355,12 +363,14 @@ export default {
       if (p) {
         p.title = 'RE:' + props.thread.title
         nextTick(() => v.posting.post = p)
+        if (p.body.length) v.editMode = true
       }
     })
 
     watch(() => props.quote, p => {
       if (p && v.posting?.post?.body) nextTick(() => v.posting.post = { title: 'RE:' + props.thread, body: v.posting.post.body + p.body, thread_id: props.thread.id})
       else if (p) nextTick(() => v.posting.post = { title: 'RE:' + props.thread, body: p.body, thread_id: props.thread.id})
+      if (p) v.quoteMode = true
       nextTick(() => v.postEditorEl.focus())
     })
 
@@ -378,13 +388,17 @@ export default {
         })
         else nextTick(() => v.messageEditorEl.focus())
       }
-
-      if (visible && !props.quote && !v.posting.post.body.lenth) {
-        nextTick(() => {
+      nextTick(() => {
+        console.log(v.quoteMode, v.editMode)
+        if (visible && !v.editMode && !v.quoteMode) {
           loadDraft()
           saveDraft()
-        })
-      }
+        }
+        else {
+          clearTimeout(v.draftTimeout)
+          v.draftTimeout = null
+        }
+      })
     })
 
     return { ...toRefs(v), cancel, closeEditor, onPollValidation }
