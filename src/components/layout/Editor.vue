@@ -407,6 +407,15 @@ export default {
 </script>
 
 <style lang="scss">
+  .alert-form-input {
+    color: $color-primary;
+    font-size: $font-size-sm;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
   .editor-container {
     z-index: 5000;
     display: flex;
