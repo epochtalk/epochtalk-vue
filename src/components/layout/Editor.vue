@@ -742,7 +742,7 @@ export default {
     height: 3rem;
     text-align: right;
     width: 100%;
-    button {
+    button, button:hover, button:focus {
       margin-right: 1.9%;
       padding: 0.35rem 1rem;
       &:last-child { margin-right: 0; }
@@ -751,7 +751,10 @@ export default {
         background-color: transparent;
         color: $secondary-font-color;
         display: inline-block;
-        &:hover { color: $color-primary; }
+        &:hover {
+          color: $color-primary;
+          background-color: transparent;
+        }
       }
     }
   }
