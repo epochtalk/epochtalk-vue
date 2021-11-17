@@ -267,6 +267,7 @@ export default {
       v.threadCopy.pollValid = valid
       v.threadCopy.poll = poll
     }
+
     const saveDraft = clear => {
       if (v.editMode || v.quoteMode) return
       let rawText = v.posting.post.body || v.threadCopy.body || v.newMessage.content.body
@@ -292,7 +293,7 @@ export default {
       }
     }
 
-    const loadDraft = () => {
+    const loadDraft = (postBody) => {
       if (v.editMode || v.quoteMode) return
       let draftPromise
       if (props.postEditorMode || props.threadEditorMode) {
@@ -300,13 +301,14 @@ export default {
       }
       else draftPromise = messagesApi.getMessageDraft
       draftPromise().then(data => {
-        if (data.draft  && confirm('Load Draft?')) {
+        if (data.draft && !postBody && confirm('Load Draft?')) {
           if (props.postEditorMode) v.posting.post.body = data.draft
           else if (props.threadEditorMode) v.threadCopy.body = data.draft
           else v.newMessage.content.body = data.draft
         }
-      });
-    };
+        else if (data.draft && postBody !== data.draft && props.postEditorMode && confirm('Load Draft?')) v.posting.post.body = data.draft
+      })
+    }
 
     /* View Data */
     const v = reactive({
@@ -389,9 +391,8 @@ export default {
         else nextTick(() => v.messageEditorEl.focus())
       }
       nextTick(() => {
-        console.log(v.quoteMode, v.editMode)
         if (visible && !v.editMode && !v.quoteMode) {
-          loadDraft()
+          loadDraft(v.posting?.post?.body)
           saveDraft()
         }
         else {
