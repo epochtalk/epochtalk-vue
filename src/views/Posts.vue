@@ -1070,6 +1070,19 @@ export default {
 
 <style lang="scss">
 /*-------------- Posts (Thread View) Layout -------------- */
+.banner-container .banner.warning {
+  border-radius: 2px;
+  font-weight: normal;
+  text-align: center;
+  display: inline-block;
+  position: relative;
+  padding: 0.25rem 0.5rem 0.25rem;
+  font-size: .8rem;
+  background-color: #f08a24;
+  color: $base-background-color;
+  width: 100%;
+  margin-bottom: 1rem;
+}
 
 $postWidth__mobile: calc(100vw - 2rem);
 .post-body {

@@ -534,6 +534,7 @@ export default {
       font-size: $font-size-xs;
       width: 90%;
       padding-top: 15px;
+      padding-left: 0.5rem;
       color: $secondary-font-color;
       white-space: nowrap;
       text-overflow: ellipsis;
