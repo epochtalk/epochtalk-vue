@@ -39,14 +39,14 @@
             <!-- image picker header -->
             <div class="header" :class="{ 'added': image.added }" >
               (<span v-html="image.progress"></span>%):
-              <a :href="image.url" target="_blank" v-if="image.url">
+              <a :href="imageUrl(image)" target="_blank" v-if="image.url">
                 <span v-html="image.name"></span>
               </a>
               <span v-html="image.status" v-if="!image.url"></span>
             </div>
             <!-- image picker body -->
             <div class="picker-body">
-              <img :src="image.url" @click="fireDone(image)"/>
+              <img :src="imageUrl(image)" @click="fireDone(image)"/>
               <a class="after" v-if="image.url" @click="fireDone(image)">
                 <div>
                   <span class="stroke" v-if="!image.added">Add to Editor</span>
@@ -75,6 +75,8 @@ export default {
   components: { Modal },
   setup(props, { emit }) { //, { emit }) {
     /* View Methods */
+    const imageUrl = image => 'http://localhost:8080' + image.url
+
     const uploadFile = (e) => {
       v.hover = false
       emit('upload-error', null) // clear previous errors
@@ -243,7 +245,7 @@ export default {
 
     watch(() => v.hover, a => a ? null : emit('hover-stop'))
 
-    return { ...toRefs(v), uploadFile, fireDone }
+    return { ...toRefs(v), imageUrl, uploadFile, fireDone }
   }
 }
 </script>
