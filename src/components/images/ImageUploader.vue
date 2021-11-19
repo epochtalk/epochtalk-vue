@@ -75,7 +75,7 @@ export default {
   components: { Modal },
   setup(props, { emit }) { //, { emit }) {
     /* View Methods */
-    const imageUrl = image => 'http://localhost:8080' + image.url
+    const imageUrl = image => window.images_local_root + image.url
 
     const uploadFile = (e) => {
       v.hover = false
