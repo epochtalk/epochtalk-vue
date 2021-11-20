@@ -71,7 +71,7 @@ Promise.each = async (arr, fn) => { for(const item of arr) await fn(item) }
 
 export default {
   name: 'image-uploader',
-  props: ['onUpload-success', 'onUpload-error', 'onHover-stop', 'purpose', 'showDropzone'],
+  props: ['onUpload-success', 'onUpload-error', 'onHover-stop', 'purpose', 'showDropzone', 'onDone'],
   components: { Modal },
   setup(props, { emit }) { //, { emit }) {
     /* View Methods */
@@ -158,7 +158,10 @@ export default {
                 let imageRoot = image.policy.storageType === 'local' ? window.images_local_root : ''
                 emit('upload-success', imageRoot + url)
               }
-              else v.images.push(image)
+              else {
+                v.images.push(image)
+                fireDone(image)
+              }
             })
             .catch(function(err) {
               updateImagesUploading(index)
@@ -220,7 +223,11 @@ export default {
       if (v.uploadingImages <= 0) v.imagesUploading = false
     }
 
-    const fireDone = () => console.log('done')
+    const fireDone = image => {
+      image.added = true
+      props.onDone(image.url.indexOf('/') === 0 ? imageUrl(image) : image.url)
+      setTimeout(() => image.added = false, 1000)
+    }
 
     const v = reactive({
       hover: false,

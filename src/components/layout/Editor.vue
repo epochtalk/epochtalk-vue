@@ -157,7 +157,7 @@
 
           <div class="editor-body" @dragenter.prevent="showDropzone = true" @dragover.prevent="showDropzone = true">
             <div class="editor-column-input" :class="{ 'hidden': preview }">
-              <textarea class="editor-input" v-if="threadEditorMode" v-model="threadCopy.body" :class="{ 'rtl': rightToLeft }" placeholder="Write someting interesting! (BTW, you can drag and drop images directly into the editor panel)" :maxlength="postMaxLength || 10000"></textarea>
+              <textarea class="editor-input" v-if="threadEditorMode" v-model="threadCopy.body" :class="{ 'rtl': rightToLeft }" placeholder="Write someting interesting! (BTW, you can drag and drop images directly into the editor panel)" :maxlength="postMaxLength || 10000" ref="threadEditorEl"></textarea>
               <textarea class="editor-input" v-if="postEditorMode" v-model="posting.post.body" :class="{ 'rtl': rightToLeft }" placeholder="Enter your reply here. (BTW, you can drag and drop images directly into the editor panel)" :maxlength="postMaxLength || 10000" ref="postEditorEl"></textarea>
               <textarea class="editor-input" v-if="editorConvoMode || (!threadEditorMode && !editorConvoMode && !postEditorMode)" v-model="newMessage.content.body" :class="{ 'rtl': rightToLeft }" :placeholder="editorConvoMode ? 'Enter your message here. (BTW, you can drag and drop images directly into the editor panel)' : 'Enter your reply here. (BTW, you can drag and drop images directly into the editor panel)'" :maxlength="postMaxLength || 10000" ref="messageEditorEl"></textarea>
               <div class="editor-drag-container" :class="{ 'visible': showDropzone}">
@@ -174,7 +174,7 @@
 
           <div class="editor-footer">
             <div class="editor-image-uploader">
-              <image-uploader purpose="editor" @upload-success="() => {}" @upload-error="() => {}" :show-dropzone="showDropzone" @hover-stop="showDropzone = false" />
+              <image-uploader purpose="editor" @upload-success="() => {}" @upload-error="() => {}" :show-dropzone="showDropzone" @hover-stop="showDropzone = false" :on-done="insertImageUrl" />
             </div>
           </div>
           <!-- END EDITOR -->
@@ -192,10 +192,10 @@
           <button class="inverted-button cancel" @click="cancel()">
             Cancel
           </button>
-          <button class="no-animate send" v-if="editorConvoMode" @click.prevent="createAction(newMessage).then(closeEditor)" :disabled="!canCreate() || !newMessage.content.body.length || !newMessage.content.subject.length || !newMessage.receiver_ids.length">
+          <button class="no-animate send" v-if="editorConvoMode" @click.prevent="createAction(newMessage).then(closeEditor)" :disabled="!canCreate() || !newMessage?.content?.body?.length || !newMessage?.content?.subject?.length || !newMessage?.receiver_ids?.length">
             <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;Send
           </button>
-          <button class="no-animate send" v-if="!editorConvoMode" @click.prevent="updateAction(newMessage).then(closeEditor)" :disabled="!canUpdate() || !newMessage.content.body.length">
+          <button class="no-animate send" v-if="!editorConvoMode" @click.prevent="updateAction(newMessage).then(closeEditor)" :disabled="!canUpdate() || !newMessage?.content?.body?.length">
             <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;Send Reply
           </button>
 
@@ -293,7 +293,7 @@ export default {
       }
     }
 
-    const loadDraft = (postBody) => {
+    const loadDraft = body => {
       if (v.editMode || v.quoteMode) return
       let draftPromise
       if (props.postEditorMode || props.threadEditorMode) {
@@ -301,13 +301,21 @@ export default {
       }
       else draftPromise = messagesApi.getMessageDraft
       draftPromise().then(data => {
-        if (data.draft && !postBody && confirm('Load Draft?')) {
+        if (data.draft && body !== data.draft && confirm('Load Draft?')) {
           if (props.postEditorMode) v.posting.post.body = data.draft
           else if (props.threadEditorMode) v.threadCopy.body = data.draft
           else v.newMessage.content.body = data.draft
         }
-        else if (data.draft && postBody !== data.draft && props.postEditorMode && confirm('Load Draft?')) v.posting.post.body = data.draft
       })
+    }
+
+    const insertImageUrl = url => {
+      if (!url) return
+      let imageCode = '[img]' + url + '[/img]'
+      v.preview = false // show compose tab
+      if (props.threadEditorMode) v.threadCopy.body = v.threadCopy.body + imageCode
+      else if (props.postEditorMode) v.posting.post.body = v.posting.post.body + imageCode
+      else if (props.currentMessage) v.newMessage.content.body = v.newMessage.content.body + imageCode
     }
 
     /* View Data */
@@ -329,6 +337,7 @@ export default {
       newMessage: { receiver_ids: [], conversation_id: null, content: { subject: '', body: '' } },
       rightToLeft: false,
       threadTitleEl: null,
+      threadEditorEl: null,
       postEditorEl: null,
       messageReceiverEl: null,
       messageEditorEl: null,
@@ -402,7 +411,7 @@ export default {
       })
     })
 
-    return { ...toRefs(v), cancel, closeEditor, onPollValidation }
+    return { ...toRefs(v), cancel, closeEditor, insertImageUrl, onPollValidation }
   }
 }
 </script>

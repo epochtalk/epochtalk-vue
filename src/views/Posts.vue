@@ -1094,7 +1094,7 @@ $postWidth__mobile: calc(100vw - 2rem);
   ul, ol { @include pad(0 0 0 1.15rem); }
   ul { white-space: normal }
   img.loaded { opacity: 1; }
-  img { @include transition(opacity 0.5s ease-in); opacity: 0; }
+  img { @include transition(opacity 0.5s ease-in); opacity: 1; }
   & table {
     display: block;
     overflow-x: scroll;
