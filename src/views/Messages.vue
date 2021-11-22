@@ -97,7 +97,7 @@
                 </div>
               </div>
               <div class="avatar" :class="defaultAvatarShape">
-                <router-link :to="{ path: '/profile/' + message.sender_username.toLowerCase() }"><img :src="message.sender_avatar || defaultAvatar" /></router-link>
+                <router-link :to="{ path: '/profile/' + message.sender_username.toLowerCase() }"><img :src="message.sender_avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" /></router-link>
               </div>
               <div class="title">
                 <div class="title-username-role">
