@@ -313,7 +313,6 @@ export default {
       if (!url) return
       let imageCode = '[img]' + url + '[/img]'
       v.preview = false // show compose tab
-      console.log(v.threadCopy, v.posting, v.newMessage)
       if (props.threadEditorMode) v.threadCopy.body = `${v.threadCopy.body ? v.threadCopy.body + '\n' : ''}${imageCode}`
       else if (props.postEditorMode) v.posting.post.body = `${v.posting?.post?.body ? v.posting.post.body + '\n' : ''}${imageCode}`
       else if (props.currentMessage) v.newMessage.content.body = `${v.newMessage?.content?.body ? v.newMessage.content.body + '\n' : ''}${imageCode}`
@@ -366,7 +365,7 @@ export default {
     watch(() => props.thread, t => {
       if (t) {
         v.posting.post.thread_id = t.id
-        v.posting.post.title = 'RE:' + props.thread.title
+        if (!v.posting.post?.title) v.posting.post.title = 'RE: ' + props.thread.title
         nextTick(() => v.threadCopy = t)
       }
     })
@@ -374,7 +373,7 @@ export default {
     watch(() => props.post, p => {
       if (p) {
         if (p.body.length) v.editMode = true
-        if (p.position !== 1) p.title = 'RE:' + props.thread.title
+        if (p.position !== 1) p.title = 'RE: ' + props.thread.title
         nextTick(() => v.posting.post = p)
       }
     })
