@@ -313,9 +313,10 @@ export default {
       if (!url) return
       let imageCode = '[img]' + url + '[/img]'
       v.preview = false // show compose tab
-      if (props.threadEditorMode) v.threadCopy.body = v.threadCopy.body + imageCode
-      else if (props.postEditorMode) v.posting.post.body = v.posting.post.body + imageCode
-      else if (props.currentMessage) v.newMessage.content.body = v.newMessage.content.body + imageCode
+      console.log(v.threadCopy, v.posting, v.newMessage)
+      if (props.threadEditorMode) v.threadCopy.body = `${v.threadCopy.body ? v.threadCopy.body + '\n' : ''}${imageCode}`
+      else if (props.postEditorMode) v.posting.post.body = `${v.posting?.post?.body ? v.posting.post.body + '\n' : ''}${imageCode}`
+      else if (props.currentMessage) v.newMessage.content.body = `${v.newMessage?.content?.body ? v.newMessage.content.body + '\n' : ''}${imageCode}`
     }
 
     /* View Data */
