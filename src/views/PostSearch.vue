@@ -37,11 +37,12 @@
               <h5>
                 <router-link :title="decode(post.thread_title)" :to="{ name: 'Posts', params: { threadSlug: post.thread_slug, threadId: post.thread_id }, query: { start: post.position }, hash: `#${post.id}` }" v-html="decode(post.thread_title)"></router-link>
               </h5>
+              <!--TODO(akinsey): post.user.online does not exist -->
               <span v-if="post.user.online" :data-balloon="post.user.username + ' is online'" class="online green"><i class="fas fa-circle"></i></span>
               <span v-if="!post.user.online" class="online green"><i class="far fa-circle"></i></span>
-              <a class="username" :data-balloon="post.user.role_name || 'User'" href="#" :style="usernameHighlight(post.user.highlight_color)" v-html="post.user.username"></a>
+              <router-link :to="{ path: '/profile/' + post.user.username.toLowerCase() }" class="username" v-html="post.user.username" />
               <div class="posted-in">posted in</div>
-              <a class="board-name" href="#" v-html="post.board_name"></a>
+              <router-link class="board-name" :to="{ name: 'Threads', params: { boardSlug: post.board_slug, boardId: post.board_id } }" v-html="post.board_name" />
               <div class="timestamp">{{ humanDate(post.created_at) }}</div>
               <div class="clear"></div>
             </div>
