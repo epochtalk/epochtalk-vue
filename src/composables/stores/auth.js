@@ -46,7 +46,7 @@ export default {
         BanStore.initBanNotice(user)
         $prefs.fetch()
         socketLogin(user)
-      }).catch(() => {})
+      }).catch(() => userCleanup(`Goodbye ${user.username}, your session has expired`))
 
     const login = (username, password, rememberMe) => authApi.login({ username, password, rememberMe })
       .then(dbUser => {
@@ -59,18 +59,20 @@ export default {
       }).catch(() => {})
 
     const logout = () => authApi.logout()
-      .then(() => {
-        delete user.token // clear token to invalidate session immediately
-        $appCache.delete(AUTH_KEY)
-        $prefs.clear()
-        BanStore.clearBanNotice()
-        $alertStore.warn(`Goodbye ${user.username}, you have successfully logged out!`)
-        // redirect to home on logout
-        if ($route.meta.requiresAuth && $route.path !== '/') $router.push({ path: '/' })
-        // delay clearing reactive user to give css transitions time to complete
-        setTimeout(() => Object.assign(user, cloneDeep(emtpyUser)), 500)
-        socketLogout(emtpyUser)
-      }).catch(() => {})
+      .then(() => userCleanup(`Goodbye ${user.username}, you have successfully logged out!`))
+
+    const userCleanup = msg => {
+      delete user.token // clear token to invalidate session immediately
+      $appCache.delete(AUTH_KEY)
+      $prefs.clear()
+      BanStore.clearBanNotice()
+      $alertStore.warn(msg)
+      // redirect to home on logout
+      if ($route.meta.requiresAuth && $route.path !== '/') $router.push({ path: '/' })
+      // delay clearing reactive user to give css transitions time to complete
+      setTimeout(() => Object.assign(user, cloneDeep(emtpyUser)), 500)
+      socketLogout(emtpyUser)
+    }
 
     const register = (email, username, password) => authApi.register({ email, username, password })
       .then(dbUser => {
