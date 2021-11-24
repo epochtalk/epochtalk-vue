@@ -49,9 +49,7 @@ export default {
       v.errorMessage = null
       const params = {
         username: props.user.username,
-        // if uploading locally, remove local root
-        // server side uses relative links in expirty
-        avatar: v.userCopy.avatar.replace(window.images_local_root, '')
+        avatar: v.userCopy.avatar,
       }
       usersApi.update(props.user.id, params)
       .then(data => {
