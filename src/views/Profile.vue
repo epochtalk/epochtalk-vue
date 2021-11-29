@@ -532,7 +532,7 @@ export default {
     align-items: center;
     flex-direction: column;
     .profile-avatar {
-      margin-bottom: 1rem;
+      margin-bottom: 3rem;
       margin-right: 0;
     }
     .profile-user-details {
