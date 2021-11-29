@@ -294,7 +294,10 @@ export default {
     /* Template Methods */
     const logout = () => $auth.logout()
 
-    const searchForum = () => $router.push({ name: 'PostSearch', query: { search: v.searchTerms } })
+    const searchForum = () => {
+      $router.push({ name: 'PostSearch', query: { search: v.searchTerms } })
+      toggleFocusSearch()
+    }
 
     const dismissNotifications = params => NotificationsStore.dismiss(params)
 
