@@ -151,7 +151,11 @@ export default {
 </script>
 
 <style lang="scss">
-/*-------------- Watchlist Layout --------------- */
+.watchlist .pagination-simple {
+  text-align: center;
+  grid-template-columns: auto 6rem auto;
+  button:first-child { text-align: right; }
+}
 .watchlist-section {
   display: flex;
   align-items: flex-end;
