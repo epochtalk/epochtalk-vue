@@ -708,6 +708,46 @@ input[disabled].toggle-switch:checked + label:after { background-color: lighten(
   @include break-mobile-sm { grid-template-columns: 1fr; }
 }
 
+.pagination-slide {
+  grid-template-columns: minmax(0, 3fr) minmax($sidebarWidth, 1fr);
+  max-width: $view-maxWidth;
+  margin-left: auto;
+  margin-right: auto;
+  display: grid;
+  padding: 0;
+
+  .pagination-controls {
+    display: flex;
+    justify-self: end;
+
+    button {
+      background: transparent;
+      margin-bottom: 0;
+      color: $color-primary;
+      padding: 0 1rem;
+      width: max-content;
+      &:disabled { color: $text-gray-med; }
+      &:first-child { padding-left: 0; }
+      &:last-child { padding-right: 0; }
+    }
+
+    .page {
+      background-color: $color-primary;
+      border-radius: 3px;
+      color: #fff;
+      padding: 0.325rem;
+    }
+  }
+
+  @include break-mobile-sm {
+    grid-template-columns: 1fr;
+
+    .pagination-controls {
+      justify-self: center;
+    }
+  }
+}
+
 .pagination-simple {
   display: grid;
   grid-template-columns: 6rem 6rem auto;
