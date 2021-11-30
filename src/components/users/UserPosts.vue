@@ -326,5 +326,9 @@ export default {
 
 .pagination-wrap {
   float: right;
+  @include break-mobile-sm {
+    float: unset;
+    text-align: center;
+  }
 }
 </style>

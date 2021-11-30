@@ -632,6 +632,9 @@ export default {
     .title { font-weight: 600; }
     .pagination-wrap {
       float: right;
+      @include break-mobile-sm {
+        float: unset;
+      }
       ul.pagination { float: right; margin-bottom: 0px; }
     }
   }

@@ -46,7 +46,6 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 1.375rem;
   height: 1.375rem;
   margin: 0 .125rem;
   color: $base-font-color;
@@ -58,6 +57,10 @@ export default {
   cursor: pointer;
   outline: 0;
   user-select: none;
+  @include break-mobile-sm {
+    padding: 0 1rem;
+    width: 0;
+  }
 
   &:focus, &:hover, &:focus:hover {
     color: $base-font-color;
