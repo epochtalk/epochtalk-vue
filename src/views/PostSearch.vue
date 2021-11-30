@@ -144,7 +144,10 @@ export default {
 </script>
 
 <style lang="scss">
-.post-search main #public-content { grid-template-areas: 'header header' 'main sidebar' 'main sidebar'; }
+.post-search main #public-content {
+  grid-template-areas: 'header header' 'main sidebar' 'main sidebar';
+  @include break-mobile-sm { grid-template-areas: unset; }
+}
 .main { grid-area: main; }
 .sidebar {
   grid-area: sidebar;
