@@ -88,16 +88,19 @@
 </div>
 
 <div class="actions-bottom">
-  <div class="pagination-simple">
-    <button @click="pageResults(-1)" :disabled="watchlistData?.page === 1">&#10094; Prev</button>
-    <button @click="pageResults(1)" :disabled="!watchlistData?.has_more_threads">Next &#10095;</button>
+  <div class="pagination-slide">
+    <div class="pagination-controls">
+      <button @click="pageResults(-1)" :disabled="watchlistData?.page === 1">&#10094; Prev</button>
+      <div class="page">{{currentPage}}</div>
+      <button @click="pageResults(1)" :disabled="!watchlistData?.has_more_threads">Next &#10095;</button>
+    </div>
   </div>
 </div>
 
 </template>
 
 <script>
-import { reactive, toRefs } from 'vue'
+import { reactive, toRefs, computed } from 'vue'
 import { watchlistApi } from '@/api'
 import { localStoragePrefs } from '@/composables/stores/prefs'
 import humanDate from '@/composables/filters/humanDate'
@@ -139,7 +142,7 @@ export default {
     const $router = useRouter()
 
     const v = reactive({
-      currentPage: Number($route.query.page) || 1,
+      currentPage: computed(() => Number($route.query.page) || 1),
       watchlistData: null,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
