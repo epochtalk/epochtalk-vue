@@ -61,7 +61,7 @@
             <span v-if="thread.user.deleted">deleted</span>
             <a v-if="!thread.user.deleted" ui-sref="profile.posts({ username: thread.user.username })"
               v-html="thread.user.username"></a>
-            <span v-html="'on ' + humanDate(thread.created_at)"></span>
+            <span v-html="' on ' + humanDate(thread.created_at)"></span>
           </div>
         </td>
 
