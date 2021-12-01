@@ -17,10 +17,12 @@
   <div class="watchlist-watched-boards watchlist-panel">
     <div class="watchlist-panel-header">
       <h2>Watched Boards</h2>
-      <div class="pagination-simple">
-        <button @click="pageResults(-1)" :disabled="currentPage <= 1">&#10094; Prev</button>
-        <div class="page" v-html="currentPage"></div>
-        <button @click="pageResults(1)" :disabled="!has_more_boards">Next &#10095;</button>
+      <div class="pagination-slide">
+        <div class="pagination-controls">
+          <button @click="pageResults(-1)" :disabled="currentPage <= 1">&#10094; Prev</button>
+          <div class="page" v-html="currentPage"></div>
+          <button @click="pageResults(1)" :disabled="!has_more_boards">Next &#10095;</button>
+        </div>
       </div>
     </div>
 
@@ -74,10 +76,12 @@
   <div class="watchlist-watched-threads watchlist-panel" v-if="threads.length">
     <div class="watchlist-panel-header">
       <h2>Watched Threads</h2>
-      <div class="pagination-simple">
-        <button @click="pageResults(-1, true)" :disabled="currentTPage <= 1">&#10094; Prev</button>
-        <div class="page" v-html="currentTPage"></div>
-        <button @click="pageResults(1, true)" :disabled="!has_more_threads">Next &#10095;</button>
+      <div class="pagination-slide">
+        <div class="pagination-controls">
+          <button @click="pageResults(-1, true)" :disabled="currentTPage <= 1">&#10094; Prev</button>
+          <div class="page" v-html="currentTPage"></div>
+          <button @click="pageResults(1, true)" :disabled="!has_more_threads">Next &#10095;</button>
+        </div>
       </div>
     </div>
 

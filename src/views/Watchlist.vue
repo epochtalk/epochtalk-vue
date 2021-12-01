@@ -154,10 +154,18 @@ export default {
 </script>
 
 <style lang="scss">
-.watchlist .pagination-simple {
-  text-align: center;
-  grid-template-columns: auto 6rem auto;
-  button:first-child { text-align: right; }
+.watchlist main #public-content {
+  grid-template-areas:
+      "header header"
+      "main sidebar"
+      "main sidebar";
+  @include break-mobile-sm {
+    grid-template-areas:
+      "header"
+      "sidebar"
+      "main"
+      "footer";
+  }
 }
 .watchlist-section {
   display: flex;
