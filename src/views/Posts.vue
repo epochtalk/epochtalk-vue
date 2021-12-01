@@ -1162,6 +1162,7 @@ $postWidth__mobile: calc(100vw - 2rem);
         "ads ads"
         "main main";
       grid-template-columns: 1fr;
+      grid-template-rows: auto auto 1fr;
     }
   }
 }
