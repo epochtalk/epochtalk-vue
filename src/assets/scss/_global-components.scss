@@ -708,6 +708,58 @@ input[disabled].toggle-switch:checked + label:after { background-color: lighten(
   @include break-mobile-sm { grid-template-columns: 1fr; }
 }
 
+// Bottom actions and pagination
+.actions-bottom {
+  border-top: 1px solid $border-color;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  background: $base-background-color;
+  padding: 0.75rem;
+  z-index: 1000;
+  &-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(240px, 1fr);
+    align-items: center;
+    column-gap: 2rem;
+    max-width: $view-maxWidth;
+    margin: 0 auto;
+  }
+  .button {
+    display: block;
+    margin-bottom: 0;
+    width: 100%;
+  }
+}
+.pagination-bottom {
+  justify-self: end;
+  ul { &.pagination { li { a { font-size: $font-size-sm; } } } }
+}
+.pagination-wrap {
+  float: right;
+  @include break-mobile-sm {
+    float: unset;
+    text-align: center;
+  }
+}
+
+@include break-mobile-sm {
+  .posts {
+    .actions-bottom {
+      .actions-bottom-grid {
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        justify-items: center;
+        column-gap: 1rem;
+      }
+      .pagination-bottom {
+        justify-self: end;
+      }
+    }
+  }
+}
+
 .pagination-slide {
   grid-template-columns: minmax(0, 3fr) minmax($sidebarWidth, 1fr);
   max-width: $view-maxWidth;
