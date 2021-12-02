@@ -1,12 +1,11 @@
 <template>
-  <modal :name="$options.name" :show="show" @close="close()">
+  <modal :name="$options.name" :show="show" @close="close()" :focusInput="focusInput">
     <template v-slot:header>Move Thread</template>
     <template v-slot:body>
       <form name="$parent.form" class="css-form" novalidate>
         <label>Select a board to move this thread to:</label>
         <div class="control-full-width">
-          <!-- TODO(boka): modal-focus="{{PostsParentCtrl.showMoveThreadModal}}" -->
-          <select name="boards" id="moveThreadBoards" v-model="newBoard">
+          <select name="boards" id="moveThreadBoards" v-model="newBoard" ref="focusInput" class="boards-select">
             <optgroup v-for="(boards, parentName) in boardsMovelist" :label="parentName" :key="parentName">
               <option v-for="board in boards" :value="board" :key="decode(board.name)">{{decode(board.name)}}</option>
             </optgroup>
@@ -52,7 +51,8 @@ export default {
     const v = reactive({
       threadId: props.threadId,
       boardsMovelist: {},
-      newBoard: null
+      newBoard: null,
+      focusInput: null
     })
 
     boardsApi.movelist()
@@ -74,3 +74,9 @@ export default {
   }
 }
 </script>
+<style lang="scss">
+.boards-select:focus {
+  border-color: darken($border-color, 10%);
+  background-color: $color-highlighted;
+}
+</style>
