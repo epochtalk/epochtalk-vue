@@ -344,10 +344,11 @@ img.avatar-small {
   .button, .button:focus {
     margin: 0 1rem;
     min-width: 160px;
+    &:last-child { margin-left: 0; }
   }
 
   @include break-mobile-sm {
-    .button {
+    .button, .button:focus {
       font-size: $font-size-sm;
     }
   }
