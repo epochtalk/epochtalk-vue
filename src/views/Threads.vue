@@ -198,6 +198,17 @@
     </table>
   </div>
 
+  <div class="mobile-pagination" v-if="threadData.data?.board">
+    <div class="pagination-wrap">
+      <simple-pagination
+        v-model="currentPage"
+        :pages="pages"
+        :range-size="1"
+        @update:modelValue="pageResults"
+      />
+    </div>
+  </div>
+
   <div class="board-sidebar">
     <div class="board-actions" v-if="loggedIn">
       <a v-if="canCreate()" class="button secondary" href="#" @click.prevent="showEditor = true">
@@ -224,7 +235,7 @@ import SetModeratorsModal from '@/components/modals/threads/SetModerators.vue'
 import humanDate from '@/composables/filters/humanDate'
 import decode from '@/composables/filters/decode'
 import truncate from '@/composables/filters/truncate'
-import { inject, reactive, watch, toRefs } from 'vue'
+import { inject, reactive, watch, toRefs, computed } from 'vue'
 import { boardsApi, threadsApi, watchlistApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore, localStoragePrefs } from '@/composables/stores/prefs'
@@ -232,11 +243,12 @@ import { processThreads } from '@/composables/utils/boardUtils'
 import BanStore from '@/composables/stores/ban'
 import Editor from '@/components/layout/Editor.vue'
 import slugify from 'slugify'
+import SimplePagination from '@/components/layout/SimplePagination.vue'
 
 export default {
   name: 'Threads',
   props: ['boardSlug', 'boardId'],
-  components: { Pagination, SetModeratorsModal, Editor },
+  components: { Pagination, SetModeratorsModal, Editor, SimplePagination },
   beforeRouteEnter(to, from, next) {
     const params = {
       limit: localStoragePrefs().data.threads_per_page,
@@ -277,6 +289,13 @@ export default {
   },
   setup(props) {
     /* Internal Methods */
+    const pageResults = page => {
+      let query = { ...$route.query, page: page }
+      if (query.page === 1 || !query.page) delete query.page
+      if ($route.query.page !== v.currentPage)
+        $router.replace({ name: $route.name, params: $route.params, query: query })
+    }
+
     const getThreads = () => {
       return Promise.resolve(props.boardId)
       .then(boardId => {
@@ -363,7 +382,6 @@ export default {
 
     const canModerate = () => {
       if (v.banned) return false
-      console.log(v.threadData?.data?.board, v.threadData?.data?.board?.disable_selfmod)
       if (v.threadData?.data?.board?.disable_selfmod) return false
       return v.threadData.data?.write_access && v.permissionUtils.hasPermission('threads.moderated.allow')
     }
@@ -387,6 +405,8 @@ export default {
 
     /* View Data */
     const v = reactive({
+      currentPage: Number($route.query.page) || 1,
+      pages: computed(() => Math.ceil(v.threadData?.data?.board?.thread_count / v.threadData?.data?.limit)),
       threadData: { data: {} },
       showEditor: false,
       prefs: $prefs.data,
@@ -423,7 +443,7 @@ export default {
       v.banned = BanStore.updateBanNotice(v.threadData.data.banned_from_board)
     })) // Update threads on login
 
-    return { ...toRefs(v), createThread, canCreate, canSetModerator, canLock, canSticky, canModerate, canCreatePoll, watchBoard, setSortField, getSortClass, humanDate, decode, truncate }
+    return { ...toRefs(v), pageResults, createThread, canCreate, canSetModerator, canLock, canSticky, canModerate, canCreatePoll, watchBoard, setSortField, getSortClass, humanDate, decode, truncate }
   }
 }
 </script>
@@ -448,6 +468,27 @@ export default {
   }
 }
 
+.mobile-pagination {
+  display: none;
+  @include break-mobile-sm {
+    border-top: 1px solid $border-color;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    background: $base-background-color;
+    padding: 0.75rem;
+    z-index: 1000;
+    margin: 0 auto;
+    width: 100vw;
+    display: block;
+
+    .pagination-wrap > ul {
+      margin: 0 auto;
+      width: fit-content;
+    }
+  }
+}
 
 .board-controls {
   background-color: $base-background-color;
@@ -467,32 +508,12 @@ export default {
     font-weight: 600;
     text-transform: none;
   }
-
-  pagination {
-    justify-self: end;
-  }
-
-  @include break-mobile-sm {
-    grid-template-columns: 1fr;
-    margin-left: -1rem;
-    margin-right: -1rem;
-    padding-left: 1rem;
-    padding-right: 1rem;
-    width: 100vw;
-
-    pagination {
-      justify-self: center;
-    }
-  }
 }
 
 .board-data {
   padding-left: 1rem;
   grid-area: main;
-
-  @include break-min-large {
-    // grid-column: auto;
-  }
+  width: 100%;
 }
 
 .board-sidebar {
@@ -507,6 +528,8 @@ export default {
 
   @include break-mobile-sm {
     margin-bottom: 1rem;
+    width: 100%;
+    .pagination-component { display: none; }
   }
 
   @media screen and (min-width: 1280px) {
@@ -635,7 +658,10 @@ export default {
     padding: 0;
     -webkit-appearance: auto;
     width: initial;
-  };
+  }
+  @include break-mobile-sm {
+    text-align: left;
+  }
 }
 
 
