@@ -107,7 +107,6 @@ export default {
   },
   setup() {
     const pageResults = page => {
-      console.log(page)
       let query = { ...$route.query, page: page }
       if (query.page === 1 || !query.page) delete query.page
       if ($route.query.page !== v.currentPage)
