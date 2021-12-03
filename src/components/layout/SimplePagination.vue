@@ -119,7 +119,6 @@ export default {
 .pagination {
   display: flex;
   flex-flow: row;
-  flex-wrap: wrap;
   align-items: center;
   margin: 0;
   padding: 0;

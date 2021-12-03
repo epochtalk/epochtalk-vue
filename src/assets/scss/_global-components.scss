@@ -771,6 +771,7 @@ input[disabled].toggle-switch:checked + label:after { background-color: lighten(
   .pagination-controls {
     display: flex;
     justify-self: end;
+    flex: 1;
 
     button {
       background: transparent;
