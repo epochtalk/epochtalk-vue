@@ -131,7 +131,7 @@ export default {
 
 <style scoped lang="scss">
 .threads-posted-in main #public-content { grid-template-areas: 'header header' 'main sidebar' 'main sidebar'; }
-.thread-data { grid-area: main; }
+.thread-data { grid-area: main; width: 100%; }
 .sidebar {
   grid-area: sidebar;
   .sidebar-block {

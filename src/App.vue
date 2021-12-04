@@ -34,7 +34,6 @@ export default {
 /*-- View Layout Wrappers --*/
 #public-content {
   margin-top: $header-bottom-margin;
-  & > div:first-child { width: 100%; }
   @include break-mobile-sm {
     margin-top: -0.5rem;
   }

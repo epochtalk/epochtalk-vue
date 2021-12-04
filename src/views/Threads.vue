@@ -498,7 +498,7 @@ export default {
   grid-column: 1 / span 2;
   display: grid;
   grid-area: header;
-
+  width: 100%;
   h1 {
     margin: 0;
     padding: 0;
