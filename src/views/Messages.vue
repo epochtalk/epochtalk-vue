@@ -293,7 +293,7 @@ export default {
       }
     }
     const addQuote = message => console.log(message)
-    const canDeleteConversation = () => true
+    const canDeleteConversation = () => v.loggedIn && v.controlAccess.deleteConversations
     const canDeleteMessage = () => true
     const canCreateConversation = () => true
     const canCreateMessage = () => true
@@ -339,6 +339,7 @@ export default {
       showEditor: false,
       editorConvoMode: false,
       controlAccess: {
+        deleteConversations: $auth.permissionUtils.hasPermission('conversations.delete.allow'),
         reportMessages: $auth.permissionUtils.hasPermission('reports.createMessageReport')
       }
     })
