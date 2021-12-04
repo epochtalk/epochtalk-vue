@@ -231,7 +231,7 @@ img.avatar-small {
     display: flex;
     flex-direction: row;
     padding: 0 0 1rem 0;
-
+    @include break-mobile-sm { flex-direction: column; }
     .info {
       flex: 2 0 0;
       margin-right: 1rem;
