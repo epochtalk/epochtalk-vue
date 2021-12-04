@@ -1033,5 +1033,5 @@ header {
   }
 }
 
-#motd-spacer { height: 1rem; }
+#motd-spacer { height: 1rem; @include break-mobile-sm { height: 2rem; } }
 </style>
