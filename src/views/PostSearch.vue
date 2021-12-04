@@ -54,10 +54,11 @@
       </div>
     </div>
   </div>
-  <div class="sidebar">
-    <div class="sidebar-block" v-if="searchData?.posts.length > 0">
-      <div class="pagination-simple">
+  <div class="actions-bottom" v-if="searchData?.posts.length > 0">
+    <div class="pagination-slide">
+      <div class="pagination-controls">
         <button @click="pageResults(-1)" :disabled="!searchData?.prev">&#10094; Prev</button>
+        <div class="page">{{currentPage}}</div>
         <button @click="pageResults(1)" :disabled="!searchData?.next">Next &#10095;</button>
       </div>
     </div>
@@ -65,7 +66,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, nextTick, watch } from 'vue'
+import { reactive, toRefs, nextTick, watch, computed } from 'vue'
 import { postsApi } from '@/api'
 import { useRoute, useRouter } from 'vue-router'
 import humanDate from '@/composables/filters/humanDate'
@@ -128,7 +129,7 @@ export default {
     const $router = useRouter()
 
     const v = reactive({
-      currentPage: Number($route.query.page) || 1,
+      currentPage: computed(() => Number($route.query.page) || 1),
       searchData: null,
       search: $route.query.search,
       searchInput: null
@@ -149,15 +150,6 @@ export default {
   @include break-mobile-sm { grid-template-areas: unset; }
 }
 .main { grid-area: main; }
-.sidebar {
-  grid-area: sidebar;
-  .sidebar-block {
-    display: block;
-    position: sticky;
-    top: $header-offset;
-    padding-top: .5rem;
-  }
-}
 .search-results {
   @include pad(0 0 1rem 0);
   clear: both;
