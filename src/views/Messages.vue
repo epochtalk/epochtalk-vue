@@ -294,7 +294,15 @@ export default {
     }
     const addQuote = message => console.log(message)
     const canDeleteConversation = () => v.loggedIn && v.controlAccess.deleteConversations
-    const canDeleteMessage = () => true
+    const canDeleteMessage = messageSenderId => {
+      if (!v.loggedIn) return false
+      if (!v.controlAccess.deleteMessages) return false
+
+      // check message ownership/bypass
+      if (messageSenderId === v.authedUser.id) return true
+      else if (v.controlAccess.ownerBypassDeleteMessages) return true
+      else return false
+    }
     const canCreateConversation = () => true
     const canCreateMessage = () => true
     const createConversation = convo => messagesApi.convos.create(convo).then(reload)
@@ -340,6 +348,8 @@ export default {
       editorConvoMode: false,
       controlAccess: {
         deleteConversations: $auth.permissionUtils.hasPermission('conversations.delete.allow'),
+        deleteMessages: $auth.permissionUtils.hasPermission('messages.delete.allow'),
+        ownerBypassDeleteMessages: $auth.permissionUtils.hasPermission('messages.delete.bypass.owner'),
         reportMessages: $auth.permissionUtils.hasPermission('reports.createMessageReport')
       }
     })
