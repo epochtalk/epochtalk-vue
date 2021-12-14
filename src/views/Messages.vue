@@ -303,8 +303,8 @@ export default {
       else if (v.controlAccess.ownerBypassDeleteMessages) return true
       else return false
     }
-    const canCreateConversation = () => return v.loggedIn && v.controlAccess.createConversations
-    const canCreateMessage = () => return v.loggedIn && v.controlAccess.createMessages
+    const canCreateConversation = () => v.loggedIn && v.controlAccess.createConversations
+    const canCreateMessage = () => v.loggedIn && v.controlAccess.createMessages
     const createConversation = convo => messagesApi.convos.create(convo).then(reload)
     const createMessage = msg => messagesApi.create(msg).then(reload)
 
