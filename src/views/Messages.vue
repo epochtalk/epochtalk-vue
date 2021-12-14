@@ -304,7 +304,7 @@ export default {
       else return false
     }
     const canCreateConversation = () => return v.loggedIn && v.controlAccess.createConversations
-    const canCreateMessage = () => true
+    const canCreateMessage = () => return v.loggedIn && v.controlAccess.createMessages
     const createConversation = convo => messagesApi.convos.create(convo).then(reload)
     const createMessage = msg => messagesApi.create(msg).then(reload)
 
@@ -349,6 +349,7 @@ export default {
       controlAccess: {
         createConversations: $auth.permissionUtils.hasPermission('conversations.create.allow'),
         deleteConversations: $auth.permissionUtils.hasPermission('conversations.delete.allow'),
+        createMessages: $auth.permissionUtils.hasPermission('messages.create.allow'),
         deleteMessages: $auth.permissionUtils.hasPermission('messages.delete.allow'),
         ownerBypassDeleteMessages: $auth.permissionUtils.hasPermission('messages.delete.bypass.owner'),
         reportMessages: $auth.permissionUtils.hasPermission('reports.createMessageReport')
