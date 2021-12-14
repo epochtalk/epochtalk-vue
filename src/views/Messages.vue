@@ -303,7 +303,7 @@ export default {
       else if (v.controlAccess.ownerBypassDeleteMessages) return true
       else return false
     }
-    const canCreateConversation = () => true
+    const canCreateConversation = () => return v.loggedIn && v.controlAccess.createConversations
     const canCreateMessage = () => true
     const createConversation = convo => messagesApi.convos.create(convo).then(reload)
     const createMessage = msg => messagesApi.create(msg).then(reload)
@@ -347,6 +347,7 @@ export default {
       showEditor: false,
       editorConvoMode: false,
       controlAccess: {
+        createConversations: $auth.permissionUtils.hasPermission('conversations.create.allow'),
         deleteConversations: $auth.permissionUtils.hasPermission('conversations.delete.allow'),
         deleteMessages: $auth.permissionUtils.hasPermission('messages.delete.allow'),
         ownerBypassDeleteMessages: $auth.permissionUtils.hasPermission('messages.delete.bypass.owner'),
