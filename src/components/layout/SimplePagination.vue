@@ -123,6 +123,7 @@ export default {
   margin: 0;
   padding: 0;
   list-style-type: none;
+  li { flex: 1; }
 }
 
 .pagination-control {
@@ -135,7 +136,7 @@ export default {
   display: block;
   width: 18px;
   height: 18px;
-  margin: 0 2px;
+  margin: 0 auto;
   fill: $border-color;
   &:hover { fill: $border-color; }
   &-active {

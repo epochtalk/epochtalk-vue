@@ -43,15 +43,18 @@
       </tbody>
     </table>
 
-    <div class="pagination-simple">
-      <button @click="pullPage(-1)" :disabled="!ignored?.prev">&#10094; Prev</button>
-      <button @click="pullPage(1)" :disabled="!ignored?.next">Next &#10095;</button>
+    <div class="pagination-slide mobile-grid">
+      <div class="pagination-controls">
+        <button @click="pullPage(-1)" :disabled="!ignored?.prev">&#10094; Prev</button>
+        <div class="page">{{currentPage}}</div>
+        <button @click="pullPage(1)" :disabled="!ignored?.next">Next &#10095;</button>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { reactive, inject, onBeforeMount, toRefs } from 'vue'
+import { reactive, inject, onBeforeMount, toRefs, computed } from 'vue'
 import { usersApi } from '@/api'
 import Multiselect from '@vueform/multiselect'
 
@@ -85,6 +88,7 @@ export default {
 
     const v = reactive({
       ignoredInput: null,
+      currentPage: computed(() => v.ignored?.page),
       ignored: {},
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
@@ -114,7 +118,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .multiselect { margin: 0; }
 .input-button-wrap { margin-top: .25rem; }
 table.striped.ignored-users {
@@ -151,4 +155,8 @@ table.striped.ignored-users {
     .no-data { display: none; }
   }
 }
+
+
+.pagination-slide { grid-template-columns: 1fr; }
+
 </style>
