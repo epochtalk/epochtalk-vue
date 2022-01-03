@@ -533,7 +533,7 @@ export default {
   }
 }
 
-.messages {
+.messages-grid .messages {
   grid-area: details;
 
   .action-bar {
@@ -730,7 +730,7 @@ export default {
   @include break-mobile-sm {
     background: $base-background-color;
     position: absolute;
-    top: 0;
+    top: 1rem;
     right: 0;
     bottom: 0;
     left: 0;
@@ -738,7 +738,6 @@ export default {
     padding: 0.5rem;
     transform: translateX(100%);
     transition: all ease-in-out 150ms;
-
     &.is__active {
       transform: translateX(0%);
     }
