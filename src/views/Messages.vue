@@ -50,7 +50,7 @@
     <!-- Current Conversation -->
     <div class="messages" :class="{ 'is__active' : selectedConversationId }">
       <div class="action-bar">
-        <a href="" class="to__messages" @click="selectedConversationId = null">
+        <a href="" class="to__messages" @click="reload()">
           <svg class="" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
             <title></title>
             <path d="M24,38.83,4.59,19.41a2,2,0,0,1,2.82-2.82L24,33.17,40.59,16.59a2,2,0,0,1,2.82,2.82Z"/>
