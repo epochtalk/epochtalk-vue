@@ -175,7 +175,10 @@ export default {
     next(vm => {
       messagesApi.page(query)
       .then(d => vm.recentMessages = d)
-      .then(() => vm.preloadConversation(to.query.id || vm.recentMessages.messages[0].conversation_id))
+      .then(() => {
+        // Hacky, handle mobile split view
+        window.innerWidth > window.mobile_break_width || to.query.id ? vm.preloadConversation(to.query.id || vm.recentMessages.messages[0].conversation_id) : null
+      })
       .catch(() => {})
     })
   },
@@ -186,7 +189,10 @@ export default {
     }
     messagesApi.page(query)
     .then(d => this.recentMessages = d)
-    .then(() => this.preloadConversation(to.query.id || this.recentMessages.messages[0].conversation_id))
+    .then(() => {
+      // Hacky, handle mobile split view
+      window.innerWidth > window.mobile_break_width || to.query.id ? this.preloadConversation(to.query.id || this.recentMessages.messages[0].conversation_id) : null
+    })
     .catch(() => {})
     next()
   },
@@ -227,7 +233,7 @@ export default {
       v.recentMessages.messages.forEach(message => {
         if (message.conversation_id === conversationId) { message.viewed = true }
       })
-      messagesApi.convos.page(conversationId)
+      return messagesApi.convos.page(conversationId)
       // build out conversation information
       .then(data => {
         v.currentSubject = data.messages[0].content.subject
@@ -297,8 +303,10 @@ export default {
     const canDeleteMessage = () => true
     const canCreateConversation = () => true
     const canCreateMessage = () => true
-    const createConversation = convo => messagesApi.convos.create(convo).then(reload)
-    const createMessage = msg => messagesApi.create(msg).then(reload)
+    const createConversation = convo => window.innerWidth > window.mobile_break_width ?messagesApi.convos.create(convo).then(reload) : messagesApi.convos.create(convo).then(data => preloadConversation(data.conversation_id))
+
+    // Hacky, handle mobile split view
+    const createMessage = msg => window.innerWidth > window.mobile_break_width ? messagesApi.create(msg).then(reload) : messagesApi.create(msg).then(() => preloadConversation(v.selectedConversationId))
 
     const listMessageReceivers = message => {
       let receiverNames = []
