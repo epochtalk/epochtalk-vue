@@ -167,7 +167,7 @@ export const usersApi = {
 }
 
 export const messagesApi = {
-  create: data => $http('/api/messages', { method: 'POST', data }),
+  create: data => $http('/api/messages', { method: 'POST', data }, true),
   page: params => $http('/api/messages', { params }),
   pageIgnored: params => $http('/api/messages/ignored', { params }),
   ignore: data => $http('/api/messages/ignore', { method: 'POST', data }),
@@ -180,7 +180,7 @@ export const messagesApi = {
   updateMessageDraft: draft => $http('/api/messages/draft', { method: 'PUT', data: { draft } }),
   convos: {
     page: (id, params) => $http(`/api/conversations/${id}`, { params }),
-    create: data => $http('/api/conversations', { method: 'POST', data }),
+    create: data => $http('/api/conversations', { method: 'POST', data }, true),
     delete: id => $http(`/api/conversations/${id}`, { method: 'DELETE' })
   }
 }
