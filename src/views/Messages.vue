@@ -23,7 +23,7 @@
         </div>
       </div>
 
-      <div v-if="!recentMessages.messages" class="empty-message-container">
+      <div v-if="!recentMessages.messages?.length" class="empty-message-container">
         <div class="empty-message">No messages</div>
       </div>
 
@@ -61,7 +61,7 @@
       <!-- New Message -->
       <div v-if="currentConversation">
         <div class="message-details-container">
-          <h4 class="message-details-header">Conversation with
+          <h4 class="message-details-header" v-if="receiverNames.length">Conversation with
             <span v-for="(name, i) in receiverNames" :key="name">
               <router-link :to="{ path: '/profile/' + name.toLowerCase() }">{{name}}</router-link>{{ i !== receiverNames.length - 1 ? ', ' : '' }}
             </span>
@@ -135,7 +135,7 @@
       </div>
 
       <!-- Empty view -->
-      <div v-if="!recentMessages.messages" class="empty-message-container">
+      <div v-if="!recentMessages.messages?.length" class="empty-message-container">
         <div class="empty-message"><strong>Your inbox is currently empty.</strong> Message someone to get started!</div>
 
         <div>
