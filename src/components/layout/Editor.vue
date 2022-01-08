@@ -272,7 +272,7 @@ export default {
       if (v.editMode || v.quoteMode) return
       let rawText = v.posting.post.body || v.threadCopy.body || v.newMessage.content.body
       v.draftTimeout = setTimeout(() => saveDraft(), 10000)
-      if (clear || rawText.length && v.oldDraft !== rawText) {
+      if (clear || rawText?.length && v.oldDraft !== rawText) {
         let draftPromise
         if (props.postEditorMode || props.threadEditorMode) {
           draftPromise = postsApi.updatePostDraft
