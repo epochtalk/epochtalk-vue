@@ -299,11 +299,21 @@ export default {
       }
     }
     const addQuote = message => console.log(message)
-    const canDeleteConversation = () => true
-    const canDeleteMessage = () => true
-    const canCreateConversation = () => true
-    const canCreateMessage = () => true
-    const createConversation = convo => window.innerWidth > window.mobile_break_width ?messagesApi.convos.create(convo).then(reload) : messagesApi.convos.create(convo).then(data => preloadConversation(data.conversation_id))
+    const canDeleteConversation = () => v.loggedIn && $auth.permissionUtils.hasPermission('conversations.delete.allow')
+
+    const canDeleteMessage = (messageUserId) => {
+      if (!v.loggedIn) return false
+      if (!$auth.permissionUtils.hasPermission('messages.delete.allow')) return false
+      return messageUserId === v.authedUser.id || $auth.permissionUtils.hasPermission('messages.delete.bypass.owner')
+    }
+
+    const canCreateConversation = () => v.loggedIn && $auth.permissionUtils.hasPermission('conversations.create.allow')
+
+    const canCreateMessage = () => v.loggedIn && $auth.permissionUtils.hasPermission('messages.create.allow')
+
+    // Stops split view in mobile from breaking after creating new conversation
+    // Hacky, handle mobile split view
+    const createConversation = convo => window.innerWidth > window.mobile_break_width ? messagesApi.convos.create(convo).then(reload) : messagesApi.convos.create(convo).then(data => preloadConversation(data.conversation_id))
 
     // Hacky, handle mobile split view
     const createMessage = msg => window.innerWidth > window.mobile_break_width ? messagesApi.create(msg).then(reload) : messagesApi.create(msg).then(() => preloadConversation(v.selectedConversationId))
@@ -738,11 +748,10 @@ export default {
   @include break-mobile-sm {
     background: $base-background-color;
     position: absolute;
-    top: 1rem;
+    top: 0;
     right: 0;
     bottom: 0;
     left: 0;
-    margin-top: 1rem;
     padding: 0.5rem;
     transform: translateX(100%);
     transition: all ease-in-out 150ms;
@@ -760,5 +769,7 @@ export default {
   .messages {
     // @include span-columns(8); @include omega;
   }
+
+  main { position: relative; }
 }
 </style>
