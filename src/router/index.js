@@ -222,6 +222,7 @@ router.afterEach(to => {
 })
 
 $axios.interceptors.response.use(res => res, err => {
+  console.log(err)
   if(err.response) { // Server still responding, just getting errors from api calls
     switch (err.response.status) {
       case 401:
