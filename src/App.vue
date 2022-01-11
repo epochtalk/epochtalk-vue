@@ -102,7 +102,7 @@ main {
   .main { grid-area: main; }
 
   @include break-mobile-sm {
-    padding: 2rem 1rem 0;
+    padding: .5rem 1rem 0;
 
     #public-content,
     .posts #public-content {
