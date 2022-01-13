@@ -79,7 +79,7 @@
       </a>
     </div>
   </div>
-  <div class="pagination-simple">
+  <div class="pagination-simple" v-if="mentionData?.prev || mentiondata?.next">
     <button @click="pageResults(-1)" :disabled="!mentionData?.prev">&#10094; Prev</button>
     <button @click="pageResults(1)" :disabled="!mentionData?.next">Next &#10095;</button>
   </div>
