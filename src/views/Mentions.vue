@@ -159,15 +159,7 @@ export default {
 </script>
 
 <style lang="scss">
-.mentions {
-  .pagination-simple {
-    display: grid;
-    grid-template-columns: 6rem auto auto;
-    -moz-column-gap: .5rem;
-    column-gap: .5rem;
-    justify-content: end;
-  }
-}
+.mentions .pagination-slide .pagination-controls { margin: auto; }
 #public-content {
   .mentions & {
     grid-template-columns: minmax(0, 3fr) minmax(240px, 1fr);
@@ -345,19 +337,6 @@ export default {
   }
 }
 
-.pagination-simple {
-  background-color: $base-background-color;
-  padding: 1rem 0;
-  position: sticky;
-  bottom: 0;
-  left: 0;
-  text-align: right;
-
-  .user-settings & {
-    position: relative;
-  }
-}
-
 .caret-right {
   height: 12px;
   position: relative;
@@ -421,15 +400,6 @@ $columnGap-small: 0.5rem;
         }
       }
     }
-  }
-
-  .pagination-simple {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    text-align: center;
-    width: 100%;
-    margin-bottom: 0;
   }
 }
 </style>
