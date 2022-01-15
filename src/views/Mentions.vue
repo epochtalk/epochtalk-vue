@@ -176,6 +176,8 @@ export default {
   .mention-actions {
     .button {
       margin: 0 0 1.25rem;
+      &:last-child { margin-bottom: 0; }
+
     }
   }
 }
