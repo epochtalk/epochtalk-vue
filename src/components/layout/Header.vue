@@ -61,7 +61,7 @@
           </a>
         </li>
         <li @click="showMobileMenu = false" >
-          <a @click="logout()"><i class="fa fa-sign-out" aria-hidden="true"></i>Logout</a>
+          <a @click="logout()"><i class="fas fa-sign-out-alt" aria-hidden="true"></i>Logout</a>
         </li>
       </ul>
     </div>
