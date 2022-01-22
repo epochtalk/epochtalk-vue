@@ -1012,6 +1012,7 @@ header {
     @include pad(0 $base-grid-padding);
     background-color: $breadcrumbs-bg-color;
     border-bottom: 1px solid $breadcrumbs-border-color;
+    border-top: 1px solid $breadcrumbs-border-color;
     margin-bottom: $breadcrumbs-bottom-margin;
     max-height: 3.2rem;
     overflow-y: auto;
