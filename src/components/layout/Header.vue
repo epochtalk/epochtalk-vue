@@ -1012,7 +1012,6 @@ header {
     @include pad(0 $base-grid-padding);
     background-color: $breadcrumbs-bg-color;
     border-bottom: 1px solid $breadcrumbs-border-color;
-    border-top: 1px solid $breadcrumbs-border-color;
     margin-bottom: $breadcrumbs-bottom-margin;
     max-height: 3.2rem;
     overflow-y: auto;
@@ -1023,6 +1022,7 @@ header {
     @include break-mobile-sm {
       font-size: $font-size-sm;
       line-height: 1.2;
+      border-top: 1px solid $breadcrumbs-border-color;
       max-height: 3.7rem;
       padding: 0 1rem;
     }
