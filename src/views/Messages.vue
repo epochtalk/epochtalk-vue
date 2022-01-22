@@ -775,10 +775,6 @@ export default {
      width: calc(100vw - 32px);
     }
 
-  .messages {
-    // @include span-columns(8); @include omega;
-  }
-
   main { position: relative; }
 }
 </style>
