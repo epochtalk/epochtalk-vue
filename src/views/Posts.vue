@@ -106,7 +106,7 @@
   <!-- <ad-viewer page="PostsParentCtrl.page"></ad-viewer> -->
 
   <!-- Posts Listing -->
-  <div v-if="postData.data?.posts">
+  <div class="thread-data" v-if="postData.data?.posts">
     <div :id="post.id" v-for="(post, i) in postData.data.posts" :key="post.id" class="post-block" :class="{ 'highlighted': post.highlighted, 'hidden': post.hidden, 'deleted': post._deleted || post.user.ignored,  'editing': post.id === posting.post.id }">
       <!-- Delete Post View -->
       <div class="deleted" v-if="post._deleted || post.user.ignored">
