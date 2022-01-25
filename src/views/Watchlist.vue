@@ -82,7 +82,7 @@
 
   <!-- No Threads Listed -->
   <div v-if="watchlistData?.threads.length < 1" class="threads-data centered-text">
-    <h5>No Threads Being Watched</h5>
+    <h5>No unread watched threads</h5>
   </div>
 
 </div>
