@@ -123,8 +123,7 @@
       <div v-if="!post._deleted && !post.user.ignored" class="post-block-grid">
         <!-- Post Profile Section -->
         <div class="post-user">
-          <a href="#">
-          <!-- <a ui-sref="profile.posts({ username: post.user.username})"> -->
+          <router-link :to="{ path: '/profile/' + post.user.username.toLowerCase() }">
             <div class="user-avatar" :class="defaultAvatarShape">
               <span v-if="post.user.online" class="online green" :data-balloon="post.user.username + ' is online'">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -140,8 +139,7 @@
               <div class="original-poster" v-if="post.user.original_poster">OP</div>
               <div v-if="post.user.activity > -1" :title="('Activity: ' + post.user.activity)" class="user-activity">Act: <span class="user-activity-value">{{post.user.activity}}</span></div>
             </router-link>
-          </a>
-
+          </router-link>
 
           <div class="user-trust" v-if="loggedIn && postData.data.thread.trust_visible">
             <trust-display :user="post.user" />
