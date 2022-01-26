@@ -438,6 +438,7 @@ import { BreadcrumbStore } from '@/composables/stores/breadcrumbs'
 import BanStore from '@/composables/stores/ban'
 import TrustDisplay from '@/components/trust/TrustDisplay.vue'
 import Editor from '@/components/layout/Editor.vue'
+import { isOnline } from '@/composables/services/websocket'
 
 export default {
   name: 'Posts',
@@ -457,6 +458,7 @@ export default {
         return postsApi.byThread(params)
         .then(data => next(vm => {
           vm.postData.data = data
+          vm.checkUsersOnline()
           BanStore.updateBanNotice(vm.postData.data.banned_from_board)
           vm.bannedFromBoard = vm.postData.data.banned_from_board
           vm.highlightPost()
@@ -476,6 +478,7 @@ export default {
         threadsApi.viewed(threadId)
         return postsApi.byThread(params).then(data => {
           this.postData.data = data
+          this.checkUsersOnline()
           BanStore.updateBanNotice(this.postData.data.banned_from_board)
           this.bannedFromBoard = this.postData.data.banned_from_board
           this.highlightPost()
@@ -500,6 +503,10 @@ export default {
         }
         if (params.page && params.start) delete params.page
         return postsApi.byThread(params)
+        .then(data => {
+          checkUsersOnline()
+          return data
+        })
       })
     }
     const postEditDisabled = (createdAt) => {
@@ -969,6 +976,23 @@ export default {
     .then(processPosts)
     .then(data => v.postData.data = data)
 
+    const checkUsersOnline = () => {
+      let uniqueUsers = {}
+      v.postData.data.posts.forEach(post => uniqueUsers[post.user.id] = 'user')
+      Object.keys(uniqueUsers).map(user => isOnline(user, setOnline))
+    }
+
+    const setOnline = (err, data) => {
+      if (err) console.log(err)
+      else {
+        v.postData.data.posts.map(post => {
+          if (post.user.id === data.id) {
+            post.user.online = data.online
+          }
+        })
+      }
+    }
+
     /* Internal Data */
     const $route = useRoute()
     const $router = useRouter()
@@ -1060,7 +1084,8 @@ export default {
       showUserControls,
       watchThread,
       toggleIgnoredPosts,
-      openMoveThreadModal
+      openMoveThreadModal,
+      checkUsersOnline
     }
   }
 }
