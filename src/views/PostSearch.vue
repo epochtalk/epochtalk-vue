@@ -37,7 +37,6 @@
               <h5>
                 <router-link :title="decode(post.thread_title)" :to="{ name: 'Posts', params: { threadSlug: post.thread_slug, threadId: post.thread_id }, query: { start: post.position }, hash: `#${post.id}` }" v-html="decode(post.thread_title)"></router-link>
               </h5>
-              <!--TODO(akinsey): post.user.online does not exist -->
               <span v-if="post.user.online" :data-balloon="post.user.username + ' is online'" class="online green"><i class="fas fa-circle"></i></span>
               <span v-if="!post.user.online" class="online green"><i class="far fa-circle"></i></span>
               <router-link :to="{ path: '/profile/' + post.user.username.toLowerCase() }" class="username" v-html="post.user.username" />
