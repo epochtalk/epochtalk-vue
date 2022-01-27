@@ -71,6 +71,7 @@ import { useRoute, useRouter } from 'vue-router'
 import humanDate from '@/composables/filters/humanDate'
 import { usernameHighlight } from '@/composables/utils/userUtils'
 import decode from '@/composables/filters/decode'
+import { isOnline } from '@/composables/services/websocket'
 
 export default {
   name: 'PostSearch',
@@ -82,7 +83,11 @@ export default {
       desc: to.query.desc,
       search: to.query.search
     }
-    next(vm => postsApi.postSearch(query).then(d => vm.searchData = d).catch(() => {}))
+    next(vm => postsApi.postSearch(query)
+    .then(d => {
+      vm.searchData = d
+      vm.checkUsersOnline()
+    }).catch(() => {}))
   },
   beforeRouteUpdate(to, from, next) {
     const query = {
@@ -92,7 +97,11 @@ export default {
       desc: to.query.desc,
       search: to.query.search
     }
-    postsApi.postSearch(query).then(d => this.searchData = d).catch(() => {})
+    postsApi.postSearch(query)
+    .then(d => {
+      this.searchData = d
+      this.checkUsersOnline()
+    }).catch(() => {})
     next()
   },
   setup() {
@@ -124,6 +133,23 @@ export default {
       v.searchInput.focus()
     }
 
+    const checkUsersOnline = () => {
+      let uniqueUsers = {}
+      v.searchData.posts.forEach(post => uniqueUsers[post.user_id] = 'user')
+      Object.keys(uniqueUsers).map(user => isOnline(user, setOnline))
+    }
+
+    const setOnline = (err, data) => {
+      if (err) console.log(err)
+      else {
+        v.searchData.posts.map(post => {
+          if (post.user_id === data.id) {
+            post.user.online = data.online
+          }
+        })
+      }
+    }
+
     const $route = useRoute()
     const $router = useRouter()
 
@@ -138,7 +164,7 @@ export default {
     // Updates page input when user uses header search
     watch(() => $route.query.search, s => v.search = s)
 
-    return { ...toRefs(v), searchPosts, pageResults, clearSearch, humanDate, usernameHighlight, decode }
+    return { ...toRefs(v), searchPosts, pageResults, clearSearch, humanDate, usernameHighlight, decode, checkUsersOnline }
   }
 }
 </script>
