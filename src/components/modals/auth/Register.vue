@@ -143,7 +143,12 @@ export default {
     /* Template Methods */
     const register = () => {
       $auth.register(v.form.email.val, v.form.username.val, v.form.password.val)
-      close()
+      .then(confirm => {
+        if (confirm) {
+          console.log('TODO: Confirmation modal')
+        }
+        else close()
+      })
     }
 
     const signInWithGoogle = () => {

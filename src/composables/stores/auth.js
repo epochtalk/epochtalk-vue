@@ -84,6 +84,7 @@ export default {
           $alertStore.success(`Welcome ${user.username}, you have successfully registered!`)
           socketLogin(user)
         }
+        else return true
         // TODO(akinsey): implement flow for when email confirmation is enabled
         // else {}
       }).catch(() => {})
