@@ -4,7 +4,6 @@ import { clearUser, AuthStore } from '@/composables/stores/auth'
 import { provide, inject, reactive } from 'vue'
 
 const socketcluster = require('socketcluster-client')
-const debug = true
 
 // Public channel idenitfier and general options
 let options = { waitForAuth: true }
@@ -41,13 +40,13 @@ export const socketLogout = socketUser => {
 }
 
 export const watchUserChannel = handler => {
-  if (debug) console.log('Watching user channel.')
+  if (window.websocket_logs) console.log('Watching user channel.')
   if (userChannel) userChannel.watch(handler)
   else setTimeout(() => watchUserChannel(handler), 1000)
 }
 
 export const unwatchUserChannel = handler => {
-  if (debug) console.log('Unwatching user channel.')
+  if (window.websocket_logs) console.log('Unwatching user channel.')
   if (userChannel) userChannel.unwatch(handler)
 }
 
@@ -61,19 +60,19 @@ export default {
     const $auth = inject(AuthStore)
 
     // Socket Error logging
-    socket.on('error', err => debug ? console.log('Websocket error:', err) : null)
+    socket.on('error', err => window.websocket_logs ? console.log('Websocket error:', err) : null)
 
     // Channel Subscribe
     socket.on('subscribe', channelName => {
      if (JSON.parse(channelName).type === 'role') {
        socket.watch(channelName, d => {
-         if (debug) console.log('Received role channel message.', d)
+         if (window.websocket_logs) console.log('Received role channel message.', d)
          $auth.reauthenticate()
        })
      }
      else if (JSON.parse(channelName).type === 'user') {
        socket.watch(channelName, d => {
-         if (debug) console.log('Received user channel message', d)
+         if (window.websocket_logs) console.log('Received user channel message', d)
          if (d.action === 'reauthenticate') $auth.reauthenticate()
          else if (d.action === 'logout' && d.sessionId === socket.getAuthToken().sessionId) {
            $auth.logout()
@@ -90,14 +89,14 @@ export default {
      else if (JSON.parse(channelName).type === 'public') {
        socket.watch(channelName, d => d.action === 'announcement' ? alertStore.warn(d.message) : null)
      }
-     else debug ? console.log('Not watching', channelName) : null
+     else window.websocket_logs ? console.log('Not watching', channelName) : null
 
-     if (debug) console.log('Websocket subscribed to', channelName, 'with watchers', socket.watchers(channelName))
+     if (window.websocket_logs) console.log('Websocket subscribed to', channelName, 'with watchers', socket.watchers(channelName))
     })
 
     // Channel Unsubscribe
     socket.on('unsubscribe', channelName => {
-     if (debug) console.log('Websocket unsubscribed from', channelName, socket.watchers(channelName))
+     if (window.websocket_logs) console.log('Websocket unsubscribed from', channelName, socket.watchers(channelName))
 
      // disconnect all watchers from the channel
      socket.unwatch(channelName)
@@ -105,7 +104,7 @@ export default {
 
     // Socket Authentication
     socket.on('authenticate', () => {
-     if (debug) console.log('Authenticated WebSocket Connection')
+     if (window.websocket_logs) console.log('Authenticated WebSocket Connection')
 
      // Emit LoggedIn event to socket server
      socket.emit('loggedIn')
