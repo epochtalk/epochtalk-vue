@@ -10,7 +10,9 @@
       <router-link :to="{ name: 'Watchlist' }" class="button">Watchlist</router-link>
       <router-link :to="{ name: 'ThreadsPostedIn' }" class="button">Threads Posted In</router-link>
     </div>
-
+    <div v-if="!boardData?.data?.boards?.length">
+      <h4 class="centered-text">There are currently no boards, an administrator must add boards before threads can be created</h4>
+    </div>
     <div v-if="boardData.data">
       <div class="category" v-for="cat in boardData.data.boards" :key="cat.id">
         <!-- Category Title -->
@@ -231,7 +233,7 @@ img.avatar-small {
     display: flex;
     flex-direction: row;
     padding: 0 0 1rem 0;
-
+    @include break-mobile-sm { flex-direction: column; }
     .info {
       flex: 2 0 0;
       margin-right: 1rem;

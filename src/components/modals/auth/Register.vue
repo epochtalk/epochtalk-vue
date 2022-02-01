@@ -1,9 +1,12 @@
 <template>
   <modal :name="$options.name" :show="show" @close="close()" :focusInput="focusInput">
-    <template v-slot:header>Register a new account</template>
+    <template v-slot:header>
+      <span v-if="showRegisterHideConfirm">Register a new account</span>
+      <span v-if="!showRegisterHideConfirm">Confirm Account</span>
+    </template>
 
     <template v-slot:body>
-      <form action="." class="css-form">
+      <form action="." class="css-form" v-if="showRegisterHideConfirm">
         <div class='input-section'>
           <label for="email">
             Email
@@ -104,7 +107,7 @@
         </div>
 
         <div class="modal-actions">
-          <button class="" @click.prevent="register()" :disabled="!form.valid">
+          <button @click.prevent="register()" :disabled="!form.valid">
             Register
           </button>
 
@@ -117,6 +120,11 @@
           </div>
         </div>
       </form>
+
+      <div v-if="!showRegisterHideConfirm">
+        <p>Thank you for registering. Please check your email and confirm your account.</p>
+        <button @click.prevent="close()">Close</button>
+      </div>
     </template>
   </modal>
 </template>
@@ -141,10 +149,8 @@ export default {
     }
 
     /* Template Methods */
-    const register = () => {
-      $auth.register(v.form.email.val, v.form.username.val, v.form.password.val)
-      close()
-    }
+    const register = () => $auth.register(v.form.email.val, v.form.username.val, v.form.password.val)
+      .then(confirm => confirm ? v.showRegisterHideConfirm = false : close())
 
     const signInWithGoogle = () => {
       console.log('Sign in with Google!')
@@ -171,6 +177,7 @@ export default {
     const v = reactive({
       form: cloneDeep(initForm),
       focusInput: null,
+      showRegisterHideConfirm: true,
       hasGoogleCredentials: true
     })
 

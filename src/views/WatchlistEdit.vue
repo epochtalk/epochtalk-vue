@@ -328,13 +328,17 @@ export default {
   }
 
   @include break-mobile-sm {
+    margin-bottom: 1rem;
     .watchlist-panel-header {
-      flex-direction: column;
+      flex-direction: row;
       width: 100%;
     }
 
     .pagination-slide {
       width: 100%;
+     .pagination-controls {
+        justify-self: right;
+      }
     }
 
     .pagination-components {

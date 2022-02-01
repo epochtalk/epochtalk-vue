@@ -64,9 +64,17 @@
       </tbody>
     </table>
   </div>
-  <div class="sidebar">
+  <div class="sidebar" v-if="threadData?.count > threadData?.limit">
     <div class="sidebar-block" v-if="threadData?.threads">
       <pagination :page="threadData.page" :limit="threadData.limit" :count="threadData.count"></pagination>
+    </div>
+    <div class="pagination-wrap">
+      <simple-pagination
+        v-model="currentPage"
+        :pages="pages"
+        :range-size="1"
+        @update:modelValue="pageResults"
+      />
     </div>
   </div>
 </template>
@@ -74,13 +82,15 @@
 <script>
 import Pagination from '@/components/layout/Pagination.vue'
 import humanDate from '@/composables/filters/humanDate'
-import { reactive, toRefs } from 'vue'
+import { reactive, computed, toRefs } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { threadsApi } from '@/api'
 import { localStoragePrefs } from '@/composables/stores/prefs'
+import SimplePagination from '@/components/layout/SimplePagination.vue'
 
 export default {
   name: 'ThreadsPostedIn',
-  components: { Pagination },
+  components: { Pagination, SimplePagination },
   beforeRouteEnter(to, from, next) {
     const params = {
       limit: localStoragePrefs().data.threads_per_page,
@@ -96,26 +106,53 @@ export default {
     threadsApi.postedIn(params).then(data => this.threadData = data )
   },
   setup() {
+    const pageResults = page => {
+      let query = { ...$route.query, page: page }
+      if (query.page === 1 || !query.page) delete query.page
+      if ($route.query.page !== v.currentPage)
+        $router.replace({ name: $route.name, params: $route.params, query: query })
+    }
+
+    const $route = useRoute()
+    const $router = useRouter()
+
     /* View Data */
     const v = reactive({
+      currentPage: Number($route.query.page) || 1,
+      pages: computed(() => Math.ceil(v.threadData?.count  / v.threadData?.limit)),
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
       threadData: null
     })
-    return { ...toRefs(v), humanDate }
+    return { ...toRefs(v), pageResults, humanDate }
   }
 }
 </script>
 
 <style scoped lang="scss">
 .threads-posted-in main #public-content { grid-template-areas: 'header header' 'main sidebar' 'main sidebar'; }
-.thread-data { grid-area: main; }
+.thread-data { grid-area: main; width: 100%; }
 .sidebar {
   grid-area: sidebar;
   .sidebar-block {
     display: block;
     position: sticky;
     top: $header-offset;
+  }
+  .pagination-wrap { display: none; }
+  @include break-mobile-sm {
+    border-top: 1px solid $border-color;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    background: $base-background-color;
+    padding: 0.75rem;
+    z-index: 1000;
+    margin: 0 auto;
+    width: 100vw;
+    .sidebar-block { display: none; }
+    .pagination-wrap { display: block; }
   }
 }
 </style>

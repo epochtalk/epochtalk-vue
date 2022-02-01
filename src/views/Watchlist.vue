@@ -82,12 +82,12 @@
 
   <!-- No Threads Listed -->
   <div v-if="watchlistData?.threads.length < 1" class="threads-data centered-text">
-    <h5>No Threads Being Watched</h5>
+    <h5>No unread watched threads</h5>
   </div>
 
 </div>
 
-<div class="actions-bottom">
+<div class="actions-bottom" v-if="watchlistData?.has_more_threads || watchlistData?.page > 1">
   <div class="pagination-slide">
     <div class="pagination-controls">
       <button @click="pageResults(-1)" :disabled="watchlistData?.page === 1">&#10094; Prev</button>

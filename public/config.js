@@ -9,6 +9,7 @@ window.images_local_root = 'http://localhost:8080'
 window.websocket_host = 'localhost'
 window.websocket_port = '23958'
 window.post_max_length = 10000
+window.mobile_break_width = 767
 window.max_image_size = 10485760
 window.max_avatar_size = 102400
 window.portal = { enabled: false }

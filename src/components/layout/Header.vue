@@ -61,7 +61,7 @@
           </a>
         </li>
         <li @click="showMobileMenu = false" >
-          <a @click="logout()"><i class="fa fa-sign-out" aria-hidden="true"></i>Logout</a>
+          <a @click="logout()"><i class="fas fa-sign-out-alt" aria-hidden="true"></i>Logout</a>
         </li>
       </ul>
     </div>
@@ -247,7 +247,9 @@
       <register-modal :show="showRegister" @close="showRegister = false" />
     </div>
   </header>
-  <div v-if="motdData && motdData.motd_html.length && !hideAnnnouncement" id="motd-spacer"></div>
+  <div v-if="motdData && motdData.motd_html.length && !hideAnnnouncement" id="motd-spacer-wrap">
+      <div id="motd-spacer" v-html="motdData?.motd_html"></div>
+  </div>
 </template>
 
 <script>
@@ -1020,6 +1022,7 @@ header {
     @include break-mobile-sm {
       font-size: $font-size-sm;
       line-height: 1.2;
+      border-top: 1px solid $breadcrumbs-border-color;
       max-height: 3.7rem;
       padding: 0 1rem;
     }
@@ -1033,5 +1036,30 @@ header {
   }
 }
 
-#motd-spacer { height: 1rem; }
+#motd-spacer-wrap {
+  @include clearfix();
+  @include pad(0 $base-grid-padding);
+  margin-bottom: $breadcrumbs-bottom-margin;
+  max-height: 3.2rem;
+  overflow-y: auto;
+  width: 100%;
+  position: relative;
+  margin-top: -1rem;
+  opacity: 0;
+
+  @include break-mobile-sm {
+    font-size: $font-size-sm;
+    line-height: 1.2;
+    max-height: 3.7rem;
+    padding: 0 1rem;
+    margin-top: 0;
+  }
+
+  #motd-spacer {
+    @include base-layout-width;
+    clear: both;
+    padding: 0.5rem 0;
+    color: #666;
+  }
+}
 </style>

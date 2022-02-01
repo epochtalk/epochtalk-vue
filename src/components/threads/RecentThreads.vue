@@ -170,6 +170,6 @@ export default {
     }
   }
 
-  @include break-mobile-sm { padding: 1rem; }
+  @include break-mobile-sm { padding: 1.5rem 1rem 0; }
 }
 </style>

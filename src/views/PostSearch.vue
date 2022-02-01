@@ -37,7 +37,6 @@
               <h5>
                 <router-link :title="decode(post.thread_title)" :to="{ name: 'Posts', params: { threadSlug: post.thread_slug, threadId: post.thread_id }, query: { start: post.position }, hash: `#${post.id}` }" v-html="decode(post.thread_title)"></router-link>
               </h5>
-              <!--TODO(akinsey): post.user.online does not exist -->
               <span v-if="post.user.online" :data-balloon="post.user.username + ' is online'" class="online green"><i class="fas fa-circle"></i></span>
               <span v-if="!post.user.online" class="online green"><i class="far fa-circle"></i></span>
               <router-link :to="{ path: '/profile/' + post.user.username.toLowerCase() }" class="username" v-html="post.user.username" />
@@ -54,10 +53,11 @@
       </div>
     </div>
   </div>
-  <div class="sidebar">
-    <div class="sidebar-block" v-if="searchData?.posts.length > 0">
-      <div class="pagination-simple">
+  <div class="actions-bottom" v-if="searchData?.posts.length > 0">
+    <div class="pagination-slide">
+      <div class="pagination-controls">
         <button @click="pageResults(-1)" :disabled="!searchData?.prev">&#10094; Prev</button>
+        <div class="page">{{currentPage}}</div>
         <button @click="pageResults(1)" :disabled="!searchData?.next">Next &#10095;</button>
       </div>
     </div>
@@ -65,12 +65,13 @@
 </template>
 
 <script>
-import { reactive, toRefs, nextTick, watch } from 'vue'
+import { reactive, toRefs, nextTick, watch, computed } from 'vue'
 import { postsApi } from '@/api'
 import { useRoute, useRouter } from 'vue-router'
 import humanDate from '@/composables/filters/humanDate'
 import { usernameHighlight } from '@/composables/utils/userUtils'
 import decode from '@/composables/filters/decode'
+import { isOnline } from '@/composables/services/websocket'
 
 export default {
   name: 'PostSearch',
@@ -82,7 +83,11 @@ export default {
       desc: to.query.desc,
       search: to.query.search
     }
-    next(vm => postsApi.postSearch(query).then(d => vm.searchData = d).catch(() => {}))
+    next(vm => postsApi.postSearch(query)
+    .then(d => {
+      vm.searchData = d
+      vm.checkUsersOnline()
+    }).catch(() => {}))
   },
   beforeRouteUpdate(to, from, next) {
     const query = {
@@ -92,7 +97,11 @@ export default {
       desc: to.query.desc,
       search: to.query.search
     }
-    postsApi.postSearch(query).then(d => this.searchData = d).catch(() => {})
+    postsApi.postSearch(query)
+    .then(d => {
+      this.searchData = d
+      this.checkUsersOnline()
+    }).catch(() => {})
     next()
   },
   setup() {
@@ -124,11 +133,28 @@ export default {
       v.searchInput.focus()
     }
 
+    const checkUsersOnline = () => {
+      let uniqueUsers = {}
+      v.searchData.posts.forEach(post => uniqueUsers[post.user_id] = 'user')
+      Object.keys(uniqueUsers).map(user => isOnline(user, setOnline))
+    }
+
+    const setOnline = (err, data) => {
+      if (err) console.log(err)
+      else {
+        v.searchData.posts.map(post => {
+          if (post.user_id === data.id) {
+            post.user.online = data.online
+          }
+        })
+      }
+    }
+
     const $route = useRoute()
     const $router = useRouter()
 
     const v = reactive({
-      currentPage: Number($route.query.page) || 1,
+      currentPage: computed(() => Number($route.query.page) || 1),
       searchData: null,
       search: $route.query.search,
       searchInput: null
@@ -138,7 +164,7 @@ export default {
     // Updates page input when user uses header search
     watch(() => $route.query.search, s => v.search = s)
 
-    return { ...toRefs(v), searchPosts, pageResults, clearSearch, humanDate, usernameHighlight, decode }
+    return { ...toRefs(v), searchPosts, pageResults, clearSearch, humanDate, usernameHighlight, decode, checkUsersOnline }
   }
 }
 </script>
@@ -149,15 +175,6 @@ export default {
   @include break-mobile-sm { grid-template-areas: unset; }
 }
 .main { grid-area: main; }
-.sidebar {
-  grid-area: sidebar;
-  .sidebar-block {
-    display: block;
-    position: sticky;
-    top: $header-offset;
-    padding-top: .5rem;
-  }
-}
 .search-results {
   @include pad(0 0 1rem 0);
   clear: both;

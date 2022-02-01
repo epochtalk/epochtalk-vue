@@ -188,7 +188,7 @@ import { AuthStore } from '@/composables/stores/auth'
 export default {
   name: 'Profile',
   props: [ 'username', 'saveScrollPos' ],
-  components: { TrustDisplay, RankDisplay, UpdateSignatureModal, UpdatePasswordModal, UpdateAvatarModal, UpdateEmailModal, DeleteAccountModal, DeactivateReactivateModal, UpdateProfileModal, QuickMessageModal,ManageBansModal, ModerationNotesModal },
+  components: { TrustDisplay, RankDisplay, UpdateSignatureModal, UpdatePasswordModal, UpdateAvatarModal, UpdateEmailModal, DeleteAccountModal, DeactivateReactivateModal, UpdateProfileModal, QuickMessageModal, ManageBansModal, ModerationNotesModal },
   beforeRouteEnter(to, from, next) {
     usersApi.find(to.params.username).then(u => next(vm => vm.user = u))
   },
@@ -340,16 +340,14 @@ export default {
   padding: 0.5rem 1rem;
   width: 100%;
 }
-
 .profile-wrap {
   grid-column: span 2;
   display: grid;
-  @include grid-columns-base
+  @include grid-columns-base;
   grid-template-areas:
     "header sidebar"
     "main sidebar";
   column-gap: 2rem;
-
   @include break-mobile-med {
     grid-template-columns: 1fr;
     grid-template-areas:
@@ -364,7 +362,6 @@ export default {
   display: flex;
   grid-area: header;
   padding: 1rem 0;
-
   .profile-avatar {
     flex: 0 0 $avatar-width;
     margin-right: 2rem;
@@ -385,14 +382,11 @@ export default {
         height: calc(#{$avatar-width / 1.5});
       }
     }
-
     .edit-avatar { font-size: $font-size-sm; }
-
     .profile-user-status {
       position: absolute;
       top: 4px;
       right: 4px;
-
       svg {
         stroke: $base-background-color;
         stroke-width: 6;
@@ -400,7 +394,6 @@ export default {
         width: 1.5rem;
       }
     }
-
     .rect {
       .profile-user-status {
         top: -8px;
@@ -408,18 +401,15 @@ export default {
       }
     }
   }
-
   .profile-user-details {
     display: flex;
     flex-direction: column;
-
     .profile-user-name-role {
       display: flex;
       align-items: center;
       font-size: 1.5rem;
       line-height: 1.1;
       margin-bottom: 0.5rem;
-
       h1 {
         color: $base-font-color;
         font-size: inherit;
@@ -428,13 +418,11 @@ export default {
         padding-right: 0.5rem;
         text-transform: none;
       }
-
       .username-screen {
         color: $text-gray-med;
         font-weight: 400;
         margin-right: 0.5rem;
       }
-
       .user-role {
         background: $color-primary;
         border-radius: 2px;
@@ -464,28 +452,21 @@ export default {
         border: 1px solid $border-color;
       }
     }
-
     .profile-user-activity {
       color: $text-gray-med;
       font-size: $font-size-sm;
       margin-bottom: 1rem;
       text-transform: uppercase;
-
       .user-activity-stat, .trust-profile {  display: inline; }
-
       .user-activity-stat { margin-right: 1rem; }
-
       .value { font-weight: 600; }
-
       .trust-profile {
         div { display: inline; }
         .trust-score { font-weight: 600; margin-right: 1rem; }
         a { color: $text-gray-med; text-decoration: underline; }
       }
     }
-
     .signature-block { display: flex; margin-bottom: 1rem; }
-
     .signature {
       @include truncate-ellipsis;
       font-size: $font-size-xs;
@@ -496,14 +477,11 @@ export default {
       white-space: pre-wrap;
       width: 100%;
     }
-
     .signature-edit { flex: 0 0 20px; }
   }
-
   .profile-user-stats {
     display: flex;
     margin-bottom: 2rem;
-
     .stats {
       border: $border;
       border-radius: 6px;
@@ -517,7 +495,6 @@ export default {
       text-align: center;
       width: 100px;
       max-width: 120px;
-
       .label { font-size: $font-size-xs; }
       .stat-text {
         font-size: 2rem;
@@ -527,7 +504,6 @@ export default {
       }
     }
   }
-
   @include break-mobile-med {
     align-items: center;
     flex-direction: column;
@@ -539,10 +515,7 @@ export default {
       .profile-user-name-role {
         flex-direction: column;
         margin-bottom: 1.5rem;
-
-        h1,
-        .username-screen,
-        .user-role {
+        h1, .username-screen, .user-role {
           margin-bottom: 0.25rem;
         }
       }
@@ -551,9 +524,7 @@ export default {
     .trust-profile { .trust-link { white-space: nowrap; } }
   }
 }
-
 .profile-threads-posts { grid-area: main; }
-
 .profile-sidebar {
   color: $text-gray-dark;
   grid-area: sidebar;
@@ -565,11 +536,8 @@ export default {
     .profile-action a { display: block; }
   }
 }
-
 .profile-save-container { padding-top: 20px; }
 .profile-posts, .profile-content, .profile-row {
-  // @include clearfix;
-  // @include row;
   margin-bottom: 1rem;
 }
 .profile-content {
@@ -577,7 +545,6 @@ export default {
   column-gap: 2rem;
   grid-template-columns: 1fr 3fr;
   display: none;
-
   .profile-left {
     word-wrap: break-word;
     .profile-avatar-container {
@@ -591,7 +558,6 @@ export default {
         position: absolute;
         right: -1rem;
         top: -1rem;
-
         svg {
           stroke: #fff;
           stroke-width: 6;
@@ -600,7 +566,6 @@ export default {
           width: auto;
         }
       }
-
       img {
         @include transition(opacity 0.5s ease-in);
         opacity: 0;
@@ -636,15 +601,9 @@ export default {
     }
   }
 }
-
 .more-posts { margin-bottom: 2rem; }
 .profile-posts { button { margin-bottom: 0; } }
 .pagination-simple { margin-bottom: 0; }
-
-// image-uploader {
-//   display: block;
-//   margin-top: 1rem;
-// }
 
 @include break-mobile-med {
   .pagination-wrap {
@@ -654,7 +613,6 @@ export default {
   }
 }
 
-
 @include break-mobile-sm {
   .profile-content {
     .profile-right {
@@ -662,13 +620,8 @@ export default {
       padding-top: 1rem;
       .stats .stat-text { font-size: 1rem; }
     }
-    // .profile-left, .profile-right { @include span-columns(8); @include omega; }
   }
   .profile-posts, & {
-    // .profile-row .title, .profile-row .pagination-wrap, .pagination-wrap {
-    //   @include span-columns(8);
-    //   @include omega;
-    // }
     .profile-row .pagination-wrap, .profile-row .pagination-wrap ul.pagination {
       float: none;
       text-align: center;

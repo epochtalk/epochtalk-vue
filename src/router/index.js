@@ -114,7 +114,7 @@ const routes = [
     path: '/messages',
     name: 'Messages',
     component: Messages,
-    meta: { requiresAuth: true, bodyClass: 'messages' }
+    meta: { requiresAuth: true, ignoreAxiosInterceptor: true, bodyClass: 'messages' }
   },
   {
     path: '/mentions',
@@ -222,12 +222,14 @@ router.afterEach(to => {
 })
 
 $axios.interceptors.response.use(res => res, err => {
+  console.log(err)
   if(err.response) { // Server still responding, just getting errors from api calls
     switch (err.response.status) {
       case 401:
         if (router.currentRoute._value.meta.requiresAuth) router.push({ name: 'Login'})
         break
       case 403:
+        if (router.currentRoute._value.meta.ignoreAxiosInterceptor) break
         if (err.response.statusText === 'Forbidden' || err.response.data.error === 'Forbidden') {
           router.push({ name: 'Forbidden'})
         }

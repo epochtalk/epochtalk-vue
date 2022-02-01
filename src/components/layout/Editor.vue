@@ -192,10 +192,10 @@
           <button class="inverted-button cancel" @click="cancel()">
             Cancel
           </button>
-          <button class="no-animate send" v-if="editorConvoMode" @click.prevent="createAction(newMessage).then(closeEditor)" :disabled="!canCreate() || !newMessage?.content?.body?.length || !newMessage?.content?.subject?.length || !newMessage?.receiver_ids?.length">
+          <button class="no-animate send" v-if="editorConvoMode" @click.prevent="createAction(newMessage).then(() => true).catch(() => false).then(c => c ? closeEditor() : null)" :disabled="!canCreate() || !newMessage?.content?.body?.length || !newMessage?.content?.subject?.length || !newMessage?.receiver_ids?.length">
             <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;Send
           </button>
-          <button class="no-animate send" v-if="!editorConvoMode" @click.prevent="updateAction(newMessage).then(closeEditor)" :disabled="!canUpdate() || !newMessage?.content?.body?.length">
+          <button class="no-animate send" v-if="!editorConvoMode" @click.prevent="updateAction(newMessage).then(() => true).catch(() => false).then(c => c ? closeEditor() : null)" :disabled="!canUpdate() || !newMessage?.content?.body?.length">
             <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;Send Reply
           </button>
 
@@ -207,7 +207,7 @@
           <button class="inverted-button cancel" @click="cancel()">
             Cancel
           </button>
-          <button class="send" @click.prevent="post?.id ? updateAction(posting.post).then(closeEditor) : createAction(posting.post).then(closeEditor)" :disabled="post?.id ? !canUpdate(post) : !canCreate()">
+          <button class="send" @click.prevent="post?.id ? updateAction(posting.post).then(() => true).catch(() => false).then(c => c ? closeEditor() : null) : createAction(posting.post).then(() => true).catch(() => false).then(c => c ? closeEditor() : null)" :disabled="post?.id ? !canUpdate(post) : !canCreate()">
             <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;{{ posting?.post?.id ? 'Edit Post' : 'Create Reply' }}
           </button>
 
@@ -219,7 +219,7 @@
           <button class="inverted-button cancel" @click="cancel()">
             Cancel
           </button>
-          <button class="send" @click.prevent="createAction(threadCopy).then(closeEditor);" :disabled="!threadCopy?.title.length || !canCreate() || (threadCopy?.addPoll && !threadCopy.pollValid)">
+          <button class="send" @click.prevent="createAction(threadCopy).then(() => true).catch(() => false).then(c => c ? closeEditor() : null);" :disabled="!threadCopy?.title.length || !canCreate() || (threadCopy?.addPoll && !threadCopy.pollValid)">
             <i class="fa fa-paper-plane" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;Start Thread
           </button>
 
@@ -272,7 +272,7 @@ export default {
       if (v.editMode || v.quoteMode) return
       let rawText = v.posting.post.body || v.threadCopy.body || v.newMessage.content.body
       v.draftTimeout = setTimeout(() => saveDraft(), 10000)
-      if (clear || rawText.length && v.oldDraft !== rawText) {
+      if (clear || rawText?.length && v.oldDraft !== rawText) {
         let draftPromise
         if (props.postEditorMode || props.threadEditorMode) {
           draftPromise = postsApi.updatePostDraft

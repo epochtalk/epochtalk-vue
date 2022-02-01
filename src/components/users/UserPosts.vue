@@ -13,7 +13,6 @@
     <!-- User's Paged Posts -->
     <div v-if="!threads && postData">
       <div class="pagination-wrap" v-if="postData?.count > postData?.limit">
-        <!-- <pagination page-count="ProfilePostsCtrl.pageCount" page="ProfilePostsCtrl.page" query-params="ProfilePostsCtrl.queryParams"></pagination> -->
         <simple-pagination
           v-model="currentPage"
           :pages="pages"
@@ -222,27 +221,22 @@ export default {
       vertical-align: top;
     }
   }
-
   .timestamp {
     color: $text-gray-med;
     min-width: 150px;
     padding-left: 1rem;
     width: 25%;
   }
-
   .truncate-title {
     width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-
   .thread-title { font-weight: 600; }
-
   .post {
     cursor: pointer;
     padding: 0 0.25rem;
     transition: all ease-in-out 200ms;
     &:hover { background-color: darken($base-background-color, 5%); }
   }
-
   .post-body {
     white-space: pre-wrap;
     &.open { background-color: darken($base-background-color, 5%); }
@@ -255,17 +249,14 @@ export default {
       text-overflow: ellipsis;
     }
   }
-
   .no-table-contents {
     color: $text-gray-med;
     font-size: $font-size-med;
     font-weight: 400;
   }
-
   @include break-mobile-med {
     display: grid;
     grid-template-columns: 1fr;
-
     thead, th, tbody, tr { display: contents; }
     thead { display: none; }
     tr {
@@ -275,7 +266,6 @@ export default {
       width: calc(100vw - 2rem);
       td { padding: 0; }
     }
-
     .timestamp {
       font-size: $font-size-sm;
       padding: 0;
@@ -289,7 +279,6 @@ export default {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-
   button {
     background: transparent;
     border-bottom: 1px solid rgba(0,0,0,0);
@@ -297,7 +286,6 @@ export default {
     color: $text-gray-dark;
     margin-right: 2rem;
     padding: 0.5rem 0;
-
     &:hover, &:hover:focus, &:focus {
       background: inherit;
       border-bottom: 1px solid rgba($color-primary, .8);
@@ -307,7 +295,6 @@ export default {
       margin-right: 2rem;
       padding: 0.5rem 0;
     }
-
     &.active {
       color: $color-primary;
       border-bottom: 1px solid rgba($color-primary, .8);
@@ -321,14 +308,6 @@ export default {
     margin-top: 2rem;
     button { font-size: $font-size-sm; }
     .username { display: none; }
-  }
-}
-
-.pagination-wrap {
-  float: right;
-  @include break-mobile-sm {
-    float: unset;
-    text-align: center;
   }
 }
 </style>

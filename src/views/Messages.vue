@@ -23,7 +23,7 @@
         </div>
       </div>
 
-      <div v-if="!recentMessages.messages" class="empty-message-container">
+      <div v-if="!recentMessages.messages?.length" class="empty-message-container">
         <div class="empty-message">No messages</div>
       </div>
 
@@ -50,7 +50,7 @@
     <!-- Current Conversation -->
     <div class="messages" :class="{ 'is__active' : selectedConversationId }">
       <div class="action-bar">
-        <a href="" class="to__messages" @click="selectedConversationId = null">
+        <a href="" class="to__messages" @click="reload()">
           <svg class="" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
             <title></title>
             <path d="M24,38.83,4.59,19.41a2,2,0,0,1,2.82-2.82L24,33.17,40.59,16.59a2,2,0,0,1,2.82,2.82Z"/>
@@ -61,7 +61,7 @@
       <!-- New Message -->
       <div v-if="currentConversation">
         <div class="message-details-container">
-          <h4 class="message-details-header">Conversation with
+          <h4 class="message-details-header" v-if="receiverNames.length">Conversation with
             <span v-for="(name, i) in receiverNames" :key="name">
               <router-link :to="{ path: '/profile/' + name.toLowerCase() }">{{name}}</router-link>{{ i !== receiverNames.length - 1 ? ', ' : '' }}
             </span>
@@ -135,7 +135,7 @@
       </div>
 
       <!-- Empty view -->
-      <div v-if="!recentMessages.messages" class="empty-message-container">
+      <div v-if="!recentMessages.messages?.length" class="empty-message-container">
         <div class="empty-message"><strong>Your inbox is currently empty.</strong> Message someone to get started!</div>
 
         <div>
@@ -163,6 +163,7 @@ import DeleteMessageModal from '@/components/modals/messages/DeleteMessage.vue'
 import ReportMessageModal from '@/components/modals/messages/ReportMessage.vue'
 import Editor from '@/components/layout/Editor.vue'
 // import { avatarHighlight, usernameHighlight, userRoleHighlight } from '@/composables/utils/userUtils'
+import { watchUserChannel, unwatchUserChannel } from '@/composables/services/websocket'
 
 export default {
   name: 'Messages',
@@ -175,7 +176,10 @@ export default {
     next(vm => {
       messagesApi.page(query)
       .then(d => vm.recentMessages = d)
-      .then(() => vm.preloadConversation(to.query.id || vm.recentMessages.messages[0].conversation_id))
+      .then(() => {
+        // Hacky, handle mobile split view
+        window.innerWidth > window.mobile_break_width || to.query.id ? vm.preloadConversation(to.query.id || vm.recentMessages.messages[0].conversation_id) : null
+      })
       .catch(() => {})
     })
   },
@@ -186,8 +190,15 @@ export default {
     }
     messagesApi.page(query)
     .then(d => this.recentMessages = d)
-    .then(() => this.preloadConversation(to.query.id || this.recentMessages.messages[0].conversation_id))
+    .then(() => {
+      // Hacky, handle mobile split view
+      window.innerWidth > window.mobile_break_width || to.query.id ? this.preloadConversation(to.query.id || this.recentMessages.messages[0].conversation_id) : null
+    })
     .catch(() => {})
+    next()
+  },
+  beforeRouteLeave(to, from, next) {
+    unwatchUserChannel(this.userChannelHandler)
     next()
   },
   setup() {
@@ -227,7 +238,7 @@ export default {
       v.recentMessages.messages.forEach(message => {
         if (message.conversation_id === conversationId) { message.viewed = true }
       })
-      messagesApi.convos.page(conversationId)
+      return messagesApi.convos.page(conversationId)
       // build out conversation information
       .then(data => {
         v.currentSubject = data.messages[0].content.subject
@@ -305,8 +316,13 @@ export default {
     }
     const canCreateConversation = () => v.loggedIn && v.controlAccess.createConversations
     const canCreateMessage = () => v.loggedIn && v.controlAccess.createMessages
-    const createConversation = convo => messagesApi.convos.create(convo).then(reload)
-    const createMessage = msg => messagesApi.create(msg).then(reload)
+
+    // Stops split view in mobile from breaking after creating new conversation
+    // Hacky, handle mobile split view
+    const createConversation = convo => window.innerWidth > window.mobile_break_width ? messagesApi.convos.create(convo).then(reload) : messagesApi.convos.create(convo).then(data => preloadConversation(data.conversation_id))
+
+    // Hacky, handle mobile split view
+    const createMessage = msg => window.innerWidth > window.mobile_break_width ? messagesApi.create(msg).then(reload) : messagesApi.create(msg).then(() => preloadConversation(v.selectedConversationId))
 
     const listMessageReceivers = message => {
       let receiverNames = []
@@ -356,7 +372,11 @@ export default {
       }
     })
 
-    return { ...toRefs(v), reload, createMessage, createConversation, loadRecentMessages, preloadConversation, loadConversation, loadMoreMessages, canDeleteConversation, canDeleteMessage, addQuote, canCreateConversation, canCreateMessage, deleteMessageSuccess, listMessageReceivers, humanDate }
+    const userChannelHandler = data => data.action === 'newMessage' ? loadConversation(v.selectedConversationId) : null
+
+    watchUserChannel(userChannelHandler)
+
+    return { ...toRefs(v), reload, createMessage, createConversation, loadRecentMessages, preloadConversation, loadConversation, loadMoreMessages, canDeleteConversation, canDeleteMessage, addQuote, canCreateConversation, canCreateMessage, deleteMessageSuccess, listMessageReceivers, humanDate, userChannelHandler }
   }
 }
 </script>
@@ -546,7 +566,7 @@ export default {
   }
 }
 
-.messages {
+.messages-grid .messages {
   grid-area: details;
 
   .action-bar {
@@ -747,11 +767,9 @@ export default {
     right: 0;
     bottom: 0;
     left: 0;
-    margin-top: 1rem;
     padding: 0.5rem;
     transform: translateX(100%);
     transition: all ease-in-out 150ms;
-
     &.is__active {
       transform: translateX(0%);
     }
@@ -763,8 +781,6 @@ export default {
      width: calc(100vw - 32px);
     }
 
-  .messages {
-    // @include span-columns(8); @include omega;
-  }
+  main { position: relative; }
 }
 </style>

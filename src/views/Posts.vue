@@ -106,7 +106,7 @@
   <!-- <ad-viewer page="PostsParentCtrl.page"></ad-viewer> -->
 
   <!-- Posts Listing -->
-  <div v-if="postData.data?.posts">
+  <div class="thread-data" v-if="postData.data?.posts">
     <div :id="post.id" v-for="(post, i) in postData.data.posts" :key="post.id" class="post-block" :class="{ 'highlighted': post.highlighted, 'hidden': post.hidden, 'deleted': post._deleted || post.user.ignored,  'editing': post.id === posting.post.id }">
       <!-- Delete Post View -->
       <div class="deleted" v-if="post._deleted || post.user.ignored">
@@ -123,8 +123,7 @@
       <div v-if="!post._deleted && !post.user.ignored" class="post-block-grid">
         <!-- Post Profile Section -->
         <div class="post-user">
-          <a href="#">
-          <!-- <a ui-sref="profile.posts({ username: post.user.username})"> -->
+          <router-link :to="{ path: '/profile/' + post.user.username.toLowerCase() }">
             <div class="user-avatar" :class="defaultAvatarShape">
               <span v-if="post.user.online" class="online green" :data-balloon="post.user.username + ' is online'">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -140,8 +139,7 @@
               <div class="original-poster" v-if="post.user.original_poster">OP</div>
               <div v-if="post.user.activity > -1" :title="('Activity: ' + post.user.activity)" class="user-activity">Act: <span class="user-activity-value">{{post.user.activity}}</span></div>
             </router-link>
-          </a>
-
+          </router-link>
 
           <div class="user-trust" v-if="loggedIn && postData.data.thread.trust_visible">
             <trust-display :user="post.user" />
@@ -440,6 +438,7 @@ import { BreadcrumbStore } from '@/composables/stores/breadcrumbs'
 import BanStore from '@/composables/stores/ban'
 import TrustDisplay from '@/components/trust/TrustDisplay.vue'
 import Editor from '@/components/layout/Editor.vue'
+import { isOnline } from '@/composables/services/websocket'
 
 export default {
   name: 'Posts',
@@ -459,6 +458,7 @@ export default {
         return postsApi.byThread(params)
         .then(data => next(vm => {
           vm.postData.data = data
+          vm.checkUsersOnline()
           BanStore.updateBanNotice(vm.postData.data.banned_from_board)
           vm.bannedFromBoard = vm.postData.data.banned_from_board
           vm.highlightPost()
@@ -478,6 +478,7 @@ export default {
         threadsApi.viewed(threadId)
         return postsApi.byThread(params).then(data => {
           this.postData.data = data
+          this.checkUsersOnline()
           BanStore.updateBanNotice(this.postData.data.banned_from_board)
           this.bannedFromBoard = this.postData.data.banned_from_board
           this.highlightPost()
@@ -502,6 +503,10 @@ export default {
         }
         if (params.page && params.start) delete params.page
         return postsApi.byThread(params)
+        .then(data => {
+          checkUsersOnline()
+          return data
+        })
       })
     }
     const postEditDisabled = (createdAt) => {
@@ -971,6 +976,23 @@ export default {
     .then(processPosts)
     .then(data => v.postData.data = data)
 
+    const checkUsersOnline = () => {
+      let uniqueUsers = {}
+      v.postData.data.posts.forEach(post => uniqueUsers[post.user.id] = 'user')
+      Object.keys(uniqueUsers).map(user => isOnline(user, setOnline))
+    }
+
+    const setOnline = (err, data) => {
+      if (err) console.log(err)
+      else {
+        v.postData.data.posts.map(post => {
+          if (post.user.id === data.id) {
+            post.user.online = data.online
+          }
+        })
+      }
+    }
+
     /* Internal Data */
     const $route = useRoute()
     const $router = useRouter()
@@ -1062,7 +1084,8 @@ export default {
       showUserControls,
       watchThread,
       toggleIgnoredPosts,
-      openMoveThreadModal
+      openMoveThreadModal,
+      checkUsersOnline
     }
   }
 }
@@ -1285,282 +1308,304 @@ ad-viewer {
 }
 
 .post-block {
-    @include transition(background-color 250ms ease-in);
-    min-height: 11rem;
-    // max-width: calc(#{$view-maxWidth} - #{$sidebarWidth} - 2rem);
-    border-bottom: $border-trans;
-    padding: 1.5rem 0.5rem 2rem;
+  @include transition(background-color 250ms ease-in);
+  min-height: 11rem;
+  // max-width: calc(#{$view-maxWidth} - #{$sidebarWidth} - 2rem);
+  border-bottom: $border-trans;
+  padding: 1.5rem 0.5rem 2rem;
+  position: relative;
 
-    &.highlighted {
-      background-color: $color-highlighted;
+  &.highlighted {
+    background-color: $color-highlighted;
 
-      .post-user .user-avatar .online svg {
-        stroke: $color-highlighted;
-      }
+    .post-user .user-avatar .online svg {
+      stroke: $color-highlighted;
     }
-    &.editing {
-      background-color: RGBA(235, 200, 120, 0.5);
-    }
-    &.hidden {
-      background-color: $sub-header-color;
-    }
-    &.deleted {
-      min-height: 0;
-      padding: 0.5rem 0.5rem;
-      color: $secondary-font-color;
-      text-align: center;
-    }
+  }
+  &.editing {
+    background-color: RGBA(235, 200, 120, 0.5);
+  }
+  &.hidden {
+    background-color: $sub-header-color;
+  }
+  &.deleted {
+    min-height: 0;
+    padding: 0.5rem 0.5rem;
+    color: $secondary-font-color;
+    text-align: center;
+  }
 
-    &:hover {
-      .post-content {
-        .post-title {
-          .post-action {
-            .post-action-icon, a {
-              opacity: 1;
-            }
-          }
-        }
-      }
-    }
-
-    .post-block-grid {
-      display: flex;
-      flex-direction: row;
-      align-items: flex-start;
-      justify-content: flex-start;
-    }
-
-
-    $postUserMargin: 1rem;
-    $postUserAvatarSize: calc(#{$postUserWidth} - #{$postUserMargin});
-
-    .post-user {
-      // width: $postUserWidth;
-      flex: 0 0 $postUserWidth;
-      margin-right: $postUserMargin;
-      font-size: $font-size-tiny;
-      text-align: center;
-      text-transform: uppercase;
-
-      a {
-        display: block;
-      }
-      .user-avatar {
-        @include bg-cover;
-        background: no-repeat center center;
-        position: relative;
-        margin-bottom: 1rem;
-        width: $postUserWidth;
-        height: $postUserWidth;
-
-        .online {
-          position: absolute;
-          top: -2px;
-          right: -2px;
-
-          svg {
-            stroke: $base-background-color;
-            stroke-width: 6;
-            fill: green;
-            width: 20px;
-            height: auto;
-          }
-        }
-
-         a, img {
-          width: 100%;
-          height: 100%;
-        }
-
-        &.circle {
-          img {
-            @include border-radius(100px);
-            object-fit: cover;
-          }
-        }
-        &.rect {
-          height: calc(#{$postUserWidth / 1.5});
-
-          img {
-            object-fit: cover;
-          }
-
-          .online {
-            top: -8px;
-            right: -8px
-          }
-        }
-      }
-      .user-trust,
-      .user-rank,
-      .user-activity, .original-poster {
-        line-height: 1;
-        color: $secondary-font-color;
-        overflow: hidden;
-        margin-bottom: 0.25rem;
-        white-space: nowrap;
-        text-align: center;
-        text-transform: uppercase;
-        width: 100%;
-
-        &-value {
-          font-weight: 600;
-        }
-      }
-      .original-poster {
-        color: #f04124;
-      }
-
-      &.rect {
-        .user-avatar {
-          height: calc(100% / 1.5);
-
-          img {
-            border-radius: 0;
-          }
-        }
-      }
-    }
-
+  &:hover {
     .post-content {
-      width: calc(100% - #{$postUserWidth} - #{$postUserMargin});
-
-      .bbcode-column {
-        img.image-loader.loaded {
-          max-width: 350px;
-          margin: 5px auto;
-          display: inline;
-        }
-      }
       .post-title {
-        color: $secondary-font-color;
-        display: flex;
-        align-items: center;
-        margin-bottom: 0.5rem;
-        width: 100%;
-
-        .post-title-user {
-          display: flex;
-          align-items: center;
-          flex: 2 1 auto;
-          flex-wrap: wrap;
-        }
-
-        span.username {
-          margin-right: 0.5rem;
-          color: $base-font-color;
-          font-weight: 600;
-          &:hover {
-            color: $color-primary;
-          }
-        }
-
-        .user-role {
-          @include truncate-ellipsis;
-          background-color: transparent;
-          border: 1px solid $secondary-font-color;
-          border-radius: 2px;
-          color: $secondary-font-color-dark;
-          display: inline-block;
-          font-size: $font-size-xs;
-          font-weight: 400;
-          line-height: 1.4;
-          margin-right: 0.5rem;
-          max-width: 140px;
-          padding: 1px 6px;
-          text-align: center;
-        }
-
-        .timestamp, .display-name {
-          display: inline-block;
-          color: $secondary-font-color;
-          font-size: $font-size-xs;
-          font-weight: 400;
-        }
-        .display-name {
-          color: $secondary-font-color-dark;
-        }
-
         .post-action {
-          // opacity: .4;
-          @include list-clean;
-          display: flex;
-          align-items: center;
-          justify-self: flex-end;
-          color: $secondary-font-color;
-          // transition: opacity ease-in-out 150ms;
-
-          li {
-            padding-left: 1rem;
-          }
-
-          svg {
-            fill: $secondary-font-color;
-          }
-
-          .post-action-icon,
-          a {
-            color: $secondary-font-color;
-            display: flex;
-            font-size: $font-size-sm;
-            opacity: .25;
-            transition: opacity ease-in-out 150ms;
-
-            @include break-mobile-sm {
-              opacity: 1;
-            }
-
-            &.selected {
-              opacity: .6;
-
-              svg {
-                // fill: $secondary-font-color-dark;
-                fill: $dark-text-default;
-              }
-            }
-
-            &:hover {
-              svg {
-                fill: $color-primary;
-              }
-            }
+          .post-action-icon, a {
+            opacity: 1;
           }
         }
-      }
-
-      .post-sig-border {
-        clear: both;
-        width: 250px;
-        border-top: $border;
-        margin-bottom: 0.5rem;
-        margin-top: 0.5rem;
-      }
-      .post-signature {
-        @include truncate-ellipsis;
-        clear: both;
-        color: $secondary-font-color;
-        border-top: $border;
-        border-color: lighten($border-color, 7%);
-        font-size: 13px;
-        line-height: 1.2;;
-        margin-top: 1rem;
-        max-height: 3.5rem;
-        padding-top: 0.5rem;
-        word-wrap: break-word;
-        white-space: pre-wrap;
-        a {
-          color: $secondary-font-color;
-          &:hover {
-            color: $color-primary;
-          }
-        }
-      }
-
-      @include break-mobile-sm {
-        width: $postWidth__mobile;
       }
     }
   }
+
+  .post-block-grid {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+
+  $postUserMargin: 1rem;
+  $postUserAvatarSize: calc(#{$postUserWidth} - #{$postUserMargin});
+
+  .post-user {
+    // width: $postUserWidth;
+    flex: 0 0 $postUserWidth;
+    margin-right: $postUserMargin;
+    font-size: $font-size-tiny;
+    text-align: center;
+    text-transform: uppercase;
+
+    a {
+      display: block;
+    }
+    .user-avatar {
+      @include bg-cover;
+      background: no-repeat center center;
+      position: relative;
+      margin-bottom: 1rem;
+      width: $postUserWidth;
+      height: $postUserWidth;
+
+      .online {
+        position: absolute;
+        top: -2px;
+        right: -2px;
+
+        svg {
+          stroke: $base-background-color;
+          stroke-width: 6;
+          fill: green;
+          width: 20px;
+          height: auto;
+        }
+      }
+
+        a, img {
+        width: 100%;
+        height: 100%;
+      }
+
+      &.circle {
+        img {
+          @include border-radius(100px);
+          object-fit: cover;
+        }
+      }
+      &.rect {
+        height: calc(#{$postUserWidth / 1.5});
+
+        img {
+          object-fit: cover;
+        }
+
+        .online {
+          top: -8px;
+          right: -8px
+        }
+      }
+    }
+    .user-trust,
+    .user-rank,
+    .user-activity, .original-poster {
+      line-height: 1;
+      color: $secondary-font-color;
+      overflow: hidden;
+      margin-bottom: 0.25rem;
+      white-space: nowrap;
+      text-align: center;
+      text-transform: uppercase;
+      width: 100%;
+
+      &-value {
+        font-weight: 600;
+      }
+    }
+    .original-poster {
+      color: #f04124;
+    }
+
+    &.rect {
+      .user-avatar {
+        height: calc(100% / 1.5);
+
+        img {
+          border-radius: 0;
+        }
+      }
+    }
+  }
+
+  .post-content {
+    width: calc(100% - #{$postUserWidth} - #{$postUserMargin});
+
+    .bbcode-column {
+      img.image-loader.loaded {
+        max-width: 350px;
+        margin: 5px auto;
+        display: inline;
+      }
+    }
+    .post-title {
+      color: $secondary-font-color;
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.5rem;
+      width: 100%;
+
+      .post-title-user {
+        display: flex;
+        align-items: center;
+        flex: 2 1 auto;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+      }
+
+      span.username {
+        margin-right: 0.25rem;
+        color: $base-font-color;
+        font-weight: 600;
+        &:hover {
+          color: $color-primary;
+        }
+      }
+
+      .user-role {
+        @include truncate-ellipsis;
+        background-color: transparent;
+        border: 1px solid $secondary-font-color;
+        border-radius: 2px;
+        color: $secondary-font-color-dark;
+        display: inline-block;
+        font-size: $font-size-xs;
+        font-weight: 400;
+        line-height: 1.4;
+        margin-right: 0.5rem;
+        max-width: 140px;
+        padding: 1px 6px;
+        text-align: center;
+      }
+
+      .timestamp, .display-name {
+        display: inline-block;
+        color: $secondary-font-color;
+        font-size: $font-size-xs;
+        font-weight: 400;
+      }
+      .display-name {
+        color: $secondary-font-color-dark;
+      }
+
+      .post-action {
+        // opacity: .4;
+        @include list-clean;
+        display: flex;
+        align-items: center;
+        justify-self: flex-end;
+        gap: 1rem;
+        color: $secondary-font-color;
+        // transition: opacity ease-in-out 150ms;
+
+        // li {
+        //   padding-left: 1rem;
+        // }
+
+        svg {
+          fill: $secondary-font-color;
+        }
+
+        .post-action-icon,
+        a {
+          color: $secondary-font-color;
+          display: flex;
+          font-size: $font-size-sm;
+          opacity: .25;
+          transition: opacity ease-in-out 150ms;
+
+          @include break-mobile-sm {
+            opacity: 1;
+          }
+
+          &.selected {
+            opacity: .6;
+
+            svg {
+              // fill: $secondary-font-color-dark;
+              fill: $dark-text-default;
+            }
+          }
+
+          &:hover {
+            svg {
+              fill: $color-primary;
+            }
+          }
+        }
+
+        @include break-mobile-sm {
+          margin-bottom: 1rem;
+          position: absolute;
+          bottom: 0;
+          right: 0;
+
+          .post-action-icon a {
+            color: #ccc;
+          }
+
+          svg {
+            fill: #ccc;
+          }
+        }
+      }
+    }
+
+    .post-sig-border {
+      clear: both;
+      width: 250px;
+      border-top: $border;
+      margin-bottom: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .post-signature {
+      @include truncate-ellipsis;
+      clear: both;
+      color: $secondary-font-color;
+      border-top: $border;
+      border-color: lighten($border-color, 7%);
+      font-size: 13px;
+      line-height: 1.2;;
+      margin-top: 1rem;
+      max-height: 3.5rem;
+      padding-top: 0.5rem;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+      a {
+        color: $secondary-font-color;
+        &:hover {
+          color: $color-primary;
+        }
+      }
+    }
+
+    @include break-mobile-sm {
+      width: $postWidth__mobile;
+    }
+  }
+
+  @include break-mobile-sm {
+    padding-bottom: 3rem;
+  }
+}
 
 .thread-title {
   flex: 1 0 calc(100% - 36px);
@@ -1626,71 +1671,6 @@ ad-viewer {
       color: $secondary-font-color;
       &.clicked {
         color: $color-primary;
-      }
-    }
-  }
-}
-
-
-// Bottom actions and pagination
-.actions-bottom {
-  border-top: 1px solid $border-color;
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  left: 0;
-  background: $base-background-color;
-  padding: 0.75rem;
-  z-index: 1000;
-
-  &-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 3fr) minmax(240px, 1fr);
-    align-items: center;
-    column-gap: 2rem;
-    max-width: $view-maxWidth;
-    margin: 0 auto;
-  }
-
-  .button {
-    display: block;
-    margin-bottom: 0;
-    width: 100%;
-  }
-}
-.pagination-bottom {
-  justify-self: end;
-
-  ul {
-    &.pagination {
-      li {
-        a {
-          font-size: $font-size-sm;;
-        }
-      }
-    }
-  }
-}
-
-@include break-mobile-sm {
-  .posts {
-    .actions-bottom {
-      .actions-bottom-grid {
-        grid-template-columns: 1fr auto;
-        align-items: center;
-        justify-items: center;
-        column-gap: 1rem;
-      }
-
-      .pagination-bottom {
-        justify-self: end;
-        // position: fixed;
-        // bottom: 3rem;
-        // left: 0;
-        // right: 0;
-        // background-color: #fff;
-        // border-top: 1px solid $border-color;
-        // text-align: center;
       }
     }
   }
@@ -1776,8 +1756,8 @@ ad-viewer {
     align-self: flex-start;
 
     li {
-      padding-left: 0;
-      padding-right: 1rem;
+      // padding-left: 0;
+      // padding-right: 1rem;
     }
   }
   #post-tools-fixed {

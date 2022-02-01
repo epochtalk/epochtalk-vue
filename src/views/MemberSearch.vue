@@ -40,23 +40,32 @@
       </table>
     </div>
   </div>
-  <div class="sidebar">
-    <div class="sidebar-block" v-if="searchData?.page_count > 1">
+  <div class="sidebar" v-if="searchData?.page_count > 1">
+    <div class="sidebar-block">
       <pagination :page="searchData.page" :limit="searchData.limit" :count="searchData.count" />
+    </div>
+    <div class="pagination-wrap">
+      <simple-pagination
+        v-model="currentPage"
+        :pages="pages"
+        :range-size="1"
+        @update:modelValue="pageResults"
+      />
     </div>
   </div>
 </template>
 
 <script>
-import { reactive, toRefs, nextTick } from 'vue'
+import { reactive, toRefs, nextTick, computed } from 'vue'
 import { usersApi } from '@/api'
 import Pagination from '@/components/layout/Pagination.vue'
 import { useRoute, useRouter } from 'vue-router'
 import humanDate from '@/composables/filters/humanDate'
+import SimplePagination from '@/components/layout/SimplePagination.vue'
 
 export default {
   name: 'MemberSearch',
-  components: { Pagination },
+  components: { Pagination, SimplePagination },
   beforeRouteEnter(to, from, next) {
     const query = {
       limit: 10,
@@ -79,6 +88,13 @@ export default {
     next()
   },
   setup() {
+    const pageResults = page => {
+      let query = { ...$route.query, page: page }
+      if (query.page === 1 || !query.page) delete query.page
+      if ($route.query.page !== v.currentPage)
+        $router.replace({ name: $route.name, params: $route.params, query: query })
+    }
+
     const searchUsers = () => {
       let query = { ...$route.query, search: v.search }
       delete query.field
@@ -135,6 +151,7 @@ export default {
 
     const v = reactive({
       currentPage: Number($route.query.page) || 1,
+      pages: computed(() => Math.ceil(v.searchData?.count  / v.searchData?.limit)),
       searchData: null,
       search: $route.query.search,
       searchInput: null,
@@ -144,7 +161,7 @@ export default {
 
     nextTick(() => v.searchInput.focus())
 
-    return { ...toRefs(v), searchUsers, clearSearch, setSortField, getSortClass, humanDate }
+    return { ...toRefs(v), pageResults, searchUsers, clearSearch, setSortField, getSortClass, humanDate }
   }
 }
 </script>
@@ -159,17 +176,30 @@ export default {
       "sidebar sidebar";
   }
 }
-.user-search { grid-area: main; }
+.user-search { grid-area: main; width: 100%; }
 .sidebar {
   grid-area: sidebar;
-
   .sidebar-block {
     display: block;
     position: sticky;
     top: $header-offset;
   }
+  .pagination-wrap { display: none; }
+  @include break-mobile-sm {
+    border-top: 1px solid $border-color;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    background: $base-background-color;
+    padding: 0.75rem;
+    z-index: 1000;
+    margin: 0 auto;
+    width: 100vw;
+    .sidebar-block { display: none; }
+    .pagination-wrap { display: block; }
+  }
 }
-
 .members td {
   height: 6.25rem;
   padding-left: 0;

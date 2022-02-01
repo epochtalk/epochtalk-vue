@@ -77,16 +77,19 @@
         </svg>
         Mark all read
       </a>
+      <div class="pagination-slide" v-if="mentionData?.prev || mentionData?.next">
+        <div class="pagination-controls">
+          <button @click="pageResults(-1)" :disabled="!mentionData?.prev">&#10094; Prev</button>
+          <div class="page">{{currentPage}}</div>
+          <button @click="pageResults(1)" :disabled="!mentionData?.next">Next &#10095;</button>
+        </div>
+      </div>
     </div>
-  </div>
-  <div class="pagination-simple">
-    <button @click="pageResults(-1)" :disabled="!mentionData?.prev">&#10094; Prev</button>
-    <button @click="pageResults(1)" :disabled="!mentionData?.next">Next &#10095;</button>
   </div>
 </template>
 
 <script>
-import { reactive, toRefs } from 'vue'
+import { reactive, toRefs, computed } from 'vue'
 import { mentionsApi } from '@/api'
 import { localStoragePrefs } from '@/composables/stores/prefs'
 import humanDate from '@/composables/filters/humanDate'
@@ -139,7 +142,7 @@ export default {
     const $router = useRouter()
 
     const v = reactive({
-      currentPage: Number($route.query.page) || 1,
+      currentPage: computed(() => Number($route.query.page) || 1),
       mentionData: null,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
@@ -156,15 +159,7 @@ export default {
 </script>
 
 <style lang="scss">
-.mentions {
-  .pagination-simple {
-    display: grid;
-    grid-template-columns: 6rem auto auto;
-    -moz-column-gap: .5rem;
-    column-gap: .5rem;
-    justify-content: end;
-  }
-}
+.mentions .pagination-slide .pagination-controls { margin: auto; }
 #public-content {
   .mentions & {
     grid-template-columns: minmax(0, 3fr) minmax(240px, 1fr);
@@ -181,6 +176,8 @@ export default {
   .mention-actions {
     .button {
       margin: 0 0 1.25rem;
+      &:last-child { margin-bottom: 0; }
+
     }
   }
 }
@@ -342,19 +339,6 @@ export default {
   }
 }
 
-.pagination-simple {
-  background-color: $base-background-color;
-  padding: 1rem 0;
-  position: sticky;
-  bottom: 0;
-  left: 0;
-  text-align: right;
-
-  .user-settings & {
-    position: relative;
-  }
-}
-
 .caret-right {
   height: 12px;
   position: relative;
@@ -418,15 +402,6 @@ $columnGap-small: 0.5rem;
         }
       }
     }
-  }
-
-  .pagination-simple {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    text-align: center;
-    width: 100%;
-    margin-bottom: 0;
   }
 }
 </style>
