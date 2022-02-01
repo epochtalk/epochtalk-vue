@@ -304,17 +304,18 @@ export default {
       }
     }
     const addQuote = message => console.log(message)
-    const canDeleteConversation = () => v.loggedIn && $auth.permissionUtils.hasPermission('conversations.delete.allow')
-
-    const canDeleteMessage = (messageUserId) => {
+    const canDeleteConversation = () => v.loggedIn && v.controlAccess.deleteConversations
+    const canDeleteMessage = messageSenderId => {
       if (!v.loggedIn) return false
-      if (!$auth.permissionUtils.hasPermission('messages.delete.allow')) return false
-      return messageUserId === v.authedUser.id || $auth.permissionUtils.hasPermission('messages.delete.bypass.owner')
+      if (!v.controlAccess.deleteMessages) return false
+
+      // check message ownership/bypass
+      if (messageSenderId === v.authedUser.id) return true
+      else if (v.controlAccess.ownerBypassDeleteMessages) return true
+      else return false
     }
-
-    const canCreateConversation = () => v.loggedIn && $auth.permissionUtils.hasPermission('conversations.create.allow')
-
-    const canCreateMessage = () => v.loggedIn && $auth.permissionUtils.hasPermission('messages.create.allow')
+    const canCreateConversation = () => v.loggedIn && v.controlAccess.createConversations
+    const canCreateMessage = () => v.loggedIn && v.controlAccess.createMessages
 
     // Stops split view in mobile from breaking after creating new conversation
     // Hacky, handle mobile split view
@@ -362,6 +363,11 @@ export default {
       showEditor: false,
       editorConvoMode: false,
       controlAccess: {
+        createConversations: $auth.permissionUtils.hasPermission('conversations.create.allow'),
+        deleteConversations: $auth.permissionUtils.hasPermission('conversations.delete.allow'),
+        createMessages: $auth.permissionUtils.hasPermission('messages.create.allow'),
+        deleteMessages: $auth.permissionUtils.hasPermission('messages.delete.allow'),
+        ownerBypassDeleteMessages: $auth.permissionUtils.hasPermission('messages.delete.bypass.owner'),
         reportMessages: $auth.permissionUtils.hasPermission('reports.createMessageReport')
       }
     })

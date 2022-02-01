@@ -4,7 +4,6 @@
 
     <template v-slot:body>
       <form action="." class="css-form">
-        <h3 class="thin-underline">Purge Post</h3>
         <p>Are you sure you want to permanently delete this post?</p>
         <div class="clear">
           <button id="purge-btn" class="fill-row" @click.prevent="purgePost()" type="submit">
