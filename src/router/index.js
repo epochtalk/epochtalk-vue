@@ -15,6 +15,7 @@ import WatchlistEdit from '@/views/WatchlistEdit.vue'
 import Mentions from '@/views/Mentions.vue'
 import Messages from '@/views/Messages.vue'
 import PostSearch from '@/views/PostSearch.vue'
+import ConfirmAccount from '@/views/ConfirmAccount.vue'
 import Profile from '@/views/Profile.vue'
 import Forbidden from '@/views/layout/Forbidden.vue'
 import NotFound from '@/views/layout/NotFound.vue'
@@ -39,6 +40,13 @@ const routes = [
     component: Login,
     props: true,
     meta: { requiresAuth: false, bodyClass: 'login' }
+  },
+  {
+    path: '/confirm/:username/:token',
+    name: 'Confirm',
+    component: ConfirmAccount,
+    props: true,
+    meta: { requiresAuth: false, bodyClass: 'confirm' }
   },
   {
     path: '/boards/:boardSlug',
