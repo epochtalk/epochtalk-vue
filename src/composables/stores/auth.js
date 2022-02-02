@@ -84,9 +84,16 @@ export default {
           $alertStore.success(`Welcome ${user.username}, you have successfully registered!`)
           socketLogin(user)
         }
-        else return true
-        // TODO(akinsey): implement flow for when email confirmation is enabled
-        // else {}
+        else return true // when email confirmation is enabled, tell modal to show confirmation msg
+      }).catch(() => {})
+
+    const confirmRegistration = (username, token) => authApi.confirmRegistration({ username, token })
+      .then(dbUser => {
+        $appCache.set(AUTH_KEY, dbUser)
+        Object.assign(user, dbUser)
+        $prefs.fetch()
+        $alertStore.success(`Welcome ${user.username}, you have successfully registered!`)
+        socketLogin(user)
       }).catch(() => {})
 
     // Reauthenticate on app init if token is present
@@ -100,7 +107,8 @@ export default {
       reauthenticate,
       login,
       logout,
-      register
+      register,
+      confirmRegistration
     })
   },
   render() { return this.$slots.default() } // renderless component
