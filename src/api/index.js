@@ -132,6 +132,7 @@ export const authApi = {
     return user
   }),
   authenticate: () => $http('/api/authenticate'),
+  confirmRegistration: data => $http('/api/confirm', { method: 'POST', data }, true),
   emailAvailable: email => $http(`/api/register/email/${email}`),
   usernameAvailable: username => $http(`/api/register/username/${username}`),
   inviteExists: email => $http(`/api/invites/exists?email=${email}`),
