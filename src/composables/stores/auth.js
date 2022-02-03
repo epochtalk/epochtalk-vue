@@ -96,6 +96,15 @@ export default {
         socketLogin(user)
       }).catch(() => {})
 
+    const inviteRegistration = (username, token, email, password) => authApi.inviteRegistration({ email, username, password, confirmation: password, hash: token })
+      .then(dbUser => {
+        $appCache.set(AUTH_KEY, dbUser)
+        Object.assign(user, dbUser)
+        $prefs.fetch()
+        $alertStore.success(`Welcome ${user.username}, you have successfully registered!`)
+        socketLogin(user)
+      }).catch(() => {})
+
     // Reauthenticate on app init if token is present
     if (localStorageAuth().data.token) reauthenticate()
 
@@ -108,7 +117,8 @@ export default {
       login,
       logout,
       register,
-      confirmRegistration
+      confirmRegistration,
+      inviteRegistration
     })
   },
   render() { return this.$slots.default() } // renderless component
