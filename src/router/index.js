@@ -15,6 +15,7 @@ import WatchlistEdit from '@/views/WatchlistEdit.vue'
 import Mentions from '@/views/Mentions.vue'
 import Messages from '@/views/Messages.vue'
 import PostSearch from '@/views/PostSearch.vue'
+import Join from '@/views/Join.vue'
 import ConfirmAccount from '@/views/ConfirmAccount.vue'
 import Profile from '@/views/Profile.vue'
 import Forbidden from '@/views/layout/Forbidden.vue'
@@ -47,6 +48,13 @@ const routes = [
     component: ConfirmAccount,
     props: true,
     meta: { requiresAuth: false, bodyClass: 'confirm' }
+  },
+    {
+    path: '/join',
+    name: 'Join',
+    component: Join,
+    props: true,
+    meta: { requiresAuth: false, bodyClass: 'join' }
   },
   {
     path: '/boards/:boardSlug',
