@@ -8,6 +8,7 @@ const socketcluster = require('socketcluster-client')
 // Public channel idenitfier and general options
 let options = { waitForAuth: true }
 let userChannel
+let publicChannel
 let session = reactive({ user: {} })
 
 // Initiate the connection to the websocket server
@@ -37,6 +38,12 @@ export const socketLogout = socketUser => {
   Object.assign(session.user, socketUser)
   socket.deauthenticate()
   socket.emit('loggedOut')
+}
+
+export const watchPublicChannel = handler => {
+  if (window.websocket_logs) console.log('Watching public channel.')
+  if (publicChannel) publicChannel.watch(handler)
+  else setTimeout(() => watchPublicChannel(handler), 1000)
 }
 
 export const watchUserChannel = handler => {
@@ -87,7 +94,7 @@ export default {
        })
      }
      else if (JSON.parse(channelName).type === 'public') {
-       socket.watch(channelName, d => d.action === 'announcement' ? alertStore.warn(d.message) : null)
+      // Placeholder for future public notifications if necessary
      }
      else window.websocket_logs ? console.log('Not watching', channelName) : null
 
@@ -125,7 +132,7 @@ export default {
     socket.on('connect', status => status.isAuthenticated ? socket.emit('loggedIn') : null)
 
     // always subscribe to the public channel
-    socket.subscribe(publicChannelKey, options)
+    publicChannel = socket.subscribe(publicChannelKey, { waitForAuth: false })
 
     /* Provide Store Data */
     return provide(WebsocketService, {
@@ -133,6 +140,7 @@ export default {
       socketLogout,
       watchUserChannel,
       unwatchUserChannel,
+      watchPublicChannel,
       isOnline,
     })
   },
