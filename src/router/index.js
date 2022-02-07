@@ -169,13 +169,7 @@ const routes = [
     meta: { requiresAuth: false, bodyClass: 'about' }
   },
   {
-    path: '/:catchAll(.*)',
-    name: 'NotFoundCatchAll',
-    component: NotFound,
-    meta: { requiresAuth: false, bodyClass: 'not-found' }
-  },
-  {
-    path: '/404',
+    path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: NotFound,
     meta: { requiresAuth: false, bodyClass: 'not-found' }
