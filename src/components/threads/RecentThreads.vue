@@ -78,7 +78,7 @@ export default {
   background-color: $sub-header-color;
   grid-area: main;
   margin: calc(-2rem - 1px) 0 2rem;
-  padding: 2rem 0;
+  padding: 2rem 1rem;
   position: relative;
   width: 100vw;
   left: 50%;
