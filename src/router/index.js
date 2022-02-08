@@ -175,13 +175,13 @@ const routes = [
     meta: { requiresAuth: false, bodyClass: 'not-found' }
   },
   {
-    path: '/403',
+    path: '/:pathMatch(.*)*',
     name: 'Forbidden',
     component: Forbidden,
     meta: { requiresAuth: false, bodyClass: 'forbidden' }
   },
   {
-    path: '/503',
+    path: '/:pathMatch(.*)*',
     name: 'ServiceUnavailable',
     component: ServiceUnavailable,
     meta: { requiresAuth: false, bodyClass: 'service-unavailable' }
