@@ -208,11 +208,13 @@ router.beforeEach(to => {
   BanStore.initBanNotice(localStorageAuth().data)
 
   // Redirect to login page if route has meta.requiresAuth set
+      console.log(to)
+
   if (to.meta.requiresAuth && !localStorageAuth().data.token) {
     router.push({
       name: 'Login',
       params: {
-        redirectName: to.name || 'Boards',
+        fullPath: to.fullPath || '/',
         redirectParams: JSON.stringify(to.params), // Cannot pass object, gets converted to string
         redirectQuery: JSON.stringify(to.query),
       },
