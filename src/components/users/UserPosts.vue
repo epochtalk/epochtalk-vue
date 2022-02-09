@@ -34,11 +34,10 @@
 
           <tbody>
             <tr v-for="post in postData?.posts" :key="post.id">
-              <td :data-balloon="post.thread_title" data-balloon-pos="top">
+              <td :data-balloon="decode(post.thread_title)" data-balloon-pos="top">
                 <div class="truncate-title">
                   <span v-if="post.hidden && !post._deleted"><i class="fa fa-eye-slash"></i></span>
-                  <!-- <a ui-sref="posts.data({ slug: post.thread_slug, start: post.position, '#': post.id })" ng-bind-html="post.thread_title" ng-if="!post._deleted" class="thread-title"></a> -->
-                  <a href="" v-if="!post._deleted" class="thread-title" v-html="post.thread_title"></a>
+                  <router-link v-if="!post._deleted" class="thread-title"  :title="decode(post.thread_title)" :to="{ name: 'Posts', params: { threadSlug: post.thread_slug, threadId: post.thread_id }, query: { start: post.position }, hash: `#${post.id}` }" v-html="decode(post.thread_title)"></router-link>
                   <span v-if="post._deleted">Deleted</span>
                 </div>
                 <div class="post" @click="post.open = !post.open">
@@ -74,11 +73,10 @@
 
           <tbody>
             <tr v-for="post in postData?.posts" :key="post.id">
-              <td :data-balloon="post.thread_title" data-balloon-pos="top">
+              <td :data-balloon="decode(post.thread_title)" data-balloon-pos="top">
                 <div class="truncate-title">
                   <span v-if="post.hidden && !post._deleted"><i class="fa fa-eye-slash"></i></span>
-                  <!-- <a ui-sref="posts.data({ slug: post.thread_slug, start: post.position, '#': post.id })" ng-bind-html="post.thread_title" ng-if="!post._deleted" class="thread-title"></a> -->
-                  <a href="" v-if="!post._deleted" class="thread-title" v-html="post.thread_title"></a>
+                  <router-link v-if="!post._deleted" class="thread-title"  :title="decode(post.thread_title)" :to="{ name: 'Posts', params: { threadSlug: post.thread_slug, threadId: post.thread_id }, query: { start: post.position }, hash: `#${post.id}` }" v-html="decode(post.thread_title)"></router-link>
                   <span v-if="post._deleted">Deleted</span>
                 </div>
                 <div class="post" @click="post.open = !post.open">
@@ -101,6 +99,7 @@ import { postsApi } from '@/api'
 import { PreferencesStore, localStoragePrefs } from '@/composables/stores/prefs'
 import { useRoute, useRouter } from 'vue-router'
 import SimplePagination from '@/components/layout/SimplePagination.vue'
+import decode from '@/composables/filters/decode'
 
 export default {
   name: 'UserPosts',
@@ -201,7 +200,7 @@ export default {
     // Refresh posts if user is updated, account may be deactivated
     watch(() => props.user, () => refresh())
 
-    return { ...toRefs(v), pagePosts, toggleThreads, setDesc, getSortClass, humanDate }
+    return { ...toRefs(v), pagePosts, toggleThreads, setDesc, getSortClass, humanDate, decode }
   }
 }
 </script>
