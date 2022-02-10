@@ -141,7 +141,9 @@
       </div>
 
       <div class="actions-destructive actions-panel" v-if="canDeactivate() || canReactivate() || canDelete()">
-        <!--  TODO(akinsey): <reset-password user="user"></reset-password> -->
+        <div class="profile-action" v-if="canReset()">
+          <a href="#" @click.prevent="showReset = true">Reset Password</a>
+        </div>
         <div class="profile-action" v-if="canDeactivate()">
           <a href="#" @click.prevent="showDeactivate = true">Deactivate Account</a>
         </div>
@@ -275,6 +277,12 @@ export default {
       if (pageOwner()) return true
       return false
     }
+    const canReset = () => {
+      if (!v.loggedIn) return false
+      if (!v.permUtils.hasPermission('users.adminRecover')) return false
+      if (pageOwner()) return true
+      return false
+    }
     const canDelete = () => {
       if (!v.loggedIn) return false
       if (!v.permUtils.hasPermission('users.delete.allow')) return false
@@ -328,7 +336,7 @@ export default {
       showDelete: false,
       showManageBans: false
     })
-    return { ...toRefs(v), refreshUser, banExpiration, toggleIgnorePosts, toggleIgnoreMessages, toggleIgnoreMentions, redirectHome, canUpdate, canUpdateUsername, canMessage, userAge, canUpdatePrivate, pageOwner, canPageUserNotes, canBanUser, canBoardBanUser, canReactivate, canDeactivate, canDelete, humanDate }
+    return { ...toRefs(v), refreshUser, banExpiration, toggleIgnorePosts, toggleIgnoreMessages, toggleIgnoreMentions, redirectHome, canUpdate, canUpdateUsername, canMessage, userAge, canUpdatePrivate, pageOwner, canPageUserNotes, canBanUser, canBoardBanUser, canReactivate, canReset, canDeactivate, canDelete, humanDate }
   }
 }
 </script>
