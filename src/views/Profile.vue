@@ -125,7 +125,9 @@
         <div class="profile-action" v-if="pageOwner()">
           <router-link :to="{ name: 'Settings' }">Edit Forum Settings</router-link>
         </div>
-        <!-- TODO(akinsey): <trust-link v-if="pageOwner()"></trust-link> -->
+        <div class="profile-action" v-if="pageOwner()">
+          <router-link :to="{ name: 'TrustSettings'}">Edit Trust Settings</router-link>
+        </div>
         <div class="profile-action" v-if="canPageUserNotes()">
           <a href="#" @click.prevent="showModNotes = true">
             Moderation Notes
