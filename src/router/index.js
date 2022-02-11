@@ -17,6 +17,7 @@ import Messages from '@/views/Messages.vue'
 import PostSearch from '@/views/PostSearch.vue'
 import Join from '@/views/Join.vue'
 import ConfirmAccount from '@/views/ConfirmAccount.vue'
+import ResetPassword from '@/views/ResetPassword.vue'
 import Profile from '@/views/Profile.vue'
 import Forbidden from '@/views/layout/Forbidden.vue'
 import NotFound from '@/views/layout/NotFound.vue'
@@ -49,7 +50,14 @@ const routes = [
     props: true,
     meta: { requiresAuth: false, bodyClass: 'confirm' }
   },
-    {
+  {
+    path: '/reset/:username/:token',
+    name: 'ResetPassword',
+    component: ResetPassword,
+    props: true,
+    meta: { requiresAuth: false, bodyClass: 'reset' }
+  },
+  {
     path: '/join',
     name: 'Join',
     component: Join,
