@@ -105,6 +105,10 @@ export default {
         socketLogin(user)
       }).catch(() => {})
 
+    const resetPassword = (username, token, password) => authApi.resetPassword({ username, password, confirmation: password, token })
+        .then(() => login(username, password))
+        .catch(() => {})
+
     // Reauthenticate on app init if token is present
     if (localStorageAuth().data.token) reauthenticate()
 
@@ -118,7 +122,8 @@ export default {
       logout,
       register,
       confirmRegistration,
-      inviteRegistration
+      inviteRegistration,
+      resetPassword
     })
   },
   render() { return this.$slots.default() } // renderless component
