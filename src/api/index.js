@@ -134,6 +134,7 @@ export const authApi = {
   authenticate: () => $http('/api/authenticate'),
   confirmRegistration: data => $http('/api/confirm', { method: 'POST', data }, true),
   inviteRegistration: data => $http('/api/join', { method: 'POST', data }, true),
+  resetPassword: data => $http(`/api/reset`, { method: 'POST', data }, true),
   emailAvailable: email => $http(`/api/register/email/${email}`),
   usernameAvailable: username => $http(`/api/register/username/${username}`),
   inviteExists: email => $http(`/api/invites/exists?email=${email}`),
@@ -158,7 +159,6 @@ export const usersApi = {
   ignore: user => $http(`/api/ignoreUsers/ignore/${user.id}`, { method: 'POST' }),
   unignore: user => $http(`/api/ignoreUsers/unignore/${user.id}`, { method: 'POST' }),
   adminRecover: data => $http(`/api/user/recover`, { method: 'POST', data }),
-  resetPassword: data => $http(`/api/reset`, { method: 'POST', data }),
   checkResetToken: (username, token) => $http(`/api/reset/${username}/${token}/validate`),
   trust: {
     getTrustList: () => $http('/api/trustlist'),
