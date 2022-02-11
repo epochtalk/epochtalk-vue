@@ -18,7 +18,7 @@
             </div>
           </label>
 
-          <input type="email" class="icon-padding" id="email" name="email" maxlength="255" v-model="form.email.val" placeholder="your-email@email.com" @keydown="form.valid=false" ref="focusInput" disabled="true" required />
+          <input type="email" class="icon-padding" id="email" name="email" maxlength="255" v-model="form.email.val" placeholder="your-email@email.com" @keydown="form.valid=false" disabled="true" required />
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" v-if="form.email.val && form.email.val.length > -1 && (form.email.valid && form.email.unique)" class="input-icon valid">
             <title></title>
             <polygon class="cls-1" points="19.69 37.19 7.23 24.73 10.77 21.2 19.69 30.12 37.23 12.58 40.77 16.11 19.69 37.19"/>
@@ -46,7 +46,7 @@
             </div>
           </label>
 
-          <input type="text" class="input-text icon-padding" id="username" name="username" maxlength="50" v-model="form.username.val" placeholder="your-username" @keydown="form.valid=false" required />
+          <input type="text" class="input-text icon-padding" id="username" ref="focusInput" name="username" maxlength="50" v-model="form.username.val" placeholder="your-username" @keydown="form.valid=false" required />
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" v-if="form.username.val && form.username.val.length > -1 && (form.username.valid && form.username.unique)" class="input-icon valid">
             <title></title>
             <polygon class="cls-1" points="19.69 37.19 7.23 24.73 10.77 21.2 19.69 30.12 37.23 12.58 40.77 16.11 19.69 37.19"/>
