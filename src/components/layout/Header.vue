@@ -69,7 +69,7 @@
     <div class="header-contents">
       <!-- Menu -->
       <div id="menu-wrap" :class="{ 'mobile-expanded' : focusSearch }">
-        <nav id="menu">
+        <nav id="menu" :class="{ 'admin' : adminMode }">
           <!-- Logo Section -->
           <h1>
             <router-link to="/" v-if="logo"><img :src="logo" id="logo" /></router-link>
@@ -227,7 +227,7 @@
       </div>
 
       <!-- Breadcrumbs -->
-      <breadcrumbs></breadcrumbs>
+      <breadcrumbs v-if="!adminMode"></breadcrumbs>
 
       <!-- Alerts -->
       <alert></alert>
@@ -341,6 +341,7 @@ export default {
       showLogin: false,
       hideAnnnouncement: false,
       motdData: null,
+      adminMode: false,
       loggedIn: $auth.loggedIn,
       logo: '',
       scrollDownPos: 95,
@@ -358,7 +359,12 @@ export default {
     })
 
     watch(() => $auth.user, u => v.currentUser = u, { deep: true })
-    watch(() => $route.path, p => v.hideAnnnouncement = v.motdData?.main_view_only && p !== '' && p !== '/')
+    watch(() => $route.path, p => {
+      // Only show announcement on main view if setting is set in admin panel
+      v.hideAnnnouncement = v.motdData?.main_view_only && p !== '' && p !== '/'
+      //Switch header style to full width for admin views
+      v.adminMode = p.indexOf('/admin') === 0
+    })
     watch(() => NotificationsStore.messages, c => v.notificationMessages = c)
     watch(() => NotificationsStore.mentions, c => v.notificationMentions = c)
     watch(() => NotificationsStore.mentionsList, l => v.mentionsList = l)
@@ -576,6 +582,7 @@ header {
 
     #menu {
       @include base-layout-width;
+      &.admin { max-width: unset; }
       h1 {
         float: left;
         font-family: $base-font-sans;

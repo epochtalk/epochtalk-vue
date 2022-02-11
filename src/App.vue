@@ -3,7 +3,7 @@
     <ProvideAuth>
       <ProvideWebsocket>
         <ProvideBreadcrumbs>
-          <div id="wrapper">
+          <div id="wrapper" :class="{ 'admin': adminMode }">
             <Header></Header>
             <main>
               <div id="public-content">
@@ -23,10 +23,19 @@ import ProvidePreferences from '@/composables/stores/prefs'
 import ProvideAuth from '@/composables/stores/auth'
 import ProvideWebsocket from '@/composables/services/websocket'
 import ProvideBreadcrumbs from '@/composables/stores/breadcrumbs'
+import { reactive, toRefs, watch } from 'vue'
+import { useRoute } from 'vue-router'
 
 export default {
   name: 'Epochtalk',
-  components: { Header, ProvidePreferences, ProvideWebsocket, ProvideBreadcrumbs, ProvideAuth }
+  components: { Header, ProvidePreferences, ProvideWebsocket, ProvideBreadcrumbs, ProvideAuth },
+  setup() {
+    const v = reactive({ adminMode: false })
+    const $route = useRoute()
+    // Modify css when in admin routes
+    watch(() => $route.path, p => v.adminMode = p.indexOf('/admin') === 0)
+    return { ...toRefs(v) }
+  }
 }
 </script>
 
@@ -44,7 +53,7 @@ export default {
   min-height: calc(100vh - (#{$header-offset} + 1rem));
   position:relative;
   margin-top: calc(#{$header-offset} + 1rem);
-
+  &.admin { margin-top: calc(#{$header-height} + 2rem); }
   .motd-visible & {
     margin-top: calc(#{$header-offset} + 4rem);
 
