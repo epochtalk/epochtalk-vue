@@ -157,6 +157,7 @@ export const usersApi = {
   updateNote: data => $http('/api/user/notes', { method: 'PUT', data }),
   ignore: user => $http(`/api/ignoreUsers/ignore/${user.id}`, { method: 'POST' }),
   unignore: user => $http(`/api/ignoreUsers/unignore/${user.id}`, { method: 'POST' }),
+  adminRecover: data => $http(`/api/user/recover`, { method: 'POST', data }),
   trust: {
     getTrustList: () => $http('/api/trustlist'),
     getTrustTree: params => $http('/api/trusttree', { params }),
