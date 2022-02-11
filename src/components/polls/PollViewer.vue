@@ -146,7 +146,7 @@ export default {
       })
     }
     const votingEligible = () => {
-      if (!$auth.loggedIn) { return false }
+      if (!v.loggedIn) { return false }
       else if (props.bannedFromBoard) { return false }
       else if (!v.permissionUtils.hasPermission('threads.vote.allow')) { return false }
       else if (v.pollCopy.locked) { return false }
@@ -155,7 +155,7 @@ export default {
     }
     /* View Methods */
     const canLock = () => {
-      if (!$auth.loggedIn) { return false }
+      if (!v.loggedIn) { return false }
       if (props.bannedFromBoard) { return false }
       if (!v.permissionUtils.hasPermission('threads.lockPoll.allow')) { return false }
 
@@ -169,7 +169,7 @@ export default {
       else return false
     }
     const canEdit = () => {
-      if (!$auth.loggedIn) { return false }
+      if (!v.loggedIn) { return false }
       if (props.bannedFromBoard) { return false }
       if (!v.permissionUtils.hasPermission('threads.editPoll.allow')) { return false }
 
@@ -296,6 +296,7 @@ export default {
 
     /* View Data */
     const v = reactive({
+      loggedIn: $auth.loggedIn,
       permissionUtils: $auth.permissionUtils,
       options: {
         expiration: props.poll.expiration || undefined,

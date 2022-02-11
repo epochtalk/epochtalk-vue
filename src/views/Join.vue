@@ -133,8 +133,6 @@ export default {
     const $route = useRoute()
     const $router = useRouter()
 
-    if ($auth.loggedIn) $auth.logout() // If user is currently logged in for some reason, log them out
-
     /* Template Data */
     const initForm = {
       valid: false,
@@ -149,10 +147,15 @@ export default {
     }
 
     const v = reactive({
+      loggedIn: $auth.loggedIn,
       form: cloneDeep(initForm),
       focusInput: null,
       showRegisterHideConfirm: true
     })
+
+    if (v.loggedIn) $auth.logout() // If user is currently logged in for some reason, log them out
+
+    watch(() => v.focusInput, f => f ? v.focusInput.focus() : null)
 
     /* Watch Data */
     watch(() => v.form.email.val, debounce(async (val) => {
