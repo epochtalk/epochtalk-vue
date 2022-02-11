@@ -142,7 +142,7 @@
 
       <div class="actions-destructive actions-panel" v-if="canDeactivate() || canReactivate() || canDelete()">
         <div class="profile-action" v-if="canReset()">
-          <a href="#" @click.prevent="showReset = true">Reset Password</a>
+          <a href="#" @click.prevent="resetPassword()">Reset Password</a>
         </div>
         <div class="profile-action" v-if="canDeactivate()">
           <a href="#" @click.prevent="showDeactivate = true">Deactivate Account</a>
@@ -310,6 +310,10 @@ export default {
       .then(() => $alertStore.success(`${v.user.ignore_messages ? 'Ignoring' : 'Unignoring' } messages from ${v.user.username}`))
     }
 
+    const resetPassword = () => usersApi.adminRecover({ user_id: v.user.id })
+      .then(() => $alertStore.success('Password Reset Email Sent'))
+      .catch(() => $alertStore.error('Error resetting password'))
+
     /* Internal Data */
     const $router = useRouter()
     const $auth = inject(AuthStore)
@@ -336,7 +340,7 @@ export default {
       showDelete: false,
       showManageBans: false
     })
-    return { ...toRefs(v), refreshUser, banExpiration, toggleIgnorePosts, toggleIgnoreMessages, toggleIgnoreMentions, redirectHome, canUpdate, canUpdateUsername, canMessage, userAge, canUpdatePrivate, pageOwner, canPageUserNotes, canBanUser, canBoardBanUser, canReactivate, canReset, canDeactivate, canDelete, humanDate }
+    return { ...toRefs(v), refreshUser, banExpiration, toggleIgnorePosts, toggleIgnoreMessages, toggleIgnoreMentions, redirectHome, canUpdate, canUpdateUsername, canMessage, userAge, canUpdatePrivate, pageOwner, canPageUserNotes, canBanUser, canBoardBanUser, canReactivate, canReset, canDeactivate, canDelete, resetPassword, humanDate }
   }
 }
 </script>
