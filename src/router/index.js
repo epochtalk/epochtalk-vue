@@ -16,6 +16,7 @@ import Mentions from '@/views/Mentions.vue'
 import Messages from '@/views/Messages.vue'
 import PostSearch from '@/views/PostSearch.vue'
 import Join from '@/views/Join.vue'
+import GeneralSettings from '@/views/admin/GeneralSettings.vue'
 import ConfirmAccount from '@/views/ConfirmAccount.vue'
 import ResetPassword from '@/views/ResetPassword.vue'
 import Profile from '@/views/Profile.vue'
@@ -30,6 +31,13 @@ import { localStorageAuth } from '@/composables/stores/auth'
 import BanStore from '@/composables/stores/ban'
 
 const routes = [
+  {
+    path: '/admin/settings',
+    alias: '/admin',
+    name: 'GeneralSettings',
+    component: GeneralSettings,
+    meta: { requiresAuth: true, bodyClass: 'general-settings' }
+  },
   {
     path: '/',
     name: 'Boards',
@@ -216,8 +224,6 @@ router.beforeEach(to => {
   BanStore.initBanNotice(localStorageAuth().data)
 
   // Redirect to login page if route has meta.requiresAuth set
-      console.log(to)
-
   if (to.meta.requiresAuth && !localStorageAuth().data.token) {
     router.push({
       name: 'Login',
