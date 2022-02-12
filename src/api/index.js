@@ -224,6 +224,7 @@ export const banApi = {
 }
 
 export const adminApi = {
+  configurations: () => $http('/api/configurations'),
   moderators: {
     remove: data => $http('/api/admin/moderators/remove', { method: 'POST', data }),
     add: data => $http('/api/admin/moderators', { method: 'POST', data })
