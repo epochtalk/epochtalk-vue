@@ -151,7 +151,7 @@ export default {
     // Websocket Handling
     const userChannelHandler = data => data.action === 'refreshMentions' ? refreshMentions() : null
 
-    watchUserChannel(userChannelHandler);
+    watchUserChannel(userChannelHandler)
 
     return { ...toRefs(v), humanDate, pageResults, dismissNotifications, deleteMention, userChannelHandler }
   }
