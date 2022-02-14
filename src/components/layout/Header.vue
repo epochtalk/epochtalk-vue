@@ -69,14 +69,15 @@
     <div class="header-contents">
       <!-- Menu -->
       <div id="menu-wrap" :class="{ 'mobile-expanded' : focusSearch }">
-        <nav id="menu" :class="{ 'admin' : adminMode }">
+        <nav id="menu" :class="{ 'admin-menu' : adminMode }">
           <!-- Logo Section -->
-          <h1>
+          <h1 :class="{ 'hide-mobile': adminMode }">
             <router-link to="/" v-if="logo"><img :src="logo" id="logo" /></router-link>
             <router-link id="logo-text" to="/"> <!-- ng-bind="{{decode(title)}}" -->
               Epochtalk Forums
             </router-link>
           </h1>
+          <admin-navigation v-if="adminMode" />
 
           <!-- Login Section -->
           <ul class="signed-out" v-if="!loggedIn">
@@ -102,7 +103,8 @@
           </ul>
 
           <!-- User Dropdown -->
-          <ul v-if="loggedIn">
+          <ul v-if="loggedIn" :class="{ 'menu-right': adminMode }">
+            <li class="back-to-forum"><router-link :to="{ path: '/' }">Back to Forum</router-link></li>
             <li class="search" v-if="permissionUtils.hasPermission('posts.search.allow')">
               <form action="." class="search-btn" autocomplete="off" @submit.prevent="searchForum">
                 <div class="balloon" data-balloon="Search" data-balloon-pos="down">
@@ -227,10 +229,9 @@
       </div>
 
       <!-- Breadcrumbs -->
-      <breadcrumbs v-if="!adminMode"></breadcrumbs>
-
+      <breadcrumbs v-if="!adminMode" />
       <!-- Alerts -->
-      <alert></alert>
+      <alert />
 
       <!-- Bans -->
       <div id="ban-notice" v-if="BanStore.updateBanNotice()" v-html="BanStore.updateBanNotice()"></div>
@@ -259,6 +260,7 @@ import LoginModal from '@/components/modals/auth/Login.vue'
 import InviteModal from '@/components/modals/auth/Invite.vue'
 import RegisterModal from '@/components/modals/auth/Register.vue'
 import Breadcrumbs from '@/components/layout/Breadcrumbs.vue'
+import AdminNavigation from '@/components/layout/AdminNavigation.vue'
 import decode from '@/composables/filters/decode'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
@@ -272,7 +274,7 @@ import { motdApi } from '@/api'
 import { watchPublicChannel } from '@/composables/services/websocket'
 
 export default {
-  components: { Breadcrumbs, LoginModal, InviteModal, RegisterModal, Alert },
+  components: { AdminNavigation, Breadcrumbs, LoginModal, InviteModal, RegisterModal, Alert },
   setup() {
     onBeforeMount(() => {
       let fetchMotd = () => motdApi.get().then(d => v.motdData = d).catch(() => {})
@@ -582,7 +584,18 @@ header {
 
     #menu {
       @include base-layout-width;
-      &.admin { max-width: unset; }
+      &.admin-menu {
+        max-width: unset;
+        .burger-icon {
+          display: none;
+          @include break-mobile-sm {
+            display: flex;
+            flex: 0;
+            order: 3;
+            justify-content: flex-end;
+          }
+        }
+      }
       h1 {
         float: left;
         font-family: $base-font-sans;
@@ -648,6 +661,7 @@ header {
           height: inherit;
           div a { text-decoration: none; }
         }
+        li.back-to-forum { display: none; }
         form, form div { height: inherit; }
         .search {
           position: relative;
@@ -976,22 +990,11 @@ header {
     }
     #menu.admin-menu {
       display: flex;
-
-      .brand {
-        display: flex;
-        align-items: center;
-        font-size: 1.3rem;
-        margin-right: 1rem;
-
-        .brandLogo {
-          width: 2rem;
-          margin-right: 0.5rem;
-          max-height: 2rem;
-        }
-      }
-
-      #menu-left {
+      .menu-left {
         float: left;
+        margin-left: 2rem;
+        @include break-mobile-sm { order: 1; margin-left: 0; }
+
         .menu-btn, .menu-btn-selected {
           padding: 0 0.8rem;
           display: table-cell;
@@ -1000,18 +1003,30 @@ header {
         }
         .menu-btn-selected { background-color: $header-dropdown-bg-color; border-bottom: 2px solid $color-primary; }
       }
-      #menu-right {
+      .menu-right {
         display: flex;
-        flex: 1 0 auto;
+        flex: 1;
+        order: 2;
         justify-content: flex-end;
+        margin-left: auto;
 
-        li:first-child, li:nth-child(2n) {
+        li.back-to-forum { display: none; }
+
+        li:first-child, li:nth-child(2n):not(.search) {
           padding-right: 0.8rem;
           a {
             display: table-cell;
             height: inherit;
             vertical-align: middle;
           }
+        }
+        @include break-mobile-sm {
+          li { display: none; }
+          li.back-to-forum { display: table-cell; }
+        }
+        @include break-mobile-med {
+          li.search { display: none; }
+          li#notifications-tray { display: none; }
         }
       }
     }
