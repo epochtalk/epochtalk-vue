@@ -1554,6 +1554,7 @@ ad-viewer {
 
         @include break-mobile-sm {
           margin-bottom: 1rem;
+          margin-right: .5rem;
           position: absolute;
           bottom: 0;
           right: 0;
