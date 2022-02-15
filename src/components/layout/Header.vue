@@ -241,7 +241,7 @@
 
       <!-- Message of the Day -->
       <!-- style-fix="true" -->
-      <div v-if="motdData && motdData.motd_html.length && !hideAnnnouncement" id="motd-wrap">
+      <div v-if="motdData && motdData.motd_html.length && !hideAnnnouncement && !adminMode" id="motd-wrap">
         <div id="motd" v-html="motdData?.motd_html"></div>
       </div>
 
@@ -251,7 +251,7 @@
       <register-modal :show="showRegister" @close="showRegister = false" />
     </div>
   </header>
-  <div v-if="motdData && motdData.motd_html.length && !hideAnnnouncement" id="motd-spacer-wrap">
+  <div v-if="motdData && motdData.motd_html.length && !hideAnnnouncement && !adminMode" id="motd-spacer-wrap">
       <div id="motd-spacer" v-html="motdData?.motd_html"></div>
   </div>
   <div v-if="!motdData || !motdData.motd_html.length || hideAnnnouncement" id="header-spacer"></div>
