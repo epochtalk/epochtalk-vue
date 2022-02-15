@@ -77,7 +77,7 @@
               Epochtalk Forums
             </router-link>
           </h1>
-          <admin-navigation v-if="adminMode" />
+          <admin-navigation v-if="adminMode && (permissionUtils.hasPermission('adminAccess') || permissionUtils.hasPermission('modAccess'))" />
 
           <!-- Login Section -->
           <ul class="signed-out" v-if="!loggedIn">
