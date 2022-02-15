@@ -92,7 +92,6 @@
           <!-- User Dropdown Mobile -->
           <ul v-if="loggedIn" class="burger-icon">
             <div class="burger-notification show-mobile" v-if="notificationMessages || notificationMentions"></div>
-            <!-- <i @click="showMobileMenu = true" class="fa fa-bars fa-lg burger" aria-hidden="true"></i> -->
             <span class="burger-menu-icon" @click="showMobileMenu = true" aria-hidden="true">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <path d="M7,16H41a2,2,0,0,0,0-4H7a2,2,0,0,0,0,4Z"/>
