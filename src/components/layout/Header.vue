@@ -69,7 +69,7 @@
     <div class="header-contents">
       <!-- Menu -->
       <div id="menu-wrap" :class="{ 'mobile-expanded' : focusSearch }">
-        <nav id="menu" :class="{ 'admin-menu' : adminMode }">
+        <nav id="menu" :class="{ 'admin-menu' : adminMode, 'logged-out': !loggedIn }">
           <!-- Logo Section -->
           <h1 :class="{ 'hide-mobile': adminMode }">
             <router-link to="/" v-if="logo"><img :src="logo" id="logo" /></router-link>
@@ -990,6 +990,8 @@ header {
     }
     #menu.admin-menu {
       display: flex;
+
+      &.logged-out { display: block; }
       .menu-left {
         float: left;
         margin-left: 2rem;
