@@ -15,7 +15,9 @@
       </div>
       <ul>
         <li @click="showMobileMenu = false" v-if="permissionUtils.hasPermission('adminAccess')">
-          <a href="#"><i class="fa fa-cogs" aria-hidden="true"></i>Admin Panel</a>
+          <router-link :to="{ name: 'GeneralSettings' }">
+            <i class="fa fa-cogs" aria-hidden="true"></i>Admin Panel
+          </router-link>
         </li>
         <li @click="showMobileMenu = false" v-if="permissionUtils.hasPermission('modAccess') && !permissionUtils.hasPermission('adminAccess')">
           <a href="#"><i class="fa fa-cogs" aria-hidden="true"></i>Mod Panel</a>
