@@ -186,7 +186,9 @@
               </div>
               <ul id="user-dropdown">
                 <li v-if="permissionUtils.hasPermission('adminAccess')">
-                  <a href="#">Admin Panel</a>
+                  <router-link :to="{ name: 'GeneralSettings' }">
+                    Admin Panel
+                  </router-link>
                 </li>
                 <li v-if="permissionUtils.hasPermission('modAccess') && !permissionUtils.hasPermission('adminAccess')">
                   <a href="#">Mod Panel</a>
