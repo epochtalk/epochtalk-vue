@@ -250,6 +250,7 @@
   <div v-if="motdData && motdData.motd_html.length && !hideAnnnouncement" id="motd-spacer-wrap">
       <div id="motd-spacer" v-html="motdData?.motd_html"></div>
   </div>
+  <div v-if="!motdData || !motdData.motd_html.length || hideAnnnouncement" id="header-spacer"></div>
 </template>
 
 <script>
@@ -1087,5 +1088,9 @@ header {
     padding: 0.5rem 0;
     color: #666;
   }
+}
+
+@include break-mobile-sm {
+  #header-spacer { margin-bottom: 1.5rem; }
 }
 </style>
