@@ -120,6 +120,43 @@ main {
       justify-items: center;
     }
   }
+
+  // Admin view layout
+  .admin & {
+    #public-content {
+      grid-template-areas: 
+        'header'
+        'main'
+        'footer';
+      grid-template-columns: 1fr;
+      grid-template-rows: min-content auto min-content;
+      gap: 1rem;
+      max-width: unset;
+      min-height: 80vh;
+    }
+
+    .settingsHeader {
+      grid-area: header;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      .settingsTabs {
+        flex: 1 0 auto;
+      }
+    }
+
+    .settingsMain {
+      grid-area: main;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2rem;
+    }
+
+    .settingsFooter {
+      grid-area: footer;
+    }
+  }
 }
 
 #navigation {
