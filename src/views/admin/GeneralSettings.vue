@@ -1,7 +1,5 @@
 <template>
-  <h1>General Settings</h1>
-  <div class="description">Hello World</div>
-  {{config}}
+<pre>{{config}}</pre>
 </template>
 
 <script>

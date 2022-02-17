@@ -245,6 +245,8 @@
         <div id="motd" v-html="motdData?.motd_html"></div>
       </div>
 
+      <admin-sub-navigation v-if="adminMode && (permissionUtils.hasPermission('adminAccess') || permissionUtils.hasPermission('modAccess'))" />
+
       <!-- Auth Modals -->
       <login-modal :show="showLogin" @close="showLogin = false" />
       <invite-modal :show="showInvite" @close="showInvite = false" />
@@ -265,6 +267,7 @@ import InviteModal from '@/components/modals/auth/Invite.vue'
 import RegisterModal from '@/components/modals/auth/Register.vue'
 import Breadcrumbs from '@/components/layout/Breadcrumbs.vue'
 import AdminNavigation from '@/components/layout/AdminNavigation.vue'
+import AdminSubNavigation from '@/components/layout/AdminSubNavigation.vue'
 import decode from '@/composables/filters/decode'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
@@ -278,7 +281,7 @@ import { motdApi } from '@/api'
 import { watchPublicChannel } from '@/composables/services/websocket'
 
 export default {
-  components: { AdminNavigation, Breadcrumbs, LoginModal, InviteModal, RegisterModal, Alert },
+  components: { AdminNavigation, AdminSubNavigation, Breadcrumbs, LoginModal, InviteModal, RegisterModal, Alert },
   setup() {
     onBeforeMount(() => {
       let fetchMotd = () => motdApi.get().then(d => v.motdData = d).catch(() => {})
@@ -334,6 +337,8 @@ export default {
     const $prefs = inject(PreferencesStore)
     const $router = useRouter()
     const $route = useRoute()
+    const adminScrollPos = 30
+    const publicScrollPos = 95
 
     /* Template Data */
     const v = reactive({
@@ -350,7 +355,7 @@ export default {
       adminMode: false,
       loggedIn: $auth.loggedIn,
       logo: '',
-      scrollDownPos: 95,
+      scrollDownPos: $route.path.indexOf('/admin') === 0 ? adminScrollPos : publicScrollPos,
       lastScrollTop: 0,
       currentUser: $auth.user,
       permissionUtils: $auth.permissionUtils,
@@ -370,6 +375,9 @@ export default {
       v.hideAnnnouncement = v.motdData?.main_view_only && p !== '' && p !== '/'
       //Switch header style to full width for admin views
       v.adminMode = p.indexOf('/admin') === 0
+      // Change header scroll height for admin panel
+      if (v.adminMode) v.scrollDownPos = adminScrollPos
+      else v.scrollDownPos = publicScrollPos
     })
     watch(() => NotificationsStore.messages, c => v.notificationMessages = c)
     watch(() => NotificationsStore.mentions, c => v.notificationMentions = c)

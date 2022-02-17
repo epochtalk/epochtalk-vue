@@ -53,7 +53,7 @@ export default {
   min-height: calc(100vh - (#{$header-offset} + 1rem));
   position:relative;
   margin-top: calc(#{$header-offset} + 1rem);
-  &.admin { margin-top: calc(#{$header-height} + 2rem); overflow-x: unset;}
+  &.admin { margin-top: calc(#{$header-height} + 6.25rem); overflow-x: unset;}
   .motd-visible & {
     margin-top: calc(#{$header-offset} + 4rem);
 
