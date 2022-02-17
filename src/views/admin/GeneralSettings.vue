@@ -1,5 +1,5 @@
 <template>
-  <pre>{{config}}</pre>
+  <div>{{JSON.stringify(config, null, 2)}}</div>
   <div class="testContainer">
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Iste debitis animi exercitationem facilis repellat recusandae sed consequatur natus? Itaque consequuntur placeat cum eligendi nostrum quos laborum nihil sit suscipit adipisci.</p>
 

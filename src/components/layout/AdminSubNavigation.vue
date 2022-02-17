@@ -58,6 +58,14 @@ export default {
       flex: 1 0 50%;
     }
     @include break-max-large {
+      .tabs {
+        a {
+          font-size: .75rem;
+          padding: 0.75rem;
+          height: 2.75rem;
+          line-height: 1.25rem;
+        }
+      }
       .title { font-size: 1.8rem; }
     }
     @include break-mobile-med {
@@ -76,12 +84,21 @@ export default {
         }
       }
     }
+    @include break-mobile-xs {
+      .tabs a {
+        font-size: .5rem;
+        padding: 0.5rem;
+        height: 2rem;
+        line-height: 1rem;
+      }
+    }
 
     @include break-mobile-sm {
       height: 7.25rem;
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      padding: 1rem;
 
       .tabs { margin-top: .5rem; }
       button {
