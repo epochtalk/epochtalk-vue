@@ -1,20 +1,20 @@
 <template>
-  <div class="settingsHeader">
+  <div class="adminHeader">
     <h1>General Settings</h1>
-    <div class="settingsTabs">
+    <div class="adminTabs">
       <a href="">Tab One</a>
       <a href="">Tab Two</a>
     </div>
-    <div class="settingsActions">
+    <div class="adminActions">
       <a href="" class="btn">Cancel</a>
       <a href="" class="btn primary">Save</a>
     </div>
   </div>
-  <div class="settingsMain">
+  <div class="adminMain">
     <div class="description">Hello World</div>
     {{config}}
   </div>
-  <div class="settingsFooter">
+  <div class="adminFooter">
     Footer can go here. Not sure if we really need one now
   </div>
 </template>

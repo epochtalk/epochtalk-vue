@@ -135,25 +135,26 @@ main {
       min-height: 80vh;
     }
 
-    .settingsHeader {
+    .adminHeader {
       grid-area: header;
       display: flex;
       align-items: center;
       gap: 1rem;
 
-      .settingsTabs {
+      .adminTabs {
         flex: 1 0 auto;
       }
     }
 
-    .settingsMain {
+    .adminMain {
       grid-area: main;
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      grid-template-rows: min-content;
       gap: 2rem;
     }
 
-    .settingsFooter {
+    .adminFooter {
       grid-area: footer;
     }
   }
