@@ -57,7 +57,13 @@ export default {
     .tabs {
       flex: 1 0 50%;
     }
-
+    @include break-max-large {
+      .title { font-size: 1.8rem; }
+    }
+    @include break-mobile-med {
+      .tabs { padding-left: 0; }
+      .title { display: none; }
+    }
     .actions {
       flex-basis: auto;
       display: flex;
@@ -72,10 +78,15 @@ export default {
     }
 
     @include break-mobile-sm {
+      height: 7.25rem;
       flex-direction: column;
+      align-items: center;
+      justify-content: center;
 
+      .tabs { margin-top: .5rem; }
       button {
-        margin-bottom: 1rem;
+        width: 45vw;
+        margin-top: .5rem;
       }
     }
   }
