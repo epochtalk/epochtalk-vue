@@ -60,7 +60,14 @@ export default {
   min-height: calc(100vh - (#{$header-offset} + 1rem));
   position:relative;
   margin-top: calc(#{$header-offset} + 1rem);
-  &.admin { margin-top: calc(#{$header-height} + 6.25rem); overflow-x: unset;}
+  &.admin {
+    // margin-top: calc(#{$header-height} + 6.25rem);
+    overflow-x: unset;
+    main { padding-top: .5rem; }
+    @include break-mobile-sm {
+      main { padding-top: $header-offset; }
+    }
+  }
   .motd-visible & {
     margin-top: calc(#{$header-offset} + 4rem);
 

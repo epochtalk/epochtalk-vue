@@ -29,7 +29,7 @@
       </button>
       <!-- ng-click="child.reset()" -->
       <button>
-        <i class="fa fas-refresh"></i>&nbsp;&nbsp;Reset
+        <i class="fas fa-undo"></i>&nbsp;&nbsp;Reset
       </button>
     </div>
   </div>
@@ -57,6 +57,20 @@ export default {
     .tabs {
       flex: 1 0 50%;
     }
+    .title { line-height: 2.5rem; }
+    .actions {
+      flex-basis: auto;
+      display: flex;
+
+      button {
+        margin-right: 0.5rem;
+
+        &:last-child {
+          margin-right: 0;
+        }
+      }
+    }
+
     @include break-max-large {
       .tabs {
         a {
@@ -72,16 +86,18 @@ export default {
       .tabs { padding-left: 0; }
       .title { display: none; }
     }
-    .actions {
-      flex-basis: auto;
-      display: flex;
+    @include break-mobile-sm {
+      height: 7.25rem;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
 
+      .actions { width: 100%; }
+      .tabs { margin-top: .5rem; }
       button {
-        margin-right: 0.5rem;
-
-        &:last-child {
-          margin-right: 0;
-        }
+        width: 100%;
+        margin-top: .5rem;
       }
     }
     @include break-mobile-xs {
@@ -93,18 +109,5 @@ export default {
       }
     }
 
-    @include break-mobile-sm {
-      height: 7.25rem;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 1rem;
-
-      .tabs { margin-top: .5rem; }
-      button {
-        width: 45vw;
-        margin-top: .5rem;
-      }
-    }
   }
 </style>
