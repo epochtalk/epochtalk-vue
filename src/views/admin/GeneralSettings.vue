@@ -1,5 +1,10 @@
 <template>
-<pre>{{config}}</pre>
+  <pre>{{config}}</pre>
+  <div class="testContainer">
+    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Iste debitis animi exercitationem facilis repellat recusandae sed consequatur natus? Itaque consequuntur placeat cum eligendi nostrum quos laborum nihil sit suscipit adipisci.</p>
+
+    <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Est doloribus harum vero ea ullam cum optio, veritatis, et omnis incidunt eveniet esse porro. Unde cupiditate deleniti voluptate iusto neque? Impedit.</p>
+  </div>
 </template>
 
 <script>
@@ -25,10 +30,4 @@ export default {
 </script>
 
 <style lang="scss">
-.general-settings {
-  main #public-content {
-    max-width: unset;
-    grid-template-areas: 'header header' 'main main' 'main main';
-  }
-}
 </style>

@@ -46,6 +46,13 @@ export default {
   @include break-mobile-sm {
     margin-top: -0.5rem;
   }
+
+  .admin & {
+    grid-template-areas: unset;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    max-width: unset;
+  }
 }
 
 /*-------------- Index File -------------- */
