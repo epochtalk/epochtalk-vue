@@ -1,6 +1,6 @@
 <template>
   <div id="admin-sub-nav">
-    <h2>{{route.name.split(/(?=[A-Z])/).join(' ')}}</h2>
+    <h2 class="title">{{route.meta.title || route.name.split(/(?=[A-Z])/).join(' ')}}</h2>
     <dl class="tabs">
       <!-- ng-if="AdminSettingsCtrl.hasPermission('adminAccess.settings.general')"  -->
       <dd class="no-select" :class="{'active': true}">
