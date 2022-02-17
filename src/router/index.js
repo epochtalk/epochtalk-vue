@@ -36,7 +36,7 @@ const routes = [
     alias: '/admin',
     name: 'GeneralSettings',
     component: GeneralSettings,
-    meta: { requiresAuth: true, bodyClass: 'general-settings' }
+    meta: { requiresAuth: true, bodyClass: 'general-settings', title: 'General Settings' }
   },
   {
     path: '/',
