@@ -7,6 +7,27 @@
           <a href="">{{link.title}}</a>
         </dd>
       </span>
+      <dd class="no-select" :class="{'active': true}">
+        <a href="">General</a>
+      </dd>
+      <dd class="no-select" :class="{'active': false}">
+        <a href="">General</a>
+      </dd>
+      <dd class="no-select" :class="{'active': false}">
+        <a href="">General</a>
+      </dd>
+      <dd class="no-select" :class="{'active': false}">
+        <a href="">General</a>
+      </dd>
+      <dd class="no-select" :class="{'active': false}">
+        <a href="">General</a>
+      </dd>
+      <dd class="no-select" :class="{'active': false}">
+        <a href="">General</a>
+      </dd>
+      <dd class="no-select" :class="{'active': false}">
+        <a href="">General</a>
+      </dd>
     </dl>
 
     <div class="actions">
@@ -15,7 +36,7 @@
         <i class="fa fa-save"></i>&nbsp;&nbsp;Save
       </button>
       <!-- ng-click="child.reset()" -->
-      <button>
+      <button class="secondary">
         <i class="fas fa-undo"></i>&nbsp;&nbsp;Reset
       </button>
     </div>
@@ -83,7 +104,8 @@ export default {
     background: $base-background-color;
     border-bottom: 1px solid $breadcrumbs-border-color;
     .tabs {
-      flex: 1 0 50%;
+      display: flex;
+      flex: 1 0 auto;
     }
     .title { line-height: 2.5rem; }
     .actions {
@@ -112,25 +134,48 @@ export default {
     }
     @include break-mobile-med {
       .tabs { padding-left: 0; }
-      .title { display: none; }
+      // .title { display: none; }
     }
     @include break-mobile-sm {
-      height: 7.25rem;
+      height: unset;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 1rem;
+      padding: 0;
 
+      .title {
+        align-self: flex-start;
+        font-size: 1rem;
+        font-weight: 600;
+        padding: 0 1rem;
+      }
       .actions { width: 100%; }
-      .tabs { margin-top: .5rem; }
+      
+      .tabs { 
+        display: flex;
+        gap: 0.5rem;
+        width: 100%;
+        margin: 0 1rem;
+        padding: 0 1rem;
+        overflow-x: scroll;
+      }
+
       button {
         width: 100%;
         margin-top: .5rem;
       }
+
+      .actions {
+        padding: 0 1rem;
+
+        button {
+          font-size: 0.875rem;
+        }
+      }
     }
     @include break-mobile-xs {
       .tabs a {
-        font-size: .5rem;
+        font-size: .875rem;
         padding: 0.5rem;
         height: 2rem;
         line-height: 1rem;
