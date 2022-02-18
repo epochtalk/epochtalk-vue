@@ -16,7 +16,7 @@ import Mentions from '@/views/Mentions.vue'
 import Messages from '@/views/Messages.vue'
 import PostSearch from '@/views/PostSearch.vue'
 import Join from '@/views/Join.vue'
-import GeneralSettings from '@/views/admin/GeneralSettings.vue'
+import GeneralSettings from '@/views/admin/settings/General.vue'
 import ConfirmAccount from '@/views/ConfirmAccount.vue'
 import ResetPassword from '@/views/ResetPassword.vue'
 import Profile from '@/views/Profile.vue'
@@ -36,7 +36,27 @@ const routes = [
     alias: '/admin',
     name: 'GeneralSettings',
     component: GeneralSettings,
-    meta: { requiresAuth: true, bodyClass: 'general-settings', title: 'General Settings' }
+    meta: { requiresAuth: true, bodyClass: 'general-settings', title: 'General Settings' },
+    children: [
+      {
+        path: '/admin/settings/advanced',
+        name: 'AdvancedSettings',
+        component: GeneralSettings,
+        meta: { requiresAuth: true, bodyClass: 'advanced-settings', title: 'Advanced Settings' }
+      },
+      {
+        path: '/admin/settings/legal',
+        name: 'LegalSettings',
+        component: GeneralSettings,
+        meta: { requiresAuth: true, bodyClass: 'legal-settings', title: 'Legal Settings' }
+      },
+      {
+        path: '/admin/settings/theme',
+        name: 'ThemeSettings',
+        component: GeneralSettings,
+        meta: { requiresAuth: true, bodyClass: 'theme-settings', title: 'Theme Settings' }
+      }
+    ]
   },
   {
     path: '/',
