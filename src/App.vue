@@ -5,6 +5,7 @@
         <ProvideBreadcrumbs>
           <div id="wrapper" :class="{ 'admin': adminMode }">
             <Header></Header>
+            <admin-sub-navigation v-if="adminMode" />
             <main>
               <div id="public-content">
                 <router-view />
@@ -25,10 +26,11 @@ import ProvideWebsocket from '@/composables/services/websocket'
 import ProvideBreadcrumbs from '@/composables/stores/breadcrumbs'
 import { reactive, toRefs, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import AdminSubNavigation from '@/components/layout/AdminSubNavigation.vue'
 
 export default {
   name: 'Epochtalk',
-  components: { Header, ProvidePreferences, ProvideWebsocket, ProvideBreadcrumbs, ProvideAuth },
+  components: { Header, ProvidePreferences, ProvideWebsocket, ProvideBreadcrumbs, ProvideAuth, AdminSubNavigation },
   setup() {
     const v = reactive({ adminMode: false })
     const $route = useRoute()
@@ -60,7 +62,12 @@ export default {
   min-height: calc(100vh - (#{$header-offset} + 1rem));
   position:relative;
   margin-top: calc(#{$header-offset} + 1rem);
-  &.admin { margin-top: calc(#{$header-height} + 6.25rem); overflow-x: unset;}
+
+  &.admin { 
+    margin-top: $header-height; 
+    overflow-x: unset;
+  }
+
   .motd-visible & {
     margin-top: calc(#{$header-offset} + 4rem);
 

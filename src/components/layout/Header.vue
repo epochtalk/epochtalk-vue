@@ -245,7 +245,7 @@
         <div id="motd" v-html="motdData?.motd_html"></div>
       </div>
 
-      <admin-sub-navigation v-if="adminMode && (permissionUtils.hasPermission('adminAccess') || permissionUtils.hasPermission('modAccess'))" />
+      <!-- <admin-sub-navigation v-if="adminMode && (permissionUtils.hasPermission('adminAccess') || permissionUtils.hasPermission('modAccess'))" /> -->
 
       <!-- Auth Modals -->
       <login-modal :show="showLogin" @close="showLogin = false" />
@@ -267,7 +267,7 @@ import InviteModal from '@/components/modals/auth/Invite.vue'
 import RegisterModal from '@/components/modals/auth/Register.vue'
 import Breadcrumbs from '@/components/layout/Breadcrumbs.vue'
 import AdminNavigation from '@/components/layout/AdminNavigation.vue'
-import AdminSubNavigation from '@/components/layout/AdminSubNavigation.vue'
+// import AdminSubNavigation from '@/components/layout/AdminSubNavigation.vue'
 import decode from '@/composables/filters/decode'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
@@ -281,7 +281,7 @@ import { motdApi } from '@/api'
 import { watchPublicChannel } from '@/composables/services/websocket'
 
 export default {
-  components: { AdminNavigation, AdminSubNavigation, Breadcrumbs, LoginModal, InviteModal, RegisterModal, Alert },
+  components: { AdminNavigation, Breadcrumbs, LoginModal, InviteModal, RegisterModal, Alert },
   setup() {
     onBeforeMount(() => {
       let fetchMotd = () => motdApi.get().then(d => v.motdData = d).catch(() => {})
@@ -291,10 +291,12 @@ export default {
     /* Internal Methods */
     const scrollHeader = () => {
       let header = document.querySelector('header')
+      let subNav = document.querySelector('#admin-sub-nav')
       let windowY = window.scrollY
       if (windowY >= v.scrollDownPos) {
         // Scrolling DOWN
         header.classList.add('is-hidden')
+        subNav.classList.add('is-hidden')
         header.classList.remove('is-visible')
       }
       if (windowY === 0 || windowY < v.lastScrollTop) {

@@ -28,7 +28,7 @@
         <i class="fa fa-save"></i>&nbsp;&nbsp;Save
       </button>
       <!-- ng-click="child.reset()" -->
-      <button>
+      <button class="secondary">
         <i class="fa fas-refresh"></i>&nbsp;&nbsp;Reset
       </button>
     </div>
@@ -50,12 +50,13 @@ export default {
 <style lang="scss">
   #admin-sub-nav {
     height: 4.25rem;
-    padding: 1rem 2rem;
+    padding: 1rem;
     display: flex;
     background: $base-background-color;
     border-bottom: 1px solid $breadcrumbs-border-color;
+
     .tabs {
-      flex: 1 0 50%;
+      flex: 1 0 auto;
     }
 
     .actions {
@@ -73,9 +74,50 @@ export default {
 
     @include break-mobile-sm {
       flex-direction: column;
+      height: unset;
+      padding: 0;
+
+      h2 {
+        margin-bottom: 1rem;
+        padding: 1rem 1rem 0;
+      }
+
+      .tabs {
+        display: flex;
+        gap: 0.5rem;
+        flex: unset;
+        margin-top: 0;
+        padding: 0 1rem 0.5rem;
+        overflow-x: scroll;
+        overflow-y: hidden;
+        white-space: nowrap;
+
+        dd {
+          display: block;
+        }
+
+        a {
+          font-size: 0.875rem;
+          height: unset;
+          line-height: unset;
+          padding: 0.25rem 1rem;
+        }
+      }
 
       button {
-        margin-bottom: 1rem;
+        flex: 1 0 auto;
+        margin-bottom: 0;
+      }
+
+      .actions {
+        background-color: #fff;
+        display: flex;
+        padding: 0.5rem 1rem;
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        z-index: 9000;
       }
     }
   }
