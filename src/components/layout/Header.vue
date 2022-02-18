@@ -291,12 +291,10 @@ export default {
     /* Internal Methods */
     const scrollHeader = () => {
       let header = document.querySelector('header')
-      let subNav = document.querySelector('#admin-sub-nav')
       let windowY = window.scrollY
       if (windowY >= v.scrollDownPos) {
         // Scrolling DOWN
         header.classList.add('is-hidden')
-        subNav.classList.add('is-hidden')
         header.classList.remove('is-visible')
       }
       if (windowY === 0 || windowY < v.lastScrollTop) {
