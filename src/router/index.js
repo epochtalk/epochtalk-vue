@@ -17,6 +17,8 @@ import Messages from '@/views/Messages.vue'
 import PostSearch from '@/views/PostSearch.vue'
 import Join from '@/views/Join.vue'
 import GeneralSettings from '@/views/admin/settings/General.vue'
+import BoardManagement from '@/views/admin/management/Boards.vue'
+import UserModeration from '@/views/admin/moderation/Users.vue'
 import ConfirmAccount from '@/views/ConfirmAccount.vue'
 import ResetPassword from '@/views/ResetPassword.vue'
 import Profile from '@/views/Profile.vue'
@@ -36,25 +38,91 @@ const routes = [
     alias: '/admin',
     name: 'GeneralSettings',
     component: GeneralSettings,
-    meta: { requiresAuth: true, bodyClass: 'general-settings', title: 'General Settings' },
+    meta: { requiresAuth: true, bodyClass: 'general-settings', title: 'Settings' },
     children: [
       {
         path: '/admin/settings/advanced',
         name: 'AdvancedSettings',
         component: GeneralSettings,
-        meta: { requiresAuth: true, bodyClass: 'advanced-settings', title: 'Advanced Settings' }
+        meta: { requiresAuth: true, bodyClass: 'advanced-settings', title: 'Settings' }
       },
       {
         path: '/admin/settings/legal',
         name: 'LegalSettings',
         component: GeneralSettings,
-        meta: { requiresAuth: true, bodyClass: 'legal-settings', title: 'Legal Settings' }
+        meta: { requiresAuth: true, bodyClass: 'legal-settings', title: 'Settings' }
       },
       {
         path: '/admin/settings/theme',
         name: 'ThemeSettings',
         component: GeneralSettings,
-        meta: { requiresAuth: true, bodyClass: 'theme-settings', title: 'Theme Settings' }
+        meta: { requiresAuth: true, bodyClass: 'theme-settings', title: 'Settings' }
+      }
+    ]
+  },
+  {
+    path: '/admin/management/boards',
+    alias: '/admin/management',
+    name: 'BoardManagement',
+    component: BoardManagement,
+    meta: { requiresAuth: true, bodyClass: 'board-management', title: 'Management' },
+    children: [
+      {
+        path: '/admin/management/users',
+        name: 'UserManagement',
+        component: BoardManagement,
+        meta: { requiresAuth: true, bodyClass: 'user-management', title: 'Management' }
+      },
+      {
+        path: '/admin/management/roles',
+        name: 'RoleManagement',
+        component: BoardManagement,
+        meta: { requiresAuth: true, bodyClass: 'role-management', title: 'Management' }
+      },
+      {
+        path: '/admin/management/bannedaddresses',
+        name: 'BannedAddressManagement',
+        component: BoardManagement,
+        meta: { requiresAuth: true, bodyClass: 'banned-address-management', title: 'Management' }
+      },
+      {
+        path: '/admin/management/invitations',
+        name: 'InvitationManagement',
+        component: BoardManagement,
+        meta: { requiresAuth: true, bodyClass: 'invitation-management', title: 'Management' }
+      }
+    ]
+  },
+  {
+    path: '/admin/moderation/users',
+    alias: '/admin/moderation',
+    name: 'UserModeration',
+    component: UserModeration,
+    meta: { requiresAuth: true, bodyClass: 'user-moderation', title: 'Moderation' },
+    children: [
+      {
+        path: '/admin/moderation/posts',
+        name: 'PostModeration',
+        component: UserModeration,
+        meta: { requiresAuth: true, bodyClass: 'post-moderation', title: 'Moderation' }
+      },
+      {
+        path: '/admin/moderation/messages',
+        name: 'MessageModeration',
+        component: UserModeration,
+        meta: { requiresAuth: true, bodyClass: 'message-moderation', title: 'Moderation' }
+      },
+      {
+        path: '/admin/moderation/boardbans',
+        name: 'BoardBanModeration',
+        component: UserModeration,
+        meta: { requiresAuth: true, bodyClass: 'board-ban-moderation', title: 'Moderation' }
+      },
+      {
+        path: '/admin/moderation/logs',
+        name: 'LogModeration',
+        component: UserModeration,
+        meta: { requiresAuth: true, bodyClass: 'log-moderation', title: 'Moderation' }
       }
     ]
   },

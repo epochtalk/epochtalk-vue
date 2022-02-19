@@ -22,7 +22,7 @@
 
 <script>
 import { useRoute } from 'vue-router'
-import { reactive, toRefs, inject, computed } from 'vue'
+import { reactive, toRefs, inject, computed, watch } from 'vue'
 import { AuthStore } from '@/composables/stores/auth'
 
 export default {
@@ -59,16 +59,81 @@ export default {
           routeName: 'ThemeSettings',
           permission: permUtils.hasPermission('adminAccess.settings.theme'),
           active: computed(() => checkActive('ThemeSettings'))
+        }
+      ],
+      management: [
+        {
+          title: 'Boards',
+          routeName: 'BoardManagement',
+          permission: permUtils.hasPermission('adminAccess.management.boards'),
+          active: computed(() => checkActive('BoardManagement'))
         },
+        {
+          title: 'Users',
+          routeName: 'UserManagement',
+          permission: permUtils.hasPermission('adminAccess.management.users'),
+          active: computed(() => checkActive('UserManagement'))
+        },
+        {
+          title: 'Roles',
+          routeName: 'RoleManagement',
+          permission: permUtils.hasPermission('adminAccess.management.roles'),
+          active: computed(() => checkActive('RoleManagement'))
+        },
+        {
+          title: 'Banned Addresses',
+          routeName: 'BannedAddressManagement',
+          permission: permUtils.hasPermission('adminAccess.management.bannedAddresses'),
+          active: computed(() => checkActive('BannedAddressManagement'))
+        },
+        {
+          title: 'Invitations',
+          routeName: 'InvitationManagement',
+          permission: permUtils.hasPermission('adminAccess.management.invitations'),
+          active: computed(() => checkActive('InvitationManagement'))
+        }
+      ],
+      moderation: [
+        {
+          title: 'Users',
+          routeName: 'UserModeration',
+          permission: permUtils.hasPermission('modAccess.users'),
+          active: computed(() => checkActive('UserModeration'))
+        },
+        {
+          title: 'Posts',
+          routeName: 'PostModeration',
+          permission: permUtils.hasPermission('modAccess.posts'),
+          active: computed(() => checkActive('PostModeration'))
+        },
+        {
+          title: 'Messages',
+          routeName: 'MessageModeration',
+          permission: permUtils.hasPermission('modAccess.messages'),
+          active: computed(() => checkActive('MessageModeration'))
+        },
+        {
+          title: 'Board Bans',
+          routeName: 'BoardBanModeration',
+          permission: permUtils.hasPermission('modAccess.boardBans'),
+          active: computed(() => checkActive('BoardBanModeration'))
+        },
+        {
+          title: 'Logs',
+          routeName: 'LogModeration',
+          permission: permUtils.hasPermission('modAccess.logs'),
+          active: computed(() => checkActive('LogModeration'))
+        }
       ]
     }
 
-    const topLevelNav = $route.path.split('/')[2]
-
     const v = reactive({
       routeName: $route.meta.title || $route.name.split(/(?=[A-Z])/).join(' '),
-      nav: nav[topLevelNav || 'settings']
+      nav: nav[$route.path.split('/')[2] || 'settings']
     })
+
+    watch(() => $route.path, p => v.nav = nav[p.split('/')[2] || 'settings'])
+    watch(() => $route.meta, m => v.routeName = m.title || $route.name.split(/(?=[A-Z])/).join(' '))
 
     return { ...toRefs(v) }
   }
