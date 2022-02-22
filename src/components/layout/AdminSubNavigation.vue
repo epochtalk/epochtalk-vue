@@ -10,10 +10,10 @@
     </dl>
 
     <div class="actions">
-      <button>
+      <button @click="EventBus.emit('admin-save')">
         <i class="fa fa-save"></i>&nbsp;&nbsp;Save
       </button>
-      <button>
+      <button @click="EventBus.emit('admin-reset')">
         <i class="fas fa-undo"></i>&nbsp;&nbsp;Reset
       </button>
     </div>
@@ -24,6 +24,7 @@
 import { useRoute } from 'vue-router'
 import { reactive, toRefs, inject, computed, watch } from 'vue'
 import { AuthStore } from '@/composables/stores/auth'
+import EventBus from '@/composables/services/event-bus'
 
 export default {
   name: 'AdminSubNavigation',
@@ -135,7 +136,7 @@ export default {
     watch(() => $route.path, p => v.nav = nav[p.split('/')[2] || 'settings'])
     watch(() => $route.meta, m => v.routeName = m.title || $route.name.split(/(?=[A-Z])/).join(' '))
 
-    return { ...toRefs(v) }
+    return { ...toRefs(v), EventBus }
   }
 }
 </script>

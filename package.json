@@ -24,6 +24,7 @@
     "axios": "^0.21.0",
     "core-js": "^3.6.5",
     "dayjs": "^1.9.6",
+    "emittery": "^0.10.1",
     "normalize.css": "^8.0.1",
     "nprogress": "^0.2.0",
     "slugify": "^1.6.1",

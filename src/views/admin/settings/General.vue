@@ -1,5 +1,5 @@
 <template>
-  <div>{{JSON.stringify(config, null, 2)}}{{JSON.stringify(config, null, 2)}}{{JSON.stringify(config, null, 2)}}</div>
+  <div>{{JSON.stringify(config, null, 2)}}{{JSON.stringify(config, null, 2)}}{{JSON.stringify(config, null, 2)}}{{JSON.stringify(config, null, 2)}}{{JSON.stringify(config, null, 2)}}{{JSON.stringify(config, null, 2)}}{{JSON.stringify(config, null, 2)}}</div>
   <div class="testContainer">
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Iste debitis animi exercitationem facilis repellat recusandae sed consequatur natus? Itaque consequuntur placeat cum eligendi nostrum quos laborum nihil sit suscipit adipisci.</p>
 
@@ -8,8 +8,9 @@
 </template>
 
 <script>
-import { reactive, toRefs } from 'vue'
+import { reactive, toRefs, onMounted, onUnmounted } from 'vue'
 import { adminApi } from '@/api'
+import EventBus from '@/composables/services/event-bus'
 
 export default {
   name: 'GeneralSettings',
@@ -23,6 +24,21 @@ export default {
     })
   },
   setup() {
+    const saveListener = () => {
+      console.log('Admin Save Settings!')
+    }
+    const resetListener = () => {
+      console.log('Admin Reset Settings!')
+    }
+    onMounted(() => {
+      EventBus.on('admin-save', saveListener)
+      EventBus.on('admin-reset', resetListener)
+    })
+    onUnmounted(() => {
+      EventBus.off('admin-save', saveListener)
+      EventBus.off('admin-reset', resetListener)
+    })
+
     const v = reactive({ config: {} })
     return { ...toRefs(v) }
   }
