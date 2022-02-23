@@ -134,7 +134,7 @@ export default {
     })
 
     watch(() => $route.path, p => v.nav = nav[p.split('/')[2] || 'settings'])
-    watch(() => $route.meta, m => v.routeName = m.title || $route.name.split(/(?=[A-Z])/).join(' '))
+    watch(() => $route.meta, m => v.routeName = m.title)
 
     return { ...toRefs(v), EventBus }
   }
