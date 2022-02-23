@@ -77,7 +77,33 @@
     </div>
 
     <!-- MOTD -->
-    <!-- <motd-admin></motd-admin> -->
+    <div class="settings-row" v-if="motdData">
+      <h5 class="thin-underline section-header-top-spacing">
+        Announcement Configuration
+        <span class="info-tooltip" data-balloon="Allows the forum owners to create an announcements which can be broadcast across the whole forum, or just the main page" data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
+      </h5>
+      <div class="setting-row">
+        <div class="switch-desc">
+          <label for="main-only">Main Page Only</label>
+          <label class="desc-label" for="main-only">If enabled, the announcement is only shown on the main page. If disabled, the announcement is show on every page</label>
+        </div>
+        <div class="switch-block">
+          <input id="main-only" class="toggle-switch" type="checkbox" v-model="motdData.main_view_only">
+          <label for="main-only"></label>
+        </div>
+      </div>
+      <label for="motd">Announcement Text</label>
+      <label class="desc-label">
+        This is an announcement message that will be shown at the
+        top of the page to all users.
+      </label>
+      <textarea id="motd" v-model="motdData.motd"></textarea>
+      <!-- TODO(akinsey): implement preview for motd -->
+      <label v-if="motdData.preview?.length">Announcement Preview</label>
+      <div v-if="motdData.preview?.length" class="boxed-section">
+        <div class="content" post-processing="motdData.preview" style-fix="false"></div>
+      </div>
+    </div>
 
     <!-- Analytics -->
     <div class="setting-row">
@@ -210,21 +236,25 @@
 
 <script>
 import { reactive, toRefs, onMounted, onUnmounted } from 'vue'
-import { adminApi } from '@/api'
+import { adminApi, motdApi } from '@/api'
 import EventBus from '@/composables/services/event-bus'
+import ImageUploader from '@/components/images/ImageUploader.vue'
 
 export default {
   name: 'GeneralSettings',
+  components: { ImageUploader },
   beforeRouteEnter(to, from, next) {
     adminApi.configurations().then(data => next(vm => {
       vm.config = data
       vm.localImageServer = data.images.storage === 'local'
+      motdApi.get().then(mData => vm.motdData = mData)
     }))
   },
   beforeRouteUpdate(to, from, next) {
     adminApi.configurations().then(data => {
       this.config = data
       this.localImageServer = data.images.storage === 'local'
+      motdApi.get().then(mData => this.motdData = mData)
       next()
     })
   },
@@ -246,6 +276,7 @@ export default {
 
     const v = reactive({
       config: null,
+      motdData: null,
       localImageServer: null
     })
     return { ...toRefs(v) }
