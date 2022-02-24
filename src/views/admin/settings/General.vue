@@ -161,11 +161,13 @@
       <label for="website-keywords">Website Keywords</label>
       <input type="text" class="input-text" id="website-keywords" v-model="config.website.keywords" placeholder="Example: epochtalk, forum, open source, support" />
       <label for="website-logo-upload-btn">Website Logo</label>
-      <!-- <image-uploader class="editor-image-uploader" model="config.website.logo" purpose="logo"></image-uploader> -->
-      <input type="text" class="input-text" id="website-logo" v-model="config.website.logo" placeholder="default_logo.png" />
+      <!-- TODO(akinsey): <image-uploader  model="config.website.logo" purpose="logo"></image-uploader> -->
+      <image-uploader purpose="avatar" inputId="website-logo" @upload-success="() => {}" @upload-error="() => {}" />
+      <!-- <input type="text" class="input-text" id="website-logo" v-model="config.website.logo" placeholder="default_logo.png" /> -->
       <label for="website-favicon-upload-btn">Website Favicon</label>
-      <!-- <image-uploader class="editor-image-uploader" model="config.website.favicon" purpose="favicon"></image-uploader> -->
-      <input type="text" class="input-text" id="website-favicon" v-model="config.website.favicon" placeholder="favicon.ico" />
+      <!-- TODO(akinsey): <image-uploader class="editor-image-uploader" model="config.website.favicon" purpose="favicon"></image-uploader> -->
+      <image-uploader purpose="avatar" inputId="website-favicon" @upload-success="() => {}" @upload-error="() => {}" />
+<!--       <input type="text" class="input-text" id="website-favicon" v-model="config.website.favicon" placeholder="favicon.ico" /> -->
     </div>
 
     <!-- Image Server Configurations -->
