@@ -160,14 +160,20 @@
       <input type="text" class="input-text" id="website-description" v-model="config.website.description" placeholder="Example: Support forums for Epochtalk software" />
       <label for="website-keywords">Website Keywords</label>
       <input type="text" class="input-text" id="website-keywords" v-model="config.website.keywords" placeholder="Example: epochtalk, forum, open source, support" />
-      <label for="website-logo-upload-btn">Website Logo</label>
       <!-- TODO(akinsey): <image-uploader  model="config.website.logo" purpose="logo"></image-uploader> -->
-      <image-uploader purpose="avatar" inputId="website-logo" @upload-success="() => {}" @upload-error="() => {}" />
-      <!-- <input type="text" class="input-text" id="website-logo" v-model="config.website.logo" placeholder="default_logo.png" /> -->
-      <label for="website-favicon-upload-btn">Website Favicon</label>
-      <!-- TODO(akinsey): <image-uploader class="editor-image-uploader" model="config.website.favicon" purpose="favicon"></image-uploader> -->
-      <image-uploader purpose="avatar" inputId="website-favicon" @upload-success="() => {}" @upload-error="() => {}" />
-<!--       <input type="text" class="input-text" id="website-favicon" v-model="config.website.favicon" placeholder="favicon.ico" /> -->
+      <div class="row">
+        <div class="column">
+          <label for="website-logo-upload-btn">Website Logo</label>
+          <input type="text" class="input-text" v-model="config.website.logo" placeholder="default_logo.png" />
+          <image-uploader purpose="avatar" inputId="website-logo" @upload-success="() => {}" @upload-error="() => {}" />
+        </div>
+        <div class="column">
+          <label for="website-favicon-upload-btn">Website Favicon</label>
+          <!-- TODO(akinsey): <image-uploader class="editor-image-uploader" model="config.website.favicon" purpose="favicon"></image-uploader> -->
+          <input type="text" class="input-text" v-model="config.website.favicon" placeholder="favicon.ico" />
+          <image-uploader purpose="avatar" inputId="website-favicon" @upload-success="() => {}" @upload-error="() => {}" />
+        </div>
+      </div>
     </div>
 
     <!-- Image Server Configurations -->
@@ -287,5 +293,19 @@ export default {
 </script>
 
 <style lang="scss">
-
+  .file-input, .input-container { height: auto; }
+  .input-container { margin-bottom: 1rem; }
+  .row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+    column-gap: 1rem;
+  }
+  .column {
+    display: flex;
+    flex-direction: column;
+    flex-basis: 100%;
+    flex: 1;
+  }
 </style>
