@@ -8,7 +8,7 @@
         <span class="info-tooltip" data-balloon="General configurations which allow you to restrict/grant access to your forum" data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
       </h5>
     </div>
-    <div class="setting-row">
+    <div class="setting-row switch">
       <div class="switch-desc">
         <label for="public-forum">
           Public Forum
@@ -21,7 +21,7 @@
         <label for="public-forum"></label>
       </div>
     </div>
-    <div class="setting-row">
+    <div class="setting-row switch">
       <div class="switch-desc">
         <label for="verify-registration">
           Verify Registration
@@ -33,7 +33,7 @@
         <label for="verify-registration"></label>
       </div>
     </div>
-    <div class="setting-row">
+    <div class="setting-row switch">
       <div class="switch-desc">
         <label for="invite-only">Invite Only</label>
         <label class="desc-label" for="invite-only">Disable public registration</label>
@@ -43,7 +43,7 @@
         <label for="invite-only"></label>
       </div>
     </div>
-    <div class="setting-row">
+    <div class="setting-row switch">
       <div class="switch-desc">
         <label for="post-max-length">Max Post Length</label>
         <label class="desc-label" for="post-max-length">The number of characters allowed per post</label>
@@ -58,7 +58,7 @@
         Portal Configurations
         <span class="info-tooltip" data-balloon="Enabling portal mode allows you to choose a specific board to be the main feed of the homepage as opposed to a listing of all the boards" data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
       </h5>
-      <div class="setting-row">
+      <div class="setting-row switch">
         <div class="switch-desc">
           <label for="public-forum">Enable Portal</label>
           <label class="desc-label" for="public-forum">Default the homepage to the portal</label>
@@ -82,7 +82,7 @@
         Announcement Configuration
         <span class="info-tooltip" data-balloon="Allows the forum owners to create an announcements which can be broadcast across the whole forum, or just the main page" data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
       </h5>
-      <div class="setting-row">
+      <div class="setting-row switch">
         <div class="switch-desc">
           <label for="main-only">Main Page Only</label>
           <label class="desc-label" for="main-only">If enabled, the announcement is only shown on the main page. If disabled, the announcement is show on every page</label>
@@ -308,4 +308,12 @@ export default {
     flex-basis: 100%;
     flex: 1;
   }
+  .setting-row.switch {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+      .switch-desc { width: 75%; }
+      .switch-block { width: 25%; }
+   }
 </style>
