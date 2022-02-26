@@ -71,7 +71,12 @@
       <div class="setting-row">
         <label for="portal-boardId">Board to Show</label>
         <div class="control-full-width">
-  <!--         <select name="boards" id="portal-boardId" v-model="config.portal.board_id" ng-options="board.id as board.name group by board.parent_name for board in boards | orderBy:board.view_order"></select> -->
+          <select name="boards" id="portal-boardId" v-model="config.portal.board_id">
+            <option value="" disabled hidden>Select a Board to display in the Portal</option>
+            <optgroup v-for="(boards, parentName) in boardsMovelist" :label="parentName" :key="parentName">
+              <option v-for="board in boards" :value="board.id" :key="decode(board.name)">{{decode(board.name)}}</option>
+            </optgroup>
+          </select>
         </div>
       </div>
     </div>
@@ -184,18 +189,22 @@
         Image Server Configurations
         <span class="info-tooltip" data-balloon="Image server configurations give the option of hosting the forums images locally or using an Amazon s3 bucket" data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
       </h5>
-      <div class="img-wrap">
-        <div class="img-server-wrap">
+      <div class="row">
+        <div class="column">
           <label>Image Server Host</label>
           <label class="desc-label">Host image server locally or on Amazon S3</label>
         </div>
-        <div class="radio-button">
-          <input type="radio" class="hide-radio" name="image-type" :value="true" @click.prevent="config.images.storage = 'local'" v-model="localImageServer" id="image-type-local" />
-          <label for="image-type-local">Local</label>
-        </div>
-        <div class="radio-button">
-          <input type="radio" class="hide-radio" name="image-type" :value="false" @click.prevent="config.images.storage = 's3'" id="image-type-s3" v-model="localImageServer" />
-          <label for="image-type-s3">S3</label>
+        <div class="column">
+          <div class="row">
+            <div class="radio-button column">
+              <input type="radio" class="hide-radio" name="image-type" :value="true" @click=" localImageServer = true" v-model="localImageServer" id="image-type-local" />
+              <label for="image-type-local" class="radio-label">Local</label>
+            </div>
+            <div class="radio-button column">
+              <input type="radio" class="hide-radio" name="image-type" :value="false" @click="config.images.storage = 's3'" id="image-type-s3" v-model="localImageServer" />
+              <label for="image-type-s3" class="radio-label">S3</label>
+            </div>
+          </div>
         </div>
       </div>
       <div class="input-three-col">
@@ -245,10 +254,12 @@
 </template>
 
 <script>
-import { reactive, toRefs, onMounted, onUnmounted } from 'vue'
-import { adminApi, motdApi } from '@/api'
+import { reactive, toRefs, onMounted, onUnmounted, inject } from 'vue'
+import { adminApi, motdApi, boardsApi } from '@/api'
 import EventBus from '@/composables/services/event-bus'
 import ImageUploader from '@/components/images/ImageUploader.vue'
+import { cloneDeep, groupBy } from 'lodash'
+import decode from '@/composables/filters/decode'
 
 export default {
   name: 'GeneralSettings',
@@ -256,25 +267,35 @@ export default {
   beforeRouteEnter(to, from, next) {
     adminApi.configurations().then(data => next(vm => {
       vm.config = data
+      vm.originalConfig = cloneDeep(data)
       vm.localImageServer = data.images.storage === 'local'
       motdApi.get().then(mData => vm.motdData = mData)
+      boardsApi.movelist()
+      .then(ml => groupBy(ml, 'parent_name'))
+      .then(movelist => vm.boardsMovelist = movelist)
     }))
   },
   beforeRouteUpdate(to, from, next) {
     adminApi.configurations().then(data => {
       this.config = data
+      this.originalConfig = cloneDeep(data)
       this.localImageServer = data.images.storage === 'local'
       motdApi.get().then(mData => this.motdData = mData)
+      boardsApi.movelist()
+      .then(ml => groupBy(ml, 'parent_name'))
+      .then(movelist => this.boardsMovelist = movelist)
       next()
     })
   },
   setup() {
     const saveListener = () => {
-      console.log('Admin Save Settings!')
+      adminApi.updateConfigurations(v.config)
+      .then(() => motdApi.save(v.motdData))
+      .then(() => $alertStore.success('Successfully updated forum settings!'))
+      .catch(() => $alertStore.error('Error saving forum settings'))
     }
-    const resetListener = () => {
-      console.log('Admin Reset Settings!')
-    }
+    const resetListener = () => v.config = cloneDeep(v.originalConfig)
+
     onMounted(() => {
       EventBus.on('admin-save', saveListener)
       EventBus.on('admin-reset', resetListener)
