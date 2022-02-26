@@ -164,14 +164,16 @@
       <div class="row">
         <div class="column">
           <label for="website-logo-upload-btn">Website Logo</label>
-          <input type="text" class="input-text" v-model="config.website.logo" placeholder="default_logo.png" />
-          <image-uploader purpose="avatar" inputId="website-logo" @upload-success="() => {}" @upload-error="() => {}" />
+          <input type="text" class="input-text upload-input" v-model="config.website.logo" placeholder="default_logo.png" />
+          <div class="upload-err">{{ logoError ? 'Selected image exceeds 100kB' : null }}</div>
+          <image-uploader purpose="avatar" inputId="website-logo" @upload-success="url => { config.website.logo = url; logoError = null }" @upload-error="err => logoError = err" />
         </div>
         <div class="column">
           <label for="website-favicon-upload-btn">Website Favicon</label>
           <!-- TODO(akinsey): <image-uploader class="editor-image-uploader" model="config.website.favicon" purpose="favicon"></image-uploader> -->
-          <input type="text" class="input-text" v-model="config.website.favicon" placeholder="favicon.ico" />
-          <image-uploader purpose="avatar" inputId="website-favicon" @upload-success="() => {}" @upload-error="() => {}" />
+          <input type="text" class="input-text upload-input" v-model="config.website.favicon" placeholder="favicon.ico" />
+          <div class="upload-err">{{ faviconError ? 'Selected image exceeds 100kB' : null }}</div>
+          <image-uploader purpose="avatar" inputId="website-favicon" @upload-success="url => { config.website.favicon = url; faviconError = null }" @upload-error="err => faviconError = err" />
         </div>
       </div>
     </div>
@@ -282,25 +284,40 @@ export default {
       EventBus.off('admin-reset', resetListener)
     })
 
+    const $alertStore = inject('$alertStore')
+
     const v = reactive({
+      originalConfig: null,
       config: null,
       motdData: null,
-      localImageServer: null
+      localImageServer: null,
+      faviconError: null,
+      boardsMovelist: null,
+      logoError: null
     })
-    return { ...toRefs(v) }
+    return { ...toRefs(v), decode }
   }
 }
 </script>
 
 <style lang="scss">
+  .input-text.upload-input { margin-bottom: 0; }
+  .upload-err { height: 1rem; font-size: .725rem; color: #ff0000; }
   .file-input, .input-container { height: auto; }
   .input-container { margin-bottom: 1rem; }
+  .radio-label {
+    height: 3.25rem;
+    line-height: 2.25rem;
+    text-align: center;
+    border-radius: 3px;
+  }
   .row {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     width: 100%;
     column-gap: 1rem;
+    .progress-container { margin-top: .5rem; }
   }
   .column {
     display: flex;
