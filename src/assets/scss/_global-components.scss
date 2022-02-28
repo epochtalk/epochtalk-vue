@@ -219,6 +219,15 @@ a.button, .button, button, button:focus, .button:focus {
   svg {
     fill: $color-primary;
   }
+  &.negative {
+    background-color: transparent;
+    color: $color-primary;
+    border: 1px solid;
+    &:hover {
+      color: $color-primary-alt;
+      border-color: $color-primary-alt;
+    }
+  }
 
   &.outline {
     background: #f4f4f4;

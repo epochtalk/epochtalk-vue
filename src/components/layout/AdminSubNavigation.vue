@@ -13,7 +13,7 @@
       <button @click="EventBus.emit('admin-save')">
         <i class="fa fa-save"></i>&nbsp;&nbsp;Save
       </button>
-      <button @click="EventBus.emit('admin-reset')">
+      <button class="negative" @click="EventBus.emit('admin-reset')">
         <i class="fas fa-undo"></i>&nbsp;&nbsp;Reset
       </button>
     </div>
@@ -158,7 +158,6 @@ export default {
 
       button {
         margin-right: 0.5rem;
-
         &:last-child {
           margin-right: 0;
         }
