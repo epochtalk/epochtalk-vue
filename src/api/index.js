@@ -161,6 +161,7 @@ export const usersApi = {
   adminRecover: data => $http(`/api/user/recover`, { method: 'POST', data }),
   checkResetToken: (username, token) => $http(`/api/reset/${username}/${token}/validate`),
   trust: {
+    getTrustBoards: () => $http('/api/trustboards'),
     getTrustList: () => $http('/api/trustlist'),
     getTrustTree: params => $http('/api/trusttree', { params }),
     getTrustStats: username => $http(`/api/trust/${username}`),
