@@ -227,10 +227,12 @@ import { reactive, toRefs, onMounted, onUnmounted } from 'vue'
 // import { adminApi, motdApi, boardsApi } from '@/api'
 import EventBus from '@/composables/services/event-bus'
 import TrustAdminSettings from '@/components/admin/settings/TrustAdminSettings.vue'
+import TrustList from '@/components/admin/settings/TrustList.vue'
+import AdManager from '@/components/admin/settings/AdManager.vue'
 
 export default {
   name: 'AdvancedSettings',
-  components: { TrustAdminSettings },
+  components: { TrustAdminSettings, TrustList, AdManager },
   // beforeRouteEnter(to, from, next) {
   //   adminApi.configurations().then(data => next(vm => {
   //     vm.config = data
