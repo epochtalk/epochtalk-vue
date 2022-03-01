@@ -279,4 +279,12 @@ export default {
 
 <style lang="scss">
   .advanced-settings .full-width { grid-column: 1/3; }
+  .input-three-col {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    grid-column-gap: .5rem;
+    @include break-mobile-med {
+      grid-template-columns: unset;
+    }
+  }
 </style>
