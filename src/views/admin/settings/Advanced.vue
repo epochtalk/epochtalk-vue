@@ -1,16 +1,114 @@
 <template>
   <!-- Column One -->
-  <div class="settings half-column">
+  <div>
+    <div>
+      <!-- Black List -->
+      <h5 class="thin-underline section-header-top-spacing">IP Blacklist Rules
+        <span class="info-tooltip" data-balloon="Adding an IP address/range/wildcard to the blacklist will disallow users with that specific IP or in that IP Range from loading the forum or its data" data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
+        <a ng-click="vmBlacklist.showAddModal = true" class="right"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add Rule</a></h5>
 
-    <blacklist></blacklist>
+      <table class="striped rulesTable" width="100%">
+        <thead>
+          <th>Rule Name</th>
+          <th>Rule</th>
+          <th>Actions</th>
+        </thead>
+        <tbody ng-if="!vmBlacklist.blacklist.length">
+          <tr>
+            <td colspan="3">
+              <h6>There are currently no IP blacklist rules. Click "+ Add Rule" above to create a new rule.</h6>
+            </td>
+          </tr>
+        </tbody>
+        <tbody ng-if="vmBlacklist.blacklist.length" ng-repeat="rule in vmBlacklist.blacklist track by rule.id">
+          <tr>
+            <td class="name" ng-bind="rule.note"></td>
+            <td ng-bind-html="rule.ip_data | replace: '-' : ' - ' "></td>
+            <td>
+              <a ng-click="vmBlacklist.openEditModal(rule)"><i class="fa fa-pencil"></i></a>
+              &nbsp;&nbsp;&nbsp;
+              <a ng-click="vmBlacklist.selectedRule = rule; vmBlacklist.showDeleteModal = true"><i class="fa fa-trash"></i></a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <h5 class="thin-underline section-header-top-spacing">Rank Management
+        <span class="info-tooltip" data-balloon="Allows forum owners to create a rank, which is a title associated with a post count" data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
+        <a ng-click="vm.showAddModal = true" class="right"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add Rank</a></h5>
 
-    <rank-manager></rank-manager>
+      <table class="striped rulesTable" width="100%">
+        <thead>
+          <th>Rank Name</th>
+          <th>Minimum Post Count</th>
+          <th>Actions</th>
+        </thead>
+        <tbody ng-if="!vm.ranks.length">
+          <tr>
+            <td colspan="3">
+              <h6>There are currently no ranks. Click "+ Add Rank" above to create a new rank.</h6>
+            </td>
+          </tr>
+        </tbody>
+        <tbody ng-if="vm.ranks.length" ng-repeat="rank in vm.ranks track by rank.post_count">
+          <tr>
+            <td class="name" ng-bind-html="rank.name"></td>
+            <td ng-bind-html="rank.post_count"></td>
+            <td>
+              <a ng-click="vm.selectedRank = rank; vm.editedRank = { name: rank.name, post_count: rank.post_count }; vm.showEditModal = true"><i class="fa fa-pencil"></i></a>
+              &nbsp;&nbsp;&nbsp;
+              <a ng-click="vm.selectedRank = rank; vm.showDeleteModal = true"><i class="fa fa-trash"></i></a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-    <auto-moderation></auto-moderation>
+    </div>
+
+    <div ng-if="vm.canViewRules()">
+      <h5 class="thin-underline section-header-top-spacing">
+        Auto Moderation Rules
+        <span class="info-tooltip" data-balloon="Allows forum owners to set up rules which will auto detect keywords or phrases and take a predesignated action without the intervention of a human moderator" data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
+        <a ng-click="vm.createRule()" class="right" ng-if="vm.canCreateRule()">
+          <i class="fa fa-plus"></i>&nbsp;&nbsp;Add Rule
+        </a>
+      </h5>
+
+      <table class="striped rulesTable" width="100%">
+        <thead>
+          <th>Rule Name</th>
+          <th>Rule Description</th>
+          <th>Actions</th>
+        </thead>
+        <tbody ng-if="!vm.rules.length">
+          <tr>
+            <td colspan="3">
+              <h6>There are currently no auto moderation rules. Click "+ Add Rule" above to create a new rule.</h6>
+            </td>
+          </tr>
+        </tbody>
+        <tbody ng-if="vm.rules.length" ng-repeat="rule in vm.rules track by rule.id">
+          <tr>
+            <td class="name" ng-bind-html="rule.name"></td>
+            <td ng-bind-html="rule.description"></td>
+            <td>
+              <a ng-click="vm.viewRule(rule)" ng-if="vm.canEditRule()">
+                <i class="fa fa-pencil"></i>
+              </a>
+              &nbsp;&nbsp;&nbsp;
+              <a ng-click="vm.deleteRule(rule)" ng-if="vm.canRemoveRule()">
+                <i class="fa fa-trash"></i>
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <!-- Column Two -->
-  <div class="settings half-column">
+  <div>
     <!-- Rate Limiting -->
     <h5 class="thin-underline section-header-top-spacing">API Rate Limiting (Global Defaults)
       <span class="info-tooltip" data-balloon="Allows the forum owners to apply rate limits to different types of data requests" data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
@@ -115,10 +213,11 @@
     <trust-admin-settings></trust-admin-settings>
   </div>
 
-  <trust-list default-trust="true"></trust-list>
-
+  <div class="full-width">
+    <trust-list default-trust="true"></trust-list>
+  </div>
   <!-- Full Row -->
-  <div class="ad-settings">
+  <div class="full-width ad-settings">
     <ad-manager></ad-manager>
   </div>
 </template>
@@ -127,9 +226,11 @@
 import { reactive, toRefs, onMounted, onUnmounted } from 'vue'
 // import { adminApi, motdApi, boardsApi } from '@/api'
 import EventBus from '@/composables/services/event-bus'
+import TrustAdminSettings from '@/components/admin/settings/TrustAdminSettings.vue'
 
 export default {
   name: 'AdvancedSettings',
+  components: { TrustAdminSettings },
   // beforeRouteEnter(to, from, next) {
   //   adminApi.configurations().then(data => next(vm => {
   //     vm.config = data
@@ -175,4 +276,5 @@ export default {
 </script>
 
 <style lang="scss">
+  .advanced-settings .full-width { grid-column: 1/3; }
 </style>
