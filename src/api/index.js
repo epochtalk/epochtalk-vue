@@ -230,5 +230,11 @@ export const adminApi = {
   moderators: {
     remove: data => $http('/api/admin/moderators/remove', { method: 'POST', data }),
     add: data => $http('/api/admin/moderators', { method: 'POST', data })
+  },
+  blacklist: {
+    get: () => $http('/api/admin/blacklist'),
+    add: data => $http('/api/admin/blacklist', { method: 'POST', data }),
+    update: data => $http('/api/admin/blacklist', { method: 'PUT', data }),
+    delete: id => $http(`/api/admin/blacklist/${id}`, { method: 'DELETE' })
   }
 }
