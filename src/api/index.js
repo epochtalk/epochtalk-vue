@@ -248,3 +248,26 @@ export const adminApi = {
     deleteRule: id => $http(`/api/automoderation/rules/${id}`, { method: 'DELETE' })
   }
 }
+
+export const adsApi = {
+  get: () => $http('/api/ads'),
+  getAnalytics: round => $http(`/api/ads/analytics/${round}`),
+  create: data => $http('/api/ads', { method: 'POST', data }),
+  duplicate: data => $http(`/api/ads/${data.id}/duplicate`, { method: 'POST', data }),
+  update: data => $http(`/api/ads/${data.id}`, { method: 'PUT', data }),
+  delete: id => $http(`/api/ads/${id}`, { method: 'DELETE' }),
+  saveText: data => $http('/api/ads/text', { method: 'POST', data }),
+  factoids: {
+   create: data => $http('/api/ads/factoids', { method: 'POST', data }),
+   update: data => $http(`/api/ads/factoids/${data.id}`, { method: 'PUT', data }),
+   delete: id => $http(`/api/ads/factoids/${id}`, { method: 'DELETE' }),
+   enable: data => $http(`/api/ads/factoids/${data.id}/enable`, { method: 'PUT', data }),
+   disable: data => $http(`/api/ads/factoids/${data.id}/disable`, { method: 'PUT', data })
+  },
+  rounds: {
+    create: data => $http('/api/ads/rounds', { method: 'POST', data }),
+    get: () => $http('/api/ads/rounds/info'),
+    getRound: id => $http(`/api/ads/rounds/${id}`),
+    rotate: data => $http('/api/ads/rounds/rotate', { method: 'POST', data })
+  }
+}
