@@ -236,5 +236,9 @@ export const adminApi = {
     add: data => $http('/api/admin/blacklist', { method: 'POST', data }),
     update: data => $http('/api/admin/blacklist', { method: 'PUT', data }),
     delete: id => $http(`/api/admin/blacklist/${id}`, { method: 'DELETE' })
+  },
+  ranks: {
+    get: () => $http('/api/rank'),
+    update: data => $http('/api/rank', { method: 'PUT', data })
   }
 }
