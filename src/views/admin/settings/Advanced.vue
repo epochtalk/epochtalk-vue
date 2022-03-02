@@ -214,7 +214,7 @@
   </div>
 
   <div class="full-width">
-    <trust-list default-trust="true"></trust-list>
+    <trust-list admin="true"></trust-list>
   </div>
   <!-- Full Row -->
   <div class="full-width ad-settings">
@@ -226,8 +226,8 @@
 import { reactive, toRefs, onMounted, onUnmounted } from 'vue'
 // import { adminApi, motdApi, boardsApi } from '@/api'
 import EventBus from '@/composables/services/event-bus'
-import TrustAdminSettings from '@/components/admin/settings/TrustAdminSettings.vue'
-import TrustList from '@/components/admin/settings/TrustList.vue'
+import TrustAdminSettings from '@/components/trust/TrustAdminSettings.vue'
+import TrustList from '@/components/trust/TrustList.vue'
 import AdManager from '@/components/admin/settings/AdManager.vue'
 
 export default {
