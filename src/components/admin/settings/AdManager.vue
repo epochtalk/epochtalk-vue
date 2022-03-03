@@ -85,7 +85,7 @@
     <section class="ads-container">
       <section class="ad-item" ng-repeat="ad in vm.ads track by ad.id">
         <h5 class="thin-underline">
-          Ad #{{$index+1}}
+          <!-- Ad #{{$index+1}} -->
           <div class="right">
             <a data-balloon="Duplicate" ng-click="vm.duplicateAd(ad.id)"><i class="fa fa-files-o"></i></a>
             &nbsp;&nbsp;&nbsp;
@@ -94,7 +94,7 @@
             <a data-balloon="Delete" ng-click="vm.openDeleteAd(ad)"><i class="fa fa-trash"></i></a>
           </div>
         </h5>
-        <div id="ad-{{$index}}"></div>
+        <!-- <div id="ad-{{$index}}"></div> -->
       </section>
     </section>
 
@@ -165,14 +165,14 @@
         <h5 class="thin-underline">
           <span class="post large" ng-if="factoid.enabled" ng-click="vm.disableFactoid(factoid.id)">Enabled</span>
           <span class="delete large" ng-if="!factoid.enabled" ng-click="vm.enableFactoid(factoid.id)">Disabled</span>
-          Factoid #{{$index+1}}
+          <!-- Factoid #{{$index+1}} -->
           <div class="right">
             <a ng-click="vm.openEditFactoid(factoid)"><i class="fa fa-pencil"></i></a>
             &nbsp;&nbsp;&nbsp;
             <a ng-click="vm.openDeleteFactoid(factoid)"><i class="fa fa-trash"></i></a>
           </div>
         </h5>
-        <div id="factoid-{{$index}}"></div>
+        <!-- <div id="factoid-{{$index}}"></div> -->
       </section>
     </section>
   </div>
