@@ -121,19 +121,19 @@
           <label class="desc-label" for="get-interval">Interval
             <span class="info-tooltip" data-balloon="The amount of time to which you are limiting the number of request to (e.g. 'Max in Interval' requests every 'Interval' milliseconds)" data-balloon-pos="up" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
           </label>
-          <input type="text" class="input-text" id="get-interval" ng-model="AdminSettingsCtrl.settings.rate_limiting.get.interval" placeholder="In MS (Ex: 1000)" />
+          <input type="text" class="input-text" id="get-interval" ng-model="config.rate_limiting.get.interval" placeholder="In MS (Ex: 1000)" />
         </div>
         <div>
           <label class="desc-label" for="get-max-in-interval">Max In Interval
             <span class="info-tooltip" data-balloon="How many requests you can make within the interval (e.g. 'Max in Interval' requests every 'Interval' milliseconds)" data-balloon-pos="up" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
           </label>
-          <input type="text" class="input-text" id="get-max-in-interval" ng-model="AdminSettingsCtrl.settings.rate_limiting.get.max_in_interval" placeholder="Ex: 1" />
+          <input type="text" class="input-text" id="get-max-in-interval" ng-model="config.rate_limiting.get.max_in_interval" placeholder="Ex: 1" />
         </div>
         <div>
           <label class="desc-label" for="get-min-difference">Min Difference
             <span class="info-tooltip" data-balloon="How long between each request (e.g. how much time between each 'Max in Interval')" data-balloon-pos="up" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
           </label>
-          <input type="text" class="input-text" id="get-min-difference" ng-model="AdminSettingsCtrl.settings.rate_limiting.get.min_difference" placeholder="In MS (Ex: 100)" />
+          <input type="text" class="input-text" id="get-min-difference" ng-model="config.rate_limiting.get.min_difference" placeholder="In MS (Ex: 100)" />
         </div>
       </div>
     </section>
@@ -145,19 +145,19 @@
           <label class="desc-label" for="post-interval">Interval
             <span class="info-tooltip" data-balloon="The amount of time to which you are limiting the number of request to (e.g. 'Max in Interval' requests every 'Interval' milliseconds)" data-balloon-pos="up" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
           </label>
-          <input type="text" class="input-text" id="post-interval" ng-model="AdminSettingsCtrl.settings.rate_limiting.post.interval" placeholder="In MS (Ex: 1000)" />
+          <input type="text" class="input-text" id="post-interval" ng-model="config.rate_limiting.post.interval" placeholder="In MS (Ex: 1000)" />
         </div>
         <div>
           <label class="desc-label" for="post-max-in-interval">Max In Interval
             <span class="info-tooltip" data-balloon="How many requests you can make within the interval (e.g. 'Max in Interval' requests every 'Interval' milliseconds)" data-balloon-pos="up" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
           </label>
-          <input type="text" class="input-text" id="post-max-in-interval" ng-model="AdminSettingsCtrl.settings.rate_limiting.post.max_in_interval" placeholder="Ex: 1" />
+          <input type="text" class="input-text" id="post-max-in-interval" ng-model="config.rate_limiting.post.max_in_interval" placeholder="Ex: 1" />
         </div>
         <div>
           <label class="desc-label" for="post-min-difference">Min Difference
             <span class="info-tooltip" data-balloon="How long between each request (e.g. how much time between each 'Max in Interval')" data-balloon-pos="up" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
           </label>
-          <input type="text" class="input-text" id="post-min-difference" ng-model="AdminSettingsCtrl.settings.rate_limiting.post.min_difference" placeholder="In MS (Ex: 100)" />
+          <input type="text" class="input-text" id="post-min-difference" ng-model="config.rate_limiting.post.min_difference" placeholder="In MS (Ex: 100)" />
         </div>
       </div>
     </section>
@@ -169,19 +169,19 @@
           <label class="desc-label" for="put-interval">Interval
             <span class="info-tooltip" data-balloon="The amount of time to which you are limiting the number of request to (e.g. 'Max in Interval' requests every 'Interval' milliseconds)" data-balloon-pos="up" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
           </label>
-          <input type="text" class="input-text" id="put-interval" ng-model="AdminSettingsCtrl.settings.rate_limiting.put.interval" placeholder="In MS (Ex: 1000)" />
+          <input type="text" class="input-text" id="put-interval" ng-model="config.rate_limiting.put.interval" placeholder="In MS (Ex: 1000)" />
         </div>
         <div>
           <label class="desc-label" for="put-max-in-interval">Max In Interval
             <span class="info-tooltip" data-balloon="How many requests you can make within the interval (e.g. 'Max in Interval' requests every 'Interval' milliseconds)" data-balloon-pos="up" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
           </label>
-          <input type="text" class="input-text" id="put-max-in-interval" ng-model="AdminSettingsCtrl.settings.rate_limiting.put.max_in_interval" placeholder="Ex: 1" />
+          <input type="text" class="input-text" id="put-max-in-interval" ng-model="config.rate_limiting.put.max_in_interval" placeholder="Ex: 1" />
         </div>
         <div>
           <label class="desc-label" for="put-min-difference">Min Difference
             <span class="info-tooltip" data-balloon="How long between each request (e.g. how much time between each 'Max in Interval')" data-balloon-pos="up" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
           </label>
-          <input type="text" class="input-text" id="put-min-difference" ng-model="AdminSettingsCtrl.settings.rate_limiting.put.min_difference" placeholder="In MS (Ex: 100)" />
+          <input type="text" class="input-text" id="put-min-difference" ng-model="config.rate_limiting.put.min_difference" placeholder="In MS (Ex: 100)" />
         </div>
       </div>
     </section>
@@ -193,19 +193,19 @@
           <label class="desc-label" for="delete-interval">Interval
             <span class="info-tooltip" data-balloon="The amount of time to which you are limiting the number of request to (e.g. 'Max in Interval' requests every 'Interval' milliseconds)" data-balloon-pos="up" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
           </label>
-          <input type="text" class="input-text" id="delete-interval" ng-model="AdminSettingsCtrl.settings.rate_limiting.delete.interval" placeholder="In MS (Ex: 1000)" />
+          <input type="text" class="input-text" id="delete-interval" ng-model="config.rate_limiting.delete.interval" placeholder="In MS (Ex: 1000)" />
         </div>
         <div>
           <label class="desc-label" for="delete-max-in-interval">Max In Interval
             <span class="info-tooltip" data-balloon="How many requests you can make within the interval (e.g. 'Max in Interval' requests every 'Interval' milliseconds)" data-balloon-pos="up" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
           </label>
-          <input type="text" class="input-text" id="delete-max-in-interval" ng-model="AdminSettingsCtrl.settings.rate_limiting.delete.max_in_interval" placeholder="Ex: 1" />
+          <input type="text" class="input-text" id="delete-max-in-interval" ng-model="config.rate_limiting.delete.max_in_interval" placeholder="Ex: 1" />
         </div>
         <div>
           <label class="desc-label" for="delete-min-difference">Min Difference
             <span class="info-tooltip" data-balloon="How long between each request (e.g. how much time between each 'Max in Interval')" data-balloon-pos="up" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
           </label>
-          <input type="text" class="input-text" id="delete-min-difference" ng-model="AdminSettingsCtrl.settings.rate_limiting.delete.min_difference" placeholder="In MS (Ex: 100)" />
+          <input type="text" class="input-text" id="delete-min-difference" ng-model="config.rate_limiting.delete.min_difference" placeholder="In MS (Ex: 100)" />
         </div>
       </div>
     </section>
@@ -224,7 +224,7 @@
 
 <script>
 import { reactive, toRefs, onMounted, onUnmounted } from 'vue'
-// import { adminApi, motdApi, boardsApi } from '@/api'
+import { adminApi } from '@/api'
 import EventBus from '@/composables/services/event-bus'
 import TrustAdminSettings from '@/components/trust/TrustAdminSettings.vue'
 import TrustList from '@/components/trust/TrustList.vue'
@@ -233,29 +233,23 @@ import AdManager from '@/components/admin/settings/AdManager.vue'
 export default {
   name: 'AdvancedSettings',
   components: { TrustAdminSettings, TrustList, AdManager },
-  // beforeRouteEnter(to, from, next) {
-  //   adminApi.configurations().then(data => next(vm => {
-  //     vm.config = data
-  //     vm.originalConfig = cloneDeep(data)
-  //     vm.localImageServer = data.images.storage === 'local'
-  //     motdApi.get().then(mData => vm.motdData = mData)
-  //     boardsApi.movelist()
-  //     .then(ml => groupBy(ml, 'parent_name'))
-  //     .then(movelist => vm.boardsMovelist = movelist)
-  //   }))
-  // },
-  // beforeRouteUpdate(to, from, next) {
-  //   adminApi.configurations().then(data => {
-  //     this.config = data
-  //     this.originalConfig = cloneDeep(data)
-  //     this.localImageServer = data.images.storage === 'local'
-  //     motdApi.get().then(mData => this.motdData = mData)
-  //     boardsApi.movelist()
-  //     .then(ml => groupBy(ml, 'parent_name'))
-  //     .then(movelist => this.boardsMovelist = movelist)
-  //     next()
-  //   })
-  // },
+  beforeRouteEnter(to, from, next) {
+    adminApi.configurations().then(data => next(vm => {
+      vm.config = data
+      adminApi.blacklist.get().then(bl => vm.blacklist = bl)
+      adminApi.ranks.get().then(ranks => vm.ranks = ranks)
+      adminApi.autoModeration.getRules().then(rules => vm.rules = rules)
+    }))
+  },
+  beforeRouteUpdate(to, from, next) {
+    adminApi.configurations().then(data => {
+      this.config = data
+      adminApi.blacklist.get().then(bl => this.blacklist = bl)
+      adminApi.ranks.get().then(ranks => this.ranks = ranks)
+      adminApi.autoModeration.getRules().then(rules => this.rules = rules)
+      next()
+    })
+  },
   setup() {
     const saveListener = () => console.log('save')
     const resetListener = () => console.log('reset')
@@ -270,7 +264,10 @@ export default {
     })
 
     const v = reactive({
-
+      config: {},
+      blacklist: [],
+      ranks: [],
+      rules: []
     })
     return { ...toRefs(v) }
   }
