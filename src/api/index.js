@@ -244,7 +244,7 @@ export const adminApi = {
   autoModeration: {
     getRules: () => $http('/api/automoderation/rules'),
     addRule: data => $http('/api/automoderation/rules', { method: 'POST', data }),
-    updateRule: data => $http(`/api/automoderation/rules/${id}`, { method: 'PUT', data }),
+    updateRule: data => $http(`/api/automoderation/rules/${data.id}`, { method: 'PUT', data }),
     deleteRule: id => $http(`/api/automoderation/rules/${id}`, { method: 'DELETE' })
   }
 }
