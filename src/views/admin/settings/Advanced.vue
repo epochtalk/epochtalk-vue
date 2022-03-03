@@ -5,7 +5,7 @@
       <!-- Black List -->
       <h5 class="thin-underline section-header-top-spacing">IP Blacklist Rules
         <span class="info-tooltip" data-balloon="Adding an IP address/range/wildcard to the blacklist will disallow users with that specific IP or in that IP Range from loading the forum or its data" data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
-        <a ng-click="vmBlacklist.showAddModal = true" class="right"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add Rule</a></h5>
+        <a @click="showBlacklistAddModal = true" class="right"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add Rule</a></h5>
 
       <table class="striped rulesTable" width="100%">
         <thead>
@@ -13,21 +13,21 @@
           <th>Rule</th>
           <th>Actions</th>
         </thead>
-        <tbody ng-if="!vmBlacklist.blacklist.length">
+        <tbody v-if="!blacklist.length">
           <tr>
             <td colspan="3">
               <h6>There are currently no IP blacklist rules. Click "+ Add Rule" above to create a new rule.</h6>
             </td>
           </tr>
         </tbody>
-        <tbody ng-if="vmBlacklist.blacklist.length" ng-repeat="rule in vmBlacklist.blacklist track by rule.id">
-          <tr>
-            <td class="name" ng-bind="rule.note"></td>
-            <td ng-bind-html="rule.ip_data | replace: '-' : ' - ' "></td>
+        <tbody v-if="blacklist.length">
+          <tr v-for="rule in blacklist" :key="rule.id">
+            <td class="name" v-bind-html="rule.note"></td>
+            <td v-bind-html="replace(rule.ip_data, '-', ' - ')"></td>
             <td>
-              <a ng-click="vmBlacklist.openEditModal(rule)"><i class="fa fa-pencil"></i></a>
+              <a @click="showBlacklistEditModal(rule)"><i class="fa fa-pencil"></i></a>
               &nbsp;&nbsp;&nbsp;
-              <a ng-click="vmBlacklist.selectedRule = rule; vmBlacklist.showDeleteModal = true"><i class="fa fa-trash"></i></a>
+              <a @click="selectedBlacklistRule = rule; showBlacklistDeleteModal = true"><i class="fa fa-trash"></i></a>
             </td>
           </tr>
         </tbody>
@@ -226,6 +226,7 @@
 import { reactive, toRefs, onMounted, onUnmounted } from 'vue'
 import { adminApi } from '@/api'
 import EventBus from '@/composables/services/event-bus'
+import replace from '@/composables/filters/replace'
 import TrustAdminSettings from '@/components/trust/TrustAdminSettings.vue'
 import TrustList from '@/components/trust/TrustList.vue'
 import AdManager from '@/components/admin/settings/AdManager.vue'
@@ -263,13 +264,18 @@ export default {
       EventBus.off('admin-reset', resetListener)
     })
 
+    const showBlacklistEditModal = () => {}
+
     const v = reactive({
       config: {},
       blacklist: [],
       ranks: [],
-      rules: []
+      rules: [],
+      showBlacklistEditModal: false,
+      showBlacklistDeleteModal: false,
+      selectedBlacklistRule: null
     })
-    return { ...toRefs(v) }
+    return { ...toRefs(v), replace, showBlacklistEditModal }
   }
 }
 </script>
