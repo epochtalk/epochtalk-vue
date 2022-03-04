@@ -6,8 +6,6 @@
     <div class="trust-section">
       <Multiselect v-model="trustUserInput.value" v-bind="trustUserInput" />
     </div>
-<!--     <autocomplete-user-id admin="admin" user-id="vm.userToTrust.user_id_trusted" username="vm.userToTrust.username_trusted" input-placeholder="Type username to add to trust/untrust list"></autocomplete-user-id>
- -->
     <div class="trust-section split-column">
       <button class="fill-row" @click="addToTrustList()" :disabled="trustedUserExists()">Add to Trusted Users</button>
       <button class="fill-row" @click="addToUntrustList()" :disabled="untrustedUserExists()">Add to Untrusted Users</button>
