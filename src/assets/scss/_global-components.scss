@@ -164,6 +164,7 @@ table.striped thead tr th, table.striped tbody tr th, table.striped tbody tr td,
 table.striped.rulesTable {
   table-layout: fixed;
   thead { border-bottom: 1px solid $border-color; }
+  thead th { text-align: left; padding-left: .5rem; }
   tr td:first-child { width: 25%; }
   tr td h6 { @include pad(1.5rem 0); text-align: center; }
   tr td:nth-child(2) { word-wrap: break-word; font-family: courier; }
