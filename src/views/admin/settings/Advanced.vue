@@ -66,11 +66,11 @@
 
     </div>
 
-    <div ng-if="vm.canViewRules()">
+    <div v-if="canViewAutoModRules()">
       <h5 class="thin-underline section-header-top-spacing">
         Auto Moderation Rules
         <span class="info-tooltip" data-balloon="Allows forum owners to set up rules which will auto detect keywords or phrases and take a predesignated action without the intervention of a human moderator" data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
-        <a ng-click="vm.createRule()" class="right" ng-if="vm.canCreateRule()">
+        <a @click="createAutoModRule()" class="right" v-if="canCreateAutoModRule()">
           <i class="fa fa-plus"></i>&nbsp;&nbsp;Add Rule
         </a>
       </h5>
@@ -81,23 +81,23 @@
           <th>Rule Description</th>
           <th>Actions</th>
         </thead>
-        <tbody ng-if="!vm.rules.length">
+        <tbody v-if="!rules.length">
           <tr>
             <td colspan="3">
               <h6>There are currently no auto moderation rules. Click "+ Add Rule" above to create a new rule.</h6>
             </td>
           </tr>
         </tbody>
-        <tbody ng-if="vm.rules.length" ng-repeat="rule in vm.rules track by rule.id">
-          <tr>
+        <tbody v-if="rules.length">
+          <tr v-for="rule in rules" :key="rule.id">
             <td class="name" ng-bind-html="rule.name"></td>
-            <td ng-bind-html="rule.description"></td>
+            <td v-html="rule.description"></td>
             <td>
-              <a ng-click="vm.viewRule(rule)" ng-if="vm.canEditRule()">
+              <a @click="viewAutoModRule(rule)" v-if="canEditAutoModRule()">
                 <i class="fa fa-pencil"></i>
               </a>
               &nbsp;&nbsp;&nbsp;
-              <a ng-click="vm.deleteRule(rule)" ng-if="vm.canRemoveRule()">
+              <a @click="deleteAutoModRule(rule)" v-if="canDeleteAutoModRule()">
                 <i class="fa fa-trash"></i>
               </a>
             </td>
@@ -263,19 +263,32 @@ export default {
       EventBus.off('admin-save', saveListener)
       EventBus.off('admin-reset', resetListener)
     })
-
     const showBlacklistEditModal = () => {}
 
+    const createAutoModRule = () => {}
+    const viewAutoModRule = () => {}
+    const deleteAutoModRule = () => {}
+    const canDeleteAutoModRule = () => true
+    const canViewAutoModRules = () => true
+    const canCreateAutoModRule = () => true
+    const canEditAutoModRule = () => true
+
     const v = reactive({
-      config: {},
+      config: null,
+      originalConfig: null,
       blacklist: [],
       ranks: [],
       rules: [],
       showBlacklistEditModal: false,
       showBlacklistDeleteModal: false,
-      selectedBlacklistRule: null
+      selectedBlacklistRule: null,
+      showRankAddModal: false,
+      showRankEditModal: false,
+      showRankDeleteModal: false,
+      selectedRank: null,
+      editRank: null
     })
-    return { ...toRefs(v), replace, showBlacklistEditModal }
+    return { ...toRefs(v), replace, showBlacklistEditModal, canViewAutoModRules, canCreateAutoModRule, createAutoModRule, viewAutoModRule, canEditAutoModRule, deleteAutoModRule, canDeleteAutoModRule }
   }
 }
 </script>
