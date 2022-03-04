@@ -1,5 +1,5 @@
-export default () => (text, subStr, newSubStr) => {
+export default (text, subStr, newSubStr) => {
   if (!subStr || !newSubStr) return text
-  else text.split(subStr).join(newSubStr)
+  else return text.split(subStr).join(newSubStr)
 }
 
