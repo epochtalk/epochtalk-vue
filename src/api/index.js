@@ -267,7 +267,7 @@ export const adsApi = {
   rounds: {
     create: data => $http('/api/ads/rounds', { method: 'POST', data }),
     get: () => $http('/api/ads/rounds/info'),
-    getRound: id => $http(`/api/ads/rounds/${id}`),
+    getRound: data => $http(`/api/ads/rounds/${data.roundNumber}`, { params: { type: data.type } }),
     rotate: data => $http('/api/ads/rounds/rotate', { method: 'POST', data })
   }
 }
