@@ -214,7 +214,7 @@
   </div>
 
   <div class="full-width">
-    <trust-list admin="true"></trust-list>
+    <trust-list :admin="true" :trust-list="defaultTrustData.trustList" :untrust-list="defaultTrustData.untrustList" :max="defaultTrustData.maxDepth"></trust-list>
   </div>
   <!-- Full Row -->
   <div class="full-width ad-settings">
@@ -223,7 +223,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, onMounted, onUnmounted } from 'vue'
+import { reactive, toRefs, onMounted, onUnmounted, inject } from 'vue'
 import { adminApi } from '@/api'
 import EventBus from '@/composables/services/event-bus'
 import replace from '@/composables/filters/replace'
@@ -242,6 +242,7 @@ export default {
       adminApi.blacklist.get().then(bl => vm.blacklist = bl)
       adminApi.ranks.get().then(ranks => vm.ranks = ranks)
       adminApi.autoModeration.getRules().then(rules => vm.rules = rules)
+      adminApi.trust.getDefaultTrustList().then(td => vm.defaultTrustData = td)
     }))
   },
   beforeRouteUpdate(to, from, next) {
@@ -276,9 +277,12 @@ export default {
     const canCreateAutoModRule = () => true
     const canEditAutoModRule = () => true
 
+    const $alertStore = inject('$alertStore')
+
     const v = reactive({
       config: null,
       originalConfig: null,
+      defaultTrustData: {},
       blacklist: [],
       ranks: [],
       rules: [],

@@ -6,11 +6,6 @@
   <div class="board-bans-list">
     <label>
       <strong>Board Visibility</strong>
-      <div class="right">
-        <a @click="checkAll(true)"><i class="far fa-check-square"></i> Check All</a>
-        &nbsp;&nbsp;
-        <a @click="checkAll(false)"><i class="far fa-square"></i> Uncheck All</a>
-      </div>
     </label>
     <div class="clear boards-check-list">
       <div v-for="cat in boards" :key="cat.id">
@@ -29,7 +24,7 @@
 <script>
 import { reactive, toRefs, onBeforeMount } from 'vue'
 import IgnoredBoardsPartial from '@/components/settings/IgnoredBoardsPartial.vue'
-import { boardsApi, usersApi } from '@/api'
+import { boardsApi, usersApi, adminApi } from '@/api'
 
 export default {
   name: 'trust-admin-settings',
@@ -37,28 +32,18 @@ export default {
   setup() {
     onBeforeMount(() => {
       boardsApi.getBoards(true).then(d => v.boards = d.boards).catch(() => {})
-      usersApi.trust.getTrustBoards().then(d => v.trustBoards = d.reduce((acc, b) => {
-        acc[b.id] = true
-        return acc
-      }, {})).catch(() => {})
+      usersApi.trust.getTrustBoards().then(d => {
+        v.trustBoards = d.reduce((acc, id) => {
+          acc[id] = true
+          return acc
+        }, {})
+      }).catch(() => {})
     })
 
-    const genBoardsObjFromArray = (boards, checkedBoardInputs, checked) => {
-      if (!boards || !boards.length) return checkedBoardInputs
-      for (let i = 0; i < boards.length; i++) {
-        const curBoard = boards[i]
-        checkedBoardInputs = genBoardsObjFromArray(curBoard.boards || curBoard.children || [], checkedBoardInputs, checked)
-        if (checked && curBoard.category_id || curBoard.parent_id) checkedBoardInputs[curBoard.id] = true
-      }
-      return checkedBoardInputs
-    }
-
-    const checkAll = checked => v.trustBoards = checked ? genBoardsObjFromArray(v.boards, {}, true) : {}
-
-    const toggleTrustBoard = boardId => v.trustBoards[boardId] ? delete v.trustBoards[boardId] : v.trustBoards[boardId] = true
+    const toggleTrustBoard = boardId => v.trustBoards[boardId] ? adminApi.trust.deleteTrustBoard({ board_id: boardId }).then(() => delete v.trustBoards[boardId]) : adminApi.trust.addTrustBoard({ board_id: boardId }).then(() => v.trustBoards[boardId] = true)
 
     const v = reactive({ boards: [], trustBoards: [] })
-    return { ...toRefs(v), checkAll, toggleTrustBoard }
+    return { ...toRefs(v), toggleTrustBoard }
   }
 }
 </script>
