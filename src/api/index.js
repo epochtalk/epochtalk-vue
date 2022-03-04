@@ -167,7 +167,6 @@ export const usersApi = {
     getTrustStats: username => $http(`/api/trust/${username}`),
     getTrustFeedback: username => $http(`/api/trustfeedback/${username}`),
     addTrustFeedback: data => $http('/api/trust', { method: 'POST', data }),
-    editDefaultTrustList: data => $http('/api/admin/trustlist', { method: 'POST', data }),
     editTrustList: data => $http('/api/trustlist', { method: 'POST', data })
   }
 }
@@ -227,6 +226,12 @@ export const banApi = {
 export const adminApi = {
   configurations: () => $http('/api/configurations'),
   updateConfigurations: data => $http('/api/configurations', { method: 'POST', data }),
+  trust: {
+    getDefaultTrustList: () => $http('/api/admin/trustlist'),
+    editDefaultTrustList: data => $http('/api/admin/trustlist', { method: 'POST', data }),
+    deleteTrustBoard: data => $http(`/api/admin/trustboards/${data.board_id}`, { method: 'DELETE' }),
+    addTrustBoard: data => $http('/api/admin/trustboards', { method: 'POST', data })
+  },
   moderators: {
     remove: data => $http('/api/admin/moderators/remove', { method: 'POST', data }),
     add: data => $http('/api/admin/moderators', { method: 'POST', data })

@@ -54,7 +54,7 @@
 <script>
 import { reactive, toRefs, watch } from 'vue'
 import Multiselect from '@vueform/multiselect'
-import { usersApi } from '@/api'
+import { usersApi, adminApi } from '@/api'
 
 export default {
   name: 'TrustList',
@@ -67,7 +67,7 @@ export default {
         max_depth: v.maxDepth >= 0 && v.maxDepth <= 4 ? v.maxDepth : 2,
         list: v.trustListReactive.concat(v.untrustListReactive)
       }
-      let editTrustListPromise = v.admin ? usersApi.trust.editDefaultTrustList(params) : usersApi.trust.editTrustList(params)
+      let editTrustListPromise = v.admin ? adminApi.trust.editDefaultTrustList(params) : usersApi.trust.editTrustList(params)
       editTrustListPromise.then(updatedLists => {
         v.trustListReactive = updatedLists.trustList;
         v.untrustListReactive = updatedLists.untrustList;
@@ -124,7 +124,7 @@ export default {
         searchable: true,
         maxHeight: 100,
         options: async q => {
-          return await usersApi.lookup(q, { restricted: true })
+          return await usersApi.lookup(q, { restricted: !v.admin, self: v.admin })
           // convert array into array of objects
           .then(d => d.map(u =>{ return { label: u.username, value: { username_trusted: u.username, user_id_trusted: u.id } } }))
           .catch(() => { return [] })
