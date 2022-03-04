@@ -22,8 +22,8 @@
         </tbody>
         <tbody v-if="blacklist.length">
           <tr v-for="rule in blacklist" :key="rule.id">
-            <td class="name" v-bind-html="rule.note"></td>
-            <td v-bind-html="replace(rule.ip_data, '-', ' - ')"></td>
+            <td class="name" v-html="rule.note"></td>
+            <td v-html="replace(rule.ip_data, '-', ' - ')"></td>
             <td>
               <a @click="showBlacklistEditModal(rule)"><i class="fa fa-pencil"></i></a>
               &nbsp;&nbsp;&nbsp;
@@ -53,8 +53,8 @@
         </tbody>
         <tbody v-if="ranks.length">
           <tr v-for="rank in ranks" :key="rank.post_count">
-            <td class="name" v-bind-html="rank.name"></td>
-            <td v-bind-html="rank.post_count"></td>
+            <td class="name" v-html="rank.name"></td>
+            <td v-html="rank.post_count"></td>
             <td>
               <a @click="selectedRank = rank; editedRank = { name: rank.name, post_count: rank.post_count }; showRankEditModal = true"><i class="fa fa-pencil"></i></a>
               &nbsp;&nbsp;&nbsp;
