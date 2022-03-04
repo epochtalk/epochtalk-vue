@@ -25,7 +25,7 @@
             <td class="name" v-html="rule.note"></td>
             <td v-html="replace(rule.ip_data, '-', ' - ')"></td>
             <td>
-              <a @click="showBlacklistEditModal(rule)"><i class="fa fa-pencil"></i></a>
+              <a @click="showBlacklistEditModal(rule)"><i class="fas fa-edit"></i></a>
               &nbsp;&nbsp;&nbsp;
               <a @click="selectedBlacklistRule = rule; showBlacklistDeleteModal = true"><i class="fa fa-trash"></i></a>
             </td>
@@ -56,7 +56,7 @@
             <td class="name" v-html="rank.name"></td>
             <td v-html="rank.post_count"></td>
             <td>
-              <a @click="selectedRank = rank; editedRank = { name: rank.name, post_count: rank.post_count }; showRankEditModal = true"><i class="fa fa-pencil"></i></a>
+              <a @click="selectedRank = rank; editedRank = { name: rank.name, post_count: rank.post_count }; showRankEditModal = true"><i class="fas fa-edit"></i></a>
               &nbsp;&nbsp;&nbsp;
               <a @click="selectedRank = rank; showRankDeleteModal = true"><i class="fa fa-trash"></i></a>
             </td>
@@ -90,11 +90,11 @@
         </tbody>
         <tbody v-if="rules.length">
           <tr v-for="rule in rules" :key="rule.id">
-            <td class="name" ng-bind-html="rule.name"></td>
+            <td class="name" v-html="rule.name"></td>
             <td v-html="rule.description"></td>
             <td>
               <a @click="viewAutoModRule(rule)" v-if="canEditAutoModRule()">
-                <i class="fa fa-pencil"></i>
+                <i class="fas fa-edit"></i>
               </a>
               &nbsp;&nbsp;&nbsp;
               <a @click="deleteAutoModRule(rule)" v-if="canDeleteAutoModRule()">
