@@ -252,12 +252,17 @@ export default {
       adminApi.blacklist.get().then(bl => this.blacklist = bl)
       adminApi.ranks.get().then(ranks => this.ranks = ranks)
       adminApi.autoModeration.getRules().then(rules => this.rules = rules)
+      adminApi.trust.getDefaultTrustList().then(td => this.defaultTrustData = td)
       next()
     })
   },
   setup() {
-    const saveListener = () => console.log('save')
-    const resetListener = () => console.log('reset')
+    const saveListener = () => {
+      adminApi.updateConfigurations(v.config)
+      .then(() => $alertStore.success('Successfully updated rate limit settings!'))
+      .catch(() => $alertStore.error('Error saving rate limit settings'))
+    }
+    const resetListener = () => v.config = cloneDeep(v.originalConfig)
 
     onMounted(() => {
       EventBus.on('admin-save', saveListener)
