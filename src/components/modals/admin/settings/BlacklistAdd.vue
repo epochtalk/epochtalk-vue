@@ -18,7 +18,7 @@
           <input type="radio" class="pointer" name="ruleType" v-model="rule.type" :value="2" id="wildcard" :disabled="addSubmitted" required />
           <label for="wildcard">Wildcard IP</label>
 
-          <div v-if="rule.type === 0">
+          <div v-if="rule.type === 0" class="single-ip">
             <label>Enter a single IPV4 or IPV6 address
               <input type="text" v-model="rule.ip" placeholder="Ex: 203.0.113.15 or 2001:0db8:0f61:a1ff:0000:0000:0000:0080" ng-pattern="ipRegex" required />
             </label>
@@ -26,11 +26,11 @@
 
           <div v-if="rule.type === 1">
             <label>Enter a range of IPV4 or IPV6 addresses</label>
-            <div>
-              <div class="half-column">
+            <div class="col">
+              <div>
                 <input type="text" v-model="rule.start" placeholder="Start Ex: 203.0.113.0 or 2001:0db8:0000:0000:0000:0000:0000:0000" ng-pattern="ipRegex" :disabled="addSubmitted" required />
               </div>
-              <div class="half-column">
+              <div>
                 <input type="text" v-model="rule.end" placeholder="End Ex: 203.0.113.255 or 2001:0db8:ffff:ffff:ffff:ffff:ffff:ffff" ng-pattern="ipRegex" :disabled="addSubmitted" required />
               </div>
             </div>
@@ -38,7 +38,7 @@
 
           <div v-if="rule.type === 2">
             <label>Enter an IPV4 wildcard</label>
-            <div class="wildcard">
+            <div class="wildcard col">
               <input type="text" v-model="rule.blockOne" ng-pattern="blockRegex" placeholder="203" maxlength="3" :disabled="addSubmitted" required />
               <input type="text" v-model="rule.blockTwo" :disabled="addSubmitted" ng-pattern="blockWildcardRegex" placeholder="0" maxlength="3" required />
               <input type="text" v-model="rule.blockThree" :disabled="addSubmitted" ng-pattern="blockWildcardRegex" placeholder="113" maxlength="3" required />
@@ -46,12 +46,12 @@
             </div>
           </div>
 
-          <div class="clear">
-            <div class="half-column">
+          <div class="col">
+            <div>
               <button class="fill-row" @click="addRule()"
               :disabled="addSubmitted" v-html="saveRuleBtnLabel"></button>
             </div>
-            <div class="half-column">
+            <div>
               <button class="fill-row" @click="addRule(true)"
               :disabled="addSubmitted" v-html="saveContinueBtnLabel"></button>
             </div>
@@ -108,3 +108,19 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+  .single-ip { margin-bottom: 1rem; }
+  .col {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    width: 100%;
+    column-gap: 0.5rem;
+    div {
+      flex: 1;
+      button { width: 100%; }
+    }
+    &.wildcard input { flex: 1; text-align: center; }
+  }
+</style>
