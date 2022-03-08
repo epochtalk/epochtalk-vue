@@ -5,7 +5,7 @@
       <!-- Black List -->
       <h5 class="thin-underline section-header-top-spacing">IP Blacklist Rules
         <span class="info-tooltip" data-balloon="Adding an IP address/range/wildcard to the blacklist will disallow users with that specific IP or in that IP Range from loading the forum or its data" data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
-        <a @click="showBlacklistAddModal = true" class="right"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add Rule</a></h5>
+        <a href="#" @click.prevent="showBlacklistAddModal = true" class="right"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add Rule</a></h5>
 
       <table class="striped rulesTable" width="100%">
         <thead>
@@ -220,6 +220,8 @@
   <div class="full-width ad-settings">
     <ad-manager></ad-manager>
   </div>
+
+   <blacklist-add-modal :show="showBlacklistAddModal" @close="showBlacklistAddModal = false" @success="() => {}" />
 </template>
 
 <script>
@@ -231,10 +233,11 @@ import TrustAdminSettings from '@/components/trust/TrustAdminSettings.vue'
 import TrustList from '@/components/trust/TrustList.vue'
 import AdManager from '@/components/admin/settings/AdManager.vue'
 import { cloneDeep } from 'lodash'
+import BlacklistAddModal from '@/components/modals/admin/settings/BlacklistAdd.vue'
 
 export default {
   name: 'AdvancedSettings',
-  components: { TrustAdminSettings, TrustList, AdManager },
+  components: { TrustAdminSettings, TrustList, AdManager, BlacklistAddModal },
   beforeRouteEnter(to, from, next) {
     adminApi.configurations().then(data => next(vm => {
       vm.config = data
@@ -291,6 +294,7 @@ export default {
       blacklist: [],
       ranks: [],
       rules: [],
+      showBlacklistAddModal: false,
       showBlacklistEditModal: false,
       showBlacklistDeleteModal: false,
       selectedBlacklistRule: null,
