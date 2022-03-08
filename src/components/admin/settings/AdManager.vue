@@ -1,191 +1,210 @@
 <template>
-  <h5 class="thin-underline">
-    <!-- Title -->
-    Advertisements
-    <span class="info-tooltip" data-balloon="Allows admins to sell ad space to members. Members can provide admins with an html/css snippet for their advertisment which will be displayed between posts. Factoids can be enabled an will be shown randomly between ads. Ads are cycled randomly" data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
+  <div v-if="showComponent">
+    <h5 class="thin-underline">
+      <!-- Title -->
+      Advertisements
+      <span class="info-tooltip" data-balloon="Allows admins to sell ad space to members. Members can provide admins with an html/css snippet for their advertisment which will be displayed between posts. Factoids can be enabled an will be shown randomly between ads. Ads are cycled randomly" data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
 
-    <!-- Tabs -->
-    <dl class="tabs ad-tabs right">
-      <dd class="no-select" ng-class="{'active': vm.tab === 'text'}">
-        <a ng-click="vm.tab = 'text'">Text</a>
-      </dd>
-      <dd class="no-select" ng-class="{'active': vm.tab === 'rounds'}">
-        <a ng-click="vm.tab = 'rounds'">Rounds</a>
-      </dd>
-      <dd class="no-select" ng-class="{'active': vm.tab === 'factoids'}">
-        <a ng-click="vm.tab = 'factoids'">Factoids</a>
-      </dd>
-    </dl>
-  </h5>
-
-  <!-- Rounds View -->
-  <div class="text-view" ng-show="vm.tab === 'text'">
-    <!-- Ad Disclaimer -->
-    <div class="fill-row">
-      <label class="desc-label">Ad Disclaimer
-        <span class="info-tooltip" data-balloon="Optional disclaimer which will be displayed above the ads" data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
-      </label>
-      <textarea ng-model="vm.text.disclaimer"></textarea>
-    </div>
-
-    <!-- Ad Disclaimer -->
-    <div class="fill-row">
-      <label class="desc-label">Ad Information sub-header
-        <span class="info-tooltip" data-balloon="An informational area to display text or an admin message regarding the ads." data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
-      </label>
-      <textarea ng-model="vm.text.info"></textarea>
-    </div>
-
-    <button ng-click="vm.saveText()">
-      Save
-    </button>
-  </div>
-
-  <!-- Rounds View -->
-  <div class="rounds-view" ng-show="vm.tab === 'rounds'">
-    <!-- Round Controls Upper -->
-    <div class="leftcol">
-      <!-- label to show that this round is the current one -->
-      <span class="put large" ng-if="vm.currentRound === vm.round && vm.currentRound">Current</span>
-      <!-- Round Number -->
-      <span>Viewing Round: </span>
-      <span ng-bind="vm.round || 'None'"></span>
-      --
-      <span>Current Round: </span>
-      <span ng-bind="vm.currentRound || 'None'"></span>
-      <span class="info-tooltip" data-balloon="Ads run in rounds so that you can bill customers buying ad space by the round" data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
-    </div>
-
-    <div class="rightcol">
-      <!-- move to round/paginate rounds -->
-      <div class="pagination-slide">
-        <div class="prev">
-          <button ng-disabled="!vm.nextRound" ng-click="vm.pullRound(vm.nextRound);">
-            &#10094; Newer
-          </button>
-        </div>
-        <div class="page" ng-if="vm.round" ng-bind="vm.round"></div>
-        <div class="page" ng-if="!vm.round">N/A</div>
-        <div class="next">
-          <button ng-disabled="!vm.previousRound" ng-click="vm.pullRound(vm.previousRound);">
-            Older &#10095;
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Ads -->
-    <h5 class="ads-controls" ng-if="vm.round">
-      <span ng-if="vm.ads.length">Ads in this Round</span>
-      <span ng-if="!vm.ads.length">No Ads for this Round</span>
-      <a ng-click="vm.openCreateAd()"><i class="fa fa-plus"></i></a>
+      <!-- Tabs -->
+      <dl class="tabs ad-tabs right">
+        <dd class="no-select" @click="tab = 'text'" :class="{'active': tab === 'text'}">
+          <a href="" @click.prevent="">Text</a>
+        </dd>
+        <dd class="no-select" @click="tab = 'rounds'" :class="{'active': tab === 'rounds'}">
+          <a href="" @click.prevent="">Rounds</a>
+        </dd>
+        <dd class="no-select" @click="tab = 'factoids'" :class="{'active': tab === 'factoids'}">
+          <a href="" @click.prevent="">Factoids</a>
+        </dd>
+      </dl>
     </h5>
 
-    <!-- Ads container -->
-    <section class="ads-container">
-      <section class="ad-item" ng-repeat="ad in vm.ads track by ad.id">
-        <h5 class="thin-underline">
-          <!-- Ad #{{$index+1}} -->
-          <div class="right">
-            <a data-balloon="Duplicate" ng-click="vm.duplicateAd(ad.id)"><i class="fa fa-files-o"></i></a>
-            &nbsp;&nbsp;&nbsp;
-            <a data-balloon="Edit" ng-click="vm.openEditAd(ad)"><i class="fa fa-pencil"></i></a>
-            &nbsp;&nbsp;&nbsp;
-            <a data-balloon="Delete" ng-click="vm.openDeleteAd(ad)"><i class="fa fa-trash"></i></a>
-          </div>
-        </h5>
-        <!-- <div id="ad-{{$index}}"></div> -->
-      </section>
-    </section>
+    <!-- Rounds View -->
+    <div class="text-view" v-if="tab === 'text'">
+      <!-- Ad Disclaimer -->
+      <div class="fill-row">
+        <label class="desc-label">Ad Disclaimer
+          <span class="info-tooltip" data-balloon="Optional disclaimer which will be displayed above the ads" data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
+        </label>
+        <textarea v-model="text.disclaimer"></textarea>
+      </div>
 
-    <!-- Round Controls Lower -->
-    <div class="round-controls">
+      <!-- Ad Disclaimer -->
+      <div class="fill-row">
+        <label class="desc-label">Ad Information sub-header
+          <span class="info-tooltip" data-balloon="An informational area to display text or an admin message regarding the ads." data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
+        </label>
+        <textarea v-model="text.info"></textarea>
+      </div>
+
+      <button class="negative">
+        Clear
+      </button>
+      <button @click="saveText()">
+        Save
+      </button>
+    </div>
+
+    <!-- Rounds View -->
+    <div class="rounds-view" v-if="tab === 'rounds'">
+      <!-- Round Controls Upper -->
       <div class="leftcol">
-        <!-- create new round -->
-        <button ng-click="vm.showCreateRound = true">
-          <i class="fa fa-plus"></i>&nbsp;&nbsp;Create New Round
-        </button>
-        <!-- rotate this round -->
-        <button ng-click="vm.showRotateRound = true" ng-if="(!vm.currentRound && vm.round) || vm.round > vm.currentRound">
-          <i class="fa fa-toggle-right"></i>&nbsp;&nbsp;Use These Ads
-        </button>
+        <!-- label to show that this round is the current one -->
+        <span class="put large" v-if="currentRound === round && currentRound">Current</span>
+        <!-- Round Number -->
+        <span>Viewing Round: </span>
+        <span>{{round || 'None'}}</span>
+        --
+        <span>Current Round: </span>
+        <span>{{currentRound || 'None'}}</span>
+        <span class="info-tooltip" data-balloon="Ads run in rounds so that you can bill customers buying ad space by the round" data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
       </div>
 
       <div class="rightcol">
         <!-- move to round/paginate rounds -->
         <div class="pagination-slide">
           <div class="prev">
-            <button ng-disabled="!vm.nextRound" ng-click="vm.pullRound(vm.nextRound);">
+            <button :disabled="!nextRound" @click="pullRound(nextRound)">
               &#10094; Newer
             </button>
           </div>
-          <div class="page" ng-if="vm.round" ng-bind="vm.round"></div>
-          <div class="page" ng-if="!vm.round">N/A</div>
+          <div class="page">{{round || 'N/A'}}</div>
           <div class="next">
-            <button ng-disabled="!vm.previousRound" ng-click="vm.pullRound(vm.previousRound);">
+            <button :disabled="!previousRound" @click="pullRound(previousRound);">
               Older &#10095;
             </button>
           </div>
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Factoids View -->
-  <div class="factoids-view" ng-show="vm.tab === 'factoids'">
-    <div class="leftcol">
-      <span>Factoids
-        <span class="info-tooltip" data-balloon="Factoids can be quotes, facts, or anything else. They will randomly be displayed between ads to give users a break from advertisments" data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
-      </span>
-    </div>
+      <!-- Ads -->
+      <h5 class="ads-controls" v-if="round">
+        <span v-if="ads.length">Ads in this Round</span>
+        <span v-if="!ads.length">No Ads for this Round</span>
+        <a @click="openCreateAd()"><i class="fa fa-plus"></i></a>
+      </h5>
 
-    <div class="rightcol">
-      <a class="right" ng-click="vm.showDisableAllFactoids = 'true'">
-        <i class="fa fa-eye-slash"></i>
-        &nbsp;&nbsp;&nbsp;
-        Disable All
-        &nbsp;&nbsp;&nbsp;
-      </a>
-      <a class="right" ng-click="vm.showEnableAllFactoids = true">
-        <i class="fa fa-eye"></i>
-        &nbsp;&nbsp;&nbsp;
-        Enable All
-        &nbsp;&nbsp;&nbsp;
-      </a>
-      <a class="right" ng-click="vm.openCreateFactoid()">
-        <i class="fa fa-plus"></i>
-        &nbsp;&nbsp;&nbsp;
-        Create
-        &nbsp;&nbsp;&nbsp;
-      </a>
-    </div>
-
-    <section class="factoids-container">
-      <section class="factoid-item" ng-repeat="factoid in vm.factoids track by factoid.id" >
-        <h5 class="thin-underline">
-          <span class="post large" ng-if="factoid.enabled" ng-click="vm.disableFactoid(factoid.id)">Enabled</span>
-          <span class="delete large" ng-if="!factoid.enabled" ng-click="vm.enableFactoid(factoid.id)">Disabled</span>
-          <!-- Factoid #{{$index+1}} -->
-          <div class="right">
-            <a ng-click="vm.openEditFactoid(factoid)"><i class="fa fa-pencil"></i></a>
-            &nbsp;&nbsp;&nbsp;
-            <a ng-click="vm.openDeleteFactoid(factoid)"><i class="fa fa-trash"></i></a>
-          </div>
-        </h5>
-        <!-- <div id="factoid-{{$index}}"></div> -->
+      <!-- Ads container -->
+      <section class="ads-container">
+        <section class="ad-item" v-for="(ad, index) in ads" :key="ad.id">
+          <h5 class="thin-underline">
+            Ad #{{index+1}}
+            <div class="right">
+              <a data-balloon="Duplicate" @click="duplicateAd(ad.id)"><i class="fa fa-files-o"></i></a>
+              &nbsp;&nbsp;&nbsp;
+              <a data-balloon="Edit" @click="openEditAd(ad)"><i class="fa fa-pencil"></i></a>
+              &nbsp;&nbsp;&nbsp;
+              <a data-balloon="Delete" @click="openDeleteAd(ad)"><i class="fa fa-trash"></i></a>
+            </div>
+          </h5>
+          <div :id="'ad-' + index"></div>
+        </section>
       </section>
-    </section>
+
+      <!-- Round Controls Lower -->
+      <div class="round-controls">
+        <div class="leftcol">
+          <!-- create new round -->
+          <button @click="showCreateRound = true">
+            <i class="fa fa-plus"></i>&nbsp;&nbsp;Create New Round
+          </button>
+          <!-- rotate this round -->
+          <button @click="showRotateRound = true" v-if="(!currentRound && round) || round > currentRound">
+            <i class="fa fa-toggle-right"></i>&nbsp;&nbsp;Use These Ads
+          </button>
+        </div>
+
+        <div class="rightcol">
+          <!-- move to round/paginate rounds -->
+          <div class="pagination-slide">
+            <div class="prev">
+              <button :disabled="!nextRound" @click="pullRound(nextRound)">
+                &#10094; Newer
+              </button>
+            </div>
+            <div class="page">{{round || 'N/A'}}</div>
+            <div class="next">
+              <button :disabled="!previousRound" @click="pullRound(previousRound)">
+                Older &#10095;
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Factoids View -->
+    <div class="factoids-view" v-if="tab === 'factoids'">
+      <div class="leftcol">
+        <span>Factoids
+          <span class="info-tooltip" data-balloon="Factoids can be quotes, facts, or anything else. They will randomly be displayed between ads to give users a break from advertisments" data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
+        </span>
+      </div>
+
+      <div class="rightcol">
+        <a class="right" @click="showDisableAllFactoids = 'true'">
+          <i class="fa fa-eye-slash"></i>
+          &nbsp;&nbsp;&nbsp;
+          Disable All
+          &nbsp;&nbsp;&nbsp;
+        </a>
+        <a class="right" @click="showEnableAllFactoids = true">
+          <i class="fa fa-eye"></i>
+          &nbsp;&nbsp;&nbsp;
+          Enable All
+          &nbsp;&nbsp;&nbsp;
+        </a>
+        <a class="right" @click="openCreateFactoid()">
+          <i class="fa fa-plus"></i>
+          &nbsp;&nbsp;&nbsp;
+          Create
+          &nbsp;&nbsp;&nbsp;
+        </a>
+      </div>
+
+      <section class="factoids-container">
+        <section class="factoid-item" v-for="(factoid, index) in factoids" :key="factoid.id">
+          <h5 class="thin-underline">
+            <span class="post large" ng-if="factoid.enabled" @click="disableFactoid(factoid.id)">Enabled</span>
+            <span class="delete large" ng-if="!factoid.enabled" @click="enableFactoid(factoid.id)">Disabled</span>
+            Factoid #{{index+1}}
+            <div class="right">
+              <a @click="openEditFactoid(factoid)"><i class="fa fa-pencil"></i></a>
+              &nbsp;&nbsp;&nbsp;
+              <a @click="openDeleteFactoid(factoid)"><i class="fa fa-trash"></i></a>
+            </div>
+          </h5>
+          <div :id="'factoid-' + index"></div>
+        </section>
+      </section>
+    </div>
   </div>
 </template>
 
 <script>
-import { reactive, toRefs, onBeforeMount } from 'vue'
-//import { boardsApi, usersApi } from '@/api'
+import { reactive, toRefs, onBeforeMount, inject } from 'vue'
+import { adsApi } from '@/api'
 
 export default {
-  name: 'trust-list',
+  name: 'ad-manager',
   setup() {
     onBeforeMount(() => {
+      adsApi.rounds.getRound({ roundNumber: v.currentRound, type: 'both' })
+      .then(d => {
+        v.ads = d.ads
+        v.factoids = d.factoids
+        v.round = d.rounds.viewing
+        v.currentRound = d.rounds.current
+        v.nextRound = d.rounds.next
+        v.previousRound = d.rounds.previous
+        v.text = d.text
+      })
+      .then(renderAds)
+      .then(renderFactoids)
+      .catch(err => {
+        if (err.status === 403) v.showComponent = false
+        else $alertStore.error(err.data.message)
+      })
       // boardsApi.getBoards(true).then(d => v.boards = d.boards).catch(() => {})
       // usersApi.trust.getTrustBoards().then(d => v.trustBoards = d.reduce((acc, b) => {
       //   acc[b.id] = true
@@ -193,8 +212,64 @@ export default {
       // }, {})).catch(() => {})
     })
 
-    const v = reactive({ })
-    return { ...toRefs(v) }
+    const renderAds = () => {
+      v.ads.forEach((ad, index) => {
+        // render css
+        var node = document.getElementById(ad.id)
+        if (!node && ad.display_css) {
+          v.adsCss.push(ad.id) // keep track of what we loaded
+          node = document.createElement('style')
+          node.setAttribute('id', ad.id)
+          node.innerHTML = ad.display_css
+          document.body.appendChild(node)
+        }
+        // render html
+        document.getElementById('ad-' + index).innerHTML = ad.display_html
+      });
+    };
+
+    // Render Factoids
+    const renderFactoids = () => {
+      v.factoids.forEach((factoid, index) => {
+        document.getElementById('factoid-' + index).innerHTML = factoid.text;
+      })
+    };
+
+    const saveText = () => {}
+    const pullRound = () => {}
+    const openCreateAd = () => {}
+    const openEditAd= () => {}
+    const openDeleteAd = () => {}
+    const duplicateAd = () => {}
+
+    const openCreateFactoid = () => {}
+    const openEditFactoid = () => {}
+    const openDeleteFactoid = () => {}
+    const enableFactoid = () => {}
+    const disableFactoid = () => {}
+
+    const $alertStore = inject('$alertStore')
+
+    const v = reactive({
+      showCreateRound: false,
+      showRotateRound: false,
+      showWriteFactoid: false,
+      showDeleteFactoid: false,
+      showEnableAllFactoids: false,
+      showDisableAllFactoids: false,
+      tempFactoid: { text: '' },
+      tab: 'rounds',
+      showComponent: true,
+      ads: null,
+      factoids: null,
+      round: null,
+      currentRound: 'current',
+      nextRound: null,
+      previousRound: null,
+      text: null,
+      adsCss: []
+    })
+    return { ...toRefs(v), saveText, pullRound, openCreateAd, openEditAd, openDeleteAd, duplicateAd, openCreateFactoid, openEditFactoid, openDeleteFactoid, enableFactoid, disableFactoid }
   }
 }
 </script>
@@ -216,7 +291,7 @@ export default {
 
   .rounds-view {
     display: grid;
-    grid-template-columns: auto auto;
+    grid-template-columns: 50% 50%;
     .leftcol {
       h2 { display: inline-block; }
       margin-bottom: 1.5rem;
@@ -224,9 +299,12 @@ export default {
     }
     .rightcol {
       .pagination-slide {
-        // @include span-columns(10);
-        float: right;
-        // .prev, .next, .page { @include span-columns(4); }
+        display: flex;
+        width: 100%;
+        flex-direction: row;
+        align-items: stretch;
+        justify-content: flex-end;
+        .prev, .next, .page { flex: 1; text-align: right; button { float: right; } }
       }
     }
   }
@@ -240,11 +318,19 @@ export default {
     }
   }
 
-  .round-controls { padding-top: 2rem; }
+  .text-view { display: grid; grid-template-columns: 50% 50%; grid-column-gap: .5rem; }
+
+  .round-controls {
+    display: grid;
+    grid-template-columns: 50% 50%;
+    grid-row: 2;
+    grid-column: 1 / 3;
+    padding-top: 2rem;
+  }
 
   .factoids-view {
     display: grid;
-    grid-template-columns: auto auto;
+    grid-template-columns: 50% 50%;
     .leftcol {
       h2 { display: inline-block; }
       margin-bottom: 1.5rem;
@@ -281,6 +367,6 @@ export default {
   .text-right th, .text-right td { text-align: right; }
   .analytics-view {
     display: grid;
-    grid-template-columns: auto auto;
+    grid-template-columns: 50% 50%;
   }
 </style>
