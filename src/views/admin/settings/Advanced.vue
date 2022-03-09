@@ -25,7 +25,7 @@
             <td class="name" v-html="rule.note"></td>
             <td v-html="replace(rule.ip_data, '-', ' - ')"></td>
             <td>
-              <a @click="showBlacklistEditModal(rule)"><i class="fas fa-edit"></i></a>
+              <a @click="showBlacklistEditModal = true; selectedBlacklistRule = rule"><i class="fas fa-edit"></i></a>
               &nbsp;&nbsp;&nbsp;
               <a @click="selectedBlacklistRule = rule; showBlacklistDeleteModal = true"><i class="fa fa-trash"></i></a>
             </td>
@@ -221,7 +221,7 @@
     <ad-manager></ad-manager>
   </div>
 
-   <blacklist-add-modal :show="showBlacklistAddModal" @close="showBlacklistAddModal = false" @success="() => {}" />
+   <blacklist-add-modal :show="showBlacklistAddModal || showBlacklistEditModal || showBlacklistDeleteModal" @close="showBlacklistAddModal = false; showBlacklistEditModal = false; showBlacklistDeleteModal = false" @success="reloadBlacklist" :selected="selectedBlacklistRule" :add="showBlacklistAddModal" :edit="showBlacklistEditModal" :remove="showBlacklistDeleteModal" />
 </template>
 
 <script>
@@ -260,6 +260,8 @@ export default {
     })
   },
   setup() {
+    const reloadBlacklist = () => adminApi.blacklist.get().then(bl => v.blacklist = bl)
+
     const saveListener = () => {
       adminApi.updateConfigurations(v.config)
       .then(() => $alertStore.success('Successfully updated rate limit settings!'))
@@ -275,7 +277,6 @@ export default {
       EventBus.off('admin-save', saveListener)
       EventBus.off('admin-reset', resetListener)
     })
-    const showBlacklistEditModal = () => {}
 
     const createAutoModRule = () => {}
     const viewAutoModRule = () => {}
@@ -304,7 +305,7 @@ export default {
       selectedRank: null,
       editRank: null
     })
-    return { ...toRefs(v), replace, showBlacklistEditModal, canViewAutoModRules, canCreateAutoModRule, createAutoModRule, viewAutoModRule, canEditAutoModRule, deleteAutoModRule, canDeleteAutoModRule }
+    return { ...toRefs(v), reloadBlacklist, replace, canViewAutoModRules, canCreateAutoModRule, createAutoModRule, viewAutoModRule, canEditAutoModRule, deleteAutoModRule, canDeleteAutoModRule }
   }
 }
 </script>
