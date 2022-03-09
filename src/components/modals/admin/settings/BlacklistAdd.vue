@@ -48,11 +48,11 @@
 
           <div class="col">
             <div>
-              <button class="fill-row" @click="addRule()"
+              <button class="fill-row" @click.prevent="addRule()"
               :disabled="addSubmitted" v-html="saveRuleBtnLabel"></button>
             </div>
             <div>
-              <button class="fill-row" @click="addRule(true)"
+              <button class="fill-row" @click.prevent="addRule(true)"
               :disabled="addSubmitted" v-html="saveContinueBtnLabel"></button>
             </div>
           </div>
@@ -65,7 +65,7 @@
 <script>
 import Modal from '@/components/layout/Modal.vue'
 import { reactive, toRefs, inject } from 'vue'
-import { messagesApi } from '@/api'
+import { adminApi } from '@/api'
 
 export default {
   name: 'delete-message-modal',
@@ -74,20 +74,63 @@ export default {
   components: { Modal },
   setup(props, { emit }) {
     /* Template Methods */
-    const addRule = () => {
+    const formatIPRule = rule => {
+      let formattedRule = { id: rule.id, note: rule.note };
+
+      if (rule.type === 0) { // single
+        formattedRule.ip_data = rule.ip;
+      }
+      else if (rule.type === 1) { // range
+        let ipv6Start = rule.start.indexOf(':') > -1
+        let ipv6End = rule.end.indexOf(':') > -1
+        let ipv4Start = rule.start.indexOf('.') > -1
+        let ipv4End = rule.end.indexOf('.') > -1
+        if ((ipv6Start && ipv4End) || (ipv4Start && ipv6End)) {
+          $alertStore.error('Start and End address must both be either IPV4 or IPV6')
+          rule.end = ''
+          return
+        }
+        formattedRule.ip_data = rule.start + '-' + rule.end
+      }
+      else { // wildcard
+        formattedRule.ip_data = rule.blockOne + '.' + rule.blockTwo + '.' +
+          rule.blockThree + '.' + rule.blockFour
+      }
+      return formattedRule
+    }
+
+    const resetForm = () => {
       v.errorMessage = null
-      messagesApi.delete(props.messageId)
+      v.rule = { type: 0 }
+      v.addSubmitted = false
+      v.saveRuleBtnLabel = 'Save'
+      v.saveContinueBtnLabel = 'Save and Continue'
+    }
+
+    const addRule = saveAndContinue => {
+      v.errorMessage = null
+      v.addSubmitted = true
+      if (saveAndContinue) v.saveContinueBtnLabel = 'Loading...'
+      else v.saveRuleBtnLabel = 'Loading...'
+      let ruleToAdd = formatIPRule(v.rule)
+      if (!ruleToAdd) {
+        resetForm()
+        return
+      }
+      adminApi.blacklist.add(ruleToAdd)
       .then(() => {
         emit('success')
-        $alertStore.success(`Successfully deleted message!`)
+        $alertStore.success(`Successfully added blacklist rule!`)
       })
-      .catch(() => v.errorMessage = `There was an error deleting message, please contact an administrator.`)
-      .finally(() => v.errorMessage ? null : close())
+      .catch(() => v.errorMessage = `There was an error adding blacklist rule.`)
+      .finally(() => {
+        if (!v.errorMessage && saveAndContinue) resetForm()
+        else if (!v.errorMessage) close()
+      })
     }
 
     const close = () => {
-      v.errorMessage = null
-      v.rule = { type: 0 }
+      resetForm()
       emit('close')
     }
 
