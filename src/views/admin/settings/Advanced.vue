@@ -221,7 +221,7 @@
     <ad-manager></ad-manager>
   </div>
 
-   <blacklist-add-modal :show="showBlacklistAddModal || showBlacklistEditModal || showBlacklistDeleteModal" @close="showBlacklistAddModal = false; showBlacklistEditModal = false; showBlacklistDeleteModal = false" @success="reloadBlacklist" :selected="selectedBlacklistRule" :add="showBlacklistAddModal" :edit="showBlacklistEditModal" :remove="showBlacklistDeleteModal" />
+   <blacklist-modal :show="showBlacklistAddModal || showBlacklistEditModal || showBlacklistDeleteModal" @close="showBlacklistAddModal = false; showBlacklistEditModal = false; showBlacklistDeleteModal = false" @success="reloadBlacklist" :selected="selectedBlacklistRule" :add="showBlacklistAddModal" :edit="showBlacklistEditModal" :remove="showBlacklistDeleteModal" />
 </template>
 
 <script>
@@ -233,11 +233,11 @@ import TrustAdminSettings from '@/components/trust/TrustAdminSettings.vue'
 import TrustList from '@/components/trust/TrustList.vue'
 import AdManager from '@/components/admin/settings/AdManager.vue'
 import { cloneDeep } from 'lodash'
-import BlacklistAddModal from '@/components/modals/admin/settings/BlacklistAdd.vue'
+import BlacklistModal from '@/components/modals/admin/settings/Blacklist.vue'
 
 export default {
   name: 'AdvancedSettings',
-  components: { TrustAdminSettings, TrustList, AdManager, BlacklistAddModal },
+  components: { TrustAdminSettings, TrustList, AdManager, BlacklistModal },
   beforeRouteEnter(to, from, next) {
     adminApi.configurations().then(data => next(vm => {
       vm.config = data
