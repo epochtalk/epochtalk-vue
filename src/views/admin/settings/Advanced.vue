@@ -222,6 +222,7 @@
   </div>
 
    <blacklist-modal :show="showBlacklistAddModal || showBlacklistEditModal || showBlacklistDeleteModal" @close="showBlacklistAddModal = false; showBlacklistEditModal = false; showBlacklistDeleteModal = false" @success="reloadBlacklist" :selected="selectedBlacklistRule" :add="showBlacklistAddModal" :edit="showBlacklistEditModal" :remove="showBlacklistDeleteModal" />
+   <rank-modal :show="showRankAddModal || showRankEditModal || showRankDeleteModal" @close="showRankAddModal = false; showRankEditModal = false; showRankDeleteModal = false" @success="reloadRanks" :selected="selectedRank" :add="showRankAddModal" :edit="showRankEditModal" :remove="showRankDeleteModal" :ranks="ranks" />
 </template>
 
 <script>
@@ -234,10 +235,11 @@ import TrustList from '@/components/trust/TrustList.vue'
 import AdManager from '@/components/admin/settings/AdManager.vue'
 import { cloneDeep } from 'lodash'
 import BlacklistModal from '@/components/modals/admin/settings/Blacklist.vue'
+import RankModal from '@/components/modals/admin/settings/Rank.vue'
 
 export default {
   name: 'AdvancedSettings',
-  components: { TrustAdminSettings, TrustList, AdManager, BlacklistModal },
+  components: { TrustAdminSettings, TrustList, AdManager, BlacklistModal, RankModal },
   beforeRouteEnter(to, from, next) {
     adminApi.configurations().then(data => next(vm => {
       vm.config = data
@@ -261,6 +263,7 @@ export default {
   },
   setup() {
     const reloadBlacklist = () => adminApi.blacklist.get().then(bl => v.blacklist = bl)
+    const reloadRanks = () => adminApi.ranks.get().then(r => v.ranks = r)
 
     const saveListener = () => {
       adminApi.updateConfigurations(v.config)
@@ -305,7 +308,7 @@ export default {
       selectedRank: null,
       editRank: null
     })
-    return { ...toRefs(v), reloadBlacklist, replace, canViewAutoModRules, canCreateAutoModRule, createAutoModRule, viewAutoModRule, canEditAutoModRule, deleteAutoModRule, canDeleteAutoModRule }
+    return { ...toRefs(v), reloadBlacklist, reloadRanks, replace, canViewAutoModRules, canCreateAutoModRule, createAutoModRule, viewAutoModRule, canEditAutoModRule, deleteAutoModRule, canDeleteAutoModRule }
   }
 }
 </script>
