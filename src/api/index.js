@@ -244,7 +244,7 @@ export const adminApi = {
   },
   ranks: {
     get: () => $http('/api/rank'),
-    update: data => $http('/api/rank', { method: 'PUT', data })
+    upsert: data => $http('/api/rank', { method: 'PUT', data })
   },
   autoModeration: {
     getRules: () => $http('/api/automoderation/rules'),
