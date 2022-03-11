@@ -36,7 +36,7 @@
     <div>
       <h5 class="thin-underline section-header-top-spacing">Rank Management
         <span class="info-tooltip" data-balloon="Allows forum owners to create a rank, which is a title associated with a post count" data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
-        <a @click="showRankAddModal = true" class="right"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add Rank</a></h5>
+        <a href="#" @click.prevent="showRankAddModal = true" class="right"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add Rank</a></h5>
 
       <table class="striped rulesTable" width="100%">
         <thead>
@@ -56,9 +56,9 @@
             <td class="name" v-html="rank.name"></td>
             <td v-html="rank.post_count"></td>
             <td>
-              <a @click="selectedRank = rank; editedRank = { name: rank.name, post_count: rank.post_count }; showRankEditModal = true"><i class="fas fa-edit"></i></a>
+              <a href="#" @click.prevent="selectedRank = rank; editedRank = { name: rank.name, post_count: rank.post_count }; showRankEditModal = true"><i class="fas fa-edit"></i></a>
               &nbsp;&nbsp;&nbsp;
-              <a @click="selectedRank = rank; showRankDeleteModal = true"><i class="fa fa-trash"></i></a>
+              <a href="#" @click.prevent="selectedRank = rank; showRankDeleteModal = true"><i class="fa fa-trash"></i></a>
             </td>
           </tr>
         </tbody>
