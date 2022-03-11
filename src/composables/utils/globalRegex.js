@@ -11,3 +11,5 @@ export const ipRegex = /(^\s*(([0-9]{1,2}|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.([0-9]
 export const blockIpRegex = /^([0-9]{1,2}|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/
 
 export const blockIpWildcardRegex = /^([0-9]{1,2}|1[0-9]{2}|2[0-4][0-9]|25[0-5]|\*)$/
+
+export const positiveNumberRegex = /^[0-9]\d*$/
