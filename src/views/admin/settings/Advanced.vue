@@ -70,7 +70,7 @@
       <h5 class="thin-underline section-header-top-spacing">
         Auto Moderation Rules
         <span class="info-tooltip" data-balloon="Allows forum owners to set up rules which will auto detect keywords or phrases and take a predesignated action without the intervention of a human moderator" data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
-        <a @click="createAutoModRule()" class="right" v-if="canCreateAutoModRule()">
+        <a href="#" @click.prevent="showAutoModAddModal = true" class="right" v-if="canCreateAutoModRule()">
           <i class="fa fa-plus"></i>&nbsp;&nbsp;Add Rule
         </a>
       </h5>
@@ -93,11 +93,11 @@
             <td class="name" v-html="rule.name"></td>
             <td v-html="rule.description"></td>
             <td>
-              <a @click="viewAutoModRule(rule)" v-if="canEditAutoModRule()">
+              <a href="#" @click.prevent="showAutoModEditModal = true; selectedAutoModRule = rule" v-if="canEditAutoModRule()">
                 <i class="fas fa-edit"></i>
               </a>
               &nbsp;&nbsp;&nbsp;
-              <a @click="deleteAutoModRule(rule)" v-if="canDeleteAutoModRule()">
+              <a href="#" @click.prevent="showAutoModDeleteModal = true; selectedAutoModRule = rule" v-if="canDeleteAutoModRule()">
                 <i class="fa fa-trash"></i>
               </a>
             </td>
@@ -223,6 +223,7 @@
 
    <blacklist-modal :show="showBlacklistAddModal || showBlacklistEditModal || showBlacklistDeleteModal" @close="showBlacklistAddModal = false; showBlacklistEditModal = false; showBlacklistDeleteModal = false" @success="reloadBlacklist" :selected="selectedBlacklistRule" :add="showBlacklistAddModal" :edit="showBlacklistEditModal" :remove="showBlacklistDeleteModal" />
    <rank-modal :show="showRankAddModal || showRankEditModal || showRankDeleteModal" @close="showRankAddModal = false; showRankEditModal = false; showRankDeleteModal = false" @success="reloadRanks" :selected="selectedRank" :add="showRankAddModal" :edit="showRankEditModal" :remove="showRankDeleteModal" :ranks="ranks" />
+   <auto-moderation-modal :show="showAutoModAddModal || showAutoModEditModal || showAutoModDeleteModal" @close="showAutoModAddModal = false; showAutoModEditModal = false; showAutoModDeleteModal = false" @success="reloadAutoModeration" :selected="selectedAutoModRule" :add="showAutoModAddModal" :edit="showAutoModEditModal" :remove="showAutoModDeleteModal" />
 </template>
 
 <script>
@@ -236,10 +237,11 @@ import AdManager from '@/components/admin/settings/AdManager.vue'
 import { cloneDeep } from 'lodash'
 import BlacklistModal from '@/components/modals/admin/settings/Blacklist.vue'
 import RankModal from '@/components/modals/admin/settings/Rank.vue'
+import AutoModerationModal from '@/components/modals/admin/settings/AutoModeration.vue'
 
 export default {
   name: 'AdvancedSettings',
-  components: { TrustAdminSettings, TrustList, AdManager, BlacklistModal, RankModal },
+  components: { TrustAdminSettings, TrustList, AdManager, BlacklistModal, RankModal, AutoModerationModal },
   beforeRouteEnter(to, from, next) {
     adminApi.configurations().then(data => next(vm => {
       vm.config = data
@@ -264,6 +266,7 @@ export default {
   setup() {
     const reloadBlacklist = () => adminApi.blacklist.get().then(bl => v.blacklist = bl)
     const reloadRanks = () => adminApi.ranks.get().then(r => v.ranks = r)
+    const reloadAutoModeration = () => adminApi.autoModeration.getRules().then(r => v.rules = r)
 
     const saveListener = () => {
       adminApi.updateConfigurations(v.config)
@@ -281,9 +284,6 @@ export default {
       EventBus.off('admin-reset', resetListener)
     })
 
-    const createAutoModRule = () => {}
-    const viewAutoModRule = () => {}
-    const deleteAutoModRule = () => {}
     const canDeleteAutoModRule = () => true
     const canViewAutoModRules = () => true
     const canCreateAutoModRule = () => true
@@ -306,9 +306,13 @@ export default {
       showRankEditModal: false,
       showRankDeleteModal: false,
       selectedRank: null,
+      showAutoModAddModal: false,
+      showAutoModEditModal: false,
+      showAutoModDeleteModal: false,
+      selectedAutoModRule: null,
       editRank: null
     })
-    return { ...toRefs(v), reloadBlacklist, reloadRanks, replace, canViewAutoModRules, canCreateAutoModRule, createAutoModRule, viewAutoModRule, canEditAutoModRule, deleteAutoModRule, canDeleteAutoModRule }
+    return { ...toRefs(v), reloadBlacklist, reloadRanks, reloadAutoModeration, replace, canViewAutoModRules, canCreateAutoModRule, canEditAutoModRule, canDeleteAutoModRule }
   }
 }
 </script>
