@@ -21,15 +21,15 @@
         <br />
 
         <!-- Conditions -->
-        <div class="column-container">
-          <div class="half-column">
+        <div class="col">
+          <div>
             <h5 ng-class="{'rule-red':vm.viewedRule.conditions.length<1}">
               Conditions
               <span class="info-tooltip" data-balloon="Conditions allow you to match text within a post, thread, or even by a particular user. Conditions can be stacked allowing you to auto moderate things such as a specific user posting in a specific thread" data-balloon-pos="right" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
             </h5>
           </div>
           <!-- Add Condition -->
-          <div class="half-column">
+          <div>
             <a href="#" class="right" ng-click="vm.addCondition()">
               <i class="fa fa-plus"></i>&nbsp;&nbsp;Add More Conditions
             </a>
@@ -61,7 +61,7 @@
             </div>
 
             <label class="desc-label">Regex - <a href="https://www.regular-expressions.info/quickstart.html">Need regex help?</a></label>
-            <div class="column-container">
+            <div class="col">
               <div class="rule-regex-slash">/</div>
               <div class="rule-regex-input">
                 <input type="text" class="input-text" ng-model="cond.regex.pattern" placeholder="Regex Pattern" required />
@@ -85,17 +85,19 @@
           Actions
           <span class="info-tooltip" data-balloon="Actions are the moderation action that will take place when a match on the condition in the previous step is made. Actions can be stacked, with a minimum of one action being required" data-balloon-pos="right" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
         </h5>
-        <div class="column-container">
-          <div class="half-column rule-action" ng-class="{checked: vm.viewedRule.actions.indexOf('reject') > -1}" ng-click="vm.toggleActionSelection('reject')">
+        <div class="col">
+          <div class="rule-action" ng-class="{checked: vm.viewedRule.actions.indexOf('reject') > -1}" ng-click="vm.toggleActionSelection('reject')">
               <label class="desc-label">Reject Post</label>
           </div>
-          <div class="half-column rule-action" ng-class="{checked: vm.viewedRule.actions.indexOf('edit') > -1}" ng-click="vm.toggleActionSelection('edit')">
+          <div class="rule-action" ng-class="{checked: vm.viewedRule.actions.indexOf('edit') > -1}" ng-click="vm.toggleActionSelection('edit')">
               <label class="desc-label">Edit Post Body</label>
           </div>
-          <div class="half-column rule-action" ng-class="{checked: vm.viewedRule.actions.indexOf('ban') > -1}" ng-click="vm.toggleActionSelection('ban')">
+        </div>
+        <div class="col">
+          <div class="rule-action" ng-class="{checked: vm.viewedRule.actions.indexOf('ban') > -1}" ng-click="vm.toggleActionSelection('ban')">
               <label class="desc-label">Ban User</label>
           </div>
-          <div class="half-column rule-action" ng-class="{checked: vm.viewedRule.actions.indexOf('delete') > -1}" ng-click="vm.toggleActionSelection('delete')">
+          <div class="rule-action" ng-class="{checked: vm.viewedRule.actions.indexOf('delete') > -1}" ng-click="vm.toggleActionSelection('delete')">
               <label class="desc-label">Allow Post but display as deleted</label>
           </div>
         </div>
@@ -152,7 +154,7 @@
             </div>
 
             <label class="desc-label">Regex - <a href="https://www.regular-expressions.info/quickstart.html">Need regex help?</a></label>
-            <div class="column-container">
+            <div class="col">
               <div class="rule-regex-slash">/</div>
               <div class="rule-regex-input">
                 <input type="text" class="input-text" ng-model="vm.viewedRule.options.edit.replace.regex.pattern" ng-disabled="vm.viewedRule.actions.indexOf('edit') < 0" />
@@ -168,7 +170,7 @@
         <br />
 
         <!-- Save Button -->
-        <div class="column-container">
+        <div class="col">
           <button class="fill-row" ng-click="vm.saveRule(vm.viewedRule)" ng-disabled="vm.submitDisabled()">
             Save
           </button>
@@ -229,17 +231,59 @@ export default {
 </script>
 
 <style lang="scss">
-  .input-spacing { margin-bottom: 1rem; }
   .col {
     display: flex;
     flex-direction: row;
     align-items: stretch;
     width: 100%;
     column-gap: 0.5rem;
-    div {
-      flex: 1;
-      button { width: 100%; }
+    div { flex: 1; }
+    .rule-regex-slash {
+      flex: 0;
+      text-align: center;
     }
-    &.wildcard input { flex: 1; text-align: center; }
+    .rule-regex-input, .rule-regex-flags {
+      flex: auto;
+      text-align: center;
+    }
+
+    .rule-condition {
+      margin-top: 0.5rem;
+      border-bottom: 1px solid $border-color;
+    }
+    .rule-condition:first-child { margin-top: 0; }
+    .rule-condition:last-child { border-bottom: 0; }
+    .rule-action {
+      border: 1px solid $border-color;
+      padding: 0.5rem;
+      cursor: pointer;
+      margin-bottom: 0.5rem;
+      input { margin-bottom: 0; }
+    }
+    .rule-action.checked { background-color: $color-primary; }
+    .rule-action.checked label { color: $button-text-color; }
+    .rule-remove-cond { margin-top: 1.1rem; }
+    .rule-red { color: red; }
+    .input-text.rule-red-border { border-color: red; }
+    .rule-description { word-wrap: break-word; white-space: pre-wrap; }
+    .rule-regex-slash {
+      float: left;
+      color: $border-color;
+      width: 10%;
+      text-align: center;
+      font-size: 1.5rem;
+      line-height: 2rem;
+      margin-top: 0.2rem;
+    }
+    .rule-regex-input { float: left; width: 60%; }
+    .rule-regex-flags { float: left; width: 20%; }
+    .rule-no-selections {
+      text-align: center;
+      font-size: 1.2rem;
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
   }
+
 </style>
