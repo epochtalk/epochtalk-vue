@@ -52,11 +52,11 @@
 
           <div class="col">
             <div>
-              <button class="fill-row" v-if="add" @click.prevent="modifyRule(true)" :disabled="requestSubmitted || !formValid" v-html="saveContinueBtnLabel"></button>
-              <button class="fill-row negative" v-if="edit || remove" @click.prevent="close()" :disabled="requestSubmitted">Cancel</button>
+              <button class="fill-row" @click.prevent="modifyRule()" :disabled="requestSubmitted || (!formValid && !remove)" v-html="saveRuleBtnLabel"></button>
             </div>
             <div>
-              <button class="fill-row" @click.prevent="modifyRule()" :disabled="requestSubmitted || (!formValid && !remove)" v-html="saveRuleBtnLabel"></button>
+              <button class="fill-row" v-if="add" @click.prevent="modifyRule(true)" :disabled="requestSubmitted || !formValid" v-html="saveContinueBtnLabel"></button>
+              <button class="fill-row negative" v-if="edit || remove" @click.prevent="close()" :disabled="requestSubmitted">Cancel</button>
             </div>
           </div>
         <label v-if="errorMessage" class="red centered-text">{{errorMessage}}</label>
@@ -73,7 +73,7 @@ import { ipRegex, blockIpRegex, blockIpWildcardRegex } from '@/composables/utils
 import { debounce } from 'lodash'
 
 export default {
-  name: 'delete-message-modal',
+  name: 'blacklist-modal',
   props: ['show', 'messageId', 'add', 'edit', 'remove', 'selected'],
   emits: ['close', 'success'],
   components: { Modal },
