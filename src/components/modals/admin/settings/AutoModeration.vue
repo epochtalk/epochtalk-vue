@@ -12,36 +12,36 @@
 
         <!-- Name -->
         <label class="desc-label">Name</label>
-        <input type="text" class="input-text" ng-model="vm.viewedRule.name" modal-focus="{{vm.viewable}}" required />
+        <input type="text" class="input-text" v-model="rule.name" modal-focus="{{vm.viewable}}" required />
 
         <!-- Description -->
         <label class="desc-label">Description</label>
-        <textarea class="input-text" ng-model="vm.viewedRule.description"></textarea>
+        <textarea class="input-text" v-model="rule.description"></textarea>
 
         <br />
 
         <!-- Conditions -->
         <div class="col">
           <div>
-            <h5 ng-class="{'rule-red':vm.viewedRule.conditions.length<1}">
+            <h5 :class="{'rule-red':rule?.conditions?.length<1}">
               Conditions
               <span class="info-tooltip" data-balloon="Conditions allow you to match text within a post, thread, or even by a particular user. Conditions can be stacked allowing you to auto moderate things such as a specific user posting in a specific thread" data-balloon-pos="right" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
             </h5>
           </div>
           <!-- Add Condition -->
           <div>
-            <a href="#" class="right" ng-click="vm.addCondition()">
+            <a href="#" class="right" @click.prevent="addCondition()">
               <i class="fa fa-plus"></i>&nbsp;&nbsp;Add More Conditions
             </a>
           </div>
         </div>
         <div class="thin-underline"></div>
 
-        <section class="boxed-section" ng-repeat="cond in vm.viewedRule.conditions">
+        <section class="boxed-section" v-for="(cond, index) in rule.conditions" :key="index">
           <div class="header">
-            Condition {{$index+1}}
-            <div class="right" ng-show="vm.viewedRule.conditions.length > 1">
-              <a ng-click="vm.removeCondition($index)">
+            Condition {{index+1}}
+            <div class="right" v-if="rule.conditions.length > 1">
+              <a href="#" @click.prevent="removeCondition(index)">
                 <i class="fa fa-trash"></i>
               </a>
             </div>
@@ -52,7 +52,7 @@
               <label class="desc-label">
                 Parameter
               </label>
-              <select type="text" class="input-text" ng-model="cond.param" required >
+              <select class="input-text" v-model="cond.param" required>
                 <option value="body">Post Body - Detect keyword/phrase in post body</option>
                 <option value="thread_id">Thread ID - Detect keyword/phrase in a particular thread</option>
                 <option value="user_id">User ID - Detect keyword/phrase when post is made by a particular user</option>
@@ -64,40 +64,40 @@
             <div class="col">
               <div class="rule-regex-slash">/</div>
               <div class="rule-regex-input">
-                <input type="text" class="input-text" ng-model="cond.regex.pattern" placeholder="Regex Pattern" required />
+                <input type="text" class="input-text" v-model="cond.regex.pattern" placeholder="Regex Pattern" required />
               </div>
               <div class="rule-regex-slash">/</div>
               <div class="rule-regex-flags">
-                <input type="text" class="input-text" ng-model="cond.regex.flags" placeholder="Regex Flags" />
+                <input type="text" class="input-text" v-model="cond.regex.flags" placeholder="Regex Flags" />
               </div>
             </div>
           </div>
         </section>
 
-        <section class="rule-no-selections" ng-if="vm.viewedRule.conditions.length === 0" ng-init="vm.addCondition()">
+        <section class="rule-no-selections" v-if="rule.conditions.length === 0">
           Please add at least one condition
         </section>
 
         <br /><br />
 
         <!-- Actions -->
-        <h5 class="thin-underline" ng-class="{'rule-red': vm.viewedRule.actions.length < 1}">
+        <h5 class="thin-underline" :class="{'rule-red': rule?.actions?.length < 1}">
           Actions
           <span class="info-tooltip" data-balloon="Actions are the moderation action that will take place when a match on the condition in the previous step is made. Actions can be stacked, with a minimum of one action being required" data-balloon-pos="right" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
         </h5>
         <div class="col">
-          <div class="rule-action" ng-class="{checked: vm.viewedRule.actions.indexOf('reject') > -1}" ng-click="vm.toggleActionSelection('reject')">
+          <div class="rule-action" :class="{checked: rule?.actions?.indexOf('reject') > -1}" @click.prevent="toggleActionSelection('reject')">
               <label class="desc-label">Reject Post</label>
           </div>
-          <div class="rule-action" ng-class="{checked: vm.viewedRule.actions.indexOf('edit') > -1}" ng-click="vm.toggleActionSelection('edit')">
+          <div class="rule-action" :class="{checked: rule?.actions?.indexOf('edit') > -1}" @click.prevent="toggleActionSelection('edit')">
               <label class="desc-label">Edit Post Body</label>
           </div>
         </div>
         <div class="col">
-          <div class="rule-action" ng-class="{checked: vm.viewedRule.actions.indexOf('ban') > -1}" ng-click="vm.toggleActionSelection('ban')">
+          <div class="rule-action" :class="{checked: rule?.actions?.indexOf('ban') > -1}" @click.prevent="toggleActionSelection('ban')">
               <label class="desc-label">Ban User</label>
           </div>
-          <div class="rule-action" ng-class="{checked: vm.viewedRule.actions.indexOf('delete') > -1}" ng-click="vm.toggleActionSelection('delete')">
+          <div class="rule-action" :class="{checked: rule?.actions?.indexOf('delete') > -1}" @click.prevent="toggleActionSelection('delete')">
               <label class="desc-label">Allow Post but display as deleted</label>
           </div>
         </div>
@@ -105,43 +105,43 @@
         <br /><br />
 
         <!-- Options -->
-        <h5 class="thin-underline">Options</h5>
+        <h5 class="thin-underline" :class="{'rule-red': rule?.actions?.length === 0 }">Options</h5>
 
-        <section class="rule-no-selections" ng-if="vm.viewedRule.actions.length === 0 || (vm.viewedRule.actions.length === 1 && vm.viewedRule.actions[0] === 'delete')">
+        <section class="rule-no-selections" v-if="rule?.actions?.length === 0 || (rule?.actions?.length === 1 && rule?.actions[0] === 'delete')">
           No Options to display
         </section>
 
         <!-- Reject -->
-        <section class="boxed-section" ng-if="vm.viewedRule.actions.indexOf('reject') > -1">
+        <section class="boxed-section" v-if="rule?.actions?.indexOf('reject') > -1">
           <div class="header">Reject Post Options</div>
           <div class="content">
             <label class="desc-label">Error Message
               <span class="info-tooltip" data-balloon="The error message the user should receive when their post is rejected for this auto moderation rule" data-balloon-pos="up" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
             </label>
-            <input type="text" class="input-text" ng-model="vm.viewedRule.message" ng-disabled="vm.viewedRule.actions.indexOf('reject') < 0" />
+            <input type="text" class="input-text" v-model="rule.message" :disabled="rule?.actions?.indexOf('reject') < 0" />
           </div>
         </section>
 
         <!-- Ban -->
-        <section class="boxed-section" ng-if="vm.viewedRule.actions.indexOf('ban') > -1">
+        <section class="boxed-section" v-if="rule?.actions?.indexOf('ban') > -1">
           <div class="header">Ban User Options</div>
           <div class="content">
             <label class="desc-label">Days Banned
               <span class="info-tooltip" data-balloon="The number of days to ban the user for, left blank for a permanent ban" data-balloon-pos="up" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
             </label>
-            <input type="number" ng-model="vm.viewedRule.options.ban_interval" min="0" ng-disabled="vm.viewedRule.actions.indexOf('ban') < 0" />
+            <input type="number" v-model="rule.options.ban_interval" min="0" :disabled="rule?.actions?.indexOf('ban') < 0" />
           </div>
         </section>
 
         <!-- Edit -->
-        <section class="boxed-section" ng-if="vm.viewedRule.actions.indexOf('edit') > -1">
+        <section class="boxed-section" v-if="rule?.actions?.indexOf('edit') > -1">
           <div class="header">Edit Post Body Options</div>
           <div class="content">
             <!-- Edit Template -->
             <label class="desc-label">Template
               <span class="info-tooltip" data-balloon="Allows the user's post to be edited. The {body} tag in this text area will be replaced with the user's actual post, so a message can be appeneded, prepended or replaced all together by removing the {body} tag" data-balloon-pos="up" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
             </label>
-            <textarea class="input-text" ng-model="vm.viewedRule.options.edit.template" ng-class="{'rule-red-border': vm.viewedRule.options.edit.template.length && vm.viewedRule.options.edit.template.indexOf('{body}') < 0}" ng-disabled="vm.viewedRule.actions.indexOf('edit') < 0" placeholder="*Pre-append message* {body} *Post-apprend message*" ></textarea>
+            <textarea class="input-text" v-model="rule.options.edit.template" :class="{'rule-red-border': rule?.options?.edit?.template?.length && rule?.options?.edit?.template.indexOf('{body}') < 0}" :disabled="rule?.actions?.indexOf('edit') < 0" placeholder="*Pre-append message* {body} *Post-apprend message*" ></textarea>
 
             <br /><hr /><br />
 
@@ -150,18 +150,18 @@
               <label class="desc-label">Replacement Text
                 <span class="info-tooltip" data-balloon="The text which will replace the keyword or phrase matched by the regex below" data-balloon-pos="up" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
               </label>
-              <input type="text" class="input-text" ng-model="vm.viewedRule.options.edit.replace.text" ng-disabled="vm.viewedRule.actions.indexOf('edit') < 0" />
+              <input v-if="rule.options?.edit?.replace" type="text" class="input-text" v-model="rule.options.edit.replace.text" :disabled="rule?.actions?.indexOf('edit') < 0" />
             </div>
 
             <label class="desc-label">Regex - <a href="https://www.regular-expressions.info/quickstart.html">Need regex help?</a></label>
             <div class="col">
               <div class="rule-regex-slash">/</div>
               <div class="rule-regex-input">
-                <input type="text" class="input-text" ng-model="vm.viewedRule.options.edit.replace.regex.pattern" ng-disabled="vm.viewedRule.actions.indexOf('edit') < 0" />
+                <input v-if="rule.options?.edit?.replace?.regex" type="text" class="input-text" v-model="rule.options.edit.replace.regex.pattern" :disabled="rule?.actions?.indexOf('edit') < 0" />
               </div>
               <div class="rule-regex-slash">/</div>
               <div class="rule-regex-flags">
-                <input type="text" class="input-text" ng-init="vm.viewedRule.options.edit.replace.regex.flags = 'gi'" ng-model="vm.viewedRule.options.edit.replace.regex.flags" ng-disabled="vm.viewedRule.actions.indexOf('edit') < 0" />
+                <input v-if="rule.options?.edit?.replace?.regex" type="text" class="input-text" v-model="rule.options.edit.replace.regex.flags" :disabled="rule?.actions?.indexOf('edit') < 0" />
               </div>
             </div>
           </div>
@@ -171,7 +171,7 @@
 
         <!-- Save Button -->
         <div class="col">
-          <button class="fill-row" ng-click="vm.saveRule(vm.viewedRule)" ng-disabled="vm.submitDisabled()">
+          <button class="fill-row" @click.prevent="modifyRule()" :disabled="submitDisabled()">
             Save
           </button>
         </div>
@@ -196,11 +196,26 @@ export default {
     const resetForm = () => {
       v.requestSubmitted = false
       v.saveRuleBtnLabel = props.remove ? 'Confirm Delete' : 'Save'
+      v.rule = cloneDeep(initRule)
     }
 
     const modifyRule = () => {
       v.requestSubmitted = true
       $alertStore.success('Success!')
+      console.log(cleanRule())
+    }
+
+    const cleanRule = () => {
+      if (!v.rule.actions.indexOf('reject') < 0) delete v.rule.message
+      if (!v.rule.actions.indexOf('ban') < 0) delete v.rule.options.ban_interval
+      if (!v.rule.actions.indexOf('edit') < 0) delete v.rule.options.edit
+
+      if (v.rule.options.edit.replace) {
+        if (!v.rule.options.edit.replace.text) delete v.rule.options.edit.replace.text
+        if (!v.rule.options.edit.replace.regex.pattern) delete v.rule.options.edit.replace.regex
+        if (!v.rule.options.edit.replace.text || !v.rule.options.edit.replace.regex) delete v.rule.options.edit.replace
+      }
+      return v.rule
     }
 
     const close = () => {
@@ -208,24 +223,67 @@ export default {
       emit('close')
     }
 
+    const addCondition = () => v.rule.conditions.push({ param: '', regex: { pattern: '', flags: 'gi' } })
+
+    const toggleActionSelection = action => {
+      let idx = v.rule.actions.indexOf(action)
+      // is currently selected
+      if (idx > -1) v.rule.actions.splice(idx, 1)
+      // is newly selected
+      else v.rule.actions.push(action)
+    }
+
+    const removeCondition = index => v.rule.conditions.splice(index, 1)
+
+    const submitDisabled = () => {
+      let disabled = false
+      if (v.rule.name.length < 1) disabled = true
+      if (v.rule.conditions.length < 1) disabled = true
+      v.rule.conditions.map(condition => {
+        if (!condition.param) disabled = true
+        if (!condition.regex.pattern) disabled = true
+      })
+      if (v.rule.actions.length < 1) disabled = true
+      if (v.rule.options.edit.template) {
+        let template = v.rule.options.edit.template
+        if (template.indexOf('{body}') < 0) disabled = true
+      }
+      if (v.rule.options.edit.replace) {
+        let pattern = v.rule.options.edit.replace.regex.pattern
+        let text = v.rule.options.edit.replace.text
+        if ((pattern && !text) || (!pattern && text)) disabled = true
+      }
+      return disabled
+    }
+
     /* Internal Data */
     const $alertStore = inject('$alertStore')
+
+    const initRule = {
+      name:'',
+      conditions: [ { param: '', regex: { pattern: '', flags: 'gi' } } ],
+      actions: [],
+      options: {
+        edit: { replace: { regex: { pattern: '', flags: 'gi' } } }
+      }
+    }
 
     /* Template Data */
     const v = reactive({
       focusInput: null,
-      countValid: false,
-      rule: {},
+      rule: cloneDeep(initRule),
       saveRuleBtnLabel: props.remove ? 'Confirm Delete' : 'Save',
       requestSubmitted: false,
     })
 
     watch(() => props.show, () => {
       v.saveRuleBtnLabel = props.remove ? 'Confirm Delete' : 'Save'
-      v.rule = props.edit || props.remove ? cloneDeep(props.selected) : {}
+      v.rule = props.edit || props.remove ? cloneDeep(props.selected) : v.rule
+      // Handle empty edit options when editing existing rule
+      if (v.rule.actions.indexOf('edit') > -1 && Object.keys(v.rule.options.edit).length < 1) v.rule.options.edit = cloneDeep(initRule.options.edit)
     })
 
-    return { ...toRefs(v), modifyRule, close }
+    return { ...toRefs(v), modifyRule, addCondition, removeCondition, submitDisabled, toggleActionSelection, close }
   }
 }
 </script>
@@ -234,10 +292,10 @@ export default {
   .col {
     display: flex;
     flex-direction: row;
-    align-items: stretch;
+    align-items: center;
     width: 100%;
     column-gap: 0.5rem;
-    div { flex: 1; }
+    div, button { flex: 1; }
     .rule-regex-slash {
       flex: 0;
       text-align: center;
@@ -246,44 +304,32 @@ export default {
       flex: auto;
       text-align: center;
     }
-
-    .rule-condition {
-      margin-top: 0.5rem;
-      border-bottom: 1px solid $border-color;
-    }
-    .rule-condition:first-child { margin-top: 0; }
-    .rule-condition:last-child { border-bottom: 0; }
-    .rule-action {
-      border: 1px solid $border-color;
-      padding: 0.5rem;
-      cursor: pointer;
-      margin-bottom: 0.5rem;
-      input { margin-bottom: 0; }
-    }
-    .rule-action.checked { background-color: $color-primary; }
-    .rule-action.checked label { color: $button-text-color; }
-    .rule-remove-cond { margin-top: 1.1rem; }
-    .rule-red { color: red; }
-    .input-text.rule-red-border { border-color: red; }
-    .rule-description { word-wrap: break-word; white-space: pre-wrap; }
-    .rule-regex-slash {
-      float: left;
-      color: $border-color;
-      width: 10%;
-      text-align: center;
-      font-size: 1.5rem;
-      line-height: 2rem;
-      margin-top: 0.2rem;
-    }
-    .rule-regex-input { float: left; width: 60%; }
-    .rule-regex-flags { float: left; width: 20%; }
-    .rule-no-selections {
-      text-align: center;
-      font-size: 1.2rem;
-      margin-top: 1rem;
-      margin-bottom: 0.5rem;
-    }
-
   }
-
+  .rule-condition {
+    margin-top: 0.5rem;
+    border-bottom: 1px solid $border-color;
+  }
+  .rule-condition:first-child { margin-top: 0; }
+  .rule-condition:last-child { border-bottom: 0; }
+  .rule-action {
+    border: 1px solid $border-color;
+    padding: 0.5rem;
+    cursor: pointer;
+    margin-bottom: 0.5rem;
+    input { margin-bottom: 0; }
+  }
+  .rule-action.checked { background-color: $color-primary; }
+  .rule-action.checked label { color: $button-text-color; }
+  .rule-remove-cond { margin-top: 1.1rem; }
+  .rule-red { color: red; }
+  .input-text.rule-red-border { border-color: red; }
+  .rule-description { word-wrap: break-word; white-space: pre-wrap; }
+  .rule-regex-slash {
+    color: $border-color;
+    font-size: 1.5rem;
+  }
+  .rule-no-selections {
+    text-align: center;
+    font-size: 1.2rem;
+  }
 </style>
