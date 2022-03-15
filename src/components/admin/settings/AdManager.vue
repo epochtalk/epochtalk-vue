@@ -1,6 +1,6 @@
 <template>
   <div v-if="showComponent">
-    <h5 class="thin-underline">
+    <h5 class="thin-underline title">
       <!-- Title -->
       Advertisements
       <span class="info-tooltip" data-balloon="Allows admins to sell ad space to members. Members can provide admins with an html/css snippet for their advertisment which will be displayed between posts. Factoids can be enabled an will be shown randomly between ads. Ads are cycled randomly" data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
@@ -78,56 +78,57 @@
       </div>
 
       <!-- Ads -->
-      <h5 class="ads-controls" v-if="round">
-        <span v-if="ads.length">Ads in this Round</span>
-        <span v-if="!ads.length">No Ads for this Round</span>
-        <a @click="openCreateAd()"><i class="fa fa-plus"></i></a>
-      </h5>
+      <div class="ad-wrap">
+        <h5 class="ads-controls" v-if="round">
+          <a href="#" @click.prevent="openCreateAd()"><i class="fa fa-plus"></i> Create New Ad</a>
+          <br />
+          <span v-if="ads.length">Ads in this Round</span>
+          <span v-if="!ads.length">Currently no Ads in this Round</span>
+        </h5>
 
-      <!-- Ads container -->
-      <section class="ads-container">
-        <section class="ad-item" v-for="(ad, index) in ads" :key="ad.id">
-          <h5 class="thin-underline">
-            Ad #{{index+1}}
-            <div class="right">
-              <a data-balloon="Duplicate" @click="duplicateAd(ad.id)"><i class="fa fa-files-o"></i></a>
-              &nbsp;&nbsp;&nbsp;
-              <a data-balloon="Edit" @click="openEditAd(ad)"><i class="fa fa-pencil"></i></a>
-              &nbsp;&nbsp;&nbsp;
-              <a data-balloon="Delete" @click="openDeleteAd(ad)"><i class="fa fa-trash"></i></a>
-            </div>
-          </h5>
-          <div :id="'ad-' + index"></div>
+        <!-- Ads container -->
+        <section class="ads-container">
+          <section class="ad-item" v-for="(ad, index) in ads" :key="ad.id">
+            <h5 class="thin-underline">
+              Ad #{{index+1}}
+              <div class="right">
+                <a data-balloon="Duplicate" @click="duplicateAd(ad.id)"><i class="fa fa-files-o"></i></a>
+                &nbsp;&nbsp;&nbsp;
+                <a data-balloon="Edit" @click="openEditAd(ad)"><i class="fa fa-pencil"></i></a>
+                &nbsp;&nbsp;&nbsp;
+                <a data-balloon="Delete" @click="openDeleteAd(ad)"><i class="fa fa-trash"></i></a>
+              </div>
+            </h5>
+            <div :id="'ad-' + index"></div>
+          </section>
         </section>
-      </section>
+      </div>
 
       <!-- Round Controls Lower -->
-      <div class="round-controls">
-        <div class="leftcol">
-          <!-- create new round -->
-          <button @click="showCreateRound = true">
-            <i class="fa fa-plus"></i>&nbsp;&nbsp;Create New Round
-          </button>
-          <!-- rotate this round -->
-          <button @click="showRotateRound = true" v-if="(!currentRound && round) || round > currentRound">
-            <i class="fa fa-toggle-right"></i>&nbsp;&nbsp;Use These Ads
-          </button>
-        </div>
+      <div class="leftcol">
+        <!-- create new round -->
+        <button @click="showCreateRound = true">
+          <i class="fa fa-plus"></i>&nbsp;&nbsp;Create New Round
+        </button>
+        <!-- rotate this round -->
+        <button @click="showRotateRound = true" v-if="(!currentRound && round) || round > currentRound">
+          <i class="fa fa-toggle-right"></i>&nbsp;&nbsp;Use These Ads
+        </button>
+      </div>
 
-        <div class="rightcol">
-          <!-- move to round/paginate rounds -->
-          <div class="pagination-slide">
-            <div class="prev">
-              <button :disabled="!nextRound" @click="pullRound(nextRound)">
-                &#10094; Newer
-              </button>
-            </div>
-            <div class="page">{{round || 'N/A'}}</div>
-            <div class="next">
-              <button :disabled="!previousRound" @click="pullRound(previousRound)">
-                Older &#10095;
-              </button>
-            </div>
+      <div class="rightcol">
+        <!-- move to round/paginate rounds -->
+        <div class="pagination-slide">
+          <div class="prev">
+            <button :disabled="!nextRound" @click="pullRound(nextRound)">
+              &#10094; Newer
+            </button>
+          </div>
+          <div class="page">{{round || 'N/A'}}</div>
+          <div class="next">
+            <button :disabled="!previousRound" @click="pullRound(previousRound)">
+              Older &#10095;
+            </button>
           </div>
         </div>
       </div>
@@ -269,14 +270,15 @@ export default {
       text: null,
       adsCss: []
     })
-    return { ...toRefs(v), saveText, pullRound, openCreateAd, openEditAd, openDeleteAd, duplicateAd, openCreateFactoid, openEditFactoid, openDeleteFactoid, enableFactoid, disableFactoid }
+    return { ...toRefs(v), init, saveText, pullRound, openCreateAd, openEditAd, openDeleteAd, duplicateAd, openCreateFactoid, openEditFactoid, openDeleteFactoid, enableFactoid, disableFactoid }
   }
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
   // ads viewer
   #eptAd { padding-bottom: 1rem; }
+  .title { line-height: 2.5rem; }
   .ad-text { text-align: center; }
   .ad-disclaimer { text-align: center; font-size: 0.8rem; }
 
@@ -291,8 +293,14 @@ export default {
 
   .rounds-view {
     display: grid;
-    grid-template-columns: 50% 50%;
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: minmax(auto, auto);
+    .ad-wrap {
+      grid-column: 1 / 3;
+    }
     .leftcol {
+      display: flex;
+      column-gap: .5rem;
       h2 { display: inline-block; }
       margin-bottom: 1.5rem;
       span { font-size: 1.25rem; };
@@ -319,14 +327,6 @@ export default {
   }
 
   .text-view { display: grid; grid-template-columns: 50% 50%; grid-column-gap: .5rem; }
-
-  .round-controls {
-    display: grid;
-    grid-template-columns: 50% 50%;
-    grid-row: 2;
-    grid-column: 1 / 3;
-    padding-top: 2rem;
-  }
 
   .factoids-view {
     display: grid;
