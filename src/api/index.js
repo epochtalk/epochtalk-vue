@@ -270,7 +270,7 @@ export const adsApi = {
    disable: data => $http(`/api/ads/factoids/${data.id}/disable`, { method: 'PUT', data })
   },
   rounds: {
-    create: data => $http('/api/ads/rounds', { method: 'POST', data }),
+    create: () => $http('/api/ads/rounds', { method: 'POST' }),
     get: () => $http('/api/ads/rounds/info'),
     getRound: data => $http(`/api/ads/rounds/${data.roundNumber}`, { params: { type: data.type } }),
     rotate: data => $http('/api/ads/rounds/rotate', { method: 'POST', data })
