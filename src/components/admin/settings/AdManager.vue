@@ -80,7 +80,7 @@
       <!-- Ads -->
       <div class="ad-wrap">
         <h5 class="ads-controls" v-if="round">
-          <a href="#" @click.prevent="openCreateAd()"><i class="fa fa-plus"></i> Create New Ad</a>
+          <a href="#" @click.prevent="showCreateAd = true; selectedAd = { round: round, html: '', css: '' }"><i class="fa fa-plus"></i> Create New Ad</a>
           <br />
           <span v-if="ads.length">Ads in this Round</span>
           <span v-if="!ads.length">Currently no Ads in this Round</span>
@@ -180,17 +180,21 @@
       </section>
     </div>
   </div>
+  <ad-manager-modal :show="showCreateRound || showCreateAd" :createRound="showCreateRound" :createAd="showCreateAd" :round="round" @close="showCreateRound = false; showCreateAd = false;" :ad="selectedAd" @success="pullRound" />
 </template>
 
 <script>
 import { reactive, toRefs, onBeforeMount, inject } from 'vue'
 import { adsApi } from '@/api'
+import AdManagerModal from '@/components/modals/admin/settings/AdManager.vue'
 
 export default {
   name: 'ad-manager',
+  components: { AdManagerModal },
   setup() {
-    onBeforeMount(() => {
-      adsApi.rounds.getRound({ roundNumber: v.currentRound, type: 'both' })
+    onBeforeMount(() => pullRound())
+
+    const pullRound = round => adsApi.rounds.getRound({ roundNumber: round || v.currentRound, type: 'both' })
       .then(d => {
         v.ads = d.ads
         v.factoids = d.factoids
@@ -200,18 +204,13 @@ export default {
         v.previousRound = d.rounds.previous
         v.text = d.text
       })
+      .then(trashAds)
       .then(renderAds)
       .then(renderFactoids)
       .catch(err => {
         if (err.status === 403) v.showComponent = false
         else $alertStore.error(err.data.message)
       })
-      // boardsApi.getBoards(true).then(d => v.boards = d.boards).catch(() => {})
-      // usersApi.trust.getTrustBoards().then(d => v.trustBoards = d.reduce((acc, b) => {
-      //   acc[b.id] = true
-      //   return acc
-      // }, {})).catch(() => {})
-    })
 
     const renderAds = () => {
       v.ads.forEach((ad, index) => {
@@ -226,19 +225,25 @@ export default {
         }
         // render html
         document.getElementById('ad-' + index).innerHTML = ad.display_html
-      });
-    };
+      })
+    }
 
     // Render Factoids
     const renderFactoids = () => {
       v.factoids.forEach((factoid, index) => {
-        document.getElementById('factoid-' + index).innerHTML = factoid.text;
+        document.getElementById('factoid-' + index).innerHTML = factoid.text
       })
-    };
+    }
+
+    const trashAds = () => {
+      v.adsCss.map(adId => {
+        let node = document.getElementById(adId)
+        node.parentElement.removeChild(node)
+      })
+      v.adsCss = []
+    }
 
     const saveText = () => {}
-    const pullRound = () => {}
-    const openCreateAd = () => {}
     const openEditAd= () => {}
     const openDeleteAd = () => {}
     const duplicateAd = () => {}
@@ -252,6 +257,7 @@ export default {
     const $alertStore = inject('$alertStore')
 
     const v = reactive({
+      showCreateAd: false,
       showCreateRound: false,
       showRotateRound: false,
       showWriteFactoid: false,
@@ -265,12 +271,13 @@ export default {
       factoids: null,
       round: null,
       currentRound: 'current',
+      selectedAd: null,
       nextRound: null,
       previousRound: null,
       text: null,
       adsCss: []
     })
-    return { ...toRefs(v), init, saveText, pullRound, openCreateAd, openEditAd, openDeleteAd, duplicateAd, openCreateFactoid, openEditFactoid, openDeleteFactoid, enableFactoid, disableFactoid }
+    return { ...toRefs(v), saveText, pullRound, openEditAd, openDeleteAd, duplicateAd, openCreateFactoid, openEditFactoid, openDeleteFactoid, enableFactoid, disableFactoid }
   }
 }
 </script>
