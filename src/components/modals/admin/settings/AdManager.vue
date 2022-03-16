@@ -2,7 +2,7 @@
   <modal :name="$options.name" :show="show" @close="close()" :focusInput="focusInput">
     <template v-slot:header>
       <span v-if="createRound">Create Round</span>
-      <span v-if="rotateRound">Rotate Round</span>
+      <span v-if="rotateRound">Move Ads into Circulation?</span>
       <span v-if="createAd">Create Ad for Round {{round}}</span>
       <span v-if="deleteAd">Delete Ad</span>
       <span v-if="createFactoid">Create Factoid</span>
@@ -32,6 +32,15 @@
           <br />
           <div class="col">
             <button @click.prevent="modifyAd()" :disabled="!currentAd.html">Save</button>
+            <button class="negative" @click.prevent="close()">Cancel</button>
+          </div>
+        </div>
+
+        <!-- rotate round -->
+        <div v-if="rotateRound">
+          <p class="input-spacing">This will put the ads from round {{round}} into circulation, Are you sure you want to do this? (It will also end the previous round, and start this round. Previous rounds cannot be activated again.)</p>
+          <div class="col">
+            <button @click.prevent="enableRound()">Confirm</button>
             <button class="negative" @click.prevent="close()">Cancel</button>
           </div>
         </div>
@@ -69,15 +78,22 @@ export default {
       .finally(() => close())
     }
 
-    const modifyAd = () => {
-      adsApi.create(v.currentAd)
+    const enableRound = () => adsApi.rounds.rotate({ round: v.round })
+      .then(data => {
+        v.round = data.round
+        $alertStore.success(`Ads from round ${v.round} are now in circulation!`)
+        emit('success', v.round)
+      })
+      .catch(() => $alertStore.error('There was an issue circulating ad.'))
+      .finally(() => close())
+
+    const modifyAd = () => adsApi.create(v.currentAd)
       .then(() => {
         $alertStore.success(`Successfully created an ad for round ${v.round}!`)
         emit('success', v.round)
       })
       .catch(() => $alertStore.error('There was an issue creating ad.'))
       .finally(() => close())
-    }
 
     const close = () => {
       resetForm()
@@ -102,7 +118,7 @@ export default {
     watch(() => props.round, r => v.round = r)
     watch(() => props.ad, a => v.currentAd = a)
 
-    return { ...toRefs(v), createNewRound, modifyAd, close }
+    return { ...toRefs(v), createNewRound, enableRound, modifyAd, close }
   }
 }
 </script>
