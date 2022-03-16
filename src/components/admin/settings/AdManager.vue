@@ -166,8 +166,8 @@
       <section class="factoids-container">
         <section class="factoid-item" v-for="(factoid, index) in factoids" :key="factoid.id">
           <h5 class="thin-underline">
-            <span class="post large" ng-if="factoid.enabled" @click="disableFactoid(factoid.id)">Enabled</span>
-            <span class="delete large" ng-if="!factoid.enabled" @click="enableFactoid(factoid.id)">Disabled</span>
+            <span class="post large" v-if="factoid.enabled" @click="disableFactoid(factoid.id)">Enabled</span>
+            <span class="delete large" v-if="!factoid.enabled" @click="enableFactoid(factoid.id)">Disabled</span>
             Factoid #{{index+1}}
             <div class="right">
               <a @click="openEditFactoid(factoid)"><i class="fa fa-pencil"></i></a>
