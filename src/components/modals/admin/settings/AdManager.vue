@@ -5,7 +5,8 @@
       <span v-if="rotateRound">Move Ads into Circulation?</span>
       <span v-if="createAd">Create Ad for Round {{round}}</span>
       <span v-if="updateAd">Edit Ad for Round {{round}}</span>
-      <span v-if="deleteAd">Delete Ad</span>
+      <span v-if="duplicateAd">Duplicate Ad for Round {{round}}</span>
+      <span v-if="deleteAd">Delete Ad for Round {{round}}</span>
       <span v-if="createFactoid">Create Factoid</span>
       <span v-if="updateFactoid">Update Factoid</span>
       <span v-if="enableFactoids">Enable Factoid</span>
@@ -24,7 +25,7 @@
           </div>
         </div>
 
-        <!-- create ad -->
+        <!-- create/modify ad -->
         <div v-if="createAd || updateAd">
           <label class="desc-label">HTML (use ${hash} to obfuscate css classes)</label>
           <textarea class="input-text" v-model="currentAd.html" ref="focusInput"></textarea>
@@ -33,6 +34,24 @@
           <br />
           <div class="col">
             <button @click.prevent="modifyAd()" :disabled="!currentAd.html">Save</button>
+            <button class="negative" @click.prevent="close()">Cancel</button>
+          </div>
+        </div>
+
+        <!-- delete ad -->
+        <div v-if="deleteAd">
+          <p class="input-spacing">This will also delete any analytics attached to this ad.</p>
+          <div class="col">
+            <button @click.prevent="removeAd()">Delete Ad</button>
+            <button class="negative" @click.prevent="close()">Cancel</button>
+          </div>
+        </div>
+
+        <!-- duplicate ad -->
+        <div v-if="duplicateAd">
+          <p class="input-spacing">This will create a duplicate of this ad in the current round.</p>
+          <div class="col">
+            <button @click.prevent="dupeAd()">Duplicate Ad</button>
             <button class="negative" @click.prevent="close()">Cancel</button>
           </div>
         </div>
@@ -57,7 +76,7 @@ import { adsApi } from '@/api'
 
 export default {
   name: 'rank-modal',
-  props: ['show', 'createRound', 'rotateRound', 'createAd', 'updateAd', 'deleteAd', 'createFactoid', 'updateFactoid', 'enableFactoids', 'disableFactoids', 'round', 'ad'],
+  props: ['show', 'createRound', 'rotateRound', 'createAd', 'duplicateAd', 'updateAd', 'deleteAd', 'createFactoid', 'updateFactoid', 'enableFactoids', 'disableFactoids', 'round', 'ad'],
   emits: ['close', 'success'],
   components: { Modal },
   setup(props, { emit }) {
@@ -88,12 +107,31 @@ export default {
       .catch(() => $alertStore.error('There was an issue circulating ad.'))
       .finally(() => close())
 
-    const modifyAd = () => adsApi.create(v.currentAd)
+    const modifyAd = () => {
+      let requestPromise = props.createAd ? adsApi.create : adsApi.update
+      requestPromise(v.currentAd)
       .then(() => {
-        $alertStore.success(`Successfully created an ad for round ${v.round}!`)
+        $alertStore.success(`Successfully ${props.createAd ? 'created' : 'edited'} ad for round ${v.round}!`)
         emit('success', v.round)
       })
       .catch(() => $alertStore.error('There was an issue creating ad.'))
+      .finally(() => close())
+    }
+
+    const removeAd = () => adsApi.delete(v.currentAd)
+      .then(() => {
+        $alertStore.success(`Successfully deleted ad from round ${v.round}!`)
+        emit('success', v.round)
+      })
+      .catch(() => $alertStore.error('There was an issue deleting ad.'))
+      .finally(() => close())
+
+    const dupeAd = () => adsApi.duplicate(v.currentAd)
+      .then(() => {
+        $alertStore.success(`Successfully duplicated ad from round ${v.round}!`)
+        emit('success', v.round)
+      })
+      .catch(() => $alertStore.error('There was an issue duplicating ad.'))
       .finally(() => close())
 
     const close = () => {
@@ -119,7 +157,7 @@ export default {
     watch(() => props.round, r => v.round = r)
     watch(() => props.ad, a => v.currentAd = a)
 
-    return { ...toRefs(v), createNewRound, enableRound, modifyAd, close }
+    return { ...toRefs(v), createNewRound, enableRound, modifyAd, removeAd, dupeAd, close }
   }
 }
 </script>
