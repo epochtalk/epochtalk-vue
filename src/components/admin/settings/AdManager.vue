@@ -92,11 +92,11 @@
             <h5 class="thin-underline">
               Ad #{{index+1}}
               <div class="right">
-                <a href="#" data-balloon="Duplicate" @click.prevent="duplicateAd(ad.id)"><i class="fas fa-clone"></i></a>
+                <a href="#" data-balloon="Duplicate" @click.prevent="showDuplicateAd = true; selectedAd = ad"><i class="fas fa-clone"></i></a>
                 &nbsp;&nbsp;&nbsp;
                 <a href="#" data-balloon="Edit" @click.prevent="showUpdateAd = true; selectedAd = ad"><i class="fas fa-edit"></i></a>
                 &nbsp;&nbsp;&nbsp;
-                <a href="#" data-balloon="Delete" @click.prevent="openDeleteAd(ad)"><i class="fa fa-trash"></i></a>
+                <a href="#" data-balloon="Delete" @click.prevent="showDeleteAd = true; selectedAd = ad"><i class="fa fa-trash"></i></a>
               </div>
             </h5>
             <div :id="'ad-' + index"></div>
@@ -180,7 +180,7 @@
       </section>
     </div>
   </div>
-  <ad-manager-modal :show="showCreateRound || showCreateAd || showUpdateAd || showRotateRound" :createRound="showCreateRound" :createAd="showCreateAd" :rotateRound="showRotateRound" :round="round" :updateAd="showUpdateAd" @close="showCreateRound = false; showRotateRound = false; showCreateAd = false; showUpdateAd = false;" :ad="selectedAd" @success="pullRound" />
+  <ad-manager-modal :show="showCreateRound || showCreateAd || showUpdateAd || showDuplicateAd || showRotateRound || showDeleteAd" :createRound="showCreateRound" :createAd="showCreateAd" :deleteAd="showDeleteAd" :duplicateAd="showDuplicateAd" :rotateRound="showRotateRound" :round="round" :updateAd="showUpdateAd" @close="showCreateRound = false; showRotateRound = false; showCreateAd = false; showUpdateAd = false; showDeleteAd = false; showDuplicateAd = false" :ad="selectedAd" @success="pullRound" />
 </template>
 
 <script>
@@ -244,9 +244,6 @@ export default {
     }
 
     const saveText = () => {}
-    const openEditAd= () => {}
-    const openDeleteAd = () => {}
-    const duplicateAd = () => {}
 
     const openCreateFactoid = () => {}
     const openEditFactoid = () => {}
@@ -259,6 +256,8 @@ export default {
     const v = reactive({
       showCreateAd: false,
       showUpdateAd: false,
+      showDeleteAd: false,
+      showDuplicateAd: false,
       showCreateRound: false,
       showRotateRound: false,
       showWriteFactoid: false,
@@ -278,7 +277,7 @@ export default {
       text: null,
       adsCss: []
     })
-    return { ...toRefs(v), saveText, pullRound, openEditAd, openDeleteAd, duplicateAd, openCreateFactoid, openEditFactoid, openDeleteFactoid, enableFactoid, disableFactoid }
+    return { ...toRefs(v), saveText, pullRound, openCreateFactoid, openEditFactoid, openDeleteFactoid, enableFactoid, disableFactoid }
   }
 }
 </script>
