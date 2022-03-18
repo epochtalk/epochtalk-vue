@@ -20,7 +20,7 @@
     </h5>
 
     <!-- Rounds View -->
-    <div class="text-view" v-if="tab === 'text'">
+    <div class="text-view" v-show="tab === 'text'">
       <!-- Ad Disclaimer -->
       <div class="fill-row">
         <label class="desc-label">Ad Disclaimer
@@ -37,7 +37,7 @@
         <textarea v-model="text.info"></textarea>
       </div>
 
-      <button class="negative">
+      <button class="negative" @click.prevent="text.disclaimer = ''; text.info = ''">
         Clear
       </button>
       <button @click="saveText()">
@@ -46,7 +46,7 @@
     </div>
 
     <!-- Rounds View -->
-    <div class="rounds-view" v-if="tab === 'rounds'">
+    <div class="rounds-view" v-show="tab === 'rounds'">
       <!-- Round Controls Upper -->
       <div class="leftcol">
         <!-- label to show that this round is the current one -->
@@ -80,27 +80,42 @@
       <!-- Ads -->
       <div class="ad-wrap">
         <h5 class="ads-controls" v-if="round">
-          <a href="#" @click.prevent="showCreateAd = true; selectedAd = { round: round, html: '', css: '' }"><i class="fa fa-plus"></i> Create New Ad</a>
-          <br />
-          <span v-if="ads.length">Ads in this Round</span>
-          <span v-if="!ads.length">Currently no Ads in this Round</span>
+          <div class="col">
+            <div>
+              <span v-if="ads.length">Ads in this Round</span>
+              <span v-if="!ads.length">Currently no Ads in this Round</span>
+            </div>
+            <div>
+              <a class="button" href="#" @click.prevent="showCreateAd = true; selectedAd = { round: round, html: '', css: '' }"><i class="fa fa-plus"></i>&nbsp;&nbsp;Create New Ad</a>
+            </div>
+          </div>
         </h5>
 
         <!-- Ads container -->
         <section class="ads-container">
-          <section class="ad-item" v-for="(ad, index) in ads" :key="ad.id">
-            <h5 class="thin-underline">
-              Ad #{{index+1}}
-              <div class="right">
-                <a href="#" data-balloon="Duplicate" @click.prevent="showDuplicateAd = true; selectedAd = ad"><i class="fas fa-clone"></i></a>
-                &nbsp;&nbsp;&nbsp;
-                <a href="#" data-balloon="Edit" @click.prevent="showUpdateAd = true; selectedAd = ad"><i class="fas fa-edit"></i></a>
-                &nbsp;&nbsp;&nbsp;
-                <a href="#" data-balloon="Delete" @click.prevent="showDeleteAd = true; selectedAd = ad"><i class="fa fa-trash"></i></a>
-              </div>
-            </h5>
-            <div :id="'ad-' + index"></div>
-          </section>
+          <table class="striped ads-table full-width">
+            <thead>
+              <th>Number</th>
+              <th>Display</th>
+              <th>Actions</th>
+            </thead>
+            <tbody>
+              <tr v-for="(ad, index) in ads" :key="ad.id">
+                <td width="10%">Ad #{{index+1}}</td>
+                <td width="80%" :id="'ad-' + index"></td>
+                <td width="10%">
+                  <a href="#" data-balloon="Duplicate" @click.prevent="showDuplicateAd = true; selectedAd = ad"><i class="fas fa-clone"></i></a>
+                  &nbsp;&nbsp;&nbsp;
+                  <a href="#" data-balloon="Edit" @click.prevent="showUpdateAd = true; selectedAd = ad"><i class="fas fa-edit"></i></a>
+                  &nbsp;&nbsp;&nbsp;
+                  <a href="#" data-balloon="Delete" @click.prevent="showDeleteAd = true; selectedAd = ad"><i class="fa fa-trash"></i></a>
+                </td>
+              </tr>
+              <tr v-if="!ads || ads.length < 1">
+                <td>No ads to display</td>
+              </tr>
+            </tbody>
+          </table>
         </section>
       </div>
 
@@ -135,7 +150,7 @@
     </div>
 
     <!-- Factoids View -->
-    <div class="factoids-view" v-if="tab === 'factoids'">
+    <div class="factoids-view" v-show="tab === 'factoids'">
       <div class="leftcol">
         <span>Factoids
           <span class="info-tooltip" data-balloon="Factoids can be quotes, facts, or anything else. They will randomly be displayed between ads to give users a break from advertisments" data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
@@ -209,7 +224,7 @@ export default {
       .then(renderFactoids)
       .catch(err => {
         if (err.status === 403) v.showComponent = false
-        else $alertStore.error(err.data.message)
+        else $alertStore.error(err)
       })
 
     const renderAds = () => {
@@ -317,14 +332,22 @@ export default {
         display: flex;
         width: 100%;
         flex-direction: row;
+        column-gap: 1rem;
         align-items: stretch;
         justify-content: flex-end;
-        .prev, .next, .page { flex: 1; text-align: right; button { float: right; } }
+        .prev, .next, .page {
+          flex: 0;
+          text-align: right;
+          line-height: 2.25rem;
+          button { width: 7rem; float: right; }
+        }
       }
     }
   }
-
-  .ads-controls { clear: both; padding-top: 1rem; text-align: center; }
+  .ads-controls .col {
+    .button { float: right; width: 16.5rem; text-transform: capitalize; }
+  }
+  .ads-controls { clear: both; padding-top: 1rem; padding-bottom: 0; text-align: left; }
   .ads-container {
     .ad-item {
       margin: auto;
@@ -375,5 +398,12 @@ export default {
   .analytics-view {
     display: grid;
     grid-template-columns: 50% 50%;
+  }
+
+  .ads-table {
+    thead {
+      border-bottom: 1px solid $border-color;
+      text-align: left;
+    }
   }
 </style>
