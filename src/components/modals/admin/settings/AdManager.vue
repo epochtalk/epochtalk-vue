@@ -4,6 +4,7 @@
       <span v-if="createRound">Create Round</span>
       <span v-if="rotateRound">Move Ads into Circulation?</span>
       <span v-if="createAd">Create Ad for Round {{round}}</span>
+      <span v-if="updateAd">Edit Ad for Round {{round}}</span>
       <span v-if="deleteAd">Delete Ad</span>
       <span v-if="createFactoid">Create Factoid</span>
       <span v-if="updateFactoid">Update Factoid</span>
@@ -24,7 +25,7 @@
         </div>
 
         <!-- create ad -->
-        <div v-if="createAd">
+        <div v-if="createAd || updateAd">
           <label class="desc-label">HTML (use ${hash} to obfuscate css classes)</label>
           <textarea class="input-text" v-model="currentAd.html" ref="focusInput"></textarea>
           <label class="desc-label">CSS (use ${hash} to obfuscate css classes)</label>
@@ -56,7 +57,7 @@ import { adsApi } from '@/api'
 
 export default {
   name: 'rank-modal',
-  props: ['show', 'createRound', 'rotateRound', 'createAd', 'deleteAd', 'createFactoid', 'updateFactoid', 'enableFactoids', 'disableFactoids', 'round', 'ad'],
+  props: ['show', 'createRound', 'rotateRound', 'createAd', 'updateAd', 'deleteAd', 'createFactoid', 'updateFactoid', 'enableFactoids', 'disableFactoids', 'round', 'ad'],
   emits: ['close', 'success'],
   components: { Modal },
   setup(props, { emit }) {
