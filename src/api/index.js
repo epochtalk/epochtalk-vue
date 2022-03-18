@@ -260,7 +260,7 @@ export const adsApi = {
   create: data => $http('/api/ads', { method: 'POST', data }),
   duplicate: data => $http(`/api/ads/${data.id}/duplicate`, { method: 'POST', data }),
   update: data => $http(`/api/ads/${data.id}`, { method: 'PUT', data }),
-  delete: id => $http(`/api/ads/${id}`, { method: 'DELETE' }),
+  delete: data => $http(`/api/ads/${data.id}`, { method: 'DELETE' }),
   saveText: data => $http('/api/ads/text', { method: 'POST', data }),
   factoids: {
    create: data => $http('/api/ads/factoids', { method: 'POST', data }),
