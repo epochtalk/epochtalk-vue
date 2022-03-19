@@ -265,7 +265,7 @@ export const adsApi = {
   factoids: {
    create: data => $http('/api/ads/factoids', { method: 'POST', data }),
    update: data => $http(`/api/ads/factoids/${data.id}`, { method: 'PUT', data }),
-   delete: id => $http(`/api/ads/factoids/${id}`, { method: 'DELETE' }),
+   delete: data => $http(`/api/ads/factoids/${data.id}`, { method: 'DELETE' }),
    enable: data => $http(`/api/ads/factoids/${data.id}/enable`, { method: 'PUT', data }),
    disable: data => $http(`/api/ads/factoids/${data.id}/disable`, { method: 'PUT', data })
   },

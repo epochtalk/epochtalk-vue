@@ -258,7 +258,9 @@ export default {
       v.adsCss = []
     }
 
-    const saveText = () => {}
+    const saveText = () => adsApi.saveText(v.text)
+      .then(() => $alertStore.success('Successfully saved text data!'))
+      .catch(() => $alertStore.error('There was an error saving text data.'))
 
     const openCreateFactoid = () => {}
     const openEditFactoid = () => {}
@@ -289,7 +291,7 @@ export default {
       selectedAd: null,
       nextRound: null,
       previousRound: null,
-      text: null,
+      text: { disclaimer: '', info: '' },
       adsCss: []
     })
     return { ...toRefs(v), saveText, pullRound, openCreateFactoid, openEditFactoid, openDeleteFactoid, enableFactoid, disableFactoid }
