@@ -158,19 +158,19 @@
       </div>
 
       <div class="rightcol">
-        <a class="right" @click="showDisableAllFactoids = 'true'">
+        <a class="right pointer" @click="showDisableAllFactoids = true">
           <i class="fa fa-eye-slash"></i>
           &nbsp;&nbsp;&nbsp;
           Disable All
           &nbsp;&nbsp;&nbsp;
         </a>
-        <a class="right" @click="showEnableAllFactoids = true">
+        <a class="right pointer" @click="showEnableAllFactoids = true">
           <i class="fa fa-eye"></i>
           &nbsp;&nbsp;&nbsp;
           Enable All
           &nbsp;&nbsp;&nbsp;
         </a>
-        <a class="right" @click="openCreateFactoid()">
+        <a class="right pointer" @click="showCreateFactoid = true; selectedFactoid = { text: '' }">
           <i class="fa fa-plus"></i>
           &nbsp;&nbsp;&nbsp;
           Create
@@ -178,24 +178,37 @@
         </a>
       </div>
 
-      <section class="factoids-container">
-        <section class="factoid-item" v-for="(factoid, index) in factoids" :key="factoid.id">
-          <h5 class="thin-underline">
-            <span class="post large" v-if="factoid.enabled" @click="disableFactoid(factoid.id)">Enabled</span>
-            <span class="delete large" v-if="!factoid.enabled" @click="enableFactoid(factoid.id)">Disabled</span>
-            Factoid #{{index+1}}
-            <div class="right">
-              <a @click="openEditFactoid(factoid)"><i class="fa fa-pencil"></i></a>
-              &nbsp;&nbsp;&nbsp;
-              <a @click="openDeleteFactoid(factoid)"><i class="fa fa-trash"></i></a>
-            </div>
-          </h5>
-          <div :id="'factoid-' + index"></div>
-        </section>
+      <section class="factoids-container full-width">
+        <table class="striped ads-table full-width">
+          <thead>
+            <th>Number</th>
+            <th>Display</th>
+            <th>Enabled</th>
+            <th>Actions</th>
+          </thead>
+          <tbody>
+            <tr v-for="(factoid, index) in factoids" :key="factoid.id">
+              <td width="10%">Factoid #{{index+1}}</td>
+              <td width="80%" :id="'factoid-' + index"></td>
+              <td width="5%">
+                <span class="post large pointer" v-if="factoid.enabled" @click="enableFactoid(factoid.id, false)">Enabled</span>
+                <span class="delete large pointer" v-if="!factoid.enabled" @click="enableFactoid(factoid.id, true)">Disabled</span>
+              </td>
+              <td width="5%">
+                <a href="#" data-balloon="Edit" @click.prevent="showUpdateFactoid = true; selectedFactoid = factoid"><i class="fas fa-edit"></i></a>
+                &nbsp;&nbsp;&nbsp;
+                <a href="#" data-balloon="Delete" @click.prevent="showDeleteFactoid = true; selectedFactoid = factoid"><i class="fa fa-trash"></i></a>
+              </td>
+            </tr>
+            <tr v-if="!factoids || factoids.length < 1">
+              <td>No factoids to display</td>
+            </tr>
+          </tbody>
+        </table>
       </section>
     </div>
   </div>
-  <ad-manager-modal :show="showCreateRound || showCreateAd || showUpdateAd || showDuplicateAd || showRotateRound || showDeleteAd" :createRound="showCreateRound" :createAd="showCreateAd" :deleteAd="showDeleteAd" :duplicateAd="showDuplicateAd" :rotateRound="showRotateRound" :round="round" :updateAd="showUpdateAd" @close="showCreateRound = false; showRotateRound = false; showCreateAd = false; showUpdateAd = false; showDeleteAd = false; showDuplicateAd = false" :ad="selectedAd" @success="pullRound" />
+  <ad-manager-modal :show="showCreateRound || showCreateAd || showUpdateAd || showDuplicateAd || showRotateRound || showDeleteAd || showCreateFactoid || showUpdateFactoid || showDeleteFactoid || showEnableAllFactoids || showDisableAllFactoids" :createRound="showCreateRound" :createAd="showCreateAd" :deleteAd="showDeleteAd" :duplicateAd="showDuplicateAd" :rotateRound="showRotateRound" :round="round" :updateAd="showUpdateAd" :createFactoid="showCreateFactoid" :updateFactoid="showUpdateFactoid" :deleteFactoid="showDeleteFactoid" :enableFactoids="showEnableAllFactoids" :disableFactoids="showDisableAllFactoids" @close="showCreateRound = false; showRotateRound = false; showCreateAd = false; showUpdateAd = false; showDeleteAd = false; showDuplicateAd = false; showCreateFactoid = false; showUpdateFactoid = false; showDeleteFactoid = false; showEnableAllFactoids = false; showDisableAllFactoids = false" :factoid="selectedFactoid" :ad="selectedAd" @success="pullRound" />
 </template>
 
 <script>
@@ -262,11 +275,16 @@ export default {
       .then(() => $alertStore.success('Successfully saved text data!'))
       .catch(() => $alertStore.error('There was an error saving text data.'))
 
-    const openCreateFactoid = () => {}
-    const openEditFactoid = () => {}
-    const openDeleteFactoid = () => {}
-    const enableFactoid = () => {}
-    const disableFactoid = () => {}
+    const enableFactoid =  (id, enable) => {
+      const requestPromise = enable ? adsApi.factoids.enable : adsApi.factoids.disable
+      requestPromise({ id: id }).then(() => {
+        $alertStore.success(`Successfully ${enable ? 'enabled': 'disabled'} factoid!`)
+        pullRound()
+      })
+      .catch(() => $alertStore.error(`There was an issue ${enable ? 'enabling': 'disabling'} factoid.`))
+      .finally(() => close())
+    }
+
 
     const $alertStore = inject('$alertStore')
 
@@ -277,11 +295,11 @@ export default {
       showDuplicateAd: false,
       showCreateRound: false,
       showRotateRound: false,
-      showWriteFactoid: false,
+      showCreateFactoid: false,
+      showUpdateFactoid: false,
       showDeleteFactoid: false,
       showEnableAllFactoids: false,
       showDisableAllFactoids: false,
-      tempFactoid: { text: '' },
       tab: 'rounds',
       showComponent: true,
       ads: null,
@@ -289,12 +307,13 @@ export default {
       round: null,
       currentRound: 'current',
       selectedAd: null,
+      selectedFactoid: null,
       nextRound: null,
       previousRound: null,
       text: { disclaimer: '', info: '' },
       adsCss: []
     })
-    return { ...toRefs(v), saveText, pullRound, openCreateFactoid, openEditFactoid, openDeleteFactoid, enableFactoid, disableFactoid }
+    return { ...toRefs(v), saveText, pullRound, enableFactoid }
   }
 }
 </script>
@@ -403,6 +422,7 @@ export default {
   }
 
   .ads-table {
+    tbody tr td { padding-left: 0; }
     thead {
       border-bottom: 1px solid $border-color;
       text-align: left;
