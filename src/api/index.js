@@ -49,6 +49,12 @@ export const motdApi = {
   save: data => $http('/api/motd', { method: 'PUT', data })
 }
 
+export const legalApi = {
+  get: () => $http('/api/legal'),
+  reset: () => $http('/api/legal/reset'),
+  save: data => $http('/api/legal', { method: 'PUT', data })
+}
+
 export const imagesApi = {
   imagePolicy: data => $http('/api/images/policy', { method: 'POST', data })
 }
