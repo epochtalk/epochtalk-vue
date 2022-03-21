@@ -18,6 +18,7 @@ import PostSearch from '@/views/PostSearch.vue'
 import Join from '@/views/Join.vue'
 import GeneralSettings from '@/views/admin/settings/General.vue'
 import AdvancedSettings from '@/views/admin/settings/Advanced.vue'
+import LegalSettings from '@/views/admin/settings/Legal.vue'
 import BoardManagement from '@/views/admin/management/Boards.vue'
 import UserModeration from '@/views/admin/moderation/Users.vue'
 import ConfirmAccount from '@/views/ConfirmAccount.vue'
@@ -50,7 +51,7 @@ const routes = [
   {
     path: '/admin/settings/legal',
     name: 'LegalSettings',
-    component: GeneralSettings,
+    component: LegalSettings,
     meta: { requiresAuth: true, bodyClass: 'legal-settings', title: 'Settings' }
   },
   {
