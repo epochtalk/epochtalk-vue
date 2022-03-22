@@ -183,6 +183,7 @@ export default {
     adminApi.configurations().then(data => next(vm => {
       vm.config = data
       vm.originalConfig = cloneDeep(data)
+      vm.defaultAvatarShapeCircle = data?.website?.default_avatar_shape === 'circle'
       themeApi.get(to.query.preview ? { preview: true } : undefined).then(t => vm.theme = t)
     }))
   },
@@ -190,6 +191,7 @@ export default {
     adminApi.configurations().then(data => {
       this.config = data
       this.originalConfig = cloneDeep(data)
+      this.defaultAvatarShapeCircle = data?.website?.default_avatar_shape === 'circle'
       themeApi.get(to.query.preview ? { preview: true } : undefined).then(t => this.theme = t)
       next()
     })
@@ -211,14 +213,19 @@ export default {
       EventBus.off('admin-reset', resetListener)
     })
 
+    const loadTheme = theme => console.log(theme)
+    const revert = () => console.log('Revert Theme')
+
     const $alertStore = inject('$alertStore')
 
     const v = reactive({
       originalConfig: null,
       config: null,
-      theme: null
+      theme: {},
+      defaultAvatarShapeCircle: null
     })
-    return { ...toRefs(v) }
+
+    return { ...toRefs(v), loadTheme, revert }
   }
 }
 </script>
