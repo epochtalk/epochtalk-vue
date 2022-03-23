@@ -241,6 +241,15 @@ export default {
     .desc { flex: 65%; }
     .input-block { width: auto; }
     &:last-child { flex: 1; }
+    .radio-select { line-height: 3.25rem; }
+    .radio-button { display: inline-block; }
+    .radio-button label {
+      display: inline-block;
+      padding: 0 .9rem;
+      border-radius: 3px;
+      line-height: 2rem;
+    }
+    .radio-button:last-child label { margin-right: 0; }
   }
   .swatch-input {
     position: relative;
