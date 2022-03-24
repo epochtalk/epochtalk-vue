@@ -58,7 +58,7 @@ export const legalApi = {
 export const themeApi = {
   get: () => $http('/api/theme'),
   reset: () => $http('/api/theme', { method: 'POST' }),
-  save: data => $http('/api/theme/preview', { method: 'PUT', data }),
+  save: data => $http('/api/theme', { method: 'PUT', data }),
   preview: data => $http('/api/theme/preview', { method: 'PUT', data })
 }
 
