@@ -189,6 +189,7 @@ export default {
       themeApi.get(to.query.preview ? { preview: true } : undefined).then(t => {
         vm.theme = t
         vm.removeVarPostFix()
+        vm.originalTheme = cloneDeep(vm.theme)
       })
     }))
   },
@@ -200,18 +201,25 @@ export default {
       themeApi.get(to.query.preview ? { preview: true } : undefined).then(t => {
         this.theme = t
         this.removeVarPostFix()
+        this.originalTheme = cloneDeep(this.theme)
       })
       next()
     })
   },
   setup() {
     const saveListener = () => {
-      themeApi.save(v.legal)
+      addVarPostFix()
+      themeApi.save(v.themeCopy)
+      .then(() => adminApi.updateConfigurations(v.config))
+      .then(() => v.originalConfig = v.config)
+      .then(() => v.originalTheme = v.theme)
       .then(() => $alertStore.success('Successfully updated theme settings!'))
       .catch(() => $alertStore.error('Error saving theme settings'))
     }
-    const resetListener = () => v.legal = cloneDeep(v.originalConfig)
-
+    const resetListener = () => {
+      v.config = cloneDeep(v.originalConfig)
+      v.theme = cloneDeep(v.originalTheme)
+    }
     onMounted(() => {
       EventBus.on('admin-save', saveListener)
       EventBus.on('admin-reset', resetListener)
@@ -260,11 +268,16 @@ export default {
       return image.style.color !== 'rgb(255, 255, 255)'
     }
 
-    const baseFontSizeRegex = /^([1][0-8])/
+    const baseFontSizeRegex = /^([1][0-8])$/
     const baseLineHeightRegex = /^(?:2(?:\.00?0?)?|[1](?:\.[0-9]([0-9])?([0-9])?)?|1?\.[1-9])$/
 
     const loadTheme = theme => console.log(theme)
     const revert = () => console.log('Revert Theme')
+    const checkFormValid = () => {
+      let valid = true
+      Object.keys(v.formValid).forEach(k => v.formValid[k] ? null : valid = false)
+      return valid
+    }
 
     const removeVarPostFix = () => {
       v.theme['base-font-size'] = v.theme['base-font-size'].split('px')[0]
@@ -282,20 +295,22 @@ export default {
     const v = reactive({
       originalConfig: null,
       config: null,
+      originalTheme: {},
       theme: {},
       themeCopy: {},
       formValid: {},
       defaultAvatarShapeCircle: null
     })
 
+    // Form Validation
     let watchColorProps = ['base-background-color', 'base-font-color', 'border-color', 'color-primary', 'header-bg-color', 'header-font-color', 'input-background-color', 'input-font-color', 'secondary-font-color', 'sub-header-color']
     watchColorProps.forEach(p => watch(() => v.theme[p], val => v.formValid[p] = validColor(val)))
-
     watch(() => v.theme['base-font-size'], val => v.formValid['base-font-size'] = baseFontSizeRegex.test(val))
     watch(() => v.theme['base-line-height'], val => v.formValid['base-line-height'] = baseLineHeightRegex.test(val))
     watch(() => v.theme['base-font-sans'], val => v.formValid['base-font-sans'] = !!val)
+    watch(() => v.formValid, () => EventBus.emit('admin-save-valid', checkFormValid()), { deep: true }) // notify admin sub header of form validity
 
-    return { ...toRefs(v), loadTheme, revert, removeVarPostFix, addVarPostFix }
+    return { ...toRefs(v), loadTheme, revert, checkFormValid, removeVarPostFix, addVarPostFix }
   }
 }
 </script>

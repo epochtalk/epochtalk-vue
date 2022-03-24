@@ -10,7 +10,7 @@
     </dl>
 
     <div class="actions">
-      <button @click="EventBus.emit('admin-save')">
+      <button @click="EventBus.emit('admin-save')" :disabled="!formValid">
         <i class="fa fa-save"></i>&nbsp;&nbsp;Save
       </button>
       <button class="negative" @click="EventBus.emit('admin-reset')">
@@ -22,13 +22,17 @@
 
 <script>
 import { useRoute } from 'vue-router'
-import { reactive, toRefs, inject, computed, watch } from 'vue'
+import { reactive, toRefs, inject, computed, watch, onMounted, onUnmounted } from 'vue'
 import { AuthStore } from '@/composables/stores/auth'
 import EventBus from '@/composables/services/event-bus'
 
 export default {
   name: 'AdminSubNavigation',
   setup() {
+    const checkFormValid = valid => v.formValid = valid
+    onMounted(() => EventBus.on('admin-save-valid', checkFormValid))
+    onUnmounted(() => EventBus.off('admin-save-valid', checkFormValid))
+
     const $route = useRoute()
     const $auth = inject(AuthStore)
 
@@ -130,7 +134,8 @@ export default {
 
     const v = reactive({
       routeName: $route.meta.title || $route.name.split(/(?=[A-Z])/).join(' '),
-      nav: nav[$route.path.split('/')[2] || 'settings']
+      nav: nav[$route.path.split('/')[2] || 'settings'],
+      formValid: true
     })
 
     watch(() => $route.path, p => v.nav = nav[p.split('/')[2] || 'settings'])
