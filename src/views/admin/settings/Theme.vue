@@ -73,7 +73,7 @@
   <div v-if="theme" class="theme-col-two settings half-column">
     <h5 class="thin-underline">Layout Settings
       <span class="info-tooltip" data-balloon="Allows you to customize forum colors. Use preview mode to ensure that your color changes look good without affecting the current theme. Variables must be valid css" data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
-      <a class="right header-link hide-mobile" @click="revert()">Revert to Default Theme</a></h5>
+      <a href="#" class="right header-link hide-mobile" @click.prevent="revert()">Revert to Default Theme</a></h5>
     <div class="setting-row">
       <div class="desc">
         <label>Avatar Shape</label>
@@ -272,7 +272,20 @@ export default {
     const baseLineHeightRegex = /^(?:2(?:\.00?0?)?|[1](?:\.[0-9]([0-9])?([0-9])?)?|1?\.[1-9])$/
 
     const loadTheme = theme => console.log(theme)
-    const revert = () => console.log('Revert Theme')
+    const revert = () => {
+      themeApi.reset().then(resetTheme => {
+        v.theme = resetTheme
+        removeVarPostFix()
+        v.originalTheme = cloneDeep(v.theme)
+        return adminApi.updateConfigurations(v.originalConfig)
+      })
+      .then(() => {
+        v.config = cloneDeep(v.originalConfig)
+        $alertStore.success('Theme successfully reset to default!')
+      })
+      .catch(() => $alertStore.error('There was an error reverting to default theme'))
+    }
+
     const checkFormValid = () => {
       let valid = true
       Object.keys(v.formValid).forEach(k => v.formValid[k] ? null : valid = false)
