@@ -10,6 +10,9 @@
     </dl>
 
     <div class="actions">
+      <button v-if="nav[3]?.routeName === 'ThemeSettings' && nav[3]?.active" @click="EventBus.emit('admin-preview')" :disabled="!formValid">
+        <i class="fa fa-eye"></i>&nbsp;&nbsp;Preview
+      </button>
       <button @click="EventBus.emit('admin-save')" :disabled="!formValid">
         <i class="fa fa-save"></i>&nbsp;&nbsp;Save
       </button>
