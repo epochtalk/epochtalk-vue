@@ -213,6 +213,8 @@ export default {
       .then(() => adminApi.updateConfigurations(v.config))
       .then(() => v.originalConfig = v.config)
       .then(() => v.originalTheme = v.theme)
+      //TODO(akinsey): Implement theme service
+      //.then(() => ThemeService.toggleCSS(false))
       .then(() => $alertStore.success('Successfully updated theme settings!'))
       .catch(() => $alertStore.error('Error saving theme settings'))
     }
@@ -220,11 +222,23 @@ export default {
       v.config = cloneDeep(v.originalConfig)
       v.theme = cloneDeep(v.originalTheme)
     }
+    const previewListener = () => {
+      addVarPostFix()
+      //TODO(akinsey): Implement theme service
+      // ThemeService.setTheme(v.themeCopy)
+      themeApi.preview(v.themeCopy)
+      //TODO(akinsey): Implement theme service
+      //.then(() => ThemeService.toggleCSS(true))
+      .then(() => $alertStore.success('Previewing theme locally!'))
+      .catch(() => $alertStore.error('Error previewing theme'))
+    }
     onMounted(() => {
+      EventBus.on('admin-preview', previewListener)
       EventBus.on('admin-save', saveListener)
       EventBus.on('admin-reset', resetListener)
     })
     onUnmounted(() => {
+      EventBus.off('admin-preview', previewListener)
       EventBus.off('admin-save', saveListener)
       EventBus.off('admin-reset', resetListener)
     })
