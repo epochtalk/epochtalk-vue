@@ -3,7 +3,9 @@ import App from '@/App.vue'
 import router from '@/router'
 import localStorageCache from '@/composables/utils/localStorageCache'
 import alertStore from '@/composables/stores/alert'
-
+import * as jqueryExports from 'jquery'
+window.jQuery = window.$ = jqueryExports.default
+// eslint-disable-next-line no-unused-vars
 // extend dayjs with utc plugin
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'

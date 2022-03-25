@@ -69,7 +69,8 @@ export const imagesApi = {
 export const boardsApi = {
   slugToBoardId: slug => $http(`/api/boards/${slug}/id`),
   getBoards: stripped => $http(`/api/boards${stripped ? '?stripped=true' : ''}`),
-  movelist: () => $http('/api/boards/movelist')
+  movelist: () => $http('/api/boards/movelist'),
+  unfiltered: () => $http('/api/boards/unfiltered')
 }
 
 export const threadsApi = {
