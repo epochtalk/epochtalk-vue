@@ -49,6 +49,19 @@ export const motdApi = {
   save: data => $http('/api/motd', { method: 'PUT', data })
 }
 
+export const legalApi = {
+  get: () => $http('/api/legal'),
+  reset: () => $http('/api/legal/reset'),
+  save: data => $http('/api/legal', { method: 'PUT', data })
+}
+
+export const themeApi = {
+  get: () => $http('/api/theme'),
+  reset: () => $http('/api/theme', { method: 'POST' }),
+  save: data => $http('/api/theme', { method: 'PUT', data }),
+  preview: data => $http('/api/theme/preview', { method: 'PUT', data })
+}
+
 export const imagesApi = {
   imagePolicy: data => $http('/api/images/policy', { method: 'POST', data })
 }
@@ -56,7 +69,8 @@ export const imagesApi = {
 export const boardsApi = {
   slugToBoardId: slug => $http(`/api/boards/${slug}/id`),
   getBoards: stripped => $http(`/api/boards${stripped ? '?stripped=true' : ''}`),
-  movelist: () => $http('/api/boards/movelist')
+  movelist: () => $http('/api/boards/movelist'),
+  unfiltered: () => $http('/api/boards/unfiltered')
 }
 
 export const threadsApi = {
@@ -161,12 +175,12 @@ export const usersApi = {
   adminRecover: data => $http(`/api/user/recover`, { method: 'POST', data }),
   checkResetToken: (username, token) => $http(`/api/reset/${username}/${token}/validate`),
   trust: {
+    getTrustBoards: () => $http('/api/trustboards'),
     getTrustList: () => $http('/api/trustlist'),
     getTrustTree: params => $http('/api/trusttree', { params }),
     getTrustStats: username => $http(`/api/trust/${username}`),
     getTrustFeedback: username => $http(`/api/trustfeedback/${username}`),
     addTrustFeedback: data => $http('/api/trust', { method: 'POST', data }),
-    editDefaultTrustList: data => $http('/api/admin/trustlist', { method: 'POST', data }),
     editTrustList: data => $http('/api/trustlist', { method: 'POST', data })
   }
 }
@@ -225,8 +239,54 @@ export const banApi = {
 
 export const adminApi = {
   configurations: () => $http('/api/configurations'),
+  updateConfigurations: data => $http('/api/configurations', { method: 'POST', data }),
+  trust: {
+    getDefaultTrustList: () => $http('/api/admin/trustlist'),
+    editDefaultTrustList: data => $http('/api/admin/trustlist', { method: 'POST', data }),
+    deleteTrustBoard: data => $http(`/api/admin/trustboards/${data.board_id}`, { method: 'DELETE' }),
+    addTrustBoard: data => $http('/api/admin/trustboards', { method: 'POST', data })
+  },
   moderators: {
     remove: data => $http('/api/admin/moderators/remove', { method: 'POST', data }),
     add: data => $http('/api/admin/moderators', { method: 'POST', data })
+  },
+  blacklist: {
+    get: () => $http('/api/admin/blacklist'),
+    add: data => $http('/api/admin/blacklist', { method: 'POST', data }),
+    update: data => $http('/api/admin/blacklist', { method: 'PUT', data }),
+    delete: id => $http(`/api/admin/blacklist/${id}`, { method: 'DELETE' })
+  },
+  ranks: {
+    get: () => $http('/api/rank'),
+    upsert: data => $http('/api/rank', { method: 'PUT', data })
+  },
+  autoModeration: {
+    getRules: () => $http('/api/automoderation/rules'),
+    addRule: data => $http('/api/automoderation/rules', { method: 'POST', data }),
+    updateRule: data => $http(`/api/automoderation/rules/${data.id}`, { method: 'PUT', data }),
+    deleteRule: data => $http(`/api/automoderation/rules/${data.id}`, { method: 'DELETE' })
+  }
+}
+
+export const adsApi = {
+  get: () => $http('/api/ads'),
+  getAnalytics: round => $http(`/api/ads/analytics/${round}`),
+  create: data => $http('/api/ads', { method: 'POST', data }),
+  duplicate: data => $http(`/api/ads/${data.id}/duplicate`, { method: 'POST', data }),
+  update: data => $http(`/api/ads/${data.id}`, { method: 'PUT', data }),
+  delete: data => $http(`/api/ads/${data.id}`, { method: 'DELETE' }),
+  saveText: data => $http('/api/ads/text', { method: 'POST', data }),
+  factoids: {
+   create: data => $http('/api/ads/factoids', { method: 'POST', data }),
+   update: data => $http(`/api/ads/factoids/${data.id}`, { method: 'PUT', data }),
+   delete: data => $http(`/api/ads/factoids/${data.id}`, { method: 'DELETE' }),
+   enable: data => $http(`/api/ads/factoids/${data.id}/enable`, { method: 'PUT', data }),
+   disable: data => $http(`/api/ads/factoids/${data.id}/disable`, { method: 'PUT', data })
+  },
+  rounds: {
+    create: () => $http('/api/ads/rounds', { method: 'POST' }),
+    get: () => $http('/api/ads/rounds/info'),
+    getRound: data => $http(`/api/ads/rounds/${data.roundNumber}`, { params: { type: data.type } }),
+    rotate: data => $http('/api/ads/rounds/rotate', { method: 'POST', data })
   }
 }

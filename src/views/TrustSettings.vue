@@ -24,16 +24,6 @@
         </span>
 
         <div v-if="hierarchy">
-<!--           <script type="text/ng-template" id="trustTree">
-            <span ng-if="user.type === 0">{{ user.username_trusted }}</span>
-            <span ng-if="user.type === 1"><s>{{ user.username_trusted }}</s></span>
-            <ul ng-if="user.trusted">
-              <li ng-repeat="user in user.trusted" ng-include="'trustTree'"></li>
-            </ul>
-          </script>
-            <li ng-repeat="user in TrustSettingsCtrl.trustTree" ng-include="'trustTree'">
-            </li>
-          </ul> -->
           <ul class="depth-tree">
             <trust-hierarchy-partial :trust-tree="trustTree" />
           </ul>

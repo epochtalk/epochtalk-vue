@@ -2,6 +2,12 @@
 @charset "UTF-8";
 
 // Page Break Mixins
+@mixin break-mobile-xs {
+  @media screen and (max-width: #{$small}) {
+    @content;
+  }
+}
+
 @mixin break-mobile-sm {
   @media screen and (max-width: #{$tablet}) {
     @content;

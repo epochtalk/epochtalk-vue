@@ -2,7 +2,7 @@
   <div class="input-container" @dragend.prevent.self="hover=false;" @dragexit.prevent.self="hover=false" @dragleave.prevent.self="hover=false">
     <div>
       <label v-if="purpose !== 'editor'" for="fileInput" class="input-label" :class="{ 'hidden': hover }">Choose Image File or Drag and Drop</label>
-      <input type="file" name="fileInput" id="fileInput" @change="uploadFile" ref="fileInput" :multiple="multiple" @dragenter.prevent.self.stop="hover=true" @dragover.prevent.self.stop="hover=true" :disabled="hover" :class="{ 'hidden': hover }" :hidden="purpose === 'editor' ? 'hidden' : null">
+      <input type="file" name="fileInput" :id="inputId || 'fileInput'" class="file-input" @change="uploadFile" ref="fileInput" :multiple="multiple" @dragenter.prevent.self.stop="hover=true" @dragover.prevent.self.stop="hover=true" :disabled="hover" :class="{ 'hidden': hover }" :hidden="purpose === 'editor' ? 'hidden' : null">
       <div class="progress-container" :class="{ 'hidden': hover }">
         <div class="progress" :class="{ 'progress-editor': purpose === 'editor'}">
           <span class="meter" :style="{ width: imagesProgress + '%' }"></span>
@@ -71,7 +71,7 @@ Promise.each = async (arr, fn) => { for(const item of arr) await fn(item) }
 
 export default {
   name: 'image-uploader',
-  props: ['onUpload-success', 'onUpload-error', 'onHover-stop', 'purpose', 'showDropzone', 'onDone'],
+  props: ['onUpload-success', 'onUpload-error', 'onHover-stop', 'purpose', 'showDropzone', 'onDone', 'inputId'],
   components: { Modal },
   setup(props, { emit }) { //, { emit }) {
     /* View Methods */
@@ -261,7 +261,7 @@ export default {
   .input-container { position: relative; height: 4.625rem; }
   .input-section label.hidden { opacity: .1; }
 
-  #fileInput {
+  .file-input {
     height: 4.625rem;
     &.hidden {
       opacity: .1;

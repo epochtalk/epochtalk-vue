@@ -15,7 +15,9 @@
       </div>
       <ul>
         <li @click="showMobileMenu = false" v-if="permissionUtils.hasPermission('adminAccess')">
-          <a href="#"><i class="fa fa-cogs" aria-hidden="true"></i>Admin Panel</a>
+          <router-link :to="{ name: 'GeneralSettings' }">
+            <i class="fa fa-cogs" aria-hidden="true"></i>Admin Panel
+          </router-link>
         </li>
         <li @click="showMobileMenu = false" v-if="permissionUtils.hasPermission('modAccess') && !permissionUtils.hasPermission('adminAccess')">
           <a href="#"><i class="fa fa-cogs" aria-hidden="true"></i>Mod Panel</a>
@@ -239,9 +241,11 @@
 
       <!-- Message of the Day -->
       <!-- style-fix="true" -->
-      <div v-if="motdData && motdData.motd_html.length && !hideAnnnouncement" id="motd-wrap">
+      <div v-if="motdData && motdData.motd_html.length && !hideAnnnouncement && !adminMode" id="motd-wrap">
         <div id="motd" v-html="motdData?.motd_html"></div>
       </div>
+
+      <admin-sub-navigation v-if="adminMode && (permissionUtils.hasPermission('adminAccess') || permissionUtils.hasPermission('modAccess'))" />
 
       <!-- Auth Modals -->
       <login-modal :show="showLogin" @close="showLogin = false" />
@@ -249,7 +253,7 @@
       <register-modal :show="showRegister" @close="showRegister = false" />
     </div>
   </header>
-  <div v-if="motdData && motdData.motd_html.length && !hideAnnnouncement" id="motd-spacer-wrap">
+  <div v-if="motdData && motdData.motd_html.length && !hideAnnnouncement && !adminMode" id="motd-spacer-wrap">
       <div id="motd-spacer" v-html="motdData?.motd_html"></div>
   </div>
   <div v-if="!motdData || !motdData.motd_html.length || hideAnnnouncement" id="header-spacer"></div>
@@ -263,6 +267,7 @@ import InviteModal from '@/components/modals/auth/Invite.vue'
 import RegisterModal from '@/components/modals/auth/Register.vue'
 import Breadcrumbs from '@/components/layout/Breadcrumbs.vue'
 import AdminNavigation from '@/components/layout/AdminNavigation.vue'
+import AdminSubNavigation from '@/components/layout/AdminSubNavigation.vue'
 import decode from '@/composables/filters/decode'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore } from '@/composables/stores/prefs'
@@ -276,7 +281,7 @@ import { motdApi } from '@/api'
 import { watchPublicChannel } from '@/composables/services/websocket'
 
 export default {
-  components: { AdminNavigation, Breadcrumbs, LoginModal, InviteModal, RegisterModal, Alert },
+  components: { AdminNavigation, AdminSubNavigation, Breadcrumbs, LoginModal, InviteModal, RegisterModal, Alert },
   setup() {
     onBeforeMount(() => {
       let fetchMotd = () => motdApi.get().then(d => v.motdData = d).catch(() => {})
@@ -332,6 +337,8 @@ export default {
     const $prefs = inject(PreferencesStore)
     const $router = useRouter()
     const $route = useRoute()
+    const adminScrollPos = 30
+    const publicScrollPos = 95
 
     /* Template Data */
     const v = reactive({
@@ -348,7 +355,7 @@ export default {
       adminMode: false,
       loggedIn: $auth.loggedIn,
       logo: '',
-      scrollDownPos: 95,
+      scrollDownPos: $route.path.indexOf('/admin') === 0 ? adminScrollPos : publicScrollPos,
       lastScrollTop: 0,
       currentUser: $auth.user,
       permissionUtils: $auth.permissionUtils,
@@ -368,6 +375,9 @@ export default {
       v.hideAnnnouncement = v.motdData?.main_view_only && p !== '' && p !== '/'
       //Switch header style to full width for admin views
       v.adminMode = p.indexOf('/admin') === 0
+      // Change header scroll height for admin panel
+      if (v.adminMode) v.scrollDownPos = adminScrollPos
+      else v.scrollDownPos = publicScrollPos
     })
     watch(() => NotificationsStore.messages, c => v.notificationMessages = c)
     watch(() => NotificationsStore.mentions, c => v.notificationMentions = c)
