@@ -27,7 +27,7 @@
 import { reactive, toRefs, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { boardsApi } from '@/api'
 import EventBus from '@/composables/services/event-bus'
-import { sortBy } from 'lodash'
+import { sortBy, remove } from 'lodash'
 import RenderNestable from '@/components/layout/RenderNestable.vue'
 // eslint-disable-next-line no-unused-vars
 import nestable from 'nestable'
@@ -44,6 +44,7 @@ export default {
     .finally(() => next(vm => {
       vm.boardListData = boards
       vm.catListData = cats
+      vm.cleanBoardList(cats)
       vm.generateNestableBoardData(boards)
       vm.generateNestableCatData(cats)
     }))
@@ -58,6 +59,7 @@ export default {
     .finally(() => {
       this.boardListData = boards
       this.catListData = cats
+      this.cleanBoardList(cats)
       this.generateNestableBoardData(boards)
       this.generateNestableCatData(cats)
       next()
@@ -192,6 +194,17 @@ export default {
       serializedCats: null
     })
 
+    const cleanBoardList = cats => cats.forEach(cat => cleanBoards(cat.boards))
+
+    const cleanBoards = catBoards => {
+      catBoards.forEach(board => {
+        // remove this board from boardListData
+        remove(v.boardListData, b => b.id === board.id)
+        // recurse if there are children
+        if (board.children.length > 0) { cleanBoards(board.children); }
+      });
+    }
+
     const generateNestableCatData = data => {
       if (!data) { data = [] }
       v.uncompiledCatHtml = null
@@ -214,7 +227,7 @@ export default {
 
     watch(() => v.boardListData, generateNestableBoardData, { deep: true })
 
-    return { ...toRefs(v), insertNewCategory, setCatDelete, setBoardDelete, generateNestableBoardData, generateNestableCatData }
+    return { ...toRefs(v), insertNewCategory, setCatDelete, setBoardDelete, generateNestableBoardData, generateNestableCatData, cleanBoardList }
   }
 }
 </script>
