@@ -3,8 +3,8 @@ import { compile } from 'vue/dist/vue.esm-bundler.js'
 import { watch, reactive, toRefs } from 'vue'
 
 export default {
-  name: 'RenderNestable',
-  props: ['uncompiled', 'setCatDelete'],
+  name: 'RenderNestableCategories',
+  props: ['uncompiled', 'setCatDelete', 'setCatEdit', 'setBoardDelete'],
   setup (props) {
     const v = reactive({ html: compile(props.uncompiled) })
 

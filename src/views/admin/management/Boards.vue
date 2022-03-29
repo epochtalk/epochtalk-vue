@@ -12,7 +12,7 @@
         <a href="#" @click.prevent="collapseAll()"><i class="fa fa-compress"></i> Collapse</a>
       </div>
     </h5>
-    <render-nestable :key="uncompiledCatHtml" id="nestable-categories" :setCatDelete="setCatDelete" :uncompiled="uncompiledCatHtml" />
+    <render-nestable :key="uncompiledCatHtml" id="nestable-categories" :setCatDelete="setCatDelete" :setCatEdit="setCatEdit" :setBoardDelete="setBoardDelete" :uncompiled="uncompiledCatHtml" />
   </div>
   <div>
     <a href="#" ng-click="showAddBoard = true" class="input-spacer button">Add New Board</a>
@@ -99,8 +99,8 @@ export default {
         }
         // Edit pencil and trash buttons
         let toolbarHtml = '<i @click="setCatDelete(' + dataId + ')" class="dd-nodrag dd-right-icon fa fa-trash"></i>' +
-          '<i @click="setEditCat(' +
-          dataId + ')" class="dd-nodrag dd-right-icon fa fa-pencil"></i>'
+          '<i @click="setCatEdit(' +
+          dataId + ')" class="dd-nodrag dd-right-icon fas fa-edit"></i>'
         let status = '<i class="fa status"></i>'
         html += '<li class="dd-item dd-root-item" data-cat-id="' + cat.id + '" data-id="' + dataId +
           '" data-top="true" data-name="' + cat.name + '"><div class="dd-grab-cat"></div><div class="dd-handle' +
@@ -143,8 +143,9 @@ export default {
       return html
     }
 
-    const setCatDelete = () => console.log('setCatDelete')
-    const setBoardDelete = () => console.log('setBoardDelete')
+    const setCatDelete = id => console.log('setCatDelete', id)
+    const setCatEdit = id => console.log('setCatEdit', id)
+    const setBoardDelete = id => console.log('setBoardDelete', id)
 
     const expandAll = () => window.$('#nestable-categories').nestable('expandAll')
     const collapseAll = () => window.$('#nestable-categories').nestable('collapseAll')
@@ -230,7 +231,7 @@ export default {
 
     watch(() => v.boardListData, generateNestableBoardData, { deep: true })
 
-    return { ...toRefs(v), insertNewCategory, setCatDelete, setBoardDelete, generateNestableBoardData, generateNestableCatData, cleanBoardList, expandAll, collapseAll }
+    return { ...toRefs(v), insertNewCategory, setCatDelete, setCatEdit, setBoardDelete, generateNestableBoardData, generateNestableCatData, cleanBoardList, expandAll, collapseAll }
   }
 }
 </script>
