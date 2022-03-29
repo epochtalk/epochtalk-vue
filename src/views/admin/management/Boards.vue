@@ -12,14 +12,14 @@
         <a ng-click="collapseAll()"><i class="fa fa-compress"></i> Collapse</a>
       </div>
     </h5>
-    <render-nestable :key="uncompiledHtml" id="nestable-categories" :setCatDelete="setCatDelete" :uncompiled="uncompiledHtml" />
+    <render-nestable :key="uncompiledCatHtml" id="nestable-categories" :setCatDelete="setCatDelete" :uncompiled="uncompiledCatHtml" />
   </div>
   <div>
-    <a ng-href="#" ng-click="showAddBoard = true" class="input-spacer button">Add New Board</a>
+    <a href="#" ng-click="showAddBoard = true" class="input-spacer button">Add New Board</a>
     <h5 class="thin-underline">Uncategorized Boards
       <span class="info-tooltip" data-balloon="Drag the boards from the Uncategorized Boards list to the Categorized Boards list to make them visible to the public. Boards left in the Uncategorized Boards list will be inaccessable and hidden from public view" data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
     </h5>
-    <!-- <nestable-boards></nestable-boards> -->
+    <render-nestable :key="uncompiledBoardHtml" id="nestable-boards" :uncompiled="uncompiledBoardHtml" :setBoardDelete="setBoardDelete" />
   </div>
 </template>
 
@@ -36,13 +36,33 @@ export default {
   name: 'BoardManagement',
   components: { RenderNestable },
   beforeRouteEnter(to, from, next) {
-    boardsApi.unfiltered().then(data => next(vm => vm.catListData = data))
+    let boards, cats
+    boardsApi.uncategorized()
+    .then(b => boards = b)
+    .then(boardsApi.unfiltered)
+    .then(c => cats = c)
+    .finally(() => next(vm => {
+      vm.boardListData = boards
+      vm.catListData = cats
+      vm.generateNestableBoardData(boards)
+      vm.generateNestableCatData(cats)
+    }))
+    .catch(() => {})
   },
   beforeRouteUpdate(to, from, next) {
-     boardsApi.unfiltered().then(data => {
-      this.catListData = data
+    let boards, cats
+    boardsApi.uncategorized()
+    .then(b => boards = b)
+    .then(boardsApi.unfiltered)
+    .then(c => cats = c)
+    .finally(() => {
+      this.boardListData = boards
+      this.catListData = cats
+      this.generateNestableBoardData(boards)
+      this.generateNestableCatData(cats)
       next()
     })
+    .catch(() => {})
   },
   setup() {
     const saveListener = () => {
@@ -92,7 +112,7 @@ export default {
     // Generates nestable html elements for board data
     const generateBoardList = boards => {
       let html = '<ol class="dd-list">'
-      boards.forEach(function(board) {
+      boards.forEach((board) => {
         let dataId = getDataId()
 
         // Store boardData within each li's data-board attr for easy access
@@ -111,7 +131,7 @@ export default {
           moderators: board.moderators || []
         }
         let toolbarHtml = '<i @click="setBoardDelete(' + dataId + ')" class="dd-nodrag dd-right-icon fa fa-trash"></i><i @click="setEditBoard(' +
-          dataId + ')" class="dd-nodrag dd-right-icon fa fa-pencil"></i><i @click="setModBoard(' + dataId + ')" class="dd-nodrag dd-right-icon fa fa-user"></i>'
+          dataId + ')" class="dd-nodrag dd-right-icon fas fa-edit"></i><i @click="setModBoard(' + dataId + ')" class="dd-nodrag dd-right-icon fa fa-user"></i>'
         let status = '<i class="fa status"></i>'
         html += '<li class="dd-item" data-board-id="' + board.id + '" data-id="' + dataId + '">' +
           '<div class="dd-grab"></div><div class="dd-handle">' + status + '<div class="dd-desc">' + board.name + '<span>' + board.description + '</span></div>' +
@@ -122,6 +142,7 @@ export default {
     }
 
     const setCatDelete = () => console.log('setCatDelete')
+    const setBoardDelete = () => console.log('setBoardDelete')
 
     const insertNewCategory = () => {
       // serilize nestable html to get current ordering of cats, then turn into array of ids
@@ -147,36 +168,59 @@ export default {
 
     const getDataId = () => v.dataId++
 
+    // Generates nestable html for uncategorized boards
+    const generateNoCatBoardsList = boards => {
+      let emptyHtml = '<div class="dd-empty"></div>'
+      let html = '<div class="dd" id="' + v.boardListId + '">'
+      html += boards.length > 0 ? generateBoardList(boards) : emptyHtml
+      html += '</div>'
+      return html
+    }
+
     const v = reactive({
       nestableMap: {},
       dataId: 0,
       catListData: null,
-      catListOpts: { protectedRoot: true, maxDepth: 5, group: 1 },
+      nestableOpts: { protectedRoot: true, maxDepth: 5, group: 1 },
       catListId: 'categorized-boards',
       boardListId: 'uncategorized-boards',
+      boardListData: null,
       newCatName: '',
       newCategories: [],
-      uncompiledHtml: '',
+      uncompiledCatHtml: '',
+      uncompiledBoardHtml: '',
       serializedCats: null
     })
 
-
-    watch(() => v.catListData, data => {
+    const generateNestableCatData = data => {
       if (!data) { data = [] }
-        v.uncompiledHtml = null
+      v.uncompiledCatHtml = null
       let html = generateCategoryList(data)
       // Compile html so vue controls will work
-      v.uncompiledHtml = html
-      nextTick(() => window.$('#nestable-categories').nestable(v.catListOpts))
-    }, { deep: true })
+      v.uncompiledCatHtml = html
+      nextTick(() => window.$('#nestable-categories').nestable(v.nestableOpts))
+    }
 
-    return { ...toRefs(v), insertNewCategory, setCatDelete }
+    const generateNestableBoardData = data => {
+      if (!data) { data = [] }
+      v.uncompiledBoardHtml = null
+      let html = generateNoCatBoardsList(data)
+      // Compile html so vue controls will work
+      v.uncompiledBoardHtml = html
+      nextTick(() => window.$('#nestable-boards').nestable(v.nestableOpts))
+    }
+
+    watch(() => v.catListData, generateNestableCatData, { deep: true })
+
+    watch(() => v.boardListData, generateNestableBoardData, { deep: true })
+
+    return { ...toRefs(v), insertNewCategory, setCatDelete, setBoardDelete, generateNestableBoardData, generateNestableCatData }
   }
 }
 </script>
 
 <style lang="scss">
-a.input-spacer { margin-bottom: 1rem; }
+a.input-spacer, a.input-spacer.button { margin-bottom: 1rem; }
 .dd {
   position: relative;
   display: block;
