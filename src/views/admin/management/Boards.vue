@@ -8,8 +8,8 @@
       Categorized Boards
       <span class="info-tooltip" data-balloon="Drag and drop the boards and categories below to order them" data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
       <div class="right">
-        <a ng-click="expandAll()"><i class="fa fa-expand"></i> Expand</a>&nbsp;
-        <a ng-click="collapseAll()"><i class="fa fa-compress"></i> Collapse</a>
+        <a href="#" @click.prevent="expandAll()"><i class="fa fa-expand"></i> Expand</a>&nbsp;
+        <a href="#" @click.prevent="collapseAll()"><i class="fa fa-compress"></i> Collapse</a>
       </div>
     </h5>
     <render-nestable :key="uncompiledCatHtml" id="nestable-categories" :setCatDelete="setCatDelete" :uncompiled="uncompiledCatHtml" />
@@ -146,6 +146,9 @@ export default {
     const setCatDelete = () => console.log('setCatDelete')
     const setBoardDelete = () => console.log('setBoardDelete')
 
+    const expandAll = () => window.$('#nestable-categories').nestable('expandAll')
+    const collapseAll = () => window.$('#nestable-categories').nestable('collapseAll')
+
     const insertNewCategory = () => {
       // serilize nestable html to get current ordering of cats, then turn into array of ids
       // The index of the id in the array determines the view order of the catListData category.
@@ -227,7 +230,7 @@ export default {
 
     watch(() => v.boardListData, generateNestableBoardData, { deep: true })
 
-    return { ...toRefs(v), insertNewCategory, setCatDelete, setBoardDelete, generateNestableBoardData, generateNestableCatData, cleanBoardList }
+    return { ...toRefs(v), insertNewCategory, setCatDelete, setBoardDelete, generateNestableBoardData, generateNestableCatData, cleanBoardList, expandAll, collapseAll }
   }
 }
 </script>
