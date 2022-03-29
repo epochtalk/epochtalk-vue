@@ -12,7 +12,7 @@
         <a ng-click="collapseAll()"><i class="fa fa-compress"></i> Collapse</a>
       </div>
     </h5>
-    <div id="nestable-categories"></div>
+    <render-nestable :key="uncompiledHtml" id="nestable-categories" :setCatDelete="setCatDelete" :uncompiled="uncompiledHtml" />
   </div>
   <div>
     <a ng-href="#" ng-click="showAddBoard = true" class="input-spacer button">Add New Board</a>
@@ -24,16 +24,17 @@
 </template>
 
 <script>
-import { reactive, toRefs, onMounted, onUnmounted, watch } from 'vue'
+import { reactive, toRefs, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { boardsApi } from '@/api'
 import EventBus from '@/composables/services/event-bus'
 import { sortBy } from 'lodash'
-import $ from 'jquery'
+import RenderNestable from '@/components/layout/RenderNestable.vue'
 // eslint-disable-next-line no-unused-vars
-// import * as nestable from 'nestable'
+import nestable from 'nestable'
 
 export default {
   name: 'BoardManagement',
+  components: { RenderNestable },
   beforeRouteEnter(to, from, next) {
     boardsApi.unfiltered().then(data => next(vm => vm.catListData = data))
   },
@@ -120,30 +121,28 @@ export default {
       return html
     }
 
+    const setCatDelete = () => console.log('setCatDelete')
+
     const insertNewCategory = () => {
-      let category = { name: v.newCatName }
-
-      if (category.name) {
-        let dataId = getDataId()
-        // Update hashmap of list items
-        v.nestableMap[dataId] = { id: -1, name: category.name }
-        category.dataId = dataId
-        v.newCategories.push(category)
-
-        // Edit pencil and trash buttons
-        let toolbarHtml = '<i @click="setCatDelete(' + dataId + ')" class="dd-nodrag dd-right-icon fa fa-trash"></i>' +
-          '<i @click="setEditCat(' +
-            dataId + ')" class="dd-nodrag dd-right-icon fa fa-pencil"></i>'
-        let status = '<i class="fa status modified"></i>'
-        let newCatHtml = '<li class="dd-item dd-root-item" data-cat-id="' + -1 + '"  data-id="' + dataId + '" data-top="true" data-name="' + category.name +
-          '"><div class="dd-grab-cat"></div><div class="dd-handle dd-root-handle">' +
-          status + '<div class="dd-desc">' + category.name + '</div>' + toolbarHtml + '</div></li>'
-
-        // Compile and prepend new category html
-        $('#' + v.catListId + ' > .dd-list').prepend(newCatHtml)
-        $('#' + v.catListId).nestable(v.catListOpts)
-      }
-      v.newCatName = ''
+      // serilize nestable html to get current ordering of cats, then turn into array of ids
+      // The index of the id in the array determines the view order of the catListData category.
+      let ordering = window.$('#nestable-categories').nestable('serialize').map(c => c.name + c.catId + c.children.length)
+      // Add new category to vue controlled list of categories
+      v.catListData.unshift({
+        boards: [],
+        created_at: null,
+        id: "-1",
+        imported_at: null,
+        meta: null,
+        name: v.newCatName,
+        postable_by: null,
+        updated_at: null,
+        view_order: 0
+      })
+      // Modifying catListData triggers watcher, recompiles html using catListData
+      // Update view order using ordering array
+      v.catListData.forEach(c => c.view_order = ordering.indexOf(c.name + c.id + c.boards.length))
+      v.newCatName = '' // clear input for category name
     }
 
     const getDataId = () => v.dataId++
@@ -157,19 +156,21 @@ export default {
       boardListId: 'uncategorized-boards',
       newCatName: '',
       newCategories: [],
-      compiledHtml: ''
+      uncompiledHtml: '',
+      serializedCats: null
     })
+
 
     watch(() => v.catListData, data => {
       if (!data) { data = [] }
+        v.uncompiledHtml = null
       let html = generateCategoryList(data)
-      // Compile html so angular controls will work
-      let compiledHtml = html
-      console.log( document.getElementById('nestable-categories').innerHTML = compiledHtml)
-      $('#nestable-categories').html(compiledHtml)
+      // Compile html so vue controls will work
+      v.uncompiledHtml = html
+      nextTick(() => window.$('#nestable-categories').nestable(v.catListOpts))
     }, { deep: true })
 
-    return { ...toRefs(v), insertNewCategory }
+    return { ...toRefs(v), insertNewCategory, setCatDelete }
   }
 }
 </script>

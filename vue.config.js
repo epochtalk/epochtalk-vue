@@ -1,3 +1,5 @@
+const webpack = require("webpack");
+
 module.exports = {
   css: {
     loaderOptions: {
@@ -9,6 +11,13 @@ module.exports = {
     }
   },
   configureWebpack: {
+    plugins: [
+    new webpack.ProvidePlugin({
+      $: "jquery",
+      jQuery: "jquery",
+      'window.jQuery': 'jquery'
+     })
+    ],
     optimization: {
       splitChunks: {
         chunks: 'async',
