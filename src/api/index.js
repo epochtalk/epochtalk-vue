@@ -70,7 +70,8 @@ export const boardsApi = {
   slugToBoardId: slug => $http(`/api/boards/${slug}/id`),
   getBoards: stripped => $http(`/api/boards${stripped ? '?stripped=true' : ''}`),
   movelist: () => $http('/api/boards/movelist'),
-  unfiltered: () => $http('/api/boards/unfiltered')
+  unfiltered: () => $http('/api/boards/unfiltered'),
+  uncategorized: () => $http('/api/boards/uncategorized')
 }
 
 export const threadsApi = {
