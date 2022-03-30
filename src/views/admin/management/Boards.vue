@@ -12,20 +12,22 @@
         <a href="#" @click.prevent="collapseAll()"><i class="fa fa-compress"></i> Collapse</a>
       </div>
     </h5>
-    <render-nestable :key="uncompiledCatHtml" id="nestable-categories" :setCatDelete="setCatDelete" :setCatEdit="setCatEdit" :setBoardDelete="setBoardDelete" :uncompiled="uncompiledCatHtml" />
+    <render-nestable :key="uncompiledCatHtml" id="nestable-categories" :setCatDelete="setCatDelete" :setCatEdit="setCatEdit" :setBoardDelete="setBoardDelete" :setBoardMods="setBoardMods" :setBoardEdit="setBoardEdit" :uncompiled="uncompiledCatHtml" />
   </div>
   <div>
     <a href="#" ng-click="showAddBoard = true" class="input-spacer button">Add New Board</a>
     <h5 class="thin-underline">Uncategorized Boards
       <span class="info-tooltip" data-balloon="Drag the boards from the Uncategorized Boards list to the Categorized Boards list to make them visible to the public. Boards left in the Uncategorized Boards list will be inaccessable and hidden from public view" data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
     </h5>
-    <render-nestable :key="uncompiledBoardHtml" id="nestable-boards" :uncompiled="uncompiledBoardHtml" :setBoardDelete="setBoardDelete" />
+    <render-nestable :key="uncompiledBoardHtml" id="nestable-boards" :setBoardDelete="setBoardDelete" :setBoardMods="setBoardMods" :setBoardEdit="setBoardEdit" :uncompiled="uncompiledBoardHtml" />
   </div>
+  <board-manager-modal :show="showEditBoard || showEditBoardMods || showDeleteBoard || showDeleteCat || showEditCat" :editCat="showEditCat" :deleteCat="showDeleteCat" :editBoard="showEditBoard" :editBoardMods="showEditBoardMods" :deleteBoard="showDeleteBoard" :selected="{}" @close="showEditBoard = showEditBoardMods = showDeleteBoard = showDeleteCat = showEditCat = false" />
 </template>
 
 <script>
 import { reactive, toRefs, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { boardsApi } from '@/api'
+import BoardManagerModal from '@/components/modals/admin/management/BoardManager.vue'
 import EventBus from '@/composables/services/event-bus'
 import { sortBy, remove } from 'lodash'
 import RenderNestable from '@/components/layout/RenderNestable.vue'
@@ -34,7 +36,7 @@ import nestable from 'nestable'
 
 export default {
   name: 'BoardManagement',
-  components: { RenderNestable },
+  components: { RenderNestable, BoardManagerModal },
   beforeRouteEnter(to, from, next) {
     let boards, cats
     boardsApi.uncategorized()
@@ -132,8 +134,8 @@ export default {
           children: board.children || [],
           moderators: board.moderators || []
         }
-        let toolbarHtml = '<i @click="setBoardDelete(' + dataId + ')" class="dd-nodrag dd-right-icon fa fa-trash"></i><i @click="setEditBoard(' +
-          dataId + ')" class="dd-nodrag dd-right-icon fas fa-edit"></i><i @click="setModBoard(' + dataId + ')" class="dd-nodrag dd-right-icon fa fa-user"></i>'
+        let toolbarHtml = '<i @click="setBoardDelete(' + dataId + ')" class="dd-nodrag dd-right-icon fa fa-trash"></i><i @click="setBoardEdit(' +
+          dataId + ')" class="dd-nodrag dd-right-icon fas fa-edit"></i><i @click="setBoardMods(' + dataId + ')" class="dd-nodrag dd-right-icon fa fa-user"></i>'
         let status = '<i class="fa status"></i>'
         html += '<li class="dd-item" data-board-id="' + board.id + '" data-id="' + dataId + '">' +
           '<div class="dd-grab"></div><div class="dd-handle">' + status + '<div class="dd-desc">' + board.name + '<span>' + board.description + '</span></div>' +
@@ -143,9 +145,26 @@ export default {
       return html
     }
 
-    const setCatDelete = id => console.log('setCatDelete', id)
-    const setCatEdit = id => console.log('setCatEdit', id)
-    const setBoardDelete = id => console.log('setBoardDelete', id)
+    const setCatDelete = id => {
+      v.showDeleteCat = true
+      console.log('setCatDelete', id)
+    }
+    const setCatEdit = id => {
+      v.showEditCat = true
+      console.log('setCatEdit', id)
+    }
+    const setBoardDelete = id => {
+      v.showDeleteBoard = true
+      console.log('setBoardDelete', id)
+    }
+    const setBoardEdit = id => {
+      v.showEditBoard = true
+      console.log('setBoardEdit', id)
+    }
+    const setBoardMods = id => {
+      v.showEditBoardMods = true
+      console.log('setBoardMods', id)
+    }
 
     const expandAll = () => window.$('#nestable-categories').nestable('expandAll')
     const collapseAll = () => window.$('#nestable-categories').nestable('collapseAll')
@@ -195,7 +214,12 @@ export default {
       newCategories: [],
       uncompiledCatHtml: '',
       uncompiledBoardHtml: '',
-      serializedCats: null
+      serializedCats: null,
+      showEditBoard: false,
+      showEditBoardMods: false,
+      showDeleteBoard: false,
+      showEditCat: false,
+      showDeleteCat: false
     })
 
     const cleanBoardList = cats => cats.forEach(cat => cleanBoards(cat.boards))
@@ -231,7 +255,7 @@ export default {
 
     watch(() => v.boardListData, generateNestableBoardData, { deep: true })
 
-    return { ...toRefs(v), insertNewCategory, setCatDelete, setCatEdit, setBoardDelete, generateNestableBoardData, generateNestableCatData, cleanBoardList, expandAll, collapseAll }
+    return { ...toRefs(v), insertNewCategory, setCatDelete, setCatEdit, setBoardDelete, setBoardEdit, setBoardMods, generateNestableBoardData, generateNestableCatData, cleanBoardList, expandAll, collapseAll }
   }
 }
 </script>
