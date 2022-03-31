@@ -89,7 +89,7 @@ export default {
       let html = '<div class="dd" id="' + v.catListId + '"><ol class="dd-list">'
       let sortedCats = sortBy(categories, 'view_order')
       sortedCats.forEach(cat => {
-        let dataId = getDataId()
+        let dataId = getCatDataId()
         let boardIds = []
         let catBoards = cat.boards || []
         catBoards.forEach(board => boardIds.push(board.id))
@@ -117,7 +117,7 @@ export default {
     const generateBoardList = boards => {
       let html = '<ol class="dd-list">'
       boards.forEach((board) => {
-        let dataId = getDataId()
+        let dataId = getBoardDataId()
 
         // Store boardData within each li's data-board attr for easy access
         v.nestableMap[dataId] = {
@@ -169,38 +169,50 @@ export default {
     const expandAll = () => window.$('#nestable-categories').nestable('expandAll')
     const collapseAll = () => window.$('#nestable-categories').nestable('collapseAll')
 
-    const normalizeNestableCats = (cats) => {
+    const updateNestableMapForCats = (cats) => {
       cats.map(cat => {
         cat.dataId = cat.id
         cat.id = cat.catId
+        // console.log(cat.name, cat.children)
+        v.nestableMap[cat.dataId].children = cat.children // maintain updated nestable map
+        v.catListData.forEach(c => {
+          if (c.id === cat.id) c.children = cat.children
+          console.log(c.name, c.children)
+        })// maintain updated catListData
         cat.boards = cat.children
         delete cat.catId
         delete cat.top
         delete cat.children
-        normalizeNestableBoards(cat.boards)
+        updateNestableMapForBoards(cat.boards)
       })
       return cats
     }
 
-    const normalizeNestableBoards = catBoards => {
+    const updateNestableMapForBoards = catBoards => {
+      if(!catBoards) return
       catBoards.map(board => {
         board.dataId = board.id
+        v.nestableMap[board.dataId].children = board.children // maintain updated nestable map
         board.id = board.boardId
         delete board.boardId
         // recurse if there are children
-        if (board.children.length > 0) normalizeNestableBoards(board.children)
+        if (board.children.length > 0) updateNestableMapForBoards(board.children)
       })
     }
+
+    // const updateCatListData = () => {
+    //   v.catListData.map(cat)
+    // }
 
     const insertNewCategory = () => {
       // serilize nestable html to get current ordering of cats, then turn into array of ids
       // The index of the id in the array determines the view order of the catListData category.
       let cats = window.$('#nestable-categories').nestable('serialize')
-      let ordering = normalizeNestableCats(cats)
+      let ordering = updateNestableMapForCats(cats)
       console.log(ordering, v.catListData, v.nestableMap)
-      ordering = ordering.map(c => c.name + c.catId + c.children.length)
+      ordering = ordering.map(c => c.name + c.id + c.boards.length)
       // Add new category to vue controlled list of categories
-      v.catListData.unshift({
+      let newCat = {
         boards: [],
         created_at: null,
         id: "-1",
@@ -210,14 +222,17 @@ export default {
         postable_by: null,
         updated_at: null,
         view_order: 0
-      })
+      }
+      v.newCategories.push(newCat)
+      v.catListData.unshift(newCat)
       // Modifying catListData triggers watcher, recompiles html using catListData
       // Update view order using ordering array
       v.catListData.forEach(c => c.view_order = ordering.indexOf(c.name + c.id + c.boards.length))
       v.newCatName = '' // clear input for category name
     }
 
-    const getDataId = () => v.dataId++
+    const getCatDataId = () => v.catDataId++
+    const getBoardDataId = () => v.boardDataId++
 
     // Generates nestable html for uncategorized boards
     const generateNoCatBoardsList = boards => {
@@ -230,7 +245,10 @@ export default {
 
     const v = reactive({
       nestableMap: {},
-      dataId: 0,
+      catsDataIdMap: {}, // DataId keyed by cat.view_order which is unique
+      boardsDataIdMap: {}, // DataID keyed by board.slug TODO(akinsey): not unique prior to req
+      catDataId: 0,
+      boardDataId: 9999,
       catListData: null,
       nestableOpts: { protectedRoot: true, maxDepth: 5, group: 1 },
       catListId: 'categorized-boards',
@@ -262,6 +280,7 @@ export default {
     const generateNestableCatData = data => {
       if (!data) { data = [] }
       v.uncompiledCatHtml = null
+      v.catDataId = 0
       let html = generateCategoryList(data)
       // Compile html so vue controls will work
       v.uncompiledCatHtml = html
@@ -271,6 +290,7 @@ export default {
     const generateNestableBoardData = data => {
       if (!data) { data = [] }
       v.uncompiledBoardHtml = null
+      v.boardDataId = 9999
       let html = generateNoCatBoardsList(data)
       // Compile html so vue controls will work
       v.uncompiledBoardHtml = html
