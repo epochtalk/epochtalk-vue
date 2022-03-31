@@ -169,10 +169,36 @@ export default {
     const expandAll = () => window.$('#nestable-categories').nestable('expandAll')
     const collapseAll = () => window.$('#nestable-categories').nestable('collapseAll')
 
+    const normalizeNestableCats = (cats) => {
+      cats.map(cat => {
+        cat.dataId = cat.id
+        cat.id = cat.catId
+        cat.boards = cat.children
+        delete cat.catId
+        delete cat.top
+        delete cat.children
+        normalizeNestableBoards(cat.boards)
+      })
+      return cats
+    }
+
+    const normalizeNestableBoards = catBoards => {
+      catBoards.map(board => {
+        board.dataId = board.id
+        board.id = board.boardId
+        delete board.boardId
+        // recurse if there are children
+        if (board.children.length > 0) normalizeNestableBoards(board.children)
+      })
+    }
+
     const insertNewCategory = () => {
       // serilize nestable html to get current ordering of cats, then turn into array of ids
       // The index of the id in the array determines the view order of the catListData category.
-      let ordering = window.$('#nestable-categories').nestable('serialize').map(c => c.name + c.catId + c.children.length)
+      let cats = window.$('#nestable-categories').nestable('serialize')
+      let ordering = normalizeNestableCats(cats)
+      console.log(ordering, v.catListData, v.nestableMap)
+      ordering = ordering.map(c => c.name + c.catId + c.children.length)
       // Add new category to vue controlled list of categories
       v.catListData.unshift({
         boards: [],
@@ -229,8 +255,8 @@ export default {
         // remove this board from boardListData
         remove(v.boardListData, b => b.id === board.id)
         // recurse if there are children
-        if (board.children.length > 0) { cleanBoards(board.children); }
-      });
+        if (board.children.length > 0) { cleanBoards(board.children) }
+      })
     }
 
     const generateNestableCatData = data => {
