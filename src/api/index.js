@@ -241,6 +241,9 @@ export const banApi = {
 export const adminApi = {
   configurations: () => $http('/api/configurations'),
   updateConfigurations: data => $http('/api/configurations', { method: 'POST', data }),
+  roles: {
+    all: () => $http('/api/admin/roles/all'),
+  },
   trust: {
     getDefaultTrustList: () => $http('/api/admin/trustlist'),
     editDefaultTrustList: data => $http('/api/admin/trustlist', { method: 'POST', data }),
