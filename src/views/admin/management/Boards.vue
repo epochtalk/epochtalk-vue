@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="nested-input-container">
-      <a href="#" @click.prevent="insertNewCategory()" class="nested-btn">Add Category</a>
+      <a href="#" @click.prevent="insertNewCategory()" class="nested-btn" :class="{ 'nested-btn-disabled': !newCatName }">Add Category</a>
       <input class="input-text nested-input" type="text" id="new-cat" v-model="newCatName" placeholder="New Category Name" maxlength="255">
     </div>
     <h5 class="thin-underline">
@@ -226,6 +226,7 @@ export default {
 
 
     const insertNewCategory = () => {
+      if (!v.newCatName) return
       // serilize nestable html to get current ordering of cats, then turn into array of ids
       // The index of the id in the array determines the view order of the catListData category.
       let cats = window.$('#nestable-categories').nestable('serialize')
@@ -331,6 +332,7 @@ export default {
 </script>
 
 <style lang="scss">
+.nested-input-container { .nested-btn-disabled, .nested-btn { color: $base-background-color; } }
 a.input-spacer, a.input-spacer.button { margin-bottom: 1rem; }
 .dd {
   position: relative;
