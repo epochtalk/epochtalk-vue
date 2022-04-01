@@ -1,6 +1,7 @@
 <template>
   <modal :name="$options.name" :show="show" @close="close()" :focusInput="focusInput">
     <template v-slot:header>
+      <span v-if="addBoard">Add Board</span>
       <span v-if="editCat">Edit Category</span>
       <span v-if="deleteCat">Delete Category</span>
       <span v-if="editBoard">Edit Boards</span>
@@ -45,7 +46,7 @@ import { cloneDeep } from 'lodash'
 
 export default {
   name: 'rank-modal',
-  props: ['show', 'editCat', 'deleteCat', 'editBoard', 'editBoardMods', 'deleteBoard', 'selected'],
+  props: ['show', 'addBoard', 'editCat', 'deleteCat', 'editBoard', 'editBoardMods', 'deleteBoard', 'selected'],
   emits: ['close', 'success'],
   components: { Modal },
   setup(props, { emit }) {
