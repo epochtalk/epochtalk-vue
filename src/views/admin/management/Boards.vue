@@ -99,6 +99,7 @@ export default {
           viewable_by: cat.viewable_by,
           children: catBoards
         }
+        v.catsDataIdMap[cat.view_order] = dataId // Allows us to map catListData to nestableMap
         // Edit pencil and trash buttons
         let toolbarHtml = '<i @click="setCatDelete(' + dataId + ')" class="dd-nodrag dd-right-icon fa fa-trash"></i>' +
           '<i @click="setCatEdit(' +
@@ -134,6 +135,7 @@ export default {
           children: board.children || [],
           moderators: board.moderators || []
         }
+        v.boardsDataIdMap[board.slug] = dataId // Allows us to map catListData to nestableMap
         let toolbarHtml = '<i @click="setBoardDelete(' + dataId + ')" class="dd-nodrag dd-right-icon fa fa-trash"></i><i @click="setBoardEdit(' +
           dataId + ')" class="dd-nodrag dd-right-icon fas fa-edit"></i><i @click="setBoardMods(' + dataId + ')" class="dd-nodrag dd-right-icon fa fa-user"></i>'
         let status = '<i class="fa status"></i>'
@@ -169,17 +171,16 @@ export default {
     const expandAll = () => window.$('#nestable-categories').nestable('expandAll')
     const collapseAll = () => window.$('#nestable-categories').nestable('collapseAll')
 
+    // Keeps nestable map up to date using serialized nestable data
+    // this allows us to rebuild catListData when dom rebuilds to recompile nestable data
     const updateNestableMapForCats = (cats) => {
+      if (!cats) return
       cats.map(cat => {
         cat.dataId = cat.id
         cat.id = cat.catId
         // console.log(cat.name, cat.children)
         v.nestableMap[cat.dataId].children = cat.children // maintain updated nestable map
-        v.catListData.forEach(c => {
-          if (c.id === cat.id) c.children = cat.children
-          console.log(c.name, c.children)
-        })// maintain updated catListData
-        cat.boards = cat.children
+        cat.boards = cat.children || []
         delete cat.catId
         delete cat.top
         delete cat.children
@@ -196,20 +197,43 @@ export default {
         board.id = board.boardId
         delete board.boardId
         // recurse if there are children
-        if (board.children.length > 0) updateNestableMapForBoards(board.children)
+        if (board.children && board.children.length > 0) updateNestableMapForBoards(board.children)
       })
     }
 
-    // const updateCatListData = () => {
-    //   v.catListData.map(cat)
-    // }
+    // Rebuilds catListData using nestableMap, which contains ordering truth
+    const updateCatListData = () => {
+      v.catListData.map(cat => {
+        cat.boards = []
+        let children = v.nestableMap[v.catsDataIdMap[cat.view_order]].children
+        if (children) children.forEach(c => cat.boards.push(v.nestableMap[c.dataId]))
+        updateCatListDataBoards(cat.boards)
+      })
+    }
+
+    const updateCatListDataBoards = catBoards => {
+      if(!catBoards) return
+      catBoards.map(board => {
+        let newChildren = []
+        console.log(v.boardsDataIdMap, board.slug)
+        let children = v.nestableMap[v.boardsDataIdMap[board.slug]].children
+        if (children) children.forEach(c => newChildren.push(v.nestableMap[c.dataId]))
+        board.children = newChildren
+        // recurse if there are children
+        if (board.children.length > 0) updateCatListDataBoards(board.children)
+      })
+    }
+
 
     const insertNewCategory = () => {
       // serilize nestable html to get current ordering of cats, then turn into array of ids
       // The index of the id in the array determines the view order of the catListData category.
       let cats = window.$('#nestable-categories').nestable('serialize')
+      // 1) updates nestable map and returns new cats in correct viewing order
       let ordering = updateNestableMapForCats(cats)
-      console.log(ordering, v.catListData, v.nestableMap)
+      // 2) Update catListData using nestable map (maintains moved child boards)
+      updateCatListData()
+      // 3) generate mapping for category ordering (uses name, id and num children for unique key)
       ordering = ordering.map(c => c.name + c.id + c.boards.length)
       // Add new category to vue controlled list of categories
       let newCat = {
@@ -223,8 +247,8 @@ export default {
         updated_at: null,
         view_order: 0
       }
-      v.newCategories.push(newCat)
-      v.catListData.unshift(newCat)
+      v.newCategories.push(newCat) // add new cat to array of newly added cats
+      v.catListData.unshift(newCat) // add newCat to catListData
       // Modifying catListData triggers watcher, recompiles html using catListData
       // Update view order using ordering array
       v.catListData.forEach(c => c.view_order = ordering.indexOf(c.name + c.id + c.boards.length))
