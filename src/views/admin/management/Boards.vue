@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="nested-input-container">
-      <a href="#" @click.prevent="insertNewCategory()" class="nested-btn" :class="{ 'nested-btn-disabled': !newCatName }">Add Category</a>
+      <a href="#" @click.prevent="addCategory()" class="nested-btn" :class="{ 'nested-btn-disabled': !newCatName }">Add Category</a>
       <input class="input-text nested-input" type="text" id="new-cat" v-model="newCatName" placeholder="New Category Name" maxlength="255">
     </div>
     <h5 class="thin-underline">
@@ -69,8 +69,37 @@ export default {
     .catch(() => {})
   },
   setup() {
+    const DEBUG = true
+
     const saveListener = () => {
       console.log('Admin Save Management!')
+      // -- Need to update vue data to match nestable data before save
+      let cats = window.$('#nestable-categories').nestable('serialize')
+      // 1) updates nestable map and returns cats in correct viewing order
+      let ordering = updateNestableMapForCats(cats)
+      // 2) Update catListData using nestable map (maintains moved child boards)
+      updateCatListData()
+      // 3) create array using unique key to each category so we can update view_order
+      ordering = ordering.map(c => c.name + c.id + c.boards.length)
+      // 4) update view_order for each category to match array ordering
+      v.catListData.forEach(c => c.view_order = ordering.indexOf(c.name + c.id + c.boards.length))
+      cleanBoardList(v.catListData)
+      // -- End update vue data to match nestable data
+      if (DEBUG) {
+        console.log('SAVE TRIGGERED - CURRENT STATE')
+        console.log('---------------------------------------------')
+        console.log('New Categories List (v.newCategories):')
+        console.log(JSON.stringify(v.newCategories, null, 2))
+        console.log('New Boards List (v.newBoards):')
+        console.log(JSON.stringify(v.newBoards, null, 2))
+        console.log('Nestable Map (v.nestableMap):')
+        console.log(v.nestableMap)
+        console.log('Category List Data (v.catListData):')
+        console.log(v.catListData)
+        console.log('Board List Data (v.boardListData):')
+        console.log(v.boardListData)
+        console.log('---------------------------------------------')
+      }
     }
     const resetListener = () => {
       console.log('Admin Reset Management!')
@@ -84,159 +113,11 @@ export default {
       EventBus.off('admin-reset', resetListener)
     })
 
-    const handleBoardManagerSuccess = ({ type, data}) => {
-      if (type === 'addBoard') addBoard(data)
-    }
-
-    const addBoard = data => {
-      let newBoard = data
-      v.boardListData.unshift(newBoard) // triggers recompilation of nestable components/html
-    }
-
-    // Generates nestable html for category data
-    const generateCategoryList = categories => {
-      let html = '<div class="dd" id="' + v.catListId + '"><ol class="dd-list">'
-      let sortedCats = sortBy(categories, 'view_order')
-      sortedCats.forEach(cat => {
-        let dataId = getCatDataId()
-        let boardIds = []
-        let catBoards = cat.boards || []
-        catBoards.forEach(board => boardIds.push(board.id))
-        v.nestableMap[dataId] = {
-          id: cat.id,
-          name: cat.name,
-          viewable_by: cat.viewable_by,
-          children: catBoards
-        }
-        v.catsDataIdMap[cat.view_order] = dataId // Allows us to map catListData to nestableMap
-        // Edit pencil and trash buttons
-        let toolbarHtml = '<i @click="setCatDelete(' + dataId + ')" class="dd-nodrag dd-right-icon fa fa-trash"></i>' +
-          '<i @click="setCatEdit(' +
-          dataId + ')" class="dd-nodrag dd-right-icon fas fa-edit"></i>'
-        let status = '<i class="fa status"></i>'
-        html += '<li class="dd-item dd-root-item" data-cat-id="' + cat.id + '" data-id="' + dataId +
-          '" data-top="true" data-name="' + cat.name + '"><div class="dd-grab-cat"></div><div class="dd-handle' +
-          ' dd-root-handle">' + status + '<div class="dd-desc">' + cat.name + '</div>' +
-          toolbarHtml + '</div>' + generateBoardList(cat.boards) + '</li>'
-      })
-      html += '</ol></div>'
-      return html
-    }
-
-    // Generates nestable html elements for board data
-    const generateBoardList = boards => {
-      let html = '<ol class="dd-list">'
-      boards.forEach((board) => {
-        let dataId = getBoardDataId()
-
-        // Store boardData within each li's data-board attr for easy access
-        v.nestableMap[dataId] = {
-          id: board.id,
-          name: board.name,
-          slug: board.slug,
-          description: board.description,
-          viewable_by: board.viewable_by,
-          postable_by: board.postable_by,
-          right_to_left: board.right_to_left,
-          disable_signature: board.disable_signature,
-          disable_selfmod: board.disable_selfmod,
-          disable_post_edit: board.disable_post_edit,
-          children: board.children || [],
-          moderators: board.moderators || []
-        }
-        v.boardsDataIdMap[board.slug] = dataId // Allows us to map catListData to nestableMap
-        let toolbarHtml = '<i @click="setBoardDelete(' + dataId + ')" class="dd-nodrag dd-right-icon fa fa-trash"></i><i @click="setBoardEdit(' +
-          dataId + ')" class="dd-nodrag dd-right-icon fas fa-edit"></i><i @click="setBoardMods(' + dataId + ')" class="dd-nodrag dd-right-icon fa fa-user"></i>'
-        let status = '<i class="fa status"></i>'
-        html += '<li class="dd-item" data-board-id="' + board.id + '" data-id="' + dataId + '">' +
-          '<div class="dd-grab"></div><div class="dd-handle">' + status + '<div class="dd-desc">' + board.name + '<span>' + board.description + '</span></div>' +
-          toolbarHtml + '</div>' + generateBoardList(board.children || []) + '</li>'
-      })
-      html += '</ol>'
-      return html
-    }
-
-    const setCatDelete = id => {
-      v.showDeleteCat = true
-      console.log('setCatDelete', id)
-    }
-    const setCatEdit = id => {
-      v.showEditCat = true
-      console.log('setCatEdit', id)
-    }
-    const setBoardDelete = id => {
-      v.showDeleteBoard = true
-      console.log('setBoardDelete', id)
-    }
-    const setBoardEdit = id => {
-      v.showEditBoard = true
-      console.log('setBoardEdit', id)
-    }
-    const setBoardMods = id => {
-      v.showEditBoardMods = true
-      console.log('setBoardMods', id)
-    }
-
-    const expandAll = () => window.$('#nestable-categories').nestable('expandAll')
-    const collapseAll = () => window.$('#nestable-categories').nestable('collapseAll')
-
-    // Keeps nestable map up to date using serialized nestable data
-    // this allows us to rebuild catListData when dom rebuilds to recompile nestable data
-    const updateNestableMapForCats = (cats) => {
-      if (!cats) return
-      cats.map(cat => {
-        cat.dataId = cat.id
-        cat.id = cat.catId
-        // console.log(cat.name, cat.children)
-        v.nestableMap[cat.dataId].children = cat.children // maintain updated nestable map
-        cat.boards = cat.children || []
-        delete cat.catId
-        delete cat.top
-        delete cat.children
-        updateNestableMapForBoards(cat.boards)
-      })
-      return cats
-    }
-
-    const updateNestableMapForBoards = catBoards => {
-      if(!catBoards) return
-      catBoards.map(board => {
-        board.dataId = board.id
-        v.nestableMap[board.dataId].children = board.children // maintain updated nestable map
-        board.id = board.boardId
-        delete board.boardId
-        // recurse if there are children
-        if (board.children && board.children.length > 0) updateNestableMapForBoards(board.children)
-      })
-    }
-
-    // Rebuilds catListData using nestableMap, which contains ordering truth
-    const updateCatListData = () => {
-      v.catListData.map(cat => {
-        cat.boards = []
-        let children = v.nestableMap[v.catsDataIdMap[cat.view_order]].children
-        if (children) children.forEach(c => cat.boards.push(v.nestableMap[c.dataId]))
-        updateCatListDataBoards(cat.boards)
-      })
-    }
-
-    const updateCatListDataBoards = catBoards => {
-      if(!catBoards) return
-      catBoards.map(board => {
-        let newChildren = []
-        console.log(v.boardsDataIdMap, board.slug)
-        let children = v.nestableMap[v.boardsDataIdMap[board.slug]].children
-        if (children) children.forEach(c => newChildren.push(v.nestableMap[c.dataId]))
-        board.children = newChildren
-        // recurse if there are children
-        if (board.children.length > 0) updateCatListDataBoards(board.children)
-      })
-    }
-
-
-    const insertNewCategory = () => {
+    /* Page Actions */
+    const addCategory = () => {
       if (!v.newCatName) return
-      // serilize nestable html to get current ordering of cats, then turn into array of ids
+      // See explanation in addNewBoard, need to matain state between nestable data and vue data
+      // Serilize nestable html to get current ordering of cats, then turn into array of ids
       // The index of the id in the array determines the view order of the catListData category.
       let cats = window.$('#nestable-categories').nestable('serialize')
       // 1) updates nestable map and returns new cats in correct viewing order
@@ -263,20 +144,79 @@ export default {
       // Update view order using ordering array
       v.catListData.forEach(c => c.view_order = ordering.indexOf(c.name + c.id + c.boards.length))
       v.newCatName = '' // clear input for category name
+      if (DEBUG) {
+        console.log('ADDING CATEGORY TO LIST OF NEW CATEGORIES')
+        console.log('---------------------------------------------')
+        console.log('New Category:')
+        console.log(JSON.stringify(newCat, null, 2))
+        console.log('New Categories List (v.newCategories):')
+        console.log(JSON.stringify(v.newCategories, null, 2))
+        console.log('---------------------------------------------')
+      }
     }
 
-    const getCatDataId = () => v.catDataId++
-    const getBoardDataId = () => v.boardDataId++
-
-    // Generates nestable html for uncategorized boards
-    const generateNoCatBoardsList = boards => {
-      let emptyHtml = '<div class="dd-empty"></div>'
-      let html = '<div class="dd" id="' + v.boardListId + '">'
-      html += boards.length > 0 ? generateBoardList(boards) : emptyHtml
-      html += '</div>'
-      return html
+    const addBoard = newBoard => {
+      // We have to update nestable map for left side (categorized) and right
+      // side (uncategorized) when a board is added, because boards might have been
+      // moved from the uncategorized to categorized section, this is controlled by jquery.
+      // We also need to maintain the lists for Vue to be aware of the changes made in jQuery.
+      // catListData and boardListData need to match the serialized list of nestable data.
+      // This allows us to rebuild the dom and instantiate nestable without resetting the
+      // ordering of all categories and boards.
+      let cats = window.$('#nestable-categories').nestable('serialize')
+      // 1) updates nestable map and returns cats in correct viewing order
+      let ordering = updateNestableMapForCats(cats)
+      // 2) Update catListData using nestable map (maintains moved child boards)
+      updateCatListData()
+      // 3) create array using unique key to each category so we can update view_order
+      ordering = ordering.map(c => c.name + c.id + c.boards.length)
+      // 4) update view_order for each category to match array ordering
+      v.catListData.forEach(c => c.view_order = ordering.indexOf(c.name + c.id + c.boards.length))
+      cleanBoardList(v.catListData)
+      v.newBoards.push(newBoard) // add new cat to array of newly added cats
+      v.boardListData.unshift(newBoard) // triggers recompilation of nestable components/html
+      if (DEBUG) {
+        console.log('ADDING BOARD TO LIST OF NEW BOARDS')
+        console.log('---------------------------------------------')
+        console.log('New Board:')
+        console.log(JSON.stringify(newBoard, null, 2))
+        console.log('New Boards List (v.newBoards):')
+        console.log(JSON.stringify(v.newBoards, null, 2))
+        console.log('---------------------------------------------')
+      }
     }
 
+    /* Modal Actions */
+    const handleBoardManagerSuccess = ({ type, data}) => {
+      if (type === 'addBoard') addBoard(data)
+    }
+
+    const setCatDelete = id => {
+      v.showDeleteCat = true
+      console.log('setCatDelete', id)
+    }
+    const setCatEdit = id => {
+      v.showEditCat = true
+      console.log('setCatEdit', id)
+    }
+    const setBoardDelete = id => {
+      v.showDeleteBoard = true
+      console.log('setBoardDelete', id)
+    }
+    const setBoardEdit = id => {
+      v.showEditBoard = true
+      console.log('setBoardEdit', id)
+    }
+    const setBoardMods = id => {
+      v.showEditBoardMods = true
+      console.log('setBoardMods', id)
+    }
+
+    /* Nestable function calls */
+    const expandAll = () => window.$('#nestable-categories').nestable('expandAll')
+    const collapseAll = () => window.$('#nestable-categories').nestable('collapseAll')
+
+    /* Template Data */
     const v = reactive({
       nestableMap: {},
       catsDataIdMap: {}, // DataId keyed by cat.view_order which is unique
@@ -287,10 +227,14 @@ export default {
       nestableOpts: { protectedRoot: true, maxDepth: 5, group: 1 },
       catListId: 'categorized-boards',
       boardListId: 'uncategorized-boards',
-      newBoard: { viewable_by: null, postable_by: null },
+      newBoard: { viewable_by: null, postable_by: null, description: '' },
       boardListData: null,
       newCatName: '',
       newCategories: [],
+      deletedCategories: [],
+      newBoards: [],
+      editedBoards: [],
+      deletedBoards: [],
       uncompiledCatHtml: '',
       uncompiledBoardHtml: '',
       serializedCats: null,
@@ -302,9 +246,127 @@ export default {
       showDeleteCat: false
     })
 
-    const cleanBoardList = cats => cats.forEach(cat => cleanBoards(cat.boards))
+    /* Helper Methods */
+    const generateCategoryList = categories => { // Generates nestable html for category data
+      let html = '<div class="dd" id="' + v.catListId + '"><ol class="dd-list">'
+      let sortedCats = sortBy(categories, 'view_order')
+      sortedCats.forEach(cat => {
+        let dataId = v.catDataId++
+        let boardIds = []
+        let catBoards = cat.boards || []
+        catBoards.forEach(board => boardIds.push(board.id))
+        v.nestableMap[dataId] = {
+          id: cat.id,
+          name: cat.name,
+          viewable_by: cat.viewable_by,
+          children: catBoards
+        }
+        v.catsDataIdMap[cat.view_order] = dataId // Allows us to map catListData to nestableMap
+        // Edit pencil and trash buttons
+        let toolbarHtml = '<i @click="setCatDelete(' + dataId + ')" class="dd-nodrag dd-right-icon fa fa-trash"></i>' +
+          '<i @click="setCatEdit(' +
+          dataId + ')" class="dd-nodrag dd-right-icon fas fa-edit"></i>'
+        let status = '<i class="fa status"></i>'
+        html += '<li class="dd-item dd-root-item" data-cat-id="' + cat.id + '" data-id="' + dataId +
+          '" data-top="true" data-name="' + cat.name + '"><div class="dd-grab-cat"></div><div class="dd-handle' +
+          ' dd-root-handle">' + status + '<div class="dd-desc">' + cat.name + '</div>' +
+          toolbarHtml + '</div>' + generateBoardList(cat.boards) + '</li>'
+      })
+      html += '</ol></div>'
+      return html
+    }
+    const generateBoardList = boards => { // Generates nestable html elements for board data
+      let html = '<ol class="dd-list">'
+      boards.forEach((board) => {
+        let dataId = v.boardDataId++
+        // Store boardData within each li's data-board attr for easy access
+        v.nestableMap[dataId] = {
+          id: board.id,
+          name: board.name,
+          slug: board.slug,
+          description: board.description,
+          viewable_by: board.viewable_by,
+          postable_by: board.postable_by,
+          right_to_left: board.right_to_left,
+          disable_signature: board.disable_signature,
+          disable_selfmod: board.disable_selfmod,
+          disable_post_edit: board.disable_post_edit,
+          children: board.children || [],
+          moderators: board.moderators || []
+        }
+        v.boardsDataIdMap[board.slug] = dataId // Allows us to map catListData to nestableMap
+        let toolbarHtml = '<i @click="setBoardDelete(' + dataId + ')" class="dd-nodrag dd-right-icon fa fa-trash"></i><i @click="setBoardEdit(' +
+          dataId + ')" class="dd-nodrag dd-right-icon fas fa-edit"></i><i @click="setBoardMods(' + dataId + ')" class="dd-nodrag dd-right-icon fa fa-user"></i>'
+        let status = '<i class="fa status"></i>'
+        html += '<li class="dd-item" data-board-id="' + board.id + '" data-id="' + dataId + '">' +
+          '<div class="dd-grab"></div><div class="dd-handle">' + status + '<div class="dd-desc">' + board.name + '<span>' + board.description + '</span></div>' +
+          toolbarHtml + '</div>' + generateBoardList(board.children || []) + '</li>'
+      })
+      html += '</ol>'
+      return html
+    }
+    // Generates nestable html for uncategorized boards
+    const generateNoCatBoardsList = boards => {
+      let emptyHtml = '<div class="dd-empty"></div>'
+      let html = '<div class="dd" id="' + v.boardListId + '">'
+      html += boards.length > 0 ? generateBoardList(boards) : emptyHtml
+      html += '</div>'
+      return html
+    }
 
-    const cleanBoards = catBoards => {
+    // Keeps nestable map up to date using serialized nestable data
+    // this allows us to rebuild catListData when dom rebuilds to recompile nestable data
+    const updateNestableMapForCats = (cats) => {
+      if (!cats) return
+      cats.map(cat => {
+        cat.dataId = cat.id
+        cat.id = cat.catId
+        // console.log(cat.name, cat.children)
+        v.nestableMap[cat.dataId].children = cat.children // maintain updated nestable map
+        cat.boards = cat.children || []
+        delete cat.catId
+        delete cat.top
+        delete cat.children
+        updateNestableMapForBoards(cat.boards)
+      })
+      return cats
+    }
+    const updateNestableMapForBoards = catBoards => { // recursion for nestableMap update
+      if(!catBoards) return
+      catBoards.map(board => {
+        board.dataId = board.id
+        v.nestableMap[board.dataId].children = board.children // maintain updated nestable map
+        board.id = board.boardId
+        delete board.boardId
+        // recurse if there are children
+        if (board.children && board.children.length > 0) updateNestableMapForBoards(board.children)
+      })
+    }
+
+    // Rebuilds catListData using nestableMap, which contains ordering truth (from nestable)
+    const updateCatListData = () => {
+      v.catListData.map(cat => {
+        cat.boards = []
+        let children = v.nestableMap[v.catsDataIdMap[cat.view_order]].children
+        if (children) children.forEach(c => cat.boards.push(v.nestableMap[c.dataId]))
+        updateCatListDataBoards(cat.boards)
+      })
+    }
+    const updateCatListDataBoards = catBoards => { // recursion for catListData update
+      if(!catBoards) return
+      catBoards.map(board => {
+        let newChildren = []
+        let children = v.nestableMap[v.boardsDataIdMap[board.slug]].children
+        if (children) children.forEach(c => newChildren.push(v.nestableMap[c.dataId]))
+        board.children = newChildren
+        // recurse if there are children
+        if (board.children.length > 0) updateCatListDataBoards(board.children)
+      })
+    }
+
+    // Remove categorized boards from list of unfiltered boards, updates boardListData
+    const cleanBoardList = cats => cats.forEach(cat => cleanBoards(cat.boards))
+    const cleanBoards = catBoards => { // recusion for boardListData
       catBoards.forEach(board => {
         // remove this board from boardListData
         remove(v.boardListData, b => b.id === board.id)
@@ -313,6 +375,7 @@ export default {
       })
     }
 
+    // Used to generate html from request and initiate nestable
     const generateNestableCatData = data => {
       if (!data) { data = [] }
       v.uncompiledCatHtml = null
@@ -322,7 +385,6 @@ export default {
       v.uncompiledCatHtml = html
       nextTick(() => window.$('#nestable-categories').nestable(v.nestableOpts))
     }
-
     const generateNestableBoardData = data => {
       if (!data) { data = [] }
       v.uncompiledBoardHtml = null
@@ -333,11 +395,11 @@ export default {
       nextTick(() => window.$('#nestable-boards').nestable(v.nestableOpts))
     }
 
+    /* Watch Data */
     watch(() => v.catListData, generateNestableCatData, { deep: true })
-
     watch(() => v.boardListData, generateNestableBoardData, { deep: true })
 
-    return { ...toRefs(v), insertNewCategory, setCatDelete, setCatEdit, setBoardDelete, setBoardEdit, setBoardMods, generateNestableBoardData, generateNestableCatData, cleanBoardList, expandAll, collapseAll, handleBoardManagerSuccess }
+    return { ...toRefs(v), addCategory, setCatDelete, setCatEdit, setBoardDelete, setBoardEdit, setBoardMods, generateNestableBoardData, generateNestableCatData, cleanBoardList, expandAll, collapseAll, handleBoardManagerSuccess }
   }
 }
 </script>
