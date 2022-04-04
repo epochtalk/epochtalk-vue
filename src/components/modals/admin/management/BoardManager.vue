@@ -10,12 +10,74 @@
     </template>
 
     <template v-slot:body>
-        <form class="css-form">
+      <form class="css-form">
+        <div v-if="addBoard">
+          <label>Board Name
+            <input ref="focusInput" type="text" class="input-text" id="newBoardName" placeholder="Board Name" maxlength="255" v-model="data.name" ng-change="slugify()"/>
+          </label>
+          <label>Board URL Slug
+            <input type="text" class="input-text" id="newBoardSlug" v-model="data.slug" placeholder="Board URL Slug" maxlength="80"/>
+          </label>
+          <label>Board Description
+            <textarea rows="5" id="newBoardDesc" v-model="data.description" placeholder="Board Description" maxlength="255"></textarea>
+          </label>
+          <label>Board Read Access:
+            <span class="info-tooltip" data-balloon="Minimum role a user must have to read the posts in this board" data-balloon-pos="right" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
+            <select v-model="data.viewable_by" id="newBoardViewable">
+              <option :value="null" disabled selected>Minimum role level</option>
+              <option :value="role.priority" v-html="role.name" v-for="role in roles" :key="role.priority"></option>
+            </select>
+          </label>
+          <label>Board Write Access:
+            <span class="info-tooltip" data-balloon="Minimum role a user must have to create posts within this board" data-balloon-pos="right" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
+            <select v-model="data.postable_by" id="newBoardPostable">
+              <option :value="null" disabled selected>Minimum role level</option>
+              <option :value="role.priority" v-html="role.name" v-for="role in roles" :key="role.priority"></option>
+            </select>
+          </label>
+          <label>Disable Post Editing After (in Minutes)
+            <input type="number" v-model="data.disable_post_edit" class="input-text" id="newBoardPostEdit" name="newBoardPostEdit" placeholder="0 to disable editing, blank to allow editing indefinitely" maxlength="10"/>
+          </label>
+          <div class="form-switch">
+            <label for="newBoardRTL">Text Direction
+              <span class="info-tooltip" data-balloon="Sets the read direction of the text for this board" data-balloon-pos="right" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
+            </label>
+            <div class="switch-field">
+              <input type="radio" v-model="data.right_to_left" id="ltr" name="newBoardRTL" :value="false" checked/>
+              <label for="ltr">Left to Right</label>
+              <input type="radio" v-model="data.right_to_left" id="rtl" name="newBoardRTL" :value="true" />
+              <label for="rtl">Right to Left</label>
+            </div>
+          </div>
+          <div class="form-switch">
+            <label for="newBoardSignatures">Disable Signature
+              <span class="info-tooltip" data-balloon="Disable signature display for this board" data-balloon-pos="right" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
+            </label>
+            <div class="switch-field">
+              <input type="radio" v-model="data.disable_signature" id="disable-signature" name="newBoardSignatures" :value="true" />
+              <label for="disable-signature">Yes</label>
+              <input type="radio" v-model="data.disable_signature" id="enable-signature" name="newBoardSignatures" :value="false" checked/>
+              <label for="enable-signature">No</label>
+            </div>
+          </div>
+          <div class="form-switch">
+            <label for="newBoardSelfMod">Disable Self Moderated Threads
+              <span class="info-tooltip" data-balloon="Disable self moderated threads for this board" data-balloon-pos="right" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
+            </label>
+            <div class="switch-field">
+              <input type="radio" v-model="data.disable_selfmod" id="disable-selfmod" name="newBoardSelfMod" :value="true" />
+              <label for="disable-selfmod">Yes</label>
+              <input type="radio" v-model="data.disable_selfmod" id="enable-selfmod" name="newBoardSelfMod" :value="false" checked/>
+              <label for="enable-selfmod">No</label>
+            </div>
+          </div>
+        </div>
+        <div v-if="!addBoard">
           <div class="col input-spacing">
             <div>
               <label>
                 Rank Name
-                <input type="text" placeholder="Rank Name"  :disabled="requestSubmitted" ref="focusInput" required />
+                <input type="text" placeholder="Rank Name" :disabled="requestSubmitted" ref="focusInput" required />
               </label>
             </div>
             <div>
@@ -25,15 +87,16 @@
               </label>
             </div>
           </div>
+        </div>
 
-          <div class="col">
-            <div>
-              <button class="fill-row" @click.prevent="modify()" :disabled="requestSubmitted" v-html="saveRuleBtnLabel"></button>
-            </div>
-            <div>
-              <button class="fill-row negative" @click.prevent="close()" :disabled="requestSubmitted">Cancel</button>
-            </div>
+        <div class="col">
+          <div>
+            <button class="fill-row" @click.prevent="modify()" :disabled="requestSubmitted" v-html="saveRuleBtnLabel"></button>
           </div>
+          <div>
+            <button class="fill-row negative" @click.prevent="close()" :disabled="requestSubmitted">Cancel</button>
+          </div>
+        </div>
       </form>
     </template>
   </modal>
@@ -41,8 +104,9 @@
 
 <script>
 import Modal from '@/components/layout/Modal.vue'
-import { reactive, toRefs, inject, watch } from 'vue'
-import { cloneDeep } from 'lodash'
+import { reactive, toRefs, watch, onBeforeMount } from 'vue'
+import { cloneDeep, sortBy } from 'lodash'
+import { adminApi } from '@/api'
 
 export default {
   name: 'rank-modal',
@@ -50,13 +114,23 @@ export default {
   emits: ['close', 'success'],
   components: { Modal },
   setup(props, { emit }) {
+    onBeforeMount(() => adminApi.roles.all().then(r => v.roles = sortBy(r.roles, 'priority')))
     /* Template Methods */
     const resetForm = () => {
       v.requestSubmitted = false
       v.saveRuleBtnLabel = props.deleteCat || props.deleteBoard ? 'Confirm Delete' : 'Save'
     }
 
-    const modify = () => { $alertStore.success('modify')
+    const modify = () => {
+      let type
+      if (props.addBoard) type = 'addBoard'
+      if (props.editCat) type = 'editCat'
+      if (props.deleteCat) type = 'deleteCat'
+      if (props.editBoard) type = 'editBoard'
+      if (props.editBoardMods) type = 'editBoardMods'
+      if (props.deleteBoard) type = 'deleteBoard'
+      emit('success', { type: type, data: v.data })
+      close()
     }
 
     const close = () => {
@@ -65,19 +139,19 @@ export default {
     }
 
     /* Internal Data */
-    const $alertStore = inject('$alertStore')
 
     /* Template Data */
     const v = reactive({
       focusInput: null,
-      data: { },
+      roles: null,
+      data: {},
       saveRuleBtnLabel: props.deleteCat || props.deleteBoard ? 'Confirm Delete' : 'Save',
-      requestSubmitted: false
+      requestSubmitted: false,
     })
 
     watch(() => props.show, () => {
       v.saveRuleBtnLabel = props.deleteCat || props.deleteBoard ? 'Confirm Delete' : 'Save'
-      v.data = props.deleteCat || props.deleteBoard || props.editCat || props.editBoard ? cloneDeep(props.selected) : {}
+      v.data = props.addBoard || props.deleteCat || props.deleteBoard || props.editCat || props.editBoard ? cloneDeep(props.selected) : {}
     })
 
     return { ...toRefs(v), modify, close }

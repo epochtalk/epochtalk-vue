@@ -15,13 +15,13 @@
     <render-nestable :key="uncompiledCatHtml" id="nestable-categories" :setCatDelete="setCatDelete" :setCatEdit="setCatEdit" :setBoardDelete="setBoardDelete" :setBoardMods="setBoardMods" :setBoardEdit="setBoardEdit" :uncompiled="uncompiledCatHtml" />
   </div>
   <div>
-    <a href="#" ng-click="showAddBoard = true" class="input-spacer button">Add New Board</a>
+    <a href="#" @click.prevent="showAddBoard = true" class="input-spacer button">Add New Board</a>
     <h5 class="thin-underline">Uncategorized Boards
       <span class="info-tooltip" data-balloon="Drag the boards from the Uncategorized Boards list to the Categorized Boards list to make them visible to the public. Boards left in the Uncategorized Boards list will be inaccessable and hidden from public view" data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
     </h5>
     <render-nestable :key="uncompiledBoardHtml" id="nestable-boards" :setBoardDelete="setBoardDelete" :setBoardMods="setBoardMods" :setBoardEdit="setBoardEdit" :uncompiled="uncompiledBoardHtml" />
   </div>
-  <board-manager-modal :show="showEditBoard || showEditBoardMods || showDeleteBoard || showDeleteCat || showEditCat" :editCat="showEditCat" :deleteCat="showDeleteCat" :editBoard="showEditBoard" :editBoardMods="showEditBoardMods" :deleteBoard="showDeleteBoard" :selected="{}" @close="showEditBoard = showEditBoardMods = showDeleteBoard = showDeleteCat = showEditCat = false" />
+  <board-manager-modal :show="showAddBoard || showEditBoard || showEditBoardMods || showDeleteBoard || showDeleteCat || showEditCat" :editCat="showEditCat" :deleteCat="showDeleteCat" :addBoard="showAddBoard" :editBoard="showEditBoard" :editBoardMods="showEditBoardMods" :deleteBoard="showDeleteBoard" :selected="newBoard" @close="showAddBoard =showEditBoard = showEditBoardMods = showDeleteBoard = showDeleteCat = showEditCat = false" @success="handleBoardManagerSuccess"/>
 </template>
 
 <script>
@@ -83,6 +83,15 @@ export default {
       EventBus.off('admin-save', saveListener)
       EventBus.off('admin-reset', resetListener)
     })
+
+    const handleBoardManagerSuccess = ({ type, data}) => {
+      if (type === 'addBoard') addBoard(data)
+    }
+
+    const addBoard = data => {
+      let newBoard = data
+      v.boardListData.unshift(newBoard) // triggers recompilation of nestable components/html
+    }
 
     // Generates nestable html for category data
     const generateCategoryList = categories => {
@@ -278,12 +287,14 @@ export default {
       nestableOpts: { protectedRoot: true, maxDepth: 5, group: 1 },
       catListId: 'categorized-boards',
       boardListId: 'uncategorized-boards',
+      newBoard: { viewable_by: null, postable_by: null },
       boardListData: null,
       newCatName: '',
       newCategories: [],
       uncompiledCatHtml: '',
       uncompiledBoardHtml: '',
       serializedCats: null,
+      showAddBoard: false,
       showEditBoard: false,
       showEditBoardMods: false,
       showDeleteBoard: false,
@@ -326,7 +337,7 @@ export default {
 
     watch(() => v.boardListData, generateNestableBoardData, { deep: true })
 
-    return { ...toRefs(v), insertNewCategory, setCatDelete, setCatEdit, setBoardDelete, setBoardEdit, setBoardMods, generateNestableBoardData, generateNestableCatData, cleanBoardList, expandAll, collapseAll }
+    return { ...toRefs(v), insertNewCategory, setCatDelete, setCatEdit, setBoardDelete, setBoardEdit, setBoardMods, generateNestableBoardData, generateNestableCatData, cleanBoardList, expandAll, collapseAll, handleBoardManagerSuccess }
   }
 }
 </script>
