@@ -12,14 +12,14 @@
         <a href="#" @click.prevent="collapseAll()"><i class="fa fa-compress"></i> Collapse</a>
       </div>
     </h5>
-    <render-nestable :key="uncompiledCatHtml" id="nestable-categories" :setCatDelete="setCatDelete" :setCatEdit="setCatEdit" :setBoardDelete="setBoardDelete" :setBoardMods="setBoardMods" :setBoardEdit="setBoardEdit" :uncompiled="uncompiledCatHtml" />
+    <render-nestable :key="uncompiledCatHtml + reloadNestable" id="nestable-categories" :setCatDelete="setCatDelete" :setCatEdit="setCatEdit" :setBoardDelete="setBoardDelete" :setBoardMods="setBoardMods" :setBoardEdit="setBoardEdit" :uncompiled="uncompiledCatHtml" />
   </div>
   <div>
     <a href="#" @click.prevent="showAddBoard = true" class="input-spacer button">Add New Board</a>
     <h5 class="thin-underline">Uncategorized Boards
       <span class="info-tooltip" data-balloon="Drag the boards from the Uncategorized Boards list to the Categorized Boards list to make them visible to the public. Boards left in the Uncategorized Boards list will be inaccessable and hidden from public view" data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
     </h5>
-    <render-nestable :key="uncompiledBoardHtml" id="nestable-boards" :setBoardDelete="setBoardDelete" :setBoardMods="setBoardMods" :setBoardEdit="setBoardEdit" :uncompiled="uncompiledBoardHtml" />
+    <render-nestable :key="reloadNestable + uncompiledBoardHtml" id="nestable-boards" :setBoardDelete="setBoardDelete" :setBoardMods="setBoardMods" :setBoardEdit="setBoardEdit" :uncompiled="uncompiledBoardHtml" />
   </div>
   <board-manager-modal :show="showAddBoard || showEditBoard || showEditBoardMods || showDeleteBoard || showDeleteCat || showEditCat" :editCat="showEditCat" :deleteCat="showDeleteCat" :addBoard="showAddBoard" :editBoard="showEditBoard" :editBoardMods="showEditBoardMods" :deleteBoard="showDeleteBoard" :selected="newBoard" @close="showAddBoard =showEditBoard = showEditBoardMods = showDeleteBoard = showDeleteCat = showEditCat = false" @success="handleBoardManagerSuccess"/>
 </template>
@@ -29,7 +29,7 @@ import { reactive, toRefs, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { boardsApi } from '@/api'
 import BoardManagerModal from '@/components/modals/admin/management/BoardManager.vue'
 import EventBus from '@/composables/services/event-bus'
-import { sortBy, remove } from 'lodash'
+import { sortBy, remove, cloneDeep } from 'lodash'
 import RenderNestable from '@/components/layout/RenderNestable.vue'
 // eslint-disable-next-line no-unused-vars
 import nestable from 'nestable'
@@ -49,6 +49,8 @@ export default {
       vm.cleanBoardList(cats)
       vm.generateNestableBoardData(boards)
       vm.generateNestableCatData(cats)
+      vm.catListDataCopy = cloneDeep(vm.catListData)
+      vm.boardListDataCopy = cloneDeep(vm.boardListData)
     }))
     .catch(() => {})
   },
@@ -64,6 +66,8 @@ export default {
       this.cleanBoardList(cats)
       this.generateNestableBoardData(boards)
       this.generateNestableCatData(cats)
+      this.catListDataCopy = cloneDeep(this.catListData)
+      this.boardListDataCopy = cloneDeep(this.boardListData)
       next()
     })
     .catch(() => {})
@@ -102,7 +106,19 @@ export default {
       }
     }
     const resetListener = () => {
-      console.log('Admin Reset Management!')
+      v.reloadNestable = true // hack to get reload of nestable components
+      v.catDataId = 0
+      v.boardDataId = 9999
+      v.boardListData = cloneDeep(v.boardListDataCopy)
+      v.catListData = cloneDeep(v.catListDataCopy)
+      // Watcher does not properly retrigger recompilation in this case, this is a work around
+      nextTick(() => {
+        generateNestableBoardData(v.boardListData)
+        generateNestableCatData(v.catListData)
+        v.reloadNestable = false
+        window.$('#nestable-categories').nestable(v.nestableOpts)
+        window.$('#nestable-boards').nestable(v.nestableOpts)
+      })
     }
     onMounted(() => {
       EventBus.on('admin-save', saveListener)
@@ -218,6 +234,9 @@ export default {
 
     /* Template Data */
     const v = reactive({
+      reloadNestable: false,
+      catListDataCopy: null,
+      boardListDataCopy: null,
       nestableMap: {},
       catsDataIdMap: {}, // DataId keyed by cat.view_order which is unique
       boardsDataIdMap: {}, // DataID keyed by board.slug TODO(akinsey): not unique prior to req
