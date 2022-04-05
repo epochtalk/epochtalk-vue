@@ -11,7 +11,7 @@
 
     <template v-slot:body>
       <form class="css-form">
-        <div v-if="addBoard">
+        <div v-if="addBoard || editBoard">
           <label>Board Name
             <input ref="focusInput" type="text" class="input-text" id="newBoardName" placeholder="Board Name" maxlength="255" v-model="data.name" ng-change="slugify()"/>
           </label>
