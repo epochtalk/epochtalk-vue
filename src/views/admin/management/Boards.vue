@@ -96,6 +96,8 @@ export default {
         console.log(JSON.stringify(v.newCategories, null, 2))
         console.log('New Boards List (v.newBoards):')
         console.log(JSON.stringify(v.newBoards, null, 2))
+        console.log('Edited Boards List (v.editedBoards):')
+        console.log(JSON.stringify(v.editedBoards, null, 2))
         console.log('Nestable Map (v.nestableMap):')
         console.log(v.nestableMap)
         console.log('Category List Data (v.catListData):')
@@ -172,7 +174,7 @@ export default {
       }
     }
 
-    const addBoard = newBoard => {
+    const addBoard = board => {
       // We have to update nestable map for left side (categorized) and right
       // side (uncategorized) when a board is added, because boards might have been
       // moved from the uncategorized to categorized section, this is controlled by jquery.
@@ -190,45 +192,48 @@ export default {
       // 4) update view_order for each category to match array ordering
       v.catListData.forEach(c => c.view_order = ordering.indexOf(c.name + c.id + c.boards.length))
       cleanBoardList(v.catListData)
-      newBoard.modified = true
-      v.newBoards.push(newBoard) // add new cat to array of newly added cats
-      v.boardListData.unshift(newBoard) // triggers recompilation of nestable components/html
+      v.newBoards.push(board) // add new cat to array of newly added cats
+      v.boardListData.unshift(board) // triggers recompilation of nestable components/html
       if (DEBUG) {
         console.log('ADDING BOARD TO LIST OF NEW BOARDS')
         console.log('---------------------------------------------')
         console.log('New Board:')
-        console.log(JSON.stringify(newBoard, null, 2))
+        console.log(JSON.stringify(board, null, 2))
         console.log('New Boards List (v.newBoards):')
         console.log(JSON.stringify(v.newBoards, null, 2))
         console.log('---------------------------------------------')
       }
     }
 
+    const editBoard = board => {
+      // Update nestable map to contain edited board info
+      v.nestableMap[v.selectedDataId] = board
+      let cats = window.$('#nestable-categories').nestable('serialize') // data from nestable
+      let ordering = updateNestableMapForCats(cats) // update nestable map as it contains truth
+      updateCatListData() // Regen categorized board list now that nestable map has been updated
+      updateBoardListData() // Regen uncategorized board list
+      ordering = ordering.map(c => c.name + c.id + c.boards.length) // maintain ordering of cats
+      v.catListData.forEach(c => c.view_order = ordering.indexOf(c.name + c.id + c.boards.length))
+      cleanBoardList(v.catListData) // Remove categorized boards from uncat list
+
+      // Maintain editedBoards and newBoards lists (new board might be edited before submit)
+      if (board.id === -1) { // Board being edited is a new board
+        let i = v.newBoards.findIndex(b => b.slug === board.old_slug)
+        v.newBoards[i] = board
+      }
+      else { // Board is not new
+        console.log('HERE', board)
+        let i = v.editedBoards.findIndex(b => b.slug === board.old_slug)
+        if (i > -1) v.editedBoards[i] = board // replace existing board
+        else v.editedBoards.push(board) // add board if doesn't exist
+        console.log('HERE', v.editedBoards)
+      }
+    }
+
     /* Modal Actions */
     const handleBoardManagerSuccess = ({ type, data }) => {
       if (type === 'addBoard') addBoard(data)
-      if (type === 'editBoard') {
-        console.log(v.selectedDataId, v.nestableMap[v.selectedDataId])
-        v.nestableMap[v.selectedDataId] = data
-        console.log(v.selectedDataId, v.nestableMap[v.selectedDataId])
-        let cats = window.$('#nestable-categories').nestable('serialize')
-        // 1) updates nestable map and returns cats in correct viewing order
-        let ordering = updateNestableMapForCats(cats)
-        // 2) Update catListData using nestable map (maintains moved child boards)
-        updateCatListData()
-        console.log(v.boardListData)
-        v.boardListData.map(b => {
-          console.log('mapping', v.nestableMap[v.boardsDataIdMap[b.slug]])
-          return v.nestableMap[v.boardsDataIdMap[b.slug]]
-        })
-        console.log(v.boardListData)
-
-        // 3) create array using unique key to each category so we can update view_order
-        ordering = ordering.map(c => c.name + c.id + c.boards.length)
-        // 4) update view_order for each category to match array ordering
-        v.catListData.forEach(c => c.view_order = ordering.indexOf(c.name + c.id + c.boards.length))
-        cleanBoardList(v.catListData)
-      }
+      if (type === 'editBoard') editBoard(data)
     }
 
     const setCatDelete = id => {
@@ -390,10 +395,11 @@ export default {
     }
 
     // // Rebuilds boardListData using nestableMap which contains changes to boards
-    // const updateBoardListData = () => v.boardListData.map(b => {
-    //   console.log( v.nestableMap[v.boardsDataIdMap[b.slug]])
-    //   return v.nestableMap[v.boardsDataIdMap[b.slug]]
-    // })
+    const updateBoardListData = () => {
+      let tempBoards = []
+      v.boardListData.forEach(b => tempBoards.push(v.nestableMap[v.boardsDataIdMap[b.slug]]))
+      v.boardListData = tempBoards
+    }
 
     // Rebuilds catListData using nestableMap, which contains ordering truth (from nestable)
     const updateCatListData = () => {

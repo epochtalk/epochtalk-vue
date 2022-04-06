@@ -152,6 +152,14 @@ export default {
     watch(() => props.show, () => {
       v.saveRuleBtnLabel = props.deleteCat || props.deleteBoard ? 'Confirm Delete' : 'Save'
       v.data = props.addBoard || props.deleteCat || props.deleteBoard || props.editCat || props.editBoard ? cloneDeep(props.selected) : {}
+      if (props.addBoard || props.editBoard) {
+        v.data.modified = true
+        v.data.old_slug = cloneDeep(v.data.slug)
+      }
+      if (props.addBoard) {
+        v.data.modified = true
+        v.data.id = -1
+      }
     })
 
     return { ...toRefs(v), modify, close }
