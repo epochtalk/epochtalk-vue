@@ -72,21 +72,11 @@
             </div>
           </div>
         </div>
-        <div v-if="!addBoard">
-          <div class="col input-spacing">
-            <div>
-              <label>
-                Rank Name
-                <input type="text" placeholder="Rank Name" :disabled="requestSubmitted" ref="focusInput" required />
-              </label>
-            </div>
-            <div>
-              <label>
-                Minimum Post Count
-                <input type="number"  placeholder="Post count needed to attain rank" min="0" :disabled="requestSubmitted" required />
-              </label>
-            </div>
-          </div>
+        <div v-if="deleteBoard">
+            <p>Are you sure you would like to mark this board <strong>({{selected?.name}})</strong> for deletion? Delete will not take effect until the changes are saved.</p>
+            <br />
+            <p><strong>WARNING: This will permanently delete all threads and posts in this board.</strong></p>
+            <br />
         </div>
 
         <div class="col">
@@ -154,7 +144,7 @@ export default {
       v.data = props.addBoard || props.deleteCat || props.deleteBoard || props.editCat || props.editBoard ? cloneDeep(props.selected) : {}
       if (props.addBoard || props.editBoard) {
         v.data.modified = true
-        v.data.old_slug = cloneDeep(v.data.slug)
+        v.data.old_slug = cloneDeep(v.data.slug) // Needed to identify board in newBoards and editedBoards
       }
       if (props.addBoard) {
         v.data.modified = true

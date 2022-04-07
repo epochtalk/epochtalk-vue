@@ -222,11 +222,9 @@ export default {
         v.newBoards[i] = board
       }
       else { // Board is not new
-        console.log('HERE', board)
         let i = v.editedBoards.findIndex(b => b.slug === board.old_slug)
         if (i > -1) v.editedBoards[i] = board // replace existing board
         else v.editedBoards.push(board) // add board if doesn't exist
-        console.log('HERE', v.editedBoards)
       }
     }
 
@@ -246,13 +244,13 @@ export default {
     }
     const setBoardDelete = id => {
       v.showDeleteBoard = true
-      console.log('setBoardDelete', id)
+      v.selected = v.nestableMap[id]
+      v.selectedDataId = id
     }
     const setBoardEdit = id => {
       v.showEditBoard = true
       v.selected = v.nestableMap[id]
       v.selectedDataId = id
-      console.log('setBoardEdit', id, v.selected)
     }
     const setBoardMods = id => {
       v.showEditBoardMods = true
