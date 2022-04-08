@@ -77,17 +77,7 @@ export default {
 
     const saveListener = () => {
       console.log('Admin Save Management!')
-      // -- Need to update vue data to match nestable data before save
-      let cats = window.$('#nestable-categories').nestable('serialize')
-      // 1) updates nestable map and returns cats in correct viewing order
-      let ordering = updateNestableMapForCats(cats)
-      // 2) Update catListData using nestable map (maintains moved child boards)
-      updateCatListData()
-      // 3) create array using unique key to each category so we can update view_order
-      ordering = ordering.map(c => c.name + c.id + c.boards.length)
-      // 4) update view_order for each category to match array ordering
-      v.catListData.forEach(c => c.view_order = ordering.indexOf(c.name + c.id + c.boards.length))
-      cleanBoardList(v.catListData)
+      normalizeData()
       // -- End update vue data to match nestable data
       if (DEBUG) {
         console.log('SAVE TRIGGERED - CURRENT STATE')
@@ -134,16 +124,7 @@ export default {
     /* Page Actions */
     const addCategory = () => {
       if (!v.newCatName) return
-      // See explanation in addNewBoard, need to matain state between nestable data and vue data
-      // Serilize nestable html to get current ordering of cats, then turn into array of ids
-      // The index of the id in the array determines the view order of the catListData category.
-      let cats = window.$('#nestable-categories').nestable('serialize')
-      // 1) updates nestable map and returns new cats in correct viewing order
-      let ordering = updateNestableMapForCats(cats)
-      // 2) Update catListData using nestable map (maintains moved child boards)
-      updateCatListData()
-      // 3) generate mapping for category ordering (uses name, id and num children for unique key)
-      ordering = ordering.map(c => c.name + c.id + c.boards.length)
+      normalizeData()
       // Add new category to vue controlled list of categories
       let newCat = {
         boards: [],
@@ -158,10 +139,7 @@ export default {
         modified: true
       }
       v.newCategories.push(newCat) // add new cat to array of newly added cats
-      v.catListData.unshift(newCat) // add newCat to catListData
-      // Modifying catListData triggers watcher, recompiles html using catListData
-      // Update view order using ordering array
-      v.catListData.forEach(c => c.view_order = ordering.indexOf(c.name + c.id + c.boards.length))
+      v.catListData.unshift(newCat) // add newCat to catListData, triggers rebuild of html
       v.newCatName = '' // clear input for category name
       if (DEBUG) {
         console.log('ADDING CATEGORY TO LIST OF NEW CATEGORIES')
@@ -174,48 +152,22 @@ export default {
       }
     }
 
-    const addBoard = board => {
-      // We have to update nestable map for left side (categorized) and right
-      // side (uncategorized) when a board is added, because boards might have been
-      // moved from the uncategorized to categorized section, this is controlled by jquery.
-      // We also need to maintain the lists for Vue to be aware of the changes made in jQuery.
-      // catListData and uncatListData need to match the serialized list of nestable data.
-      // This allows us to rebuild the dom and instantiate nestable without resetting the
-      // ordering of all categories and boards.
-      let cats = window.$('#nestable-categories').nestable('serialize')
-      // 1) updates nestable map and returns cats in correct viewing order
-      let ordering = updateNestableMapForCats(cats)
-      // 2) Update catListData using nestable map (maintains moved child boards)
-      updateCatListData()
-      // 3) create array using unique key to each category so we can update view_order
-      ordering = ordering.map(c => c.name + c.id + c.boards.length)
-      // 4) update view_order for each category to match array ordering
-      v.catListData.forEach(c => c.view_order = ordering.indexOf(c.name + c.id + c.boards.length))
-      cleanBoardList(v.catListData)
-      v.newBoards.push(board) // add new cat to array of newly added cats
-      v.uncatListData.unshift(board) // triggers recompilation of nestable components/html
-      if (DEBUG) {
-        console.log('ADDING BOARD TO LIST OF NEW BOARDS')
-        console.log('---------------------------------------------')
-        console.log('New Board:')
-        console.log(JSON.stringify(board, null, 2))
-        console.log('New Boards List (v.newBoards):')
-        console.log(JSON.stringify(v.newBoards, null, 2))
-        console.log('---------------------------------------------')
-      }
+    /* Modal Actions */
+    const handleBoardManagerSuccess = ({ type, data }) => {
+      if (type === 'addBoard') addBoard(data)
+      if (type === 'editBoard') editBoard(data)
+      if (type === 'deleteBoard') deleteBoard(data)
     }
 
+    const addBoard = board => {
+      normalizeData() // Normalize data between vue and jquery
+      v.newBoards.push(board) // add new cat to array of newly added cats
+      v.uncatListData.unshift(board) // triggers recompilation of nestable components/html
+    }
     const editBoard = board => {
       // Update nestable map to contain edited board info
       v.nestableMap[v.selectedDataId] = board
-      let cats = window.$('#nestable-categories').nestable('serialize') // data from nestable
-      let ordering = updateNestableMapForCats(cats) // update nestable map as it contains truth
-      updateCatListData() // Regen categorized board list now that nestable map has been updated
-      updateBoardListData() // Regen uncategorized board list
-      ordering = ordering.map(c => c.name + c.id + c.boards.length) // maintain ordering of cats
-      v.catListData.forEach(c => c.view_order = ordering.indexOf(c.name + c.id + c.boards.length))
-      cleanBoardList(v.catListData) // Remove categorized boards from uncat list
-
+      normalizeData() // Normalize data between vue and jquery
       // Maintain editedBoards and newBoards lists (new board might be edited before submit)
       if (board.id === -1) { // Board being edited is a new board
         let i = v.newBoards.findIndex(b => b.slug === board.old_slug)
@@ -227,27 +179,12 @@ export default {
         else v.editedBoards.push(board) // add board if doesn't exist
       }
     }
-
     const deleteBoard = () => {
       // Update nestable map to contain deleted board info
       v.nestableMap[v.selectedDataId].deleted = true
       normalizeData()
-      // let cats = window.$('#nestable-categories').nestable('serialize') // data from nestable
-      // let ordering = updateNestableMapForCats(cats) // update nestable map as it contains truth
-      // updateCatListData() // Regen categorized board list now that nestable map has been updated
-      // updateBoardListData() // Regen uncategorized board list
-      // ordering = ordering.map(c => c.name + c.id + c.boards.length) // maintain ordering of cats
-      // v.catListData.forEach(c => c.view_order = ordering.indexOf(c.name + c.id + c.boards.length))
-      // cleanBoardList(v.catListData) // Remove categorized boards from uncat list
 
 
-    }
-
-    /* Modal Actions */
-    const handleBoardManagerSuccess = ({ type, data }) => {
-      if (type === 'addBoard') addBoard(data)
-      if (type === 'editBoard') editBoard(data)
-      if (type === 'deleteBoard') deleteBoard(data)
     }
 
     const setCatDelete = id => {
@@ -310,8 +247,114 @@ export default {
       showEditCat: false,
       showDeleteCat: false
     })
+    /* Data Normalization Helper Methods */
+    // Normalize data, take nestable data and use it to update uncatListData and catListData
+    // needs to be called when any action to boards or cats are performed
+    const normalizeData = () => {
+      // 1) Serialize categorized list and uncategorized list
+      let cats = window.$('#nestable-categories').nestable('serialize') // data from nestable
+      let boards = window.$('#nestable-boards').nestable('serialize') // data from nestable
+      // 2) Update Nestable Map for cats and boards (After, nestableMap should contain truth)
+      let catOrdering = updateNestableMapForCats(cats) // update nestable map as it contains truth
+      let boardOrdering = updateNestableMapForUncat(boards)
+      // 3) Normalize v.catListData and v.uncatListData using nestableMap and ordering arrays
+      v.catListData = updateCatListData(catOrdering)
+      v.uncatListData = updateUncatListData(boardOrdering)
+    }
 
-    /* Helper Methods */
+    // Keeps nestable map up to date using serialized nestable data
+    // this allows us to rebuild catListData when dom rebuilds to recompile nestable data
+    const updateNestableMapForUncat = boards => {
+      if (!boards) return []
+      return boards.map(b => {
+        b.dataId = b.id
+        b.id = b.boardId
+        v.nestableMap[b.dataId].children = updateNestableMapForUncat(b.children) // maintain updated nestable map
+        delete b.boardId
+        return b
+      })
+    }
+    const updateNestableMapForCats = (cats) => {
+      if (!cats) return
+      cats.map(cat => {
+        cat.dataId = cat.id
+        cat.id = cat.catId
+        // console.log(cat.name, cat.children)
+        v.nestableMap[cat.dataId].children = cat.children // maintain updated nestable map
+        cat.boards = cat.children || []
+        delete cat.catId
+        delete cat.top
+        delete cat.children
+        updateNestableMapForBoards(cat.boards)
+      })
+      return cats
+    }
+    const updateNestableMapForBoards = catBoards => { // recursion for nestableMap update
+      if(!catBoards) return
+      catBoards.map(board => {
+        board.dataId = board.id
+        v.nestableMap[board.dataId].children = board.children // maintain updated nestable map
+        board.id = board.boardId
+        delete board.boardId
+        // recurse if there are children
+        if (board.children && board.children.length) updateNestableMapForBoards(board.children)
+      })
+    }
+
+    // Rebuilds uncatListData using nestableMap which contains changes to boards
+    const updateUncatListData = (boards) => {
+      if (!boards) return []
+      return boards.map(b => {
+        let nestableBoard = v.nestableMap[b.dataId]
+        nestableBoard.children = updateUncatListData(nestableBoard.children)
+        return nestableBoard
+      })
+    }
+    // Rebuilds catListData using nestableMap, which contains ordering truth (from nestable)
+    const updateCatListData = (cats) => {
+      let viewOrder = 0
+      cats.map(cat => {
+        let nestableCat = v.nestableMap[cat.dataId]
+        cat.created_at = nestableCat.created_at
+        cat.id = nestableCat.id
+        cat.imported_at = nestableCat.imported_at
+        cat.meta = nestableCat.meta
+        cat.name = nestableCat.name
+        cat.postable_by = nestableCat.postable_by
+        cat.updated_at = nestableCat.updated_at
+        cat.view_order = viewOrder++
+        cat.viewable_by = nestableCat.viewable_by
+        cat.boards = []
+        let children = nestableCat.children
+        if (children) children.forEach(c => cat.boards.push(v.nestableMap[c.dataId]))
+        updateCatListDataBoards(cat.boards)
+      })
+      return cats
+    }
+    const updateCatListDataBoards = catBoards => { // recursion for catListData update
+      if(!catBoards) return
+      catBoards.map(board => {
+        let newChildren = []
+        let children = v.nestableMap[v.boardsDataIdMap[board.slug]].children
+        if (children) children.forEach(c => newChildren.push(v.nestableMap[c.dataId]))
+        board.children = newChildren
+        // recurse if there are children
+        if (board.children.length > 0) updateCatListDataBoards(board.children)
+      })
+    }
+
+    // Remove categorized boards from list of unfiltered boards, updates uncatListData
+    const cleanBoardList = cats => cats.forEach(cat => cleanBoards(cat.boards))
+    const cleanBoards = catBoards => { // recusion for uncatListData
+      catBoards.forEach(board => {
+        // remove this board from uncatListData
+        remove(v.uncatListData, b => b.id === board.id)
+        // recurse if there are children
+        if (board.children.length > 0) { cleanBoards(board.children) }
+      })
+    }
+
+    /* HTML Generation Helper Methods */
     const generateCategoriesHtml = categories => { // Generates nestable html for category data
       let html = '<div class="dd" id="' + v.catListId + '"><ol class="dd-list">'
       let sortedCats = sortBy(categories, 'view_order')
@@ -378,134 +421,6 @@ export default {
       })
       html += '</ol>'
       return html
-    }
-
-    // Normalize data, take nestable data and use it to update uncatListData and catListData
-    // needs to be called when any action to boards or cats are performed
-    const normalizeData = () => {
-      // 1) Serialize categorized list and uncategorized list
-      let cats = window.$('#nestable-categories').nestable('serialize') // data from nestable
-      let boards = window.$('#nestable-boards').nestable('serialize') // data from nestable
-      // 2) Update Nestable Map for cats and boards (After nestableMap should contain truth)
-      console.log('Cats From Nestable', cats)
-      console.log('Boards From Nestable', boards)
-      console.log('Nestable Map Before', v.nestableMap)
-      let catOrdering = updateNestableMapForCats(cats) // update nestable map as it contains truth
-      let boardOrdering = updateNestableMapForUncat(boards)
-      console.log('Nestable Map After Update', v.nestableMap)
-      // 3) Normalize v.catListData using diff
-      v.catListData = updateCatListData(catOrdering)
-      v.uncatListData = updateUncatListData(boardOrdering)
-      console.log('Updated Cat List Data', v.catListData)
-      console.log('Updated Uncat List Data', v.uncatListData)
-      // let cats = window.$('#nestable-categories').nestable('serialize') // data from nestable
-      // let ordering = updateNestableMapForCats(cats) // update nestable map as it contains truth
-      // updateCatListData() // Regen categorized board list now that nestable map has been updated
-      // updateBoardListData() // Regen uncategorized board list
-      // ordering = ordering.map(c => c.name + c.id + c.boards.length) // maintain ordering of cats
-      // v.catListData.forEach(c => c.view_order = ordering.indexOf(c.name + c.id + c.boards.length))
-      // cleanBoardList(v.catListData) // Remove categorized boards from uncat list
-    }
-
-    // Keeps nestable map up to date using serialized nestable data
-    // this allows us to rebuild catListData when dom rebuilds to recompile nestable data
-    const updateNestableMapForUncat = boards => {
-      if (!boards) return []
-      return boards.map(b => {
-        b.dataId = b.id
-        b.id = b.boardId
-        v.nestableMap[b.dataId].children = updateNestableMapForUncat(b.children) // maintain updated nestable map
-        delete b.boardId
-        return b
-      })
-    }
-    const updateNestableMapForCats = (cats) => {
-      if (!cats) return
-      cats.map(cat => {
-        cat.dataId = cat.id
-        cat.id = cat.catId
-        // console.log(cat.name, cat.children)
-        v.nestableMap[cat.dataId].children = cat.children // maintain updated nestable map
-        cat.boards = cat.children || []
-        delete cat.catId
-        delete cat.top
-        delete cat.children
-        updateNestableMapForBoards(cat.boards)
-      })
-      return cats
-    }
-    const updateNestableMapForBoards = catBoards => { // recursion for nestableMap update
-      if(!catBoards) return
-      catBoards.map(board => {
-        board.dataId = board.id
-        v.nestableMap[board.dataId].children = board.children // maintain updated nestable map
-        board.id = board.boardId
-        delete board.boardId
-        // recurse if there are children
-        if (board.children && board.children.length) updateNestableMapForBoards(board.children)
-      })
-    }
-
-    // // Rebuilds uncatListData using nestableMap which contains changes to boards
-    const updateBoardListData = () => {
-      let tempBoards = []
-      v.uncatListData.forEach(b => tempBoards.push(v.nestableMap[v.boardsDataIdMap[b.slug]]))
-      v.uncatListData = tempBoards
-    }
-
-    const updateUncatListData = (boards) => {
-      if (!boards) return []
-      return boards.map(b => {
-        console.log(b, b.dataId)
-        let nestableBoard = v.nestableMap[b.dataId]
-        console.log(nestableBoard)
-        nestableBoard.children = updateUncatListData(nestableBoard.children)
-        return nestableBoard
-      })
-    }
-
-    // Rebuilds catListData using nestableMap, which contains ordering truth (from nestable)
-    const updateCatListData = (cats) => {
-      let viewOrder = 0
-      cats.map(cat => {
-        let nestableCat = v.nestableMap[cat.dataId]
-        cat.created_at = nestableCat.created_at
-        cat.id = nestableCat.id
-        cat.imported_at = nestableCat.imported_at
-        cat.meta = nestableCat.meta
-        cat.name = nestableCat.name
-        cat.postable_by = nestableCat.postable_by
-        cat.updated_at = nestableCat.updated_at
-        cat.view_order = viewOrder++
-        cat.viewable_by = nestableCat.viewable_by
-        cat.boards = []
-        let children = nestableCat.children
-        if (children) children.forEach(c => cat.boards.push(v.nestableMap[c.dataId]))
-        updateCatListDataBoards(cat.boards)
-      })
-      return cats
-    }
-    const updateCatListDataBoards = catBoards => { // recursion for catListData update
-      if(!catBoards) return
-      catBoards.map(board => {
-        let newChildren = []
-        let children = v.nestableMap[v.boardsDataIdMap[board.slug]].children
-        if (children) children.forEach(c => newChildren.push(v.nestableMap[c.dataId]))
-        board.children = newChildren
-        // recurse if there are children
-        if (board.children.length > 0) updateCatListDataBoards(board.children)
-      })
-    }
-
-    // Remove categorized boards from list of unfiltered boards, updates uncatListData
-    const cleanBoardList = cats => cats.forEach(cat => cleanBoards(cat.boards))
-    const cleanBoards = catBoards => { // recusion for uncatListData
-      catBoards.forEach(board => {
-        // remove this board from uncatListData
-        remove(v.uncatListData, b => b.id === board.id)
-        // recurse if there are children
-        if (board.children.length > 0) { cleanBoards(board.children) }
-      })
     }
 
     // Used to generate html from request and initiate nestable
