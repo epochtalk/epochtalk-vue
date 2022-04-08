@@ -180,11 +180,14 @@ export default {
       }
     }
     const deleteBoard = () => {
+      normalizeData()
+      console.log('selected2', v.selectedDataId, JSON.stringify(v.nestableMap[v.selectedDataId].children))
+
       // Update nestable map to contain deleted board info
       v.nestableMap[v.selectedDataId].deleted = true
       normalizeData()
 
-
+      console.log('after', v.nestableMap[v.selectedDataId].children)
     }
 
     const setCatDelete = id => {
@@ -293,6 +296,7 @@ export default {
       if(!catBoards) return
       catBoards.map(board => {
         board.dataId = board.id
+        if (board.id === 10002) console.log(board)
         v.nestableMap[board.dataId].children = board.children // maintain updated nestable map
         board.id = board.boardId
         delete board.boardId
@@ -326,17 +330,31 @@ export default {
         cat.viewable_by = nestableCat.viewable_by
         cat.boards = []
         let children = nestableCat.children
-        if (children) children.forEach(c => cat.boards.push(v.nestableMap[c.dataId]))
+        if (children) children.forEach(b => {
+          let board = v.nestableMap[b.dataId]
+          if (board.deleted) { // move children to uncat if board deleted
+            console.log('SELE++', updateUncatListData(board.children), JSON.stringify(v.uncatListData))
+            let updatedChildren = updateUncatListData(board.children)
+            nextTick(() =>{ v.uncatListData.push(...updatedChildren); console.log(v.uncatListData)})
+          }
+          else cat.boards.push(board)
+        })
         updateCatListDataBoards(cat.boards)
       })
       return cats
     }
     const updateCatListDataBoards = catBoards => { // recursion for catListData update
       if(!catBoards) return
-      catBoards.map(board => {
+      return catBoards.map(board => {
         let newChildren = []
         let children = v.nestableMap[v.boardsDataIdMap[board.slug]].children
-        if (children) children.forEach(c => newChildren.push(v.nestableMap[c.dataId]))
+        if (children) children.forEach(b => {
+          let board = v.nestableMap[b.dataId]
+          if (board.deleted) { // move children to uncat if board deleted
+            nextTick(() => v.uncatListData.push(...updateUncatListData(board.children)))
+          }
+          else newChildren.push(board)
+        })
         board.children = newChildren
         // recurse if there are children
         if (board.children.length > 0) updateCatListDataBoards(board.children)
