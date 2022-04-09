@@ -88,6 +88,8 @@ export default {
         console.log(JSON.stringify(v.newBoards, null, 2))
         console.log('Edited Boards List (v.editedBoards):')
         console.log(JSON.stringify(v.editedBoards, null, 2))
+        console.log('Deleted Boards List (v.deletedBoards):')
+        console.log(JSON.stringify(v.deletedBoards, null, 2))
         console.log('Nestable Map (v.nestableMap):')
         console.log(v.nestableMap)
         console.log('Category List Data (v.catListData):')
@@ -181,13 +183,12 @@ export default {
     }
     const deleteBoard = () => {
       normalizeData()
-      console.log('selected2', v.selectedDataId, JSON.stringify(v.nestableMap[v.selectedDataId].children))
-
+      let board = v.nestableMap[v.selectedDataId]
       // Update nestable map to contain deleted board info
       v.nestableMap[v.selectedDataId].deleted = true
-      normalizeData()
-
-      console.log('after', v.nestableMap[v.selectedDataId].children)
+      normalizeData() // normalize again after flagging deleted
+      if (board.id === -1) remove(v.newBoards, b => b.slug === board.slug)
+      else v.deletedBoards.push(board.id)
     }
 
     const setCatDelete = id => {
@@ -306,13 +307,18 @@ export default {
     }
 
     // Rebuilds uncatListData using nestableMap which contains changes to boards
-    const updateUncatListData = (boards) => {
+    const updateUncatListData = boards => {
       if (!boards) return []
-      return boards.map(b => {
+      let orphans = []
+      boards = boards.map(b => {
+        if (!b.dataId) return b // if board already converted dont convert (fix for uncat boards)
         let nestableBoard = v.nestableMap[b.dataId]
         nestableBoard.children = updateUncatListData(nestableBoard.children)
-        return nestableBoard
-      })
+        if (nestableBoard.deleted) orphans.push(...nestableBoard.children)
+        return nestableBoard.deleted ? null : nestableBoard
+      }).filter(i => i)
+     boards.push(...orphans)
+     return boards
     }
     // Rebuilds catListData using nestableMap, which contains ordering truth (from nestable)
     const updateCatListData = (cats) => {
@@ -333,7 +339,6 @@ export default {
         if (children) children.forEach(b => {
           let board = v.nestableMap[b.dataId]
           if (board.deleted) { // move children to uncat if board deleted
-            console.log('SELE++', updateUncatListData(board.children), JSON.stringify(v.uncatListData))
             let updatedChildren = updateUncatListData(board.children)
             nextTick(() =>{ v.uncatListData.push(...updatedChildren); console.log(v.uncatListData)})
           }
