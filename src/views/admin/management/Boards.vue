@@ -158,7 +158,9 @@ export default {
     const handleBoardManagerSuccess = ({ type, data }) => {
       if (type === 'addBoard') addBoard(data)
       if (type === 'editBoard') editBoard(data)
-      if (type === 'deleteBoard') deleteBoard(data)
+      if (type === 'deleteBoard') deleteBoard()
+      if (type === 'deleteCat') deleteCat()
+      if (type === 'editCat') editCat(data)
     }
 
     const addBoard = board => {
@@ -185,19 +187,31 @@ export default {
       normalizeData()
       let board = v.nestableMap[v.selectedDataId]
       // Update nestable map to contain deleted board info
-      v.nestableMap[v.selectedDataId].deleted = true
+      board.deleted = true
       normalizeData() // normalize again after flagging deleted
       if (board.id === -1) remove(v.newBoards, b => b.slug === board.slug)
       else v.deletedBoards.push(board.id)
     }
+    const deleteCat = () => {
+      normalizeData()
+      let cat = v.nestableMap[v.selectedDataId]
+      cat.deleted = true
+      normalizeData() // normalize again after flagging deleted
+    }
+    const editCat = category => {
+      console.log(category)
+    }
 
     const setCatDelete = id => {
       v.showDeleteCat = true
-      console.log('setCatDelete', id)
+      v.selected = v.nestableMap[id]
+      v.selectedDataId = id
     }
     const setCatEdit = id => {
       console.log('setCatEdit', id)
       v.showEditCat = true
+      v.selected = v.nestableMap[id]
+      v.selectedDataId = id
     }
     const setBoardDelete = id => {
       v.showDeleteBoard = true

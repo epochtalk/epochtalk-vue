@@ -73,10 +73,28 @@
           </div>
         </div>
         <div v-if="deleteBoard">
-            <p>Are you sure you would like to mark this board <strong>({{selected?.name}})</strong> for deletion? Delete will not take effect until the changes are saved.</p>
-            <br />
-            <p><strong>WARNING: This will permanently delete all threads and posts in this board.</strong></p>
-            <br />
+          <p>Are you sure you would like to mark this board <strong>({{selected?.name}})</strong> for deletion? Delete will not take effect until the changes are saved.</p>
+          <br />
+          <p><strong>WARNING: This will permanently delete all threads and posts in this board.</strong></p>
+          <br />
+        </div>
+        <div v-if="deleteCat">
+          <p>Are you sure you would like to mark this category <strong>({{selected?.name}})</strong> for deletion? Delete will not take effect until the changes are saved.</p>
+          <br />
+          <p><strong>NOTE: All boards under this category will be moved to the 'Uncategorized Boards' section.</strong></p>
+          <br />
+        </div>
+        <div v-if="editCat">
+          <label>Category Name
+            <input ref="focusInput" type="text" class="input-text" placeholder="Board Name" maxlength="255" v-model="data.name" />
+          </label>
+          <label>Category Read Access:
+            <span class="info-tooltip" data-balloon="Minimum role a user must have to read the boards in this category" data-balloon-pos="right" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
+            <select v-model="data.viewable_by">
+              <option :value="null" disabled selected>Minimum role level</option>
+              <option :value="role.priority" v-html="role.name" v-for="role in roles" :key="role.priority"></option>
+            </select>
+          </label>
         </div>
 
         <div class="col">
