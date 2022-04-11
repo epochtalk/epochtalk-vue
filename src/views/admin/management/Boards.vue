@@ -323,7 +323,7 @@ export default {
     // Rebuilds catListData using nestableMap, which contains ordering truth (from nestable)
     const updateCatListData = (cats) => {
       let viewOrder = 0
-      cats.map(cat => {
+      let tempCats = cats.map(cat => {
         let nestableCat = v.nestableMap[cat.dataId]
         cat.created_at = nestableCat.created_at
         cat.id = nestableCat.id
@@ -336,17 +336,26 @@ export default {
         cat.viewable_by = nestableCat.viewable_by
         cat.boards = []
         let children = nestableCat.children
-        if (children) children.forEach(b => {
+        if (nestableCat.deleted) { // cat was deleted push children to uncat
+          let updatedChildren = updateUncatListData(children)
+          console.log('UPDATED', nestableCat.name, children, v.nestableMap, updatedChildren)
+          nextTick(() => v.uncatListData.push(...updatedChildren))
+          cat = null
+        }
+        else if (children) children.forEach(b => {
           let board = v.nestableMap[b.dataId]
           if (board.deleted) { // move children to uncat if board deleted
             let updatedChildren = updateUncatListData(board.children)
-            nextTick(() =>{ v.uncatListData.push(...updatedChildren); console.log(v.uncatListData)})
+            nextTick(() => v.uncatListData.push(...updatedChildren))
           }
-          else cat.boards.push(board)
+          else {
+            cat.boards.push(board)
+            updateCatListDataBoards(cat.boards)
+          }
         })
-        updateCatListDataBoards(cat.boards)
-      })
-      return cats
+        return cat
+      }).filter(i => i)
+      return tempCats
     }
     const updateCatListDataBoards = catBoards => { // recursion for catListData update
       if(!catBoards) return
@@ -354,7 +363,7 @@ export default {
         let newChildren = []
         let children = v.nestableMap[v.boardsDataIdMap[board.slug]].children
         if (children) children.forEach(b => {
-          let board = v.nestableMap[b.dataId]
+          let board = b.dataId ? v.nestableMap[b.dataId] : b
           if (board.deleted) { // move children to uncat if board deleted
             nextTick(() => v.uncatListData.push(...updateUncatListData(board.children)))
           }
@@ -449,21 +458,31 @@ export default {
     // Used to generate html from request and initiate nestable
     const generateNestableCatData = data => {
       if (!data) { data = [] }
+      v.nestableMap = {}
       v.uncompiledCatHtml = null
       v.catDataId = 0
+      v.boardDataId = 9999
       let html = generateCategoriesHtml(data)
+      let bhtml = generateUncategorizedHtml(v.uncatListData)
       // Compile html so vue controls will work
       v.uncompiledCatHtml = html
+      v.uncompiledBoardHtml = bhtml
       nextTick(() => window.$('#nestable-categories').nestable(v.nestableOpts))
+      nextTick(() => window.$('#nestable-boards').nestable(v.nestableOpts))
     }
     const generateNestableBoardData = data => {
       if (!data) { data = [] }
+      v.nestableMap = {}
       v.uncompiledBoardHtml = null
+      v.catDataId = 0
       v.boardDataId = 9999
       let html = generateUncategorizedHtml(data)
+      let chtml = generateCategoriesHtml(v.catListData)
       // Compile html so vue controls will work
       v.uncompiledBoardHtml = html
+      v.uncompiledCatHtml = chtml
       nextTick(() => window.$('#nestable-boards').nestable(v.nestableOpts))
+      nextTick(() => window.$('#nestable-categories').nestable(v.nestableOpts))
     }
 
     /* Watch Data */
