@@ -226,7 +226,6 @@ export default {
       v.selectedDataId = id
     }
     const setCatEdit = id => {
-      console.log('setCatEdit', id)
       v.showEditCat = true
       v.selected = v.nestableMap[id]
       v.selectedDataId = id
@@ -311,11 +310,13 @@ export default {
       })
     }
     const updateNestableMapForCats = (cats) => {
+      v.newCategories = [] // rebuild new cats when building nestable map
       if (!cats) return
       cats.map(cat => {
+        // cat is new if it's id is -1, easier to reset and repopulate this than to maintain it
+        if (cat.catId === -1) v.newCategories.push(cat)
         cat.dataId = cat.id
         cat.id = cat.catId
-        // console.log(cat.name, cat.children)
         v.nestableMap[cat.dataId].children = cat.children // maintain updated nestable map
         cat.boards = cat.children || []
         delete cat.catId
@@ -369,7 +370,6 @@ export default {
         let children = nestableCat.children
         if (nestableCat.deleted) { // cat was deleted push children to uncat
           let updatedChildren = updateUncatListData(children)
-          console.log('UPDATED', nestableCat.name, children, v.nestableMap, updatedChildren)
           nextTick(() => v.uncatListData.push(...updatedChildren))
           cat = null
         }
