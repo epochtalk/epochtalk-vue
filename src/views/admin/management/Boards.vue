@@ -199,7 +199,25 @@ export default {
       normalizeData() // normalize again after flagging deleted
     }
     const editCat = category => {
-      console.log(category)
+      let editCatEl = window.$(`li[data-id="${v.selectedDataId}"]`) // get parent cat element
+      let childrenDataIds = [...editCatEl.children().find('[data-id]')].map(i => i.dataset.id)
+      // Iterate through all cat children and update viewable_by to match category
+      childrenDataIds.forEach(nestableId => {
+        let board = v.nestableMap[nestableId]
+        board.viewable_by = category.viewable_by
+        // Maintain editedBoards and newBoards lists (new board might be edited before submit)
+        if (board.id === -1) { // Board being edited is a new board
+          let i = v.newBoards.findIndex(b => b.slug === board.slug)
+          v.newBoards[i] = board
+        }
+        else { // Board is not new
+          let i = v.editedBoards.findIndex(b => b.slug === board.old_slug)
+          if (i > -1) v.editedBoards[i] = board // replace existing board
+          else v.editedBoards.push(board) // add board if doesn't exist
+        }
+      })
+      v.nestableMap[v.selectedDataId] = category // update category
+      normalizeData() // normalize data after changes
     }
 
     const setCatDelete = id => {
@@ -311,7 +329,6 @@ export default {
       if(!catBoards) return
       catBoards.map(board => {
         board.dataId = board.id
-        if (board.id === 10002) console.log(board)
         v.nestableMap[board.dataId].children = board.children // maintain updated nestable map
         board.id = board.boardId
         delete board.boardId
