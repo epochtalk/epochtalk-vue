@@ -66,6 +66,11 @@ export const imagesApi = {
   imagePolicy: data => $http('/api/images/policy', { method: 'POST', data })
 }
 
+export const categoriesApi = {
+  create: data => $http('/api/categories', { method: 'POST', data}),
+  delete: data => $http('/api/categories/delete', { method: 'POST', data })
+}
+
 export const boardsApi = {
   slugToBoardId: slug => $http(`/api/boards/${slug}/id`),
   getBoards: stripped => $http(`/api/boards${stripped ? '?stripped=true' : ''}`),
