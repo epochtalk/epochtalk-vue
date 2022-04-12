@@ -76,7 +76,12 @@ export const boardsApi = {
   getBoards: stripped => $http(`/api/boards${stripped ? '?stripped=true' : ''}`),
   movelist: () => $http('/api/boards/movelist'),
   unfiltered: () => $http('/api/boards/unfiltered'),
-  uncategorized: () => $http('/api/boards/uncategorized')
+  uncategorized: () => $http('/api/boards/uncategorized'),
+  find: id => $http(`/api/boards/${id}`),
+  create: data => $http('/api/boards', { method: 'POST', data }),
+  delete: data => $http('/api/boards/delete', { method: 'POST', data }),
+  update: data => $http('/api/boards', { method: 'PUT', data }),
+  updateAll: data => $http('/api/boards/all', { method: 'POST', data })
 }
 
 export const threadsApi = {
