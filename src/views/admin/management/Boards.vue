@@ -165,7 +165,6 @@ export default {
 
     const addBoard = board => {
       normalizeData() // Normalize data between vue and jquery
-      v.newBoards.push(board) // add new cat to array of newly added cats
       v.uncatListData.unshift(board) // triggers recompilation of nestable components/html
     }
     const editBoard = board => {
@@ -173,11 +172,7 @@ export default {
       v.nestableMap[v.selectedDataId] = board
       normalizeData() // Normalize data between vue and jquery
       // Maintain editedBoards and newBoards lists (new board might be edited before submit)
-      if (board.id === -1) { // Board being edited is a new board
-        let i = v.newBoards.findIndex(b => b.slug === board.old_slug)
-        v.newBoards[i] = board
-      }
-      else { // Board is not new
+      if (board.id !== -1) { // Board being edited is a old board
         let i = v.editedBoards.findIndex(b => b.slug === board.old_slug)
         if (i > -1) v.editedBoards[i] = board // replace existing board
         else v.editedBoards.push(board) // add board if doesn't exist
@@ -290,6 +285,7 @@ export default {
       let cats = window.$('#nestable-categories').nestable('serialize') // data from nestable
       let boards = window.$('#nestable-boards').nestable('serialize') // data from nestable
       // 2) Update Nestable Map for cats and boards (After, nestableMap should contain truth)
+      v.newBoards = []
       let catOrdering = updateNestableMapForCats(cats) // update nestable map as it contains truth
       let boardOrdering = updateNestableMapForUncat(boards)
       // 3) Normalize v.catListData and v.uncatListData using nestableMap and ordering arrays
@@ -304,6 +300,7 @@ export default {
       return boards.map(b => {
         b.dataId = b.id
         b.id = b.boardId
+        if (b.boardId === -1) v.newBoards.push({...v.nestableMap[b.dataId], dataId: b.dataId})
         v.nestableMap[b.dataId].children = updateNestableMapForUncat(b.children) // maintain updated nestable map
         delete b.boardId
         return b
@@ -328,13 +325,14 @@ export default {
     }
     const updateNestableMapForBoards = catBoards => { // recursion for nestableMap update
       if(!catBoards) return
-      catBoards.map(board => {
-        board.dataId = board.id
-        v.nestableMap[board.dataId].children = board.children // maintain updated nestable map
-        board.id = board.boardId
-        delete board.boardId
+      catBoards.map(b => {
+        b.dataId = b.id
+        if (b.boardId === -1) v.newBoards.push({...v.nestableMap[b.dataId], dataId: b.dataId})
+        v.nestableMap[b.dataId].children = b.children // maintain updated nestable map
+        b.id = b.boardId
+        delete b.boardId
         // recurse if there are children
-        if (board.children && board.children.length) updateNestableMapForBoards(board.children)
+        if (b.children && b.children.length) updateNestableMapForBoards(b.children)
       })
     }
 
@@ -392,7 +390,8 @@ export default {
       if(!catBoards) return
       return catBoards.map(board => {
         let newChildren = []
-        let children = v.nestableMap[v.boardsDataIdMap[board.slug]].children
+        console.log(board)
+        let children = v.nestableMap[v.boardsDataIdMap[board.old_slug || board.slug]].children
         if (children) children.forEach(b => {
           let board = b.dataId ? v.nestableMap[b.dataId] : b
           if (board.deleted) { // move children to uncat if board deleted
