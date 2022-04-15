@@ -167,6 +167,10 @@ export default {
       if (props.addBoard) {
         v.data.modified = true
         v.data.id = -1
+        v.data.right_to_left = false
+        v.data.disable_post_edit = null
+        v.data.disable_signature = false
+        v.data.disable_selfmod = false
       }
     })
 

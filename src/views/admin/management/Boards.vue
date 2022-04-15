@@ -25,15 +25,15 @@
 </template>
 
 <script>
-import { reactive, toRefs, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { reactive, toRefs, onMounted, onUnmounted, watch, inject, nextTick } from 'vue'
 import { boardsApi, categoriesApi } from '@/api'
 import BoardManagerModal from '@/components/modals/admin/management/BoardManager.vue'
 import EventBus from '@/composables/services/event-bus'
-import { sortBy, remove, cloneDeep } from 'lodash'
+import { sortBy, remove, cloneDeep, difference } from 'lodash'
 import RenderNestable from '@/components/layout/RenderNestable.vue'
 // eslint-disable-next-line no-unused-vars
 import nestable from 'nestable'
-console.log(categoriesApi)
+
 export default {
   name: 'BoardManagement',
   components: { RenderNestable, BoardManagerModal },
@@ -75,30 +75,6 @@ export default {
   setup() {
     const DEBUG = true
 
-    const saveListener = () => {
-      console.log('Admin Save Management!')
-      normalizeData()
-      // -- End update vue data to match nestable data
-      if (DEBUG) {
-        console.log('SAVE TRIGGERED - CURRENT STATE')
-        console.log('---------------------------------------------')
-        console.log('New Categories List (v.newCategories):')
-        console.log(JSON.stringify(v.newCategories, null, 2))
-        console.log('New Boards List (v.newBoards):')
-        console.log(JSON.stringify(v.newBoards, null, 2))
-        console.log('Edited Boards List (v.editedBoards):')
-        console.log(JSON.stringify(v.editedBoards, null, 2))
-        console.log('Deleted Boards List (v.deletedBoards):')
-        console.log(JSON.stringify(v.deletedBoards, null, 2))
-        console.log('Nestable Map (v.nestableMap):')
-        console.log(v.nestableMap)
-        console.log('Category List Data (v.catListData):')
-        console.log(v.catListData)
-        console.log('Uncategorized List Data (v.uncatListData):')
-        console.log(v.uncatListData)
-        console.log('---------------------------------------------')
-      }
-    }
     const resetListener = () => {
       v.catDataId = 0
       v.boardDataId = 9999
@@ -114,27 +90,114 @@ export default {
         v.catListData = cloneDeep(v.catListDataCopy)
       })
     }
+    const saveListener = () => {
+      console.log('Admin Save Management!')
+      normalizeData()
+      // -- End update vue data to match nestable data
+      if (DEBUG) {
+        console.log('SAVE TRIGGERED - CURRENT STATE')
+        console.log('---------------------------------------------')
+        console.log('New Categories List (v.newCategories):')
+        console.log(JSON.stringify(v.newCategories, null, 2))
+        console.log('New Boards List (v.newBoards):')
+        console.log(JSON.stringify(v.newBoards, null, 2))
+        console.log('Edited Boards List (v.editedBoards):')
+        console.log(JSON.stringify(v.editedBoards, null, 2))
+        console.log('Deleted Boards List (v.deletedBoards):')
+        console.log(JSON.stringify(v.deletedBoards, null, 2))
+        console.log('Deleted Categories List (v.deletedCategories):')
+        console.log(JSON.stringify(v.deletedCategories, null, 2))
+        console.log('Nestable Map (v.nestableMap):')
+        console.log(v.nestableMap)
+        console.log('Category List Data (v.catListData):')
+        console.log(v.catListData)
+        console.log('Uncategorized List Data (v.uncatListData):')
+        console.log(v.uncatListData)
+        console.log('---------------------------------------------')
 
-    // const processNewCategories = () => {
-    //   if (v.newCategories.length < 1) Promise.resolve()
-    //   console.log(`0) Adding new Categories: \n${JSON.stringify(v.newCategories, null, 2)}`)
-    //   return categoriesApi.create({ categories: v.newCategories })
-    //   .then(cats => {
-    //     // Update nestable map to contain newly created category ids
-    //     cats.forEach((cat, index) => {
-    //       let dataId = v.newCategories[index].dataId
-    //       v.nestableMap[dataId].id = cat.id
-    //     })
-    //   })
-    //   .then(() => v.newCategories = [])
-    //   .catch(err => console.log(err))
-    // }
+        return processNewCategories()
+        .then(processNewBoards)
+        .then(processEditedBoards)
+        .then(processDeletedBoards)
+        .then(processDeletedCategories)
+        .then(() => {
+          let catMapping = buildUpdatedCats(v.serializedCats)
+          let uncatMapping = buildUncategorizedBoards(v.serializedBoards)
+          let mergedMapping = uncatMapping.concat(catMapping)
+          return processCategories(mergedMapping)
+        })
+        .then(() => {
+          console.log('Done saving!')
+          $alertStore.success('Successfully updated boards!')
+        })
+        .catch(err => {
+          console.log(err)
+          $alertStore.error('There was an error updating boards.')
+        })
+      }
+    }
 
-    // const processNewBoards = () => {
-    //   if (v.newBoards.length < 1) Promise.resolve()
-    //   console.log(`0) Adding new Boards: \n${JSON.stringify(v.newBoards, null, 2)}`)
-    //   return boardsApi.create(v.newBoards)
-    // }
+    const processNewCategories = () => {
+      if (v.newCategories.length < 1) return Promise.resolve()
+      console.log(`0) Adding new Categories: \n${JSON.stringify(v.newCategories, null, 2)}`)
+      return categoriesApi.create({ categories: v.newCategories })
+      .then(cats => cats.forEach((cat, index) => {
+        let dataId = v.newCategories[index].dataId
+        v.nestableMap[dataId].id = cat.id
+      }))
+      .then(() => v.newCategories = [])
+      .catch(err => console.log(err))
+    }
+
+    const processNewBoards = () => {
+      if (v.newBoards.length < 1) return Promise.resolve()
+      console.log(`1) Adding new Boards: \n${JSON.stringify(v.newBoards, null, 2)}`)
+      v.newBoards = v.newBoards.map(b => {
+        if (!b.postable_by) delete b.postable_by
+        if (!b.viewable_by) delete b.viewable_by
+        return b
+      })
+      return boardsApi.create(v.newBoards)
+      .then(boards => boards.forEach((board, index) => {
+        let dataId = v.newBoards[index].dataId
+        console.log('HERERERE', board, dataId)
+        v.nestableMap[dataId].id = board.id
+      }))
+      .then(() => v.newBoards = [])
+      .catch(err => console.log(err))
+    }
+
+    const processEditedBoards = () => {
+      if (v.editedBoards.length < 1) return Promise.resolve()
+      console.log(`2) Handling edited Boards: \n${JSON.stringify(v.editedBoards, null, 2)}`)
+      return boardsApi.update(v.editedBoards)
+      .then(() => v.editedBoards = [])
+      .catch(err => console.log(err))
+    }
+
+    const processDeletedBoards = () => {
+      if (v.deletedBoards.length < 1) return Promise.resolve()
+      console.log(`3) Handling deleted Boards: \n${JSON.stringify(v.deletedBoards, null, 2)}`)
+      return boardsApi.delete({ board_ids: v.deletedBoards })
+      .then(() => v.deletedBoards = [])
+      .catch(err => console.log(err))
+    }
+
+    const processDeletedCategories = () => {
+      if (v.deletedCategories.length < 1) return Promise.resolve()
+      console.log(`4) Handling deleted Categories: \n${JSON.stringify(v.deletedCategories, null, 2)}`)
+      return categoriesApi.delete({ category_ids: v.deletedCategories })
+      .then(() => v.deletedCategories = [])
+      .catch(err => console.log(err))
+    }
+
+    const processCategories = boardMapping => {
+      console.log('5) Updating board mapping: \n' + JSON.stringify(boardMapping, null, 2))
+      return boardsApi.updateAll({ boardMapping: boardMapping })
+      .catch(err => console.log(err))
+    };
+
+    // console.log(categoriesApi)
 
     onMounted(() => {
       EventBus.on('admin-save', saveListener)
@@ -186,6 +249,7 @@ export default {
     }
 
     const addBoard = board => {
+      console.log(board)
       normalizeData() // Normalize data between vue and jquery
       v.uncatListData.unshift(board) // triggers recompilation of nestable components/html
     }
@@ -194,7 +258,6 @@ export default {
       board.modified = true
       v.nestableMap[v.selectedDataId] = board
       normalizeData() // Normalize data between vue and jquery
-      console.log('EDIT', v.editedBoards)
     }
     const deleteBoard = () => {
       normalizeData()
@@ -247,12 +310,16 @@ export default {
       console.log('setBoardMods', id)
     }
 
+    const $alertStore = inject('$alertStore')
+
     /* Nestable function calls */
     const expandAll = () => window.$('#nestable-categories').nestable('expandAll')
     const collapseAll = () => window.$('#nestable-categories').nestable('collapseAll')
 
     /* Template Data */
     const v = reactive({
+      serializedCats: null,
+      serializedBoards: null,
       selected: null,
       selectedDataId: null,
       catListDataCopy: null,
@@ -276,7 +343,6 @@ export default {
       deletedBoards: [],
       uncompiledCatHtml: '',
       uncompiledBoardHtml: '',
-      serializedCats: null,
       showAddBoard: false,
       showEditBoard: false,
       showEditBoardMods: false,
@@ -291,6 +357,8 @@ export default {
       // 1) Serialize categorized list and uncategorized list
       let cats = window.$('#nestable-categories').nestable('serialize') // data from nestable
       let boards = window.$('#nestable-boards').nestable('serialize') // data from nestable
+      v.serializedCats = cats
+      v.serializedBoards = boards
       // 2) Update Nestable Map for cats and boards (After, nestableMap should contain truth)
       v.newBoards = []
       v.editedBoards = []
@@ -372,6 +440,7 @@ export default {
         cat.boards = []
         let children = nestableCat.children
         if (nestableCat.deleted) { // cat was deleted push children to uncat
+          if (nestableCat.id !== "-1") v.deletedCategories.push(nestableCat.id)
           let updatedChildren = updateUncatListData(children)
           nextTick(() => v.uncatListData.push(...updatedChildren))
           cat = null
@@ -518,6 +587,87 @@ export default {
       v.uncompiledCatHtml = chtml
       nextTick(() => window.$('#nestable-boards').nestable(v.nestableOpts))
       nextTick(() => window.$('#nestable-categories').nestable(v.nestableOpts))
+    }
+
+    /* Board Mapping Helper Functions */
+    const buildUncategorizedBoards = uncatArr => {
+      let uncategorizedMapping = []
+      // Convert Original Uncategorized List into flat array
+      let origList = v.uncatListDataCopy.map(data => data.id)
+      // Convert New Uncategorized List into flat array
+      let newList = uncatArr.map(data => data.id === -1 ? undefined : data.id)
+      // Diff new and original uncategorized lists to figure out
+      // which boards were newly uncategorized
+      let diffList = difference(newList, origList)
+      console.log(origList, newList, diffList)
+      // Add the newly uncategorized boards into the uncategorized mapping
+      diffList.forEach(id => uncategorizedMapping.push({ id: id === -1 ? undefined : id, type: 'uncategorized' }))
+      console.log('uncatMap', uncategorizedMapping)
+      return uncategorizedMapping
+    }
+
+    /* Translates serialized array into boards.updateCategory format */
+    const buildUpdatedCats = catsArr => {
+      let boardMapping = []
+      catsArr.forEach((cat, index) => {
+        // add this cat as a row entry
+        let nestableCat = v.nestableMap[cat.dataId]
+        let catId = nestableCat.id
+        let row = {
+          type: 'category',
+          id: catId,
+          name: cat.name,
+          viewable_by: nestableCat.viewable_by,
+          view_order: index
+        }
+        boardMapping.push(row)
+        if (!cat.boards) return
+        cat.boards.forEach((catBoard, index) => {
+          // add this cat board as a row entry
+          let nestableBoard = v.nestableMap[v.boardsDataIdMap[catBoard.slug]]
+          let boardId = nestableBoard.id
+          let boardRow = {
+            type: 'board',
+            id: boardId,
+            category_id: catId,
+            viewable_by: nestableBoard.viewable_by,
+            postable_by: nestableBoard.postable_by,
+            right_to_left: nestableBoard.right_to_left,
+            disable_signature: nestableBoard.disable_signature,
+            disable_selfmod: nestableBoard.disable_selfmod,
+            disable_post_edit: nestableBoard.disable_post_edit,
+            view_order: index
+          }
+          boardMapping.push(boardRow)
+          // add any children board entries
+          if (catBoard.children && catBoard.children.length > 0) buildEntries(catBoard.children, boardId, boardMapping)
+        })
+      })
+      return boardMapping
+    }
+
+    const buildEntries = (currentBoards, parentId, boardMapping) => {
+      currentBoards.forEach((board, index) => {
+        // add this board as a row entry
+        let nestableBoard = v.nestableMap[v.boardsDataIdMap[board.slug]]
+        if(nestableBoard.name === 'test2') console.log(nestableBoard, v.boardsDataIdMap[board.slug], v.nestableMap[9999])
+        let boardId = nestableBoard.id
+        let row = {
+          type: 'board',
+          id: boardId,
+          parent_id: parentId,
+          viewable_by: nestableBoard.viewable_by,
+          postable_by: nestableBoard.postable_by,
+          right_to_left: nestableBoard.right_to_left,
+          disable_signature: nestableBoard.disable_signature,
+          disable_selfmod: nestableBoard.disable_selfmod,
+          disable_post_edit: nestableBoard.disable_post_edit,
+          view_order: index
+        }
+        boardMapping.push(row)
+        // add any children boards as a row entry
+        if (board.children && board.children.length > 0) buildEntries(board.children, boardId, boardMapping)
+      })
     }
 
     /* Watch Data */
