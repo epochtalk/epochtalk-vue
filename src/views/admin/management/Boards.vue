@@ -158,9 +158,9 @@ export default {
         return b
       })
       return boardsApi.create(v.newBoards)
-      .then(boards => boards.forEach((board, index) => {
-        let dataId = v.newBoards[index].dataId
-        console.log('HERERERE', board, dataId)
+      .then(boards => boards.forEach((board) => {
+        let dataId = v.boardsDataIdMap[board.slug]
+        console.log('HERERERE', v.nestableMap[dataId], board, dataId)
         v.nestableMap[dataId].id = board.id
       }))
       .then(() => v.newBoards = [])
@@ -650,7 +650,7 @@ export default {
       currentBoards.forEach((board, index) => {
         // add this board as a row entry
         let nestableBoard = v.nestableMap[v.boardsDataIdMap[board.slug]]
-        if(nestableBoard.name === 'test2') console.log(nestableBoard, v.boardsDataIdMap[board.slug], v.nestableMap[9999])
+        if(nestableBoard.name === 'test2') console.log(board, nestableBoard, v.boardsDataIdMap[board.slug], v.nestableMap[9999])
         let boardId = nestableBoard.id
         let row = {
           type: 'board',
