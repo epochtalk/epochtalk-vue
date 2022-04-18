@@ -91,7 +91,7 @@
           <label>Category Read Access:
             <span class="info-tooltip" data-balloon="Minimum role a user must have to read the boards in this category" data-balloon-pos="right" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
             <select v-model="data.viewable_by">
-              <option :value="null" disabled selected>Minimum role level</option>
+              <option :value="null" selected>Minimum role level</option>
               <option :value="role.priority" v-html="role.name" v-for="role in roles" :key="role.priority"></option>
             </select>
           </label>
