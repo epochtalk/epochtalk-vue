@@ -117,7 +117,7 @@ import { cloneDeep, sortBy } from 'lodash'
 import { adminApi } from '@/api'
 
 export default {
-  name: 'rank-modal',
+  name: 'board-manager-modal',
   props: ['show', 'addBoard', 'editCat', 'deleteCat', 'editBoard', 'editBoardMods', 'deleteBoard', 'selected'],
   emits: ['close', 'success'],
   components: { Modal },
