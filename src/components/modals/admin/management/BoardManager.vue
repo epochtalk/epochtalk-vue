@@ -13,10 +13,10 @@
       <form class="css-form">
         <div v-if="addBoard || editBoard">
           <label>Board Name
-            <input ref="focusInput" type="text" class="input-text" id="newBoardName" placeholder="Board Name" maxlength="255" v-model="data.name" ng-change="slugify()"/>
+            <input ref="focusInput" type="text" class="input-text" id="newBoardName" placeholder="Board Name" maxlength="255" v-model="data.name" @input="e => slug(e.target.value)"/>
           </label>
           <label>Board URL Slug
-            <input type="text" class="input-text" id="newBoardSlug" v-model="data.slug" placeholder="Board URL Slug" maxlength="80"/>
+            <input type="text" class="input-text" id="newBoardSlug" v-model="data.slug" placeholder="Board URL Slug" maxlength="80" ref="slugInput" />
           </label>
           <label>Board Description
             <textarea rows="5" id="newBoardDesc" v-model="data.description" placeholder="Board Description" maxlength="255"></textarea>
@@ -115,6 +115,7 @@ import Modal from '@/components/layout/Modal.vue'
 import { reactive, toRefs, watch, onBeforeMount } from 'vue'
 import { cloneDeep, sortBy } from 'lodash'
 import { adminApi } from '@/api'
+import slugify from 'slugify'
 
 export default {
   name: 'board-manager-modal',
@@ -146,10 +147,15 @@ export default {
       emit('close')
     }
 
-    /* Internal Data */
+    const slug = data => {
+      let sluggedName = slugify(slugify(data, { remove: /[*'"~!@)(+.:]/g, lower: true }))
+      if (sluggedName === '') sluggedName = Math.random().toString(36).substring(8)
+      v.slugInput.value = sluggedName
+    }
 
     /* Template Data */
     const v = reactive({
+      slugInput: null,
       focusInput: null,
       roles: null,
       data: {},
