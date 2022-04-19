@@ -180,23 +180,7 @@ export default {
       }
     })
 
-    return { ...toRefs(v), modify, close }
+    return { ...toRefs(v), modify, close, slug }
   }
 }
 </script>
-
-<style lang="scss">
-  .input-spacing { margin-bottom: 1rem; }
-  .col {
-    display: flex;
-    flex-direction: row;
-    align-items: stretch;
-    width: 100%;
-    column-gap: 0.5rem;
-    div {
-      flex: 1;
-      button { width: 100%; }
-    }
-    &.wildcard input { flex: 1; text-align: center; }
-  }
-</style>
