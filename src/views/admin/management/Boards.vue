@@ -21,13 +21,15 @@
     </h5>
     <render-nestable :key="uncompiledBoardHtml" id="nestable-boards" :setBoardDelete="setBoardDelete" :setBoardMods="setBoardMods" :setBoardEdit="setBoardEdit" :uncompiled="uncompiledBoardHtml" />
   </div>
-  <board-manager-modal :show="showAddBoard || showEditBoard || showEditBoardMods || showDeleteBoard || showDeleteCat || showEditCat" :editCat="showEditCat" :deleteCat="showDeleteCat" :addBoard="showAddBoard" :editBoard="showEditBoard" :editBoardMods="showEditBoardMods" :deleteBoard="showDeleteBoard" :selected="selected" @close="showAddBoard =showEditBoard = showEditBoardMods = showDeleteBoard = showDeleteCat = showEditCat = false" @success="handleBoardManagerSuccess"/>
+  <board-manager-modal :show="showAddBoard || showEditBoard || showDeleteBoard || showDeleteCat || showEditCat" :editCat="showEditCat" :deleteCat="showDeleteCat" :addBoard="showAddBoard" :editBoard="showEditBoard" :editBoardMods="showEditBoardMods" :deleteBoard="showDeleteBoard" :selected="selected" @close="showAddBoard=showEditBoard=showEditBoardMods=showDeleteBoard=showDeleteCat=showEditCat=false" @success="handleBoardManagerSuccess"/>
+  <set-moderators-modal :show="showEditBoardMods" :board="selected" @close="showEditBoardMods=false" @success="mods => nestableMap[selectedDataId].moderators = mods" />
 </template>
 
 <script>
 import { reactive, toRefs, onMounted, onUnmounted, watch, inject, nextTick } from 'vue'
 import { boardsApi, categoriesApi } from '@/api'
 import BoardManagerModal from '@/components/modals/admin/management/BoardManager.vue'
+import SetModeratorsModal from '@/components/modals/admin/management/SetModerators.vue'
 import EventBus from '@/composables/services/event-bus'
 import { sortBy, remove, cloneDeep, difference } from 'lodash'
 import RenderNestable from '@/components/layout/RenderNestable.vue'
@@ -36,7 +38,7 @@ import nestable from 'nestable'
 
 export default {
   name: 'BoardManagement',
-  components: { RenderNestable, BoardManagerModal },
+  components: { RenderNestable, BoardManagerModal, SetModeratorsModal },
   beforeRouteEnter(to, from, next) {
     let boards, cats
     boardsApi.uncategorized()
