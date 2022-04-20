@@ -167,6 +167,8 @@ export const authApi = {
 }
 
 export const usersApi = {
+  page: query => $http('/api/users', { params: query }),
+  count: query => $http('/api/users/count', { params: query }),
   search: username => $http('/api/users/search', { params: { username } }),
   memberSearch: params => $http('/api/search/users', { params }),
   lookup: (username, params) => $http(`/api/users/lookup/${username}`, { params }),
