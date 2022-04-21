@@ -6,18 +6,18 @@
           <div class="column">
             <div class= "row">
               <div class="management-users radio-button column">
-                <input type="radio" class="hide-radio" name="table-filter" :value="'banned'" id="users-filter-0" v-model="query.filter" @click="setFilter()" />
+                <input type="radio" class="hide-radio" name="table-filter" :value="undefined" id="users-filter-0" v-model="query.filter" @click="setFilter()" />
                 <label for="users-filter-0">All</label>
               </div>
               <div class="management-users radio-button column">
-                <input type="radio" class="hide-radio" name="table-filter" :value="undefined" id="users-filter-1" v-model="query.filter" @click="setFilter('banned')" />
+                <input type="radio" class="hide-radio" name="table-filter" :value="'banned'" id="users-filter-1" v-model="query.filter" @click="setFilter('banned')" />
                 <label for="users-filter-1">Banned</label>
               </div>
             </div>
           </div>
           <div class="header-spacer column">
             <select @change="searchStr = ''" v-model="query.ip">
-              <option :value="false">Search by Username</option>
+              <option :value="undefined">Search by Username</option>
               <option :value="true">Search by IP Address</option>
             </select>
           </div>
@@ -27,19 +27,19 @@
         <div class="nested-input-container" v-if="!query?.ip">
           <a v-if="query.search" @click="clearSearch()" class="nested-clear-btn fa fa-times"></a>
           <a @click="searchUsers()" class="nested-btn">Search</a>
-          <input class="input-text nested-input" v-model="searchStr" type="text" id="search-users" placeholder="Search users by username" ng-keydown="$event.which === 13 && AdminManagementCtrl.searchUsers()" ng-keyup="$event.which === 27 && AdminManagementCtrl.clearSearch()" />
+          <input class="input-text nested-input" v-model="searchStr" type="text" id="search-users" placeholder="Type a username" ng-keydown="$event.which === 13 && AdminManagementCtrl.searchUsers()" ng-keyup="$event.which === 27 && AdminManagementCtrl.clearSearch()" />
         </div>
         <div class="nested-input-container" v-if="query?.ip">
           <a v-if="query?.search" @click="clearSearch()" class="nested-clear-btn fa fa-times"></a>
           <a @click="searchUsers()" class="nested-btn">Search</a>
-          <input class="input-text nested-input" v-model="searchStr" type="text" id="search-users" ng-pattern="AdminManagementCtrl.ipRegex" placeholder="Search users by IP address" ng-keydown="$event.which === 13 && AdminManagementCtrl.searchUsers()" ng-keyup="$event.which === 27 && AdminManagementCtrl.clearSearch()" />
+          <input class="input-text nested-input" v-model="searchStr" type="text" id="search-users" ng-pattern="AdminManagementCtrl.ipRegex" placeholder="Type an IP address" ng-keydown="$event.which === 13 && AdminManagementCtrl.searchUsers()" ng-keyup="$event.which === 27 && AdminManagementCtrl.clearSearch()" />
         </div>
       </div>
     </div>
-    <div class="fill-row centered-text" v-if="!query?.search && count < 1">
+    <div class="user-content fill-row centered-text" v-if="!query?.search && count < 1">
       <h4>No Users to display in <strong>{{query?.filter ? 'Banned' : 'All'}}</strong></h4>
     </div>
-    <div class="fill-row" v-if="count > 0 || query?.search">
+    <div class="user-content fill-row" v-if="count > 0 || query?.search">
       <div v-if="query.search">
       Displaying {{count}} search result(s) for "<strong>{{search}}</strong>" in <strong>{{query?.filter ? 'Banned': 'All'}}</strong>:<br /><br />
       </div>
@@ -47,7 +47,7 @@
         <thead>
           <th class="pointer" ng-click="AdminManagementCtrl.setSortField('username')"><span ng-class="AdminManagementCtrl.getSortClass('username')"></span>&nbsp;Username</th>
           <th class="pointer" ng-class="{'hide-mobile': AdminManagementCtrl.tableFilter == 1 }" ng-click="AdminManagementCtrl.setSortField('email')"><span ng-class="AdminManagementCtrl.getSortClass('email')"></span>&nbsp;Email</th>
-          <th class="pointer" ng-show="AdminManagementCtrl.tableFilter == 1" ng-click="AdminManagementCtrl.setSortField('ban_expiration')"><span ng-class="AdminManagementCtrl.getSortClass('ban_expiration')"></span>&nbsp;Ban Expiration</th>
+          <th class="pointer" v-if="query?.filter === 'banned'" ng-click="AdminManagementCtrl.setSortField('ban_expiration')"><span ng-class="AdminManagementCtrl.getSortClass('ban_expiration')"></span>&nbsp;Ban Expiration</th>
           <th class="pointer hide-mobile" ng-click="AdminManagementCtrl.setSortField('created_at')"><span ng-class="AdminManagementCtrl.getSortClass('created_at')"></span>&nbsp;Registered Date</th>
           <th class="hide-mobile">Last Active Date</th>
           <th class="hide-mobile">IP Addresses</th>
@@ -55,28 +55,29 @@
         </thead>
         <tbody>
           <tr v-for="user in users" :key="user.username">
-            <td><a ui-sref="profile.posts({ username: user.username })" ng-bind="user.username"></a>
-            <i ng-show="user.ban_expiration" class="fa fa-user-times right"></i>
+            <td><a href="" v-html="user.username"></a>
+            <i v-if="user.ban_expiration" class="fa fa-user-times right"></i>
             </td>
-            <td class="email-column" ng-class="{'hide-mobile': AdminManagementCtrl.tableFilter == 1 }"><a ng-href="mailto:{{user.email}}" ng-bind="user.email"></a></td>
-            <td ng-show="AdminManagementCtrl.tableFilter == 1" ng-bind="user.ban_expiration | humanDate:true"></td>
-            <td class="hide-mobile" ng-bind="user.created_at | humanDate"></td>
-            <td class="hide-mobile" ng-bind="(user.last_active | humanDate) || '--'"></td>
+            <td class="email-column" :class="{'hide-mobile': query?.filter === 'banned' }"><a :href="'mailto:${user.email}'" v-html="user.email"></a></td>
+            <td v-if="query?.filter === 'banned'">{{humanDate(user.ban_expiration, true)}}</td>
+            <td class="hide-mobile">{{humanDate(user.created_at)}}</td>
+            <td class="hide-mobile">{{humanDate(user.last_active) || '--'}}</td>
             <td class="hide-mobile">
-              <span ng-repeat="ip in user.user_ips track by $index">
-                <span ng-bind="ip"></span>{{ !$last ? ', ' : '' }}
+              <span v-for="(ip, index) in user.user_ips" :key="ip">
+                <span v-html="ip"></span>{{ index !== user.user_ips.length - 1 ? ', ' : '' }}
               </span>
-              <span ng-if="!user.user_ips.length">Not Available</span>
+              <span v-if="!user.user_ips.length">Not Available</span>
             </td>
             <td class=user-actions>
-              <a ui-sref="users-posts({ username: user.username })">
+              <!-- <a ui-sref="users-posts({ username: user.username })"> -->
+              <a href="#">
                 <button class="icon" data-balloon="View Posts">
-                  <i class="fa fa-file-text-o"></i>
+                  <i class="fas fa-file"></i>
                 </button>
               </a>
 
               <button class="icon" data-balloon="Edit Profile" ng-click="AdminManagementCtrl.showEditUser(user.username)">
-                <i class="fa fa-pencil"></i>
+                <i class="fas fa-edit"></i>
               </button>
 
               <button class="icon" data-balloon="Manage Bans" ng-click="AdminManagementCtrl.showManageBans(user)" ng-disabled="!AdminManagementCtrl.actionAccess.userControls.privilegedBan">
@@ -97,6 +98,7 @@
 import { reactive, toRefs, onMounted, onUnmounted } from 'vue'
 import { usersApi } from '@/api'
 import EventBus from '@/composables/services/event-bus'
+import humanDate from '@/composables/filters/humanDate'
 
 export default {
   name: 'UserManagement',
@@ -113,10 +115,10 @@ export default {
     usersApi.page(queryParams)
     .then(users => {
       usersApi.count(queryParams)
-      .then(count => next(vm => {
+      .then(d => next(vm => {
         vm.query = queryParams
         vm.users = users
-        vm.count = count
+        vm.count = d.count
       }))
     })
   },
@@ -133,10 +135,10 @@ export default {
     usersApi.page(queryParams)
     .then(users => {
       usersApi.count(queryParams)
-      .then(count => {
+      .then(d => {
         this.query = queryParams
         this.users = users
-        this.count = count
+        this.count = d.count
         next()
       })
     })
@@ -167,7 +169,7 @@ export default {
       query: {},
       searchStr: ''
     })
-    return { ...toRefs(v), setFilter, clearSearch, searchUsers }
+    return { ...toRefs(v), setFilter, clearSearch, searchUsers, humanDate }
   }
 }
 </script>
@@ -199,5 +201,60 @@ export default {
   text-align: center;
   height: 2.25rem;
   border-radius: 3px;
+}
+.user-content {
+  margin-top: 6rem;
+}
+
+table.underlined {
+  border: none;
+  margin-bottom: 1rem;
+  thead {
+    text-align: left;
+    font-size: 0.875rem;
+    background-color: transparent;
+    border-bottom: $border-alt;
+    th { color: $secondary-font-color; font-weight: 400; padding-bottom: 0.5rem; padding-left: 0.5rem; }
+    th.left-icon-col { width: 1.5rem; }
+    // th.mod-actions { width: 5.25rem; }
+    // th.user-actions { width: 8rem; }
+  }
+  tr {
+    border-bottom: 1px solid $border-color-alt;
+    vertical-align: top;
+    &.selectable-row { @include no-select; }
+    &.selectable-row:hover { background-color: $sub-header-color; }
+    &.active-row, &.active-row:nth-of-type(even) { background-color: $color-primary; }
+    &.active-row.selectable-row:hover { background-color: $color-primary }
+    &.active-row td { color: $button-text-color; }
+    &.active-row td a, &.active-row td button { color: darken($color-primary-alt, 10%); }
+    &.active-row td a:hover, &.active-row td button:not([disabled]):hover { color: $color-primary-alt; }
+    &:nth-of-type(even) { background: transparent; }
+    &:nth td { padding-top: 1.5rem; padding-bottom: 1.5rem; }
+    &.active-row td.left-icon-col { color: $button-text-color; }
+    td.left-icon-col {
+      @include pad(0 0 0 0.5rem);
+      color: $secondary-font-color;
+      padding-top: 0.5rem;
+    }
+    td {
+      padding-top: 0.5rem;
+      padding-right: 0.5rem;
+      padding-bottom: 0.5rem;
+      vertical-align: top;
+
+      &:last-child {
+        padding-right: 0;
+      }
+    }
+
+    td input { margin-bottom: 0; }
+  }
+
+  .user-actions,
+  .mod-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
 }
 </style>

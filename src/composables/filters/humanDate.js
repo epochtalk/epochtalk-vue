@@ -1,6 +1,7 @@
 import * as dayjs from 'dayjs'
 
 export default (dateStr, hideTime, customFormat) => {
+  if (!dateStr) return dateStr
   //let timezone = PreferencesSvc.preferences.timezone_offset || ''
   let timezone
   let result
