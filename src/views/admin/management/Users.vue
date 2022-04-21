@@ -1,21 +1,29 @@
 <template>
   <div class="full-width">
-    <div class="admin-table-header">
-      <div class="management-users radio-button">
-        <input type="radio" class="hide-radio" name="table-filter" :value="'banned'" id="users-filter-0" v-model="query.filter" @click="setFilter()" />
-        <label for="users-filter-0">All</label>
+    <div class="admin-table-header row">
+      <div class="column">
+        <div class="row">
+          <div class="column">
+            <div class= "row">
+              <div class="management-users radio-button column">
+                <input type="radio" class="hide-radio" name="table-filter" :value="'banned'" id="users-filter-0" v-model="query.filter" @click="setFilter()" />
+                <label for="users-filter-0">All</label>
+              </div>
+              <div class="management-users radio-button column">
+                <input type="radio" class="hide-radio" name="table-filter" :value="undefined" id="users-filter-1" v-model="query.filter" @click="setFilter('banned')" />
+                <label for="users-filter-1">Banned</label>
+              </div>
+            </div>
+          </div>
+          <div class="header-spacer column">
+            <select @change="searchStr = ''" v-model="query.ip">
+              <option :value="false">Search by Username</option>
+              <option :value="true">Search by IP Address</option>
+            </select>
+          </div>
+        </div>
       </div>
-      <div class="management-users radio-button">
-        <input type="radio" class="hide-radio" name="table-filter" :value="undefined" id="users-filter-1" v-model="query.filter" @click="setFilter('banned')" />
-        <label for="users-filter-1">Banned</label>
-      </div>
-      <div class="header-spacer">
-        <select @change="searchStr = ''" v-model="query.ip">
-          <option :value="false">Search by Username</option>
-          <option :value="true">Search by IP Address</option>
-        </select>
-      </div>
-      <div class="user-search">
+      <div class="user-search column">
         <div class="nested-input-container" v-if="!query?.ip">
           <a v-if="query.search" @click="clearSearch()" class="nested-clear-btn fa fa-times"></a>
           <a @click="searchUsers()" class="nested-btn">Search</a>
@@ -27,7 +35,6 @@
           <input class="input-text nested-input" v-model="searchStr" type="text" id="search-users" ng-pattern="AdminManagementCtrl.ipRegex" placeholder="Search users by IP address" ng-keydown="$event.which === 13 && AdminManagementCtrl.searchUsers()" ng-keyup="$event.which === 27 && AdminManagementCtrl.clearSearch()" />
         </div>
       </div>
-      <div class="clear"></div>
     </div>
     <div class="fill-row centered-text" v-if="!query?.search && count < 1">
       <h4>No Users to display in <strong>{{query?.filter ? 'Banned' : 'All'}}</strong></h4>
@@ -165,6 +172,32 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+.admin-table-header {
+  background-color: $sub-header-color;
+  position: absolute;
+  left: 0;
+  right: 0;
+  padding: 1rem;
+  padding-top: 2rem;
+  top: 0.4rem;
 
+  @include break-mobile-sm { padding: 1.25rem 1rem 0; margin: 0 -1rem 2rem; }
+}
+.row {
+  display: flex;
+  flex-flow: row;
+  row-gap: 0;
+}
+.column {
+  flex: 50%;
+}
+.nested-input { margin-bottom: 0; }
+.nested-btn { margin-bottom: 1rem; }
+
+.radio-button label {
+  text-align: center;
+  height: 2.25rem;
+  border-radius: 3px;
+}
 </style>
