@@ -25,14 +25,14 @@
       </div>
       <div class="user-search column">
         <div class="nested-input-container" v-if="!query?.ip">
-          <a v-if="query.search" @click="clearSearch()" class="nested-clear-btn fa fa-times"></a>
+          <a v-if="query?.search" @click="clearSearch()" class="nested-clear-btn fa fa-times"></a>
           <a @click="searchUsers()" class="nested-btn">Search</a>
-          <input class="input-text nested-input" v-model="searchStr" type="text" id="search-users" placeholder="Type a username" ng-keydown="$event.which === 13 && AdminManagementCtrl.searchUsers()" ng-keyup="$event.which === 27 && AdminManagementCtrl.clearSearch()" />
+          <input class="input-text nested-input" v-model="searchStr" type="text" id="search-users" placeholder="Type a username" @keydown="$event.which === 13 && searchUsers()" @keyup="$event.which === 27 && clearSearch()" />
         </div>
         <div class="nested-input-container" v-if="query?.ip">
           <a v-if="query?.search" @click="clearSearch()" class="nested-clear-btn fa fa-times"></a>
           <a @click="searchUsers()" class="nested-btn">Search</a>
-          <input class="input-text nested-input" v-model="searchStr" type="text" id="search-users" ng-pattern="AdminManagementCtrl.ipRegex" placeholder="Type an IP address" ng-keydown="$event.which === 13 && AdminManagementCtrl.searchUsers()" ng-keyup="$event.which === 27 && AdminManagementCtrl.clearSearch()" />
+          <input class="input-text nested-input" v-model="searchStr" type="text" id="search-users" ng-pattern="AdminManagementCtrl.ipRegex" placeholder="Type an IP address" @keydown="$event.which === 13 && searchUsers()" @keyup="$event.which === 27 && clearSearch()" />
         </div>
       </div>
     </div>
@@ -40,8 +40,8 @@
       <h4>No Users to display in <strong>{{query?.filter ? 'Banned' : 'All'}}</strong></h4>
     </div>
     <div class="user-content fill-row" v-if="count > 0 || query?.search">
-      <div v-if="query.search">
-      Displaying {{count}} search result(s) for "<strong>{{search}}</strong>" in <strong>{{query?.filter ? 'Banned': 'All'}}</strong>:<br /><br />
+      <div v-if="query?.search">
+      Displaying {{count}} search result(s) for "<strong>{{query?.search}}</strong>" in <strong>{{query?.filter ? 'Banned': 'All'}}</strong>:<br /><br />
       </div>
       <table class="underlined" width="100%">
         <thead>
@@ -101,10 +101,9 @@
 </template>
 
 <script>
-import { reactive, toRefs, onMounted, onUnmounted, computed } from 'vue'
+import { reactive, toRefs, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { usersApi } from '@/api'
-import EventBus from '@/composables/services/event-bus'
 import humanDate from '@/composables/filters/humanDate'
 import SimplePagination from '@/components/layout/SimplePagination.vue'
 
@@ -155,21 +154,6 @@ export default {
     })
   },
   setup() {
-    const saveListener = () => {
-      console.log('Admin Save Moderation!')
-    }
-    const resetListener = () => {
-      console.log('Admin Reset Moderation!')
-    }
-    onMounted(() => {
-      EventBus.on('admin-save', saveListener)
-      EventBus.on('admin-reset', resetListener)
-    })
-    onUnmounted(() => {
-      EventBus.off('admin-save', saveListener)
-      EventBus.off('admin-reset', resetListener)
-    })
-
     const pageResults = page => {
       let query = { ...$route.query, page: page }
       if (query.page === 1 || !query.page) delete query.page
@@ -188,7 +172,7 @@ export default {
       if (defaultField || newField === $route.query.field) desc = !desc
       else desc = true // Sort field changed, default to desc true
       // Update router to have new query params, watch on query params will update data
-      let query = { limit: $route.query.limit, field: newField, filter: $route.query.filter, page: $route.query.page }
+      let query = { limit: $route.query.limit, field: newField, filter: $route.query.filter, page: $route.query.page, search: v.searchStr, ip: $route.query.ip }
       if (!query.page) delete query.page // don't include page if undefined
       if (newField === 'username') delete query.field // do not display default field in qs
       if (desc) query.desc = true // do not display desc if false
@@ -212,8 +196,22 @@ export default {
       const params = { ...$route.params, saveScrollPos: true } // save scroll pos when sorting table
       $router.replace({ name: $route.name, params, query: query })
     }
-    const clearSearch = () => {}
-    const searchUsers = () => {}
+
+    const clearSearch = () => {
+      let query = { ...$route.query }
+      delete query.page
+      delete query.search
+      v.searchStr = ''
+      const params = { ...$route.params, saveScrollPos: true } // save scroll pos when sorting table
+      $router.replace({ name: $route.name, params, query: query })
+    }
+
+    const searchUsers = () => {
+      let query = { ...$route.query, search: v.searchStr, ip: v.query.ip }
+      delete query.page
+      const params = { ...$route.params, saveScrollPos: true } // save scroll pos when sorting table
+      $router.replace({ name: $route.name, params, query: query })
+    }
 
     const $router = useRouter()
     const $route = useRoute()
