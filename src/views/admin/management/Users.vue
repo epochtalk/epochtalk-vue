@@ -45,10 +45,10 @@
       </div>
       <table class="underlined" width="100%">
         <thead>
-          <th class="pointer" ng-click="AdminManagementCtrl.setSortField('username')"><span ng-class="AdminManagementCtrl.getSortClass('username')"></span>&nbsp;Username</th>
-          <th class="pointer" ng-class="{'hide-mobile': AdminManagementCtrl.tableFilter == 1 }" ng-click="AdminManagementCtrl.setSortField('email')"><span ng-class="AdminManagementCtrl.getSortClass('email')"></span>&nbsp;Email</th>
-          <th class="pointer" v-if="query?.filter === 'banned'" ng-click="AdminManagementCtrl.setSortField('ban_expiration')"><span ng-class="AdminManagementCtrl.getSortClass('ban_expiration')"></span>&nbsp;Ban Expiration</th>
-          <th class="pointer hide-mobile" ng-click="AdminManagementCtrl.setSortField('created_at')"><span ng-class="AdminManagementCtrl.getSortClass('created_at')"></span>&nbsp;Registered Date</th>
+          <th class="pointer" @click="setSortField('username')"><span :class="getSortClass('username')"></span>&nbsp;Username</th>
+          <th class="pointer" :class="{'hide-mobile': query?.filter === 'banned' }" @click="setSortField('email')"><span :class="getSortClass('email')"></span>&nbsp;Email</th>
+          <th class="pointer" v-if="query?.filter === 'banned'" @click="setSortField('ban_expiration')"><span :class="getSortClass('ban_expiration')"></span>&nbsp;Ban Expiration</th>
+          <th class="pointer hide-mobile" @click="setSortField('created_at')"><span :class="getSortClass('created_at')"></span>&nbsp;Registered Date</th>
           <th class="hide-mobile">Last Active Date</th>
           <th class="hide-mobile">IP Addresses</th>
           <th class="user-actions">Actions</th>
@@ -87,7 +87,13 @@
           </tr>
         </tbody>
       </table>
-      <div class="pagination-wrap">
+      <div class="pagination-wrap"> <!-- v-if="postData?.count > postData?.limit -->
+          <simple-pagination
+            v-model="currentPage"
+            :pages="pages"
+            :range-size="1"
+            @update:modelValue="pageResults"
+          />
         <!-- <pagination page-count="AdminManagementCtrl.pageCount" page="AdminManagementCtrl.page" query-params="AdminManagementCtrl.queryParams"></pagination> -->
       </div>
     </div>
@@ -95,13 +101,16 @@
 </template>
 
 <script>
-import { reactive, toRefs, onMounted, onUnmounted } from 'vue'
+import { reactive, toRefs, onMounted, onUnmounted, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { usersApi } from '@/api'
 import EventBus from '@/composables/services/event-bus'
 import humanDate from '@/composables/filters/humanDate'
+import SimplePagination from '@/components/layout/SimplePagination.vue'
 
 export default {
   name: 'UserManagement',
+  components: { SimplePagination },
   beforeRouteEnter(to, from, next) {
     let queryParams = {
       field: to.query.field,
@@ -119,6 +128,7 @@ export default {
         vm.query = queryParams
         vm.users = users
         vm.count = d.count
+        vm.pages = computed(() => Math.ceil(d.count  / queryParams.limit))
       }))
     })
   },
@@ -139,6 +149,7 @@ export default {
         this.query = queryParams
         this.users = users
         this.count = d.count
+        this.pages = computed(() => Math.ceil(d.count  / queryParams.limit))
         next()
       })
     })
@@ -159,17 +170,64 @@ export default {
       EventBus.off('admin-reset', resetListener)
     })
 
-    const setFilter = () => {}
+    const pageResults = page => {
+      let query = { ...$route.query, page: page }
+      if (query.page === 1 || !query.page) delete query.page
+      if ($route.query.page !== v.currentPage)
+        $router.replace({ name: $route.name, params: $route.params, query: query })
+    }
+
+    const setSortField = newField => {
+      // Get/Set new sort field
+      if (newField) v.sortField = newField
+      else newField = v.sortField
+      // Convert desc query param to boolean
+      let desc = $route.query.desc === 'false' || !$route.query.desc ? false : true
+      // Sort Field hasn't changed just toggle desc
+      const defaultField = newField === 'username' && !$route.query.field
+      if (defaultField || newField === $route.query.field) desc = !desc
+      else desc = true // Sort field changed, default to desc true
+      // Update router to have new query params, watch on query params will update data
+      let query = { limit: $route.query.limit, field: newField, filter: $route.query.filter, page: $route.query.page }
+      if (!query.page) delete query.page // don't include page if undefined
+      if (newField === 'username') delete query.field // do not display default field in qs
+      if (desc) query.desc = true // do not display desc if false
+      const params = { ...$route.params, saveScrollPos: true } // save scroll pos when sorting table
+      $router.replace({ name: $route.name, params: params, query: query })
+    }
+
+    const getSortClass = field => {
+      let sortClass = 'fa '
+      const desc = v.query?.desc
+      const curField = v.query?.field
+      const defaultField = field === 'username' && !curField
+      if ((defaultField || curField === field) && desc) sortClass += 'fa-sort-down'
+      else if ((defaultField || curField === field) && !desc) sortClass += 'fa-sort-up'
+      else sortClass += 'fa-sort'
+      return sortClass
+    }
+
+    const setFilter = filter => {
+      let query = { filter: filter }
+      const params = { ...$route.params, saveScrollPos: true } // save scroll pos when sorting table
+      $router.replace({ name: $route.name, params, query: query })
+    }
     const clearSearch = () => {}
     const searchUsers = () => {}
 
+    const $router = useRouter()
+    const $route = useRoute()
+
     const v = reactive({
+      currentPage: Number($route.query.page) || 1,
       users: {},
       count: 0,
+      pages: null,
       query: {},
-      searchStr: ''
+      sortField: 'username',
+      searchStr: $route.query.search
     })
-    return { ...toRefs(v), setFilter, clearSearch, searchUsers, humanDate }
+    return { ...toRefs(v), pageResults, setFilter, getSortClass, setSortField, clearSearch, searchUsers, humanDate }
   }
 }
 </script>
