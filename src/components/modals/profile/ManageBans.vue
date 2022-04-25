@@ -97,7 +97,7 @@ import { AuthStore } from '@/composables/stores/auth'
 export default {
   name: 'manage-bans-modal',
   props: ['show', 'user', 'disableBoardBans'],
-  emits: ['close'],
+  emits: ['close', 'success'],
   components: { Modal, IgnoredBoardsPartial },
   setup(props, { emit }) {
     watch(() => props.show, show => {
@@ -141,7 +141,7 @@ export default {
         v.banUntil = v.permanentBan ? undefined : dayjs.utc(banDate).format('YYYY-MM-DD')
         v.userCopy.permanent_ban = v.banUntil ? false : true
       }
-      else if (props.user.ban_expiration === null) { // Init data, user has perma ban
+      else if (props.user.ban_expiration === null && !props.disableBoardBans) { // Init data, user has perma ban
         v.permanentBan = true
         v.userCopy.permanent_ban = true
       }
@@ -285,7 +285,10 @@ export default {
       }
       Promise.all(promises)
       .then(() => initUser())
-      .then(() => close())
+      .then(() => {
+        emit('success', v.userReactive)
+        close()
+      })
       .catch(() => close())
     }
 
@@ -308,8 +311,8 @@ export default {
     /* Template Data */
     const v = reactive({
       authedUser: $auth.user,
-      userCopy: cloneDeep(props.user),
-      userReactive: props.user,
+      userCopy: {},
+      userReactive: {},
       permUtils: $auth.permissionUtils,
       authedIsAdmin: $auth.permissionUtils.hasPermission('bans.banFromBoards.bypass.type.admin'),
       focusInput: null,
