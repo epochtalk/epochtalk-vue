@@ -1,5 +1,5 @@
 import { createWebHistory, createRouter } from 'vue-router'
-import { boardsApi, threadsApi, $axios } from '@/api'
+import { usersApi, boardsApi, threadsApi, $axios } from '@/api'
 import Boards from '@/views/Boards.vue'
 import Threads from '@/views/Threads.vue'
 import ThreadsPostedIn from '@/views/ThreadsPostedIn.vue'
@@ -200,7 +200,10 @@ const routes = [
     path: '/profile/:username/posts',
     name: 'UserPosts',
     component: UserPosts,
-    props: true,
+    props: route => ({
+      user: usersApi.find(route.params.username).then(u => u),
+      username: route.params.username
+    }),
     meta: { requiresAuth: true, bodyClass: 'user-posts' }
   },
   {
