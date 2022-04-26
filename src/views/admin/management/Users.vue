@@ -55,10 +55,10 @@
         </thead>
         <tbody>
           <tr v-for="user in users" :key="user.username">
-            <td><a href="" v-html="user.username"></a>
+            <td><router-link :to="{ path: '/profile/' + user.username.toLowerCase() }" v-html="user.username" />
             <i v-if="user.ban_expiration" class="fa fa-user-times right"></i>
             </td>
-            <td class="email-column" :class="{'hide-mobile': query?.filter === 'banned' }"><a :href="'mailto:${user.email}'" v-html="user.email"></a></td>
+            <td class="email-column" :class="{'hide-mobile': query?.filter === 'banned' }"><a :href="`mailto:${user.email}`" v-html="user.email"></a></td>
             <td v-if="query?.filter === 'banned'">{{humanDate(user.ban_expiration, true)}}</td>
             <td class="hide-mobile">{{humanDate(user.created_at)}}</td>
             <td class="hide-mobile">{{humanDate(user.last_active) || '--'}}</td>
@@ -70,46 +70,50 @@
             </td>
             <td class=user-actions>
               <!-- <a ui-sref="users-posts({ username: user.username })"> -->
-              <a href="#">
+              <router-link :to="{ name: 'UserPosts', params: { username: user.username }}">
                 <button class="icon" data-balloon="View Posts">
                   <i class="fas fa-file"></i>
                 </button>
-              </a>
+              </router-link>
 
-              <button class="icon" data-balloon="Edit Profile" ng-click="AdminManagementCtrl.showEditUser(user.username)">
+              <button class="icon" data-balloon="Edit Profile" @click="editUser(user)">
                 <i class="fas fa-edit"></i>
               </button>
 
-              <button class="icon" data-balloon="Manage Bans" ng-click="AdminManagementCtrl.showManageBans(user)" ng-disabled="!AdminManagementCtrl.actionAccess.userControls.privilegedBan">
+              <button class="icon" data-balloon="Manage Bans" @click="manageBans(user)" :disabled="!controlAccess.userControls.privilegedBan">
                 <i class="fa fa-ban"></i>
               </button>
             </td>
           </tr>
         </tbody>
       </table>
-      <div class="pagination-wrap"> <!-- v-if="postData?.count > postData?.limit -->
-          <simple-pagination
-            v-model="currentPage"
-            :pages="pages"
-            :range-size="1"
-            @update:modelValue="pageResults"
-          />
-        <!-- <pagination page-count="AdminManagementCtrl.pageCount" page="AdminManagementCtrl.page" query-params="AdminManagementCtrl.queryParams"></pagination> -->
+      <div class="pagination-wrap">
+        <simple-pagination
+          v-model="currentPage"
+          :pages="pages"
+          :range-size="1"
+          @update:modelValue="pageResults"
+        />
       </div>
     </div>
   </div>
+  <manage-bans-modal :disable-board-bans="true" :user="user" :show="showManageBans" @close="showManageBans = false" @success="handleBanSuccess" />
+  <update-profile-modal :user="user" :show="showUpdateProfile" :admin="true"  @close="showUpdateProfile = false" @success="handleEditSuccess" />
 </template>
 
 <script>
-import { reactive, toRefs, computed } from 'vue'
+import { reactive, toRefs, computed, inject } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { usersApi } from '@/api'
 import humanDate from '@/composables/filters/humanDate'
 import SimplePagination from '@/components/layout/SimplePagination.vue'
+import ManageBansModal from '@/components/modals/profile/ManageBans.vue'
+import { AuthStore } from '@/composables/stores/auth'
+import UpdateProfileModal from '@/components/modals/profile/UpdateProfile.vue'
 
 export default {
   name: 'UserManagement',
-  components: { SimplePagination },
+  components: { SimplePagination, ManageBansModal, UpdateProfileModal },
   beforeRouteEnter(to, from, next) {
     let queryParams = {
       field: to.query.field,
@@ -160,6 +164,29 @@ export default {
       if ($route.query.page !== v.currentPage)
         $router.replace({ name: $route.name, params: $route.params, query: query })
     }
+
+    const editUser = user => usersApi.find(user.username)
+    .then(u => {
+      v.user = u
+      v.user.avatar = v.user.avatar || ''
+      v.user.email_password = '********' // hacky, but allows admin to bypass joi validation
+      v.showUpdateProfile = true
+    })
+
+    const handleEditSuccess = user => v.users = v.users.map(u => {
+      if (u.id === user.id) return { ...u, ...user }
+      else return u
+    })
+
+    const manageBans = user => {
+      v.user = user
+      v.showManageBans = true
+    }
+
+    const handleBanSuccess = user => v.users = v.users.map(u => { // update board ban info without reload
+      if (u.id === user.id) u.ban_expiration = user.ban_expiration
+      return u
+    })
 
     const setSortField = newField => {
       // Get/Set new sort field
@@ -215,17 +242,23 @@ export default {
 
     const $router = useRouter()
     const $route = useRoute()
+    const $auth = inject(AuthStore)
 
     const v = reactive({
+      controlAccess: $auth.permissionUtils.getModPanelControlAccess(),
       currentPage: Number($route.query.page) || 1,
       users: {},
       count: 0,
       pages: null,
       query: {},
+      user: {},
+      showManageBans: false,
+      showUpdateProfile: false,
       sortField: 'username',
       searchStr: $route.query.search
     })
-    return { ...toRefs(v), pageResults, setFilter, getSortClass, setSortField, clearSearch, searchUsers, humanDate }
+
+    return { ...toRefs(v), pageResults, setFilter, getSortClass, setSortField, clearSearch, searchUsers, humanDate, manageBans, handleBanSuccess, handleEditSuccess, editUser }
   }
 }
 </script>
