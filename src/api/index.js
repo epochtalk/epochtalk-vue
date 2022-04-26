@@ -255,6 +255,7 @@ export const adminApi = {
   updateConfigurations: data => $http('/api/configurations', { method: 'POST', data }),
   roles: {
     all: () => $http('/api/admin/roles/all'),
+    users: (id, query) => $http(`/api/admin/roles/${id}/users`, { params: query })
   },
   trust: {
     getDefaultTrustList: () => $http('/api/admin/trustlist'),
