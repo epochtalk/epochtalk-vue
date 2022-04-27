@@ -22,6 +22,7 @@ import LegalSettings from '@/views/admin/settings/Legal.vue'
 import ThemeSettings from '@/views/admin/settings/Theme.vue'
 import BoardManagement from '@/views/admin/management/Boards.vue'
 import UserManagement from '@/views/admin/management/Users.vue'
+import RoleManagement from '@/views/admin/management/Roles.vue'
 import UserModeration from '@/views/admin/moderation/Users.vue'
 import ConfirmAccount from '@/views/ConfirmAccount.vue'
 import ResetPassword from '@/views/ResetPassword.vue'
@@ -78,7 +79,7 @@ const routes = [
   {
     path: '/admin/management/roles',
     name: 'RoleManagement',
-    component: BoardManagement,
+    component: RoleManagement,
     meta: { requiresAuth: true, bodyClass: 'role-management', title: 'Management' }
   },
   {
