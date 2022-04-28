@@ -123,6 +123,7 @@
 </template>
 
 <script>
+import { useRoute, useRouter } from 'vue-router'
 import { reactive, toRefs, inject } from 'vue'
 import { adminApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
@@ -173,12 +174,19 @@ export default {
       if (v.controlAccess.reprioritize) {
         let priority = 0
         v.roles.forEach(r => r.priority = priority++)
-        console.log(v.roles)
       }
       else resetPriority()
     }
     const showRole = () => {}
-    const selectRole = r => { console.log(r) }
+    const selectRole = r => {
+      let query = { ...$route.query, roleId: r.id }
+      if (r.id === $route.query.roleId) delete query.roleId
+      $router.replace({
+        name: $route.name,
+        params: { ...$route.params, saveScrollPos: true },
+        query: query
+      })
+    }
     const showRemoveRole = () => {}
     const showResetRole = () => {}
     const savePriority = () => {}
@@ -190,6 +198,8 @@ export default {
     const canViewAddUsersControl = () => true
 
     const $auth = inject(AuthStore)
+    const $route = useRoute()
+    const $router = useRouter()
 
     const v = reactive({
       controlAccess: {
@@ -229,10 +239,6 @@ export default {
     grid-column-gap: .5rem;
     grid-template-columns: 1fr 1fr;
   }
-  .selected-row {
-    background-color: $color-primary;
-    color: $base-background-color;
-  }
   .role-table-header {
     font-size: 0.75rem;
     border-bottom: 1px solid $border-color-alt;
@@ -242,7 +248,13 @@ export default {
   .role-table-row {
     font-size: 0.875rem;
     padding: .5rem 0;
+    background-color: $base-background-color;
     border-bottom: 1px solid $border-color-alt;
+  }
+  .selected-row {
+    background-color: $color-primary;
+    color: $base-background-color;
+    a { color: $base-background-color; }
   }
   .role-table-header, .role-table-row {
     display: grid;
