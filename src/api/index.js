@@ -255,7 +255,8 @@ export const adminApi = {
   updateConfigurations: data => $http('/api/configurations', { method: 'POST', data }),
   roles: {
     all: () => $http('/api/admin/roles/all'),
-    users: (id, query) => $http(`/api/admin/roles/${id}/users`, { params: query })
+    users: (id, query) => $http(`/api/admin/roles/${id}/users`, { params: query }),
+    reprioritize: data => $http(`/api/admin/roles/reprioritize`, { method: 'PUT', data })
   },
   trust: {
     getDefaultTrustList: () => $http('/api/admin/trustlist'),
