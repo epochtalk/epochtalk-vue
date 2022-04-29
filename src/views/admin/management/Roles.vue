@@ -41,8 +41,7 @@
     </draggable>
   </div>
 
-  <div v-if="selectedRole !== null && !selectedRole.message">
-    <br />
+  <div v-if="selectedRole.id && !selectedRole.message">
     <h3 class="role-header">{{selectedRole.name}} ({{userData.count}} users)</h3>
     <div class="add-users">
       <a href="#" v-if="userData.count > 0" @click.prevent="showFilterUsers = !showFilterUsers">
@@ -109,13 +108,13 @@
     </div>
   </div>
 
-  <div v-if="selectedRole !== null && selectedRole.message">
+  <div v-if="selectedRole.id && selectedRole.message">
     <br />
     <h3>{{selectedRole.name}}</h3> <br />
     <h5>{{selectedRole.message}}</h5>
   </div>
 
-  <div v-if="selectedRole === null">
+  <div v-if="!selectedRole.id">
     <span></span>
   </div>
 
@@ -128,6 +127,7 @@ import { reactive, toRefs, inject } from 'vue'
 import { adminApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 import draggable from 'vuedraggable'
+import { intersection } from 'lodash'
 
 export default {
   name: 'RoleManagement',
@@ -147,6 +147,7 @@ export default {
         vm.rolesCopy = r.roles
         vm.roleLayouts = r.layouts
         vm.userData = d || []
+        vm.init(to.query.roleId)
       }))
     })
   },
@@ -165,6 +166,7 @@ export default {
         this.rolesCopy = r.roles
         this.roleLayouts = r.layouts
         this.userData = d || []
+        this.init(to.query.roleId)
         next()
       })
     })
@@ -213,19 +215,49 @@ export default {
           lowerPriorty: $auth.permissionUtils.hasPermission('users.addRoles.bypass.priority.less')
         }
       },
+      maxPriority: null,
       showFilterUsers: false,
       newRole: {},
       search: '',
       searchStr: '',
+      allPriorities: [],
       usersToAdd: [],
       userData: [],
       roles: [],
       rolesCopy: [],
       roleLayouts: [],
-      selectedRole: null
+      selectedRole: {}
     })
 
-    return { ...toRefs(v), reprioritizeRoles, selectRole, showRole, showRemoveRole, showResetRole, savePriority, resetPriority, searchUsers, clearSearch, addUsers, removeUser, canViewAddUsersControl }
+    const init = function(roleId) {
+      v.selectedRole = roleId ? v.roles.filter(r => r.id === roleId)[0] : {}
+
+      v.roles.forEach(r => { // remove private and anoymous priorities
+        if (r.lookup !== 'private' && r.lookup !== 'anonymous')
+          v.allPriorities.push(r.priority)
+
+        if (!v.maxPriority) v.maxPriority = r.priority;
+        else v.maxPriority = v.maxPriority < r.priority ? r.priority : v.maxPriority
+
+        if (r.lookup === 'user') {
+          r.message = 'The ' + r.name + ' role is assigned by default.  By default all new registered users are considered users.  The userbase of this role may not be manually edited.  Permission changes to this role will affect all users without another role assigned.';
+        }
+        if (r.lookup === 'anonymous') {
+          r.message = 'The ' + r.name + ' role is assigned by default to forum visitors who are not authenticated.  The user base of this role may not be manually edited.  Permission changes to this role will affect all unauthenticated users visiting the forum.';
+        }
+        if (r.lookup === 'private') {
+          r.message = 'The ' + r.name + ' role is assigned by default to forum visitors who are not authenticated.  This role is only used if the "Public Forum" is set to off via the forum settings page.  This requires all visitors to log in before they can view the forum content.  The user base of this role may not be manually edited.  Permission changes to this role will affect all unauthenticated users visiting the forum.';
+        }
+
+        // Invert Priority Restrictions
+        r.permissions.invertedRestrictions = v.allPriorities
+        if (r.permissions.priorityRestrictions && r.permissions.priorityRestrictions.length) {
+          r.permissions.invertedRestrictions = intersection(v.allPriorities, r.permissions.priorityRestrictions)
+        }
+      })
+    }
+
+    return { ...toRefs(v), reprioritizeRoles, selectRole, showRole, showRemoveRole, showResetRole, savePriority, resetPriority, searchUsers, clearSearch, addUsers, removeUser, canViewAddUsersControl, init }
   }
 }
 </script>
