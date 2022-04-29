@@ -96,13 +96,14 @@
       </div>
     </div>
     <div v-if="userData.count < 1">
+      <br />
       <h5>
         This role has no users to display. {{ selectedRole.lookup === 'banned' ? '' : 'To add users to this role click use the form above.' }}
         <span v-if="selectedRole.lookup !== 'banned'">
           To add users to this role click use the form above.
         </span>
         <span v-if="selectedRole.lookup === 'banned'">
-          Visit the <a ui-sref="^.users">Users Tab</a> to ban users
+          Visit the <router-link :to="{ name: 'UserManagement' }">Users Tab</router-link> to ban users
         </span>
       </h5>
     </div>
