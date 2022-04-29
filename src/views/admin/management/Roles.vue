@@ -66,10 +66,10 @@
 <!--       <tags-input min-length="1" placeholder="Type username to add" add-from-autocomplete-only="true" replace-spaces-with-dashes="false" ng-model="AdminManagementCtrl.usersToAdd">
         <auto-complete min-length="1" debounce-delay="250" source="AdminManagementCtrl.loadTags($query)"></auto-complete>
       </tags-input> -->
-      <input type="text" />
+      <Multiselect v-model="usersToAdd.value" v-bind="usersToAdd" />
       <div class="button-container">
-        <button @click="usersToAdd = null" :disabled="!usersToAdd || usersToAdd.length < 1">Clear</button>
-        <button @click="addUsers()" :disabled="!usersToAdd || usersToAdd.length < 1">Add User(s)</button>
+        <button @click="usersToAdd.value = []" :disabled="usersToAdd.value.length < 1">Clear</button>
+        <button @click="addUsers()" :disabled="usersToAdd.value.length < 1">Add User(s)</button>
       </div>
     </div>
     <div v-if="userData.count > 0">
@@ -124,14 +124,15 @@
 <script>
 import { useRoute, useRouter } from 'vue-router'
 import { reactive, toRefs, inject } from 'vue'
-import { adminApi } from '@/api'
+import { adminApi, usersApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 import draggable from 'vuedraggable'
 import { intersection } from 'lodash'
+import Multiselect from '@vueform/multiselect'
 
 export default {
   name: 'RoleManagement',
-  components: { draggable },
+  components: { draggable, Multiselect },
   beforeRouteEnter(to, from, next) {
     let queryParams = {
       limit: Number(to.query.limit) || 15,
@@ -215,13 +216,28 @@ export default {
           lowerPriorty: $auth.permissionUtils.hasPermission('users.addRoles.bypass.priority.less')
         }
       },
+      usersToAdd: {
+        mode: 'tags',
+        value: [],
+        placeholder: 'Type username of user(s) to add',
+        noOptionsText: 'Enter a username to start lookup...',
+        minChars: 1,
+        resolveOnLoad: false,
+        delay: 0,
+        searchable: true,
+        maxHeight: 100,
+        options: async q => {
+          return await usersApi.search(q)
+          // convert array into array of objects
+          .then(d => d.reduce((o, k) => (o[k] = k, o), {}))
+        }
+      },
       maxPriority: null,
       showFilterUsers: false,
       newRole: {},
       search: '',
       searchStr: '',
       allPriorities: [],
-      usersToAdd: [],
       userData: [],
       roles: [],
       rolesCopy: [],
@@ -267,6 +283,7 @@ export default {
   .roles.user-search, .roles.add-role { width: 100%; }
   .add-users { float: right;  line-height: 1.5rem; }
   .button-container {
+    margin-top: 1rem;
     display: grid;
     grid-column-gap: .5rem;
     grid-template-columns: 1fr 1fr;
