@@ -124,12 +124,13 @@
 
 <script>
 import { useRoute, useRouter } from 'vue-router'
-import { reactive, toRefs, inject } from 'vue'
+import { reactive, toRefs, inject, onMounted, onUnmounted } from 'vue'
 import { adminApi, usersApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 import draggable from 'vuedraggable'
 import { intersection } from 'lodash'
 import Multiselect from '@vueform/multiselect'
+import EventBus from '@/composables/services/event-bus'
 
 export default {
   name: 'RoleManagement',
@@ -174,6 +175,23 @@ export default {
     })
   },
   setup() {
+    onMounted(() => {
+      EventBus.on('admin-save', savePriority)
+      EventBus.on('admin-reset', resetPriority)
+    })
+    onUnmounted(() => {
+      EventBus.off('admin-save', savePriority)
+      EventBus.off('admin-reset', resetPriority)
+    })
+    const savePriority = () => adminApi.roles.reprioritize(v.roles)
+      .then(() => {
+        $alertStore.success('Roles successfully reprioritized!')
+        v.rolesCopy = [...v.roles]
+      })
+      .catch(() => $alertStore.error('There was an error reprioritizing the roles'))
+
+    const resetPriority = () => v.roles = [...v.rolesCopy]
+
     const reprioritizeRoles = () => {
       if (v.controlAccess.reprioritize) {
         let priority = 0
@@ -193,8 +211,7 @@ export default {
     }
     const showRemoveRole = () => {}
     const showResetRole = () => {}
-    const savePriority = () => {}
-    const resetPriority = () => v.roles = [...v.rolesCopy]
+
     const searchUsers = () => {}
     const clearSearch = () => {}
     const addUsers = () => {}
@@ -202,6 +219,7 @@ export default {
     const canViewAddUsersControl = () => true
 
     const $auth = inject(AuthStore)
+    const $alertStore = inject('$alertStore')
     const $route = useRoute()
     const $router = useRouter()
 
