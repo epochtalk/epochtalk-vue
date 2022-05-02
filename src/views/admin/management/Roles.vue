@@ -63,10 +63,7 @@
       </span>
     </div>
     <div v-if="canViewAddUsersControl()">
-<!--       <tags-input min-length="1" placeholder="Type username to add" add-from-autocomplete-only="true" replace-spaces-with-dashes="false" ng-model="AdminManagementCtrl.usersToAdd">
-        <auto-complete min-length="1" debounce-delay="250" source="AdminManagementCtrl.loadTags($query)"></auto-complete>
-      </tags-input> -->
-      <Multiselect v-model="usersToAdd.value" v-bind="usersToAdd" />
+      <multiselect v-model="usersToAdd.value" v-bind="usersToAdd" />
       <div class="button-container">
         <button @click="usersToAdd.value = []" :disabled="usersToAdd.value.length < 1">Clear</button>
         <button @click="addUsers()" :disabled="usersToAdd.value.length < 1">Add User(s)</button>
@@ -92,6 +89,12 @@
         </tbody>
       </table>
       <div class="pagination-wrap">
+        <simple-pagination
+          v-model="currentPage"
+          :pages="pages"
+          :range-size="1"
+          @update:modelValue="pageResults"
+        />
 <!--         <pagination page-count="AdminManagementCtrl.pageCount" page="AdminManagementCtrl.page" query-params="AdminManagementCtrl.queryParams"></pagination> -->
       </div>
     </div>
@@ -124,17 +127,18 @@
 
 <script>
 import { useRoute, useRouter } from 'vue-router'
-import { reactive, toRefs, inject, onMounted, onUnmounted } from 'vue'
+import { reactive, toRefs, inject, onMounted, onUnmounted, computed } from 'vue'
 import { adminApi, usersApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 import draggable from 'vuedraggable'
 import { intersection } from 'lodash'
 import Multiselect from '@vueform/multiselect'
 import EventBus from '@/composables/services/event-bus'
+import SimplePagination from '@/components/layout/SimplePagination.vue'
 
 export default {
   name: 'RoleManagement',
-  components: { draggable, Multiselect },
+  components: { draggable, Multiselect, SimplePagination },
   beforeRouteEnter(to, from, next) {
     let queryParams = {
       limit: Number(to.query.limit) || 15,
@@ -150,6 +154,7 @@ export default {
         vm.rolesCopy = r.roles
         vm.roleLayouts = r.layouts
         vm.userData = d || []
+        vm.pages = computed(() => Math.ceil(d.count  / queryParams.limit))
         vm.init(to.query.roleId)
       }))
     })
@@ -169,12 +174,23 @@ export default {
         this.rolesCopy = r.roles
         this.roleLayouts = r.layouts
         this.userData = d || []
+        this.pages = computed(() => Math.ceil(d.count  / queryParams.limit))
         this.init(to.query.roleId)
         next()
       })
     })
   },
   setup() {
+    const pageResults = page => {
+      let query = { ...$route.query, page: page }
+      if (query.page === 1 || !query.page) delete query.page
+      if ($route.query.page !== v.currentPage) $router.replace({
+          name: $route.name,
+          params: { ...$route.params, saveScrollPos: true },
+          query: query
+        })
+    }
+
     onMounted(() => {
       EventBus.on('admin-save', savePriority)
       EventBus.on('admin-reset', resetPriority)
@@ -189,9 +205,7 @@ export default {
         v.rolesCopy = [...v.roles]
       })
       .catch(() => $alertStore.error('There was an error reprioritizing the roles'))
-
     const resetPriority = () => v.roles = [...v.rolesCopy]
-
     const reprioritizeRoles = () => {
       if (v.controlAccess.reprioritize) {
         let priority = 0
@@ -199,7 +213,7 @@ export default {
       }
       else resetPriority()
     }
-    const showRole = () => {}
+
     const selectRole = r => {
       let query = { ...$route.query, roleId: r.id }
       if (r.id === $route.query.roleId) delete query.roleId
@@ -209,6 +223,7 @@ export default {
         query: query
       })
     }
+    const showRole = () => {}
     const showRemoveRole = () => {}
     const showResetRole = () => {}
 
@@ -235,6 +250,8 @@ export default {
           lowerPriorty: $auth.permissionUtils.hasPermission('users.addRoles.bypass.priority.less')
         }
       },
+      currentPage: Number($route.query.page) || 1,
+      pages: null,
       usersToAdd: {
         mode: 'tags',
         value: [],
@@ -292,12 +309,13 @@ export default {
       })
     }
 
-    return { ...toRefs(v), reprioritizeRoles, selectRole, showRole, showRemoveRole, showResetRole, savePriority, resetPriority, searchUsers, clearSearch, addUsers, removeUser, canViewAddUsersControl, init }
+    return { ...toRefs(v), pageResults, reprioritizeRoles, selectRole, showRole, showRemoveRole, showResetRole, savePriority, resetPriority, searchUsers, clearSearch, addUsers, removeUser, canViewAddUsersControl, init }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+  .pagination-wrap { margin-top: 1rem; }
   .role-header { display: inline-block; }
   .roles.user-search, .roles.add-role { width: 100%; }
   .add-users { float: right;  line-height: 1.5rem; }
