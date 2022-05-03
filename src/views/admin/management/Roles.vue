@@ -42,17 +42,17 @@
   </div>
 
   <div v-if="selectedRole.id && !selectedRole.message">
-    <h3 class="role-header">{{selectedRole.name}} ({{userData.count}} users)</h3>
+    <h3 class="role-header">{{selectedRole?.name}} ({{userData?.count}} users)</h3>
     <div class="add-users">
-      <a href="#" v-if="userData.count > 0" @click.prevent="showFilterUsers = !showFilterUsers">
+      <a href="#" v-if="userData.count > 0 || (!userData.count && searchStr?.length)" @click.prevent="showFilterUsers = !showFilterUsers">
         <i class="fa fa-search"></i> Filter Users
       </a>
     </div>
     <br /><br />
-    <div v-if="userData.count > 0">
+    <div v-if="userData.count > 0 || (!userData.count && searchStr?.length)">
       <div v-if="showFilterUsers" class="roles user-search">
         <div class="nested-input-container">
-          <a v-if="search" @click="clearSearch()" class="nested-clear-btn fa fa-times"></a>
+          <a v-if="searchStr" @click="clearSearch()" class="nested-clear-btn fa fa-times"></a>
           <a @click="searchUsers()" class="nested-btn">Search</a>
           <input class="nested-input" v-model="searchStr" type="text" id="search-users" placeholder="Search users by username" @keydown="$event.which === 13 && searchUsers()" @keyup="$event.which === 27 && clearSearch()" />
         </div>
@@ -154,6 +154,7 @@ export default {
         vm.roleLayouts = r.layouts
         vm.userData = d || []
         vm.pages = computed(() => Math.ceil(d.count  / queryParams.limit))
+        vm.searchStr = to.query.search
         vm.init(to.query.roleId)
       }))
     })
@@ -174,12 +175,35 @@ export default {
         this.roleLayouts = r.layouts
         this.userData = d || []
         this.pages = computed(() => Math.ceil(d.count  / queryParams.limit))
+        this.searchStr = to.query.search
         this.init(to.query.roleId)
         next()
       })
     })
   },
   setup() {
+    const refreshPageData = () => {
+      let queryParams = {
+        limit: Number($route.query.limit) || 15,
+        page: Number($route.query.page) || 1,
+        search: $route.query.search
+      }
+      adminApi.roles.all()
+      .then(r => {
+        let promise = $route.query.roleId ?
+          adminApi.roles.users($route.query.roleId, queryParams) : Promise.resolve()
+        promise.then(d => {
+          v.roles = r.roles
+          v.rolesCopy = r.roles
+          v.roleLayouts = r.layouts
+          v.userData = d || []
+          v.pages = computed(() => Math.ceil(d.count  / queryParams.limit))
+          v.searchStr = $route.query.search
+          init($route.query.roleId)
+        })
+      })
+    }
+
     const pageResults = page => {
       let query = { ...$route.query, page: page }
       if (query.page === 1 || !query.page) delete query.page
@@ -226,10 +250,59 @@ export default {
     const showRemoveRole = () => {}
     const showResetRole = () => {}
 
-    const searchUsers = () => {}
-    const clearSearch = () => {}
-    const addUsers = () => {}
-    const removeUser = () => {}
+    const searchUsers = () => {
+      if (!v.searchStr || v.searchStr && !v.searchStr.length) {
+        clearSearch()
+        return
+      }
+      let query = { ...$route.query, search: v.searchStr }
+      if (query.page === 1 || !query.page) delete query.page
+      $router.replace({
+        name: $route.name,
+        params: { ...$route.params, saveScrollPos: true },
+        query: query
+      })
+    }
+
+    const clearSearch = () => {
+      let query = { ...$route.query }
+      delete query.search
+      v.searchStr = null
+      $router.replace({
+        name: $route.name,
+        params: { ...$route.params, saveScrollPos: true },
+        query: query
+      })
+    }
+    const addUsers = () => adminApi.roles.addUsers({
+        usernames: v.usersToAdd.value,
+        role_id: v.selectedRole.id
+      })
+      .then(() => {
+        v.usersToAdd.value = []
+        $alertStore.success(`Users successfully added to ${v.selectedRole.name} role.`)
+        refreshPageData()
+      })
+      .catch(err => {
+        let message = 'There was an error adding users to ' + v.selectedRole.name + ' role.'
+        if (err && err.data && err.data.message) message = err.data.message
+        $alertStore.error(message)
+      })
+
+    const removeUser = user => adminApi.roles.removeUser({
+        user_id: user.id,
+        role_id: v.selectedRole.id
+      })
+      .then(() => {
+        $alertStore.success(`User ${user.username} successfully removed from ${v.selectedRole.name} role.`)
+        refreshPageData()
+      })
+      .catch(err => {
+        let message = 'There was an error removing ' + user.username + ' from ' + v.selectedRole.name + ' role.';
+        if (err && err.data && err.data.message) message = err.data.message
+        $alertStore.error(message)
+      })
+
     const canViewAddUsersControl = () => true
 
     const $auth = inject(AuthStore)
@@ -249,6 +322,7 @@ export default {
           lowerPriorty: $auth.permissionUtils.hasPermission('users.addRoles.bypass.priority.less')
         }
       },
+      authedUser: $auth.user,
       currentPage: Number($route.query.page) || 1,
       pages: null,
       usersToAdd: {
