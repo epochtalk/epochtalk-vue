@@ -260,7 +260,6 @@ export default {
 <style lang="scss">
   .input-container { position: relative; height: 4.625rem; }
   .input-section label.hidden { opacity: .1; }
-
   .file-input {
     height: 4.625rem;
     &.hidden {
@@ -268,6 +267,7 @@ export default {
       border: 1px solid transparent;
     }
   }
+  #fileInput { height: auto; }
   #dropzone {
     position: absolute;
     float: left;
