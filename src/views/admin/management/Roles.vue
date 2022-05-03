@@ -24,11 +24,11 @@
           <span v-html="element.name"></span>
           <span v-html="element.description"></span>
           <span>
-            <a href="#" v-if="controlAccess.update.allow" @click.prevent="showRole(element)">Edit</a>
+            <a href="#" v-if="controlAccess.update.allow" @click.stop.prevent="showRole(element)">Edit</a>
             <span v-if="!controlAccess.update.allow">Edit</span>
             &nbsp;&nbsp;
             <a v-if="element.id === element.lookup && controlAccess.remove.allow" href="#" @click.prevent="showRemoveRole(element)">Remove</a>
-            <a v-if="element.id !== element.lookup" href="#" @click.prevent="showResetRole(element)">Reset</a>
+            <a v-if="element.id !== element.lookup" href="#" @click.stop.prevent="showResetRole(element)">Reset</a>
           </span>
         </div>
       </template>
@@ -246,7 +246,7 @@ export default {
         query: query
       })
     }
-    const showRole = () => {}
+    const showRole = role => console.log(role)
     const showRemoveRole = () => {}
     const showResetRole = () => {}
 
