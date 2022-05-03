@@ -326,6 +326,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  .underlined thead {
+    text-align: left;
+    border-bottom: 1px solid $border-color-alt;
+    th { padding-left: .5rem; }
+  }
   .pagination-wrap { margin-top: 1rem; }
   .role-header { display: inline-block; }
   .roles.user-search, .roles.add-role { width: 100%; }
