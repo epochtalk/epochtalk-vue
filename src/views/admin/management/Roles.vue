@@ -95,7 +95,6 @@
           :range-size="1"
           @update:modelValue="pageResults"
         />
-<!--         <pagination page-count="AdminManagementCtrl.pageCount" page="AdminManagementCtrl.page" query-params="AdminManagementCtrl.queryParams"></pagination> -->
       </div>
     </div>
     <div v-if="userData.count < 1">
@@ -283,6 +282,18 @@ export default {
 
     const init = function(roleId) {
       v.selectedRole = roleId ? v.roles.filter(r => r.id === roleId)[0] : {}
+      v.showFilterUsers = !!v.searchStr
+      if (v.userData && v.userData.users) {
+        v.userData.users.forEach(user => {
+          user.remove = false
+          if (v.controlAccess.privilegedRemoveRoles && v.controlAccess.privilegedRemoveRoles.samePriority) {
+            user.remove = user.priority >= v.authedUser.permissions.priority
+          }
+          else if (v.controlAccess.privilegedRemoveRoles && v.controlAccess.privilegedRemoveRoles.lowerPriority) {
+            user.remove = user.priority > v.authedUser.permissions.priority
+          }
+        })
+      }
 
       v.roles.forEach(r => { // remove private and anoymous priorities
         if (r.lookup !== 'private' && r.lookup !== 'anonymous')
