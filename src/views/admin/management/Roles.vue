@@ -5,7 +5,7 @@
     </h3><br />
     <div v-if="controlAccess.add.allow" class="roles add-role">
       <div class="nested-input-container">
-        <a @click="showRole()" class="nested-btn">Add</a>
+        <a @click.prevent="showRole()" class="pointer nested-btn">Add</a>
         <input class="nested-input" v-model="newRole.name" type="text" id="add-role" placeholder="Enter new role name" @keydown="$event.which === 13 && showRole()" />
       </div>
     </div>
@@ -121,7 +121,7 @@
     <span></span>
   </div>
 
-
+  <role-manager-modal :show="addNewRole || editSelectedRole" :add="addNewRole" :edit="editSelectedRole" @close="addNewRole = editSelectedRole = false" :selected="modifiedRole" />
 </template>
 
 <script>
@@ -134,10 +134,11 @@ import { intersection } from 'lodash'
 import Multiselect from '@vueform/multiselect'
 import EventBus from '@/composables/services/event-bus'
 import SimplePagination from '@/components/layout/SimplePagination.vue'
+import RoleManagerModal from '@/components/modals/admin/management/RoleManager.vue'
 
 export default {
   name: 'RoleManagement',
-  components: { draggable, Multiselect, SimplePagination },
+  components: { draggable, Multiselect, SimplePagination, RoleManagerModal },
   beforeRouteEnter(to, from, next) {
     let queryParams = {
       limit: Number(to.query.limit) || 15,
@@ -246,7 +247,11 @@ export default {
         query: query
       })
     }
-    const showRole = role => console.log(role)
+    const showRole = role => {
+      v.modifiedRole = role || v.newRole
+      if (role) v.editSelectedRole = true
+      else v.addNewRole = true
+    }
     const showRemoveRole = () => {}
     const showResetRole = () => {}
 
@@ -341,9 +346,12 @@ export default {
           .then(d => d.reduce((o, k) => (o[k] = k, o), {}))
         }
       },
+      addNewRole: false,
+      editSelectedRole: false,
       maxPriority: null,
       showFilterUsers: false,
       newRole: {},
+      modifiedRole: {},
       search: '',
       searchStr: '',
       allPriorities: [],
