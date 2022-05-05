@@ -121,7 +121,7 @@
     <span></span>
   </div>
 
-  <role-manager-modal :show="addNewRole || editSelectedRole" :add="addNewRole" :edit="editSelectedRole" @close="addNewRole = editSelectedRole = false" :selected="modifiedRole" />
+  <role-manager-modal :show="addNewRole || editSelectedRole || resetSelectedRole" :add="addNewRole" :edit="editSelectedRole" :reset="resetSelectedRole" @close="addNewRole=editSelectedRole=resetSelectedRole=false" :selected="modifiedRole" />
 </template>
 
 <script>
@@ -247,13 +247,17 @@ export default {
         query: query
       })
     }
+
     const showRole = role => {
       v.modifiedRole = role || v.newRole
       if (role) v.editSelectedRole = true
       else v.addNewRole = true
     }
     const showRemoveRole = () => {}
-    const showResetRole = () => {}
+    const showResetRole = role => {
+      v.modifiedRole = role
+      v.resetSelectedRole = true
+    }
 
     const searchUsers = () => {
       if (!v.searchStr || v.searchStr && !v.searchStr.length) {
@@ -348,6 +352,7 @@ export default {
       },
       addNewRole: false,
       editSelectedRole: false,
+      resetSelectedRole: false,
       maxPriority: null,
       showFilterUsers: false,
       newRole: {},
