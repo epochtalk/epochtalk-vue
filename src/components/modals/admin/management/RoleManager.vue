@@ -1,5 +1,5 @@
 <template>
-  <modal :name="$options.name" :show="show" @close="close()" :focusInput="focusInput">
+  <modal :name="$options.name" :show="show" @close="close()" :size="reset ? null : 'large'" :focusInput="focusInput">
     <template v-slot:header>
       <span v-if="add">Add Role</span>
       <span v-if="edit">Edit Role</span>
@@ -88,5 +88,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 </style>

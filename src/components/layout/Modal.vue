@@ -3,7 +3,7 @@
     <transition name="modal">
       <div v-if="open" :id="name" class="modal-mask">
         <div class="modal-wrapper" @click="closeFromWrapper">
-          <div class="modal-container">
+          <div class="modal-container" :class="size">
             <div class="modal-close" @click="this.$emit('close')">
               <svg enable-background="new 0 0 16 16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
                 <path clip-rule="evenodd" d="m12.7 5.2-1.2-1.2-3.1 3.2-3.2-3.2-1.2 1.2 3.2 3.2-3.2 3.1 1.2 1.2 3.2-3.2 3.1 3.2 1.2-1.2-3.2-3.1z" fill-rule="evenodd"></path>
@@ -37,7 +37,7 @@
 import { ref, watch, nextTick } from 'vue'
 
 export default {
-  props: ['name', 'show', 'focusInput'],
+  props: ['name', 'show', 'focusInput', 'size'],
   emits: ['close'],
   setup(props, { emit }) {
     /* Internal Methods */
@@ -117,6 +117,7 @@ export default {
   max-height: 80vh;
   max-width: 600px;
   width: 50vw;
+  &.large { width: 80%; max-width: 80%; }
 
   .modal-close {
     position: absolute;
