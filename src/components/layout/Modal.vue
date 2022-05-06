@@ -117,7 +117,7 @@ export default {
   max-height: 80vh;
   max-width: 600px;
   width: 50vw;
-  &.large { width: 80%; max-width: 80%; }
+  &.large { width: 70vw; max-width: 70vw; }
 
   .modal-close {
     position: absolute;
