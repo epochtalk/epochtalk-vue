@@ -121,7 +121,7 @@
     <span></span>
   </div>
 
-  <role-manager-modal :show="addNewRole || editSelectedRole || resetSelectedRole" :add="addNewRole" :edit="editSelectedRole" :reset="resetSelectedRole" @close="addNewRole=editSelectedRole=resetSelectedRole=false" :selected="modifiedRole" />
+  <role-manager-modal :show="addNewRole || editSelectedRole || resetSelectedRole" :add="addNewRole" :edit="editSelectedRole" :reset="resetSelectedRole" @close="addNewRole=editSelectedRole=resetSelectedRole=false" :layouts="roleLayouts" :selected="modifiedRole" />
 </template>
 
 <script>
