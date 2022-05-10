@@ -15,62 +15,73 @@
           <div class="permissions">
             <!-- General Tab -->
             <div v-if="selectedTab === 'general'">
-              <label>
-                Role Name
-                <input type="text" v-model="role.name" placeholder="Role Name" :disabled="requestSubmitted" required />
+              <label for="name">Role Name</label>
+              <input v-model="role.name" ref="focusInput" id="name" type="text" placeholder="Enter new role name" required />
+              <label for="desc">Role Description</label>
+              <textarea id="desc" v-model="role.description" placeholder="Enter a short description of this role" required></textarea>
+
+                <label for="highlight">Highlight Color <a href="#" class="right" v-if="role.highlight_color" @click.prevent="role.highlight_color = undefined">Remove Highlight</a></label>
+                <input v-model="role.highlight_color" id="highlight" type="color" placeholder="Enter a hex value for role highlight color" />
+              <label for="basedRole">
+                Base Permissions (Optional)
+                <div class="input-info right">Set base permissions to that of an existing role</div>
               </label>
+              <select id="basedRole" class="fill-row" @change="setBasePermissions()" v-model="baseRoleId">
+                <option :value="null">Custom</option>
+                <option :selected="baseRoleId === role.id" v-for="role in roles" :key="role.id" :value="role.id" v-html="role.name"></option>
+              </select>
             </div>
 
             <!-- Views Tab -->
             <div v-if="selectedTab === 'views'">
               <h4>Moderation View Permissions</h4>
               <label>
-                <input id="modAccess-settings" type="checkbox" ng-init="modAccess = newRole.permissions.modAccess.users || newRole.permissions.modAccess.posts || newRole.permissions.modAccess.messages" ng-model="modAccess" ng-change="!modAccess ? newRole.permissions.modAccess.users = false : null; !modAccess ? newRole.permissions.modAccess.posts = false : null; !modAccess ? newRole.permissions.modAccess.messages = false : null;" />
+                <input id="modAccess-settings" type="checkbox" v-model="modAccess" @change="!modAccess ? role.permissions.modAccess.users = false : null; !modAccess ? role.permissions.modAccess.posts = false : null; !modAccess ? role.permissions.modAccess.messages = false : null" />
                 Allow user to access moderation views
               </label>
-              <div class="indent" ng-if="modAccess">
+              <div class="indent" v-if="modAccess">
                 <label>
-                  <input id="modAccess-users" type="checkbox" ng-init="newRole.permissions.modAccess.users = newRole.permissions.reports.pageUserReports.allow;" ng-model="newRole.permissions.modAccess.users" ng-change="newRole.permissions.modAccess.users ? newRole.permissions.reports.pageUserReports.allow = true : newRole.permissions.reports.pageUserReports = undefined" ng-false-value="undefined" />
+                  <input id="modAccess-users" type="checkbox" v-model="role.permissions.modAccess.users" @change="role.permissions.modAccess.users ? role.permissions.reports.pageUserReports.allow = true : role.permissions.reports.pageUserReports = undefined" :false-value="undefined" />
                   Users Moderation Tab
                 </label>
                 <label>
-                  <input id="modAccess-posts" type="checkbox" ng-init="newRole.permissions.modAccess.posts = newRole.permissions.reports.pagePostReports.allow;" ng-model="newRole.permissions.modAccess.posts" ng-change="newRole.permissions.modAccess.posts ? newRole.permissions.reports.pagePostReports.allow = true : newRole.permissions.reports.pagePostReports = undefined" ng-false-value="undefined" />
+                  <input id="modAccess-posts" type="checkbox" v-model="role.permissions.modAccess.posts" @change="role.permissions.modAccess.posts ? role.permissions.reports.pagePostReports.allow = true : role.permissions.reports.pagePostReports = undefined" :false-value="undefined" />
                   Posts Moderation Tab
                 </label>
                 <label>
-                  <input id="modAccess-messages" type="checkbox" ng-init="newRole.permissions.modAccess.messages = newRole.permissions.reports.pageMessageReports.allow;" ng-model="newRole.permissions.modAccess.messages" ng-change="newRole.permissions.modAccess.messages ? newRole.permissions.reports.pageMessageReports.allow = true : newRole.permissions.reports.pageMessageReports = undefined" ng-false-value="undefined" />
+                  <input id="modAccess-messages" type="checkbox" v-model="role.permissions.modAccess.messages" @change="role.permissions.modAccess.messages ? role.permissions.reports.pageMessageReports.allow = true : role.permissions.reports.pageMessageReports = undefined" :false-value="undefined" />
                   Messages Moderation Tab
                 </label>
                 <label>
-                  <input id="modAccess-boardBans" type="checkbox" ng-model="newRole.permissions.modAccess.boardBans" ng-change="newRole.permissions.modAccess.boardBans ? newRole.permissions.bans.byBannedBoards.allow = true : newRole.permissions.bans.byBannedBoards = undefined; newRole.permissions.modAccess.boardBans ? newRole.permissions.bans.getBannedBoards.allow = true : newRole.permissions.bans.getBannedBoards = undefined" ng-false-value="undefined" />
+                  <input id="modAccess-boardBans" type="checkbox" v-model="role.permissions.modAccess.boardBans" @change="role.permissions.modAccess.boardBans ? role.permissions.bans.byBannedBoards.allow = true : role.permissions.bans.byBannedBoards = undefined; role.permissions.modAccess.boardBans ? role.permissions.bans.getBannedBoards.allow = true : role.permissions.bans.getBannedBoards = undefined" :false-value="undefined" />
                   Board Bans Moderation Tab
                 </label>
                 <label>
-                  <input id="modAccess-logs" type="checkbox" ng-init="newRole.permissions.modAccess.logs = newRole.permissions.moderationLogs.page.allow;" ng-model="newRole.permissions.modAccess.logs" ng-change="newRole.permissions.modAccess.logs ? newRole.permissions.moderationLogs.page.allow = true : newRole.permissions.moderationLogs.page = undefined" ng-false-value="undefined" />
+                  <input id="modAccess-logs" type="checkbox" v-model="role.permissions.modAccess.logs" @change="role.permissions.modAccess.logs ? role.permissions.moderationLogs.page.allow = true : role.permissions.moderationLogs.page = undefined" :false-value="undefined" />
                   Logs Moderation Tab
                 </label>
               </div>
               <div class="clear"></div>
               <h4><br />Administration View Permissions</h4>
               <label>
-                <input id="adminAccess-settings" type="checkbox" ng-init="settings = newRole.permissions.adminAccess.settings.general || newRole.permissions.adminAccess.settings.advanced || newRole.permissions.adminAccess.settings.legal || newRole.permissions.adminAccess.settings.theme" ng-model="settings" ng-change="!settings ? newRole.permissions.adminAccess.settings.general = false : null; !settings ? newRole.permissions.adminAccess.settings.advanced = false : null; !settings ? newRole.permissions.adminAccess.settings.legal = false : null; !settings ? newRole.permissions.adminAccess.settings.theme = false : null;" />
+                <input id="adminAccess-settings" type="checkbox" v-model="settingsAccess" @change="!settingsAccess ? role.permissions.adminAccess.settings.general = false : null; !settingsAccess ? role.permissions.adminAccess.settings.advanced = false : null; !settingsAccess ? role.permissions.adminAccess.settings.legal = false : null; !settingsAccess ? role.permissions.adminAccess.settings.theme = false : null" />
                 Allow user to access admin settings view
               </label>
-              <div class="indent" ng-if="settings">
+              <div class="indent" v-if="settingsAccess">
                 <label>
-                  <input id="adminAccess-settings-general" type="checkbox" ng-model="newRole.permissions.adminAccess.settings.general" ng-false-value="undefined" />
+                  <input id="adminAccess-settings-general" type="checkbox" v-model="role.permissions.adminAccess.settings.general" :false-value="undefined" />
                   General Settings Tab
                 </label>
                 <label>
-                  <input id="adminAccess-settings-advanced" type="checkbox" ng-model="newRole.permissions.adminAccess.settings.advanced" ng-false-value="undefined" />
+                  <input id="adminAccess-settings-advanced" type="checkbox" v-model="role.permissions.adminAccess.settings.advanced" :false-value="undefined" />
                   Advanced Settings Tab
                 </label>
                 <label>
-                  <input id="adminAccess-settings-legal" type="checkbox" ng-model="newRole.permissions.adminAccess.settings.legal" ng-false-value="undefined" />
+                  <input id="adminAccess-settings-legal" type="checkbox" v-model="role.permissions.adminAccess.settings.legal" :false-value="undefined" />
                   Legal Settings Tab
                 </label>
                 <label>
-                  <input id="adminAccess-settings-theme" type="checkbox" ng-model="newRole.permissions.adminAccess.settings.theme" ng-false-value="undefined" />
+                  <input id="adminAccess-settings-theme" type="checkbox" v-model="role.permissions.adminAccess.settings.theme" :false-value="undefined" />
                   Theme Settings Tab
                 </label>
               </div>
@@ -78,7 +89,12 @@
 
             <!-- Permissions Tabs -->
             <div v-for="(obj, key) in layouts" :key="key">
-              <div v-if="key === selectedTab">{{obj}}</div>
+              <div v-if="key === selectedTab">
+                {{obj}}
+                <br />
+                <br />
+                {{role.permissions[key]}}
+              </div>
             </div>
           </div>
         </div>
@@ -112,7 +128,7 @@ import { cloneDeep } from 'lodash'
 
 export default {
   name: 'role-manager-modal',
-  props: ['show', 'add', 'edit', 'reset', 'layouts', 'selected'],
+  props: ['show', 'add', 'edit', 'reset', 'roles', 'layouts', 'selected'],
   emits: ['close', 'success'],
   components: { Modal },
   setup(props, { emit }) {
@@ -130,6 +146,14 @@ export default {
     const close = () => {
       resetForm()
       emit('close')
+    }
+
+    const setBasePermissions = () => {
+      let permissions = {}
+      console.log(v.baseRoleId)
+      v.roles.forEach(r => r.id === v.baseRoleId ? permissions = cloneDeep(r.permissions) : null)
+      console.log(permissions)
+      v.role.permissions = permissions
     }
 
     const permissionSections = [
@@ -169,24 +193,41 @@ export default {
     /* Template Data */
     const v = reactive({
       focusInput: null,
+      baseRoleId: null,
+      settingsAccess: null,
+      modAccess: null,
       role: {},
+      roles: props.roles || [],
       selectedTab: 'general',
       saveRuleBtnLabel: props.reset ? 'Reset' : 'Save',
       requestSubmitted: false,
     })
 
+    const initAdminPanelAccess = () => {
+      v.role.permissions.modAccess.messages = v.role.permissions.reports.pageMessageReports.allow
+      v.role.permissions.modAccess.posts = v.role.permissions.reports.pagePostReports.allow
+      v.role.permissions.modAccess.users = v.role.permissions.reports.pageUserReports.allow
+      v.role.permissions.modAccess.logs = v.role.permissions.moderationLogs.page.allow
+      v.settingsAccess = v.role.permissions.adminAccess.settings.general || v.role.permissions.adminAccess.settings.advanced || v.role.permissions.adminAccess.settings.legal || v.role.permissions.adminAccess.settings.theme
+      v.modAccess = v.role.permissions.modAccess.users || v.role.permissions.modAccess.posts || v.role.permissions.modAccess.messages
+    }
+
     watch(() => props.show, () => {
       v.role = cloneDeep(props.selected)
+      initAdminPanelAccess()
       v.saveRuleBtnLabel = props.reset ? 'Reset' : 'Save'
     })
 
-    return { ...toRefs(v), permissionSections, modifyRole, close }
+    return { ...toRefs(v), permissionSections, modifyRole, setBasePermissions, close }
   }
 }
 </script>
 
 <style lang="scss" scoped>
   .input-spacing { margin-bottom: .5rem; }
+  .indent { margin-left: 1.25rem; }
+  label { user-select: none; }
+  label input[type=checkbox] { margin-bottom: .125rem; }
   .permissions-grid {
     display: grid;
     grid-column-gap: .5rem;
