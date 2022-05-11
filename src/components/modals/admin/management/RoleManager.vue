@@ -8,6 +8,7 @@
 
     <template v-slot:body>
       <form class="css-form">
+        {{role.permissions}}
         <div v-if="add || edit" class="col permissions-grid input-spacing">
           <div class="sections">
             <div v-for="{key,label} in permissionSections" :key="key" @click="selectedTab = key" :class="{'active':selectedTab === key}" class="pointer" v-html="label"></div>
@@ -36,38 +37,38 @@
             <div v-if="selectedTab === 'views'">
               <h4>Moderation View Permissions</h4>
               <label>
-                <input id="modAccess-settings" type="checkbox" v-model="modAccess" @change="!modAccess ? role.permissions.modAccess.users = false : null; !modAccess ? role.permissions.modAccess.posts = false : null; !modAccess ? role.permissions.modAccess.messages = false : null" />
+                <input id="modAccess-settings" type="checkbox" v-model="role.permissions.modAccess" :true-value="role.permissions.modAccess || {}" :false-value="undefined"  />
                 Allow user to access moderation views
               </label>
-              <div class="indent" v-if="modAccess">
+              <div class="indent" v-if="role?.permissions?.modAccess">
                 <label>
-                  <input id="modAccess-users" type="checkbox" v-model="role.permissions.modAccess.users" @change="role.permissions.modAccess.users ? role.permissions.reports.pageUserReports.allow = true : role.permissions.reports.pageUserReports = undefined" :false-value="undefined" />
+                  <input id="modAccess-users" type="checkbox" v-model="role.permissions.modAccess.users" @change="role.permissions.modAccess.users ? set(role, 'permissions.reports.pageUserReports.allow', true) : set(role, 'permissions.reports.pageUserReports', undefined)"  :false-value="undefined" />
                   Users Moderation Tab
                 </label>
                 <label>
-                  <input id="modAccess-posts" type="checkbox" v-model="role.permissions.modAccess.posts" @change="role.permissions.modAccess.posts ? role.permissions.reports.pagePostReports.allow = true : role.permissions.reports.pagePostReports = undefined" :false-value="undefined" />
+                  <input id="modAccess-posts" type="checkbox" v-model="role.permissions.modAccess.posts" @change="role.permissions.modAccess.posts ? set(role, 'permissions.reports.pagePostReports.allow', true) : set(role, 'permissions.reports.pagePostReports', undefined)" :false-value="undefined" />
                   Posts Moderation Tab
                 </label>
                 <label>
-                  <input id="modAccess-messages" type="checkbox" v-model="role.permissions.modAccess.messages" @change="role.permissions.modAccess.messages ? role.permissions.reports.pageMessageReports.allow = true : role.permissions.reports.pageMessageReports = undefined" :false-value="undefined" />
+                  <input id="modAccess-messages" type="checkbox" v-model="role.permissions.modAccess.messages" @change="role.permissions.modAccess.messages ? set(role, 'permissions.reports.pageMessageReports.allow', true) : set(role, 'permissions.reports.pageMessageReports', undefined)" :false-value="undefined" />
                   Messages Moderation Tab
                 </label>
                 <label>
-                  <input id="modAccess-boardBans" type="checkbox" v-model="role.permissions.modAccess.boardBans" @change="role.permissions.modAccess.boardBans ? role.permissions.bans.byBannedBoards.allow = true : role.permissions.bans.byBannedBoards = undefined; role.permissions.modAccess.boardBans ? role.permissions.bans.getBannedBoards.allow = true : role.permissions.bans.getBannedBoards = undefined" :false-value="undefined" />
+                  <input id="modAccess-boardBans" type="checkbox" v-model="role.permissions.modAccess.boardBans" @change="role.permissions.modAccess.boardBans ? set(role, 'permissions.bans.byBannedBoards.allow', true) : set(role, 'permissions.bans.byBannedBoards', undefined); role.permissions.modAccess.boardBans ? set(role, 'permissions.bans.getBannedBoards.allow', true) : set(role, 'permissions.bans.getBannedBoards', undefined)" :false-value="undefined" />
                   Board Bans Moderation Tab
                 </label>
                 <label>
-                  <input id="modAccess-logs" type="checkbox" v-model="role.permissions.modAccess.logs" @change="role.permissions.modAccess.logs ? role.permissions.moderationLogs.page.allow = true : role.permissions.moderationLogs.page = undefined" :false-value="undefined" />
+                  <input id="modAccess-logs" type="checkbox" v-model="role.permissions.modAccess.logs" @change="role.permissions.modAccess.logs ? set(role, 'permissions.moderationLogs.page.allow', true) : set(role,
+                  'permissions.moderationLogs.page', undefined)" :false-value="undefined" />
                   Logs Moderation Tab
                 </label>
               </div>
-              <div class="clear"></div>
               <h4><br />Administration View Permissions</h4>
               <label>
-                <input id="adminAccess-settings" type="checkbox" v-model="settingsAccess" @change="!settingsAccess ? role.permissions.adminAccess.settings.general = false : null; !settingsAccess ? role.permissions.adminAccess.settings.advanced = false : null; !settingsAccess ? role.permissions.adminAccess.settings.legal = false : null; !settingsAccess ? role.permissions.adminAccess.settings.theme = false : null" />
+                <input id="adminAccess-settings" type="checkbox" v-model="role.permissions.adminAccess.settings" :true-value="role.permissions.adminAccess.settings || {}" :false-value="undefined" />
                 Allow user to access admin settings view
               </label>
-              <div class="indent" v-if="settingsAccess">
+              <div class="indent" v-if="role?.permissions?.adminAccess?.settings">
                 <label>
                   <input id="adminAccess-settings-general" type="checkbox" v-model="role.permissions.adminAccess.settings.general" :false-value="undefined" />
                   General Settings Tab
@@ -83,6 +84,32 @@
                 <label>
                   <input id="adminAccess-settings-theme" type="checkbox" v-model="role.permissions.adminAccess.settings.theme" :false-value="undefined" />
                   Theme Settings Tab
+                </label>
+              </div>
+              <label>
+                <input id="adminAccess-management" type="checkbox" v-model="role.permissions.adminAccess.management" :true-value="role.permissions.adminAccess.management || {}" :false-value="undefined" />
+                Allow user to access admin management view
+              </label>
+              <div class="indent" v-if="role?.permissions?.adminAccess?.management">
+                <label>
+                  <input id="adminAccess-management-boards" type="checkbox" v-model="role.permissions.adminAccess.management.boards" :false-value="undefined" />
+                  Boards Management Tab (Requres the 'Allow user view all roles' option in 'Roles')
+                </label>
+                <label>
+                  <input id="adminAccess-management-users" type="checkbox" v-model="role.permissions.adminAccess.management.users" :false-value="undefined" />
+                  Users Management Tab
+                </label>
+                <label>
+                  <input id="adminAccess-management-roles" type="checkbox" v-model="role.permissions.adminAccess.management.roles" :false-value="undefined" />
+                  Roles Management Tab
+                </label>
+                <label>
+                  <input id="adminAccess-management-bannedAddresses" type="checkbox" v-model="role.permissions.adminAccess.management.bannedAddresses" :false-value="undefined" />
+                  Banned Addresses Management Tab
+                </label>
+                <label>
+                  <input id="adminAccess-management-invitations" type="checkbox" v-model="role.permissions.adminAccess.management.invitations" :false-value="undefined" />
+                  Invitations Management Tab
                 </label>
               </div>
             </div>
@@ -124,7 +151,7 @@
 import Modal from '@/components/layout/Modal.vue'
 import { reactive, toRefs, inject, watch } from 'vue'
 // import { adminApi } from '@/api'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, set, get } from 'lodash'
 
 export default {
   name: 'role-manager-modal',
@@ -204,12 +231,16 @@ export default {
     })
 
     const initAdminPanelAccess = () => {
-      v.role.permissions.modAccess.messages = v.role.permissions.reports.pageMessageReports.allow
-      v.role.permissions.modAccess.posts = v.role.permissions.reports.pagePostReports.allow
-      v.role.permissions.modAccess.users = v.role.permissions.reports.pageUserReports.allow
-      v.role.permissions.modAccess.logs = v.role.permissions.moderationLogs.page.allow
-      v.settingsAccess = v.role.permissions.adminAccess.settings.general || v.role.permissions.adminAccess.settings.advanced || v.role.permissions.adminAccess.settings.legal || v.role.permissions.adminAccess.settings.theme
-      v.modAccess = v.role.permissions.modAccess.users || v.role.permissions.modAccess.posts || v.role.permissions.modAccess.messages
+      set(v.role, 'permissions.modAccess.messages',
+        get(v.role, 'permissions.reports.pageMessageReports.allow'))
+      set(v.role, 'permissions.modAccess.posts',
+        get(v.role, 'permissions.reports.pagePostReports.allow'))
+      set(v.role, 'permissions.modAccess.users',
+        get(v.role, 'permissions.reports.pageUserReports.allow'))
+      set(v.role, 'permissions.modAccess.logs',
+        get(v.role, 'permissions.moderationLogs.page.allow'))
+      set(v.role, 'permissions.adminAccess.settings', get(v.role, 'permissions.adminAccess.settings'))
+      set(v.role, 'permissions.adminAccess.management', get(v.role, 'permissions.adminAccess.management'))
     }
 
     watch(() => props.show, () => {
@@ -218,7 +249,7 @@ export default {
       v.saveRuleBtnLabel = props.reset ? 'Reset' : 'Save'
     })
 
-    return { ...toRefs(v), permissionSections, modifyRole, setBasePermissions, close }
+    return { ...toRefs(v), permissionSections, modifyRole, setBasePermissions, close, set }
   }
 }
 </script>
