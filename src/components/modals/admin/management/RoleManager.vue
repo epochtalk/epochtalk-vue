@@ -175,13 +175,8 @@ export default {
       emit('close')
     }
 
-    const setBasePermissions = () => {
-      let permissions = {}
-      console.log(v.baseRoleId)
-      v.roles.forEach(r => r.id === v.baseRoleId ? permissions = cloneDeep(r.permissions) : null)
-      console.log(permissions)
-      v.role.permissions = permissions
-    }
+    const setBasePermissions = () => v.roles.forEach(r =>
+      r.id === v.baseRoleId ? v.role.permissions = cloneDeep(r.permissions) : null)
 
     const permissionSections = [
       { key: 'general', label: 'General' },
@@ -245,6 +240,7 @@ export default {
 
     watch(() => props.show, () => {
       v.role = cloneDeep(props.selected)
+      v.roles = cloneDeep(props.roles)
       initAdminPanelAccess()
       v.saveRuleBtnLabel = props.reset ? 'Reset' : 'Save'
     })
