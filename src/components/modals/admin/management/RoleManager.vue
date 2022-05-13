@@ -8,8 +8,8 @@
 
     <template v-slot:body>
       <form class="css-form">
-        {{role.permissions}}
-        <div v-if="add || edit" class="col permissions-grid input-spacing">
+<!--         {{role.permissions}}
+ -->        <div v-if="add || edit" class="col permissions-grid input-spacing">
           <div class="sections">
             <div v-for="{key,label} in permissionSections" :key="key" @click="selectPermissionsTab(key)" :class="{'active':selectedTab === key}" class="pointer" v-html="label"></div>
           </div>
@@ -117,7 +117,8 @@
             <!-- Permissions Tabs -->
             <div v-for="(layout, model) in layouts" :key="model">
               <div v-if="model === selectedTab">
-                <!-- {{layout}}<br><br>{{role.permissions[model]}} -->
+                <!-- {{layout}}<br><br> -->
+                {{role.permissions[model]}}
                 <section class="permission" v-for="(details, prop) in layout" :key="prop">
                   <!-- Title Display -->
                   <div v-if="details.type === 'title'">
@@ -136,22 +137,25 @@
                   <!-- Main Permission -->
                   <div v-if="!details.type">
                     <label>
-                      <input type="checkbox" v-model="role.permissions[model][prop]" :true-value="{ allow: true }" :false-value="undefined" />
+                      <input type="checkbox" @change="role.permissions[model][prop]?.allow && details.bypasses ? role.permissions[model][prop].bypass = {} : null " v-model="role.permissions[model][prop]" :true-value="role.permissions[model][prop] || { allow: true }" :false-value="undefined" />
                       <span class="permission-title" v-html="details.title"></span>
                     </label>
 
                     <!-- Bypasses -->
                     <div class="bypass" v-for="bypass in details.bypasses" :key="bypass">
                       <!-- Boolean Bypass View -->
-<!--                       <div class="bypass-header" v-if="bypass.type === 'boolean'">
+                      <div class="bypass-header" v-if="bypass.type === 'boolean'">
                         <label>
-                          <input type="checkbox"
-                            :disabled="!role.permissions[model][prop].allow"
+                          <input v-if="role.permissions[model][prop]?.bypass" type="checkbox"
+                            :disabled="!role.permissions[model][prop]?.allow"
                             v-model="role.permissions[model][prop].bypass[bypass.control]"
                             :false-value="undefined" />
-                          <span class="bypass-description" :class="{ disabled: !role.permissions[model][prop].allow }" v-html="bypass.description"></span>
+                          <input v-if="!role.permissions[model][prop]?.bypass" type="checkbox"
+                            :disabled="true"
+                            :value="false" />
+                          <span class="bypass-description" :class="{ disabled: !role.permissions[model][prop]?.allow }" v-html="bypass.description"></span>
                         </label>
-                      </div> -->
+                      </div>
                       <!-- Object Bypass View -->
 <!--                       <div v-if="bypass.type === 'object' || !bypass.type">
                         <div class="bypass-header">
