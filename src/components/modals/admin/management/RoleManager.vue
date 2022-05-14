@@ -116,7 +116,7 @@
 
             <!-- Permissions Tabs -->
             <div v-for="(layout, model) in layouts" :key="model">
-              <div v-if="model === selectedTab">
+              <div v-if="model === selectedTab" class="permissions-tab">
                 <!-- {{layout}}<br><br> -->
                 {{role.permissions[model]}}
                 <section class="permission" v-for="(details, prop) in layout" :key="prop">
@@ -137,7 +137,8 @@
                   <!-- Main Permission -->
                   <div v-if="!details.type">
                     <label>
-                      <input type="checkbox" @change="role.permissions[model][prop]?.allow && details.bypasses ? role.permissions[model][prop].bypass = {} : null " v-model="role.permissions[model][prop]" :true-value="role.permissions[model][prop] || { allow: true }" :false-value="undefined" />
+                      {{'FUCK'}}
+                      <input type="checkbox" @change="createBypassStructure(model, prop, details)" v-model="role.permissions[model][prop]" :true-value="role.permissions[model][prop] ? role.permissions[model][prop]: { allow: true }" :false-value="undefined" />
                       <span class="permission-title" v-html="details.title"></span>
                     </label>
 
@@ -147,7 +148,6 @@
                       <div class="bypass-header" v-if="bypass.type === 'boolean'">
                         <label>
                           <input v-if="role.permissions[model][prop]?.bypass" type="checkbox"
-                            :disabled="!role.permissions[model][prop]?.allow"
                             v-model="role.permissions[model][prop].bypass[bypass.control]"
                             :false-value="undefined" />
                           <input v-if="!role.permissions[model][prop]?.bypass" type="checkbox"
@@ -157,47 +157,53 @@
                         </label>
                       </div>
                       <!-- Object Bypass View -->
-<!--                       <div v-if="bypass.type === 'object' || !bypass.type">
+                      <div v-if="bypass.type === 'object' || !bypass.type">
                         <div class="bypass-header">
                           <label>
-                            <input type="checkbox"
-                              ng-init="AdminManagementCtrl.newRole.permissions.users[model].bypass[bypass.control].show = AdminManagementCtrl.newRole.permissions.users[model].bypass[bypass.control].admin || AdminManagementCtrl.newRole.permissions.users[model].bypass[bypass.control].mod; AdminManagementCtrl.newRole.permissions.users[model].bypass[bypass.control].show ? null : AdminManagementCtrl.newRole.permissions.users[model].bypass[bypass.control] = undefined"
-                              ng-disabled="!AdminManagementCtrl.newRole.permissions.users[model].allow"
-                              ng-change="AdminManagementCtrl.newRole.permissions.users[model].bypass[bypass.control].show ? AdminManagementCtrl.newRole.permissions.users[model].bypass[bypass.control].mod = true : AdminManagementCtrl.newRole.permissions.users[model].bypass[bypass.control] = undefined"
-                              ng-model="AdminManagementCtrl.newRole.permissions.users[model].bypass[bypass.control].show"
-                              ng-false-value="undefined" />
-                            <span class="bypass-description" ng-class="{ disabled: !AdminManagementCtrl.newRole.permissions.users[model].allow }" ng-bind-html="bypass.description"></span>
+                            <input v-if="role.permissions[model][prop]?.bypass" type="checkbox"
+                              v-model="role.permissions[model][prop].bypass[bypass.control]"
+                              :true-value="role.permissions[model][prop].bypass[bypass.control] ? role.permissions[model][prop].bypass[bypass.control] : { mod: true }" :false-value="undefined" />
+                            <input v-if="!role.permissions[model][prop]?.bypass" type="checkbox"
+                              :disabled="true"
+                              :value="false" />
+                            <span class="bypass-description" :class="{ disabled: !role.permissions[model][prop]?.allow }" v-html="bypass.description"></span>
                           </label>
                         </div>
                         <div class="bypass-control">
-                          <label ng-class="{ disabled: !AdminManagementCtrl.newRole.permissions.users[model].bypass[bypass.control].show }">
+                          <label :class="{ disabled: !role.permissions[model][prop]?.bypass }">
                             <input type="radio"
-                              ng-disabled="!AdminManagementCtrl.newRole.permissions.users[model].bypass[bypass.control].show"
-                              ng-model="AdminManagementCtrl.newRole.permissions.users[model].bypass[bypass.control].admin"
-                              ng-click="AdminManagementCtrl.newRole.permissions.users[model].bypass[bypass.control].mod = undefined" ng-value="true" />
+                              @click="role.permissions[model][prop].bypass[bypass.control].admin = true; role.permissions[model][prop].bypass[bypass.control].mod = undefined"
+                              :disabled="role.permissions[model][prop]?.bypass ? !role.permissions[model][prop]?.bypass[bypass.control] : true"
+                              :checked="role.permissions[model][prop]?.bypass ? role.permissions[model][prop]?.bypass[bypass.control]?.admin : false" />
                             All
                           </label>
-                          <label ng-class="{ disabled: !AdminManagementCtrl.newRole.permissions.users[model].bypass[bypass.control].show }">
+                          <label :class="{ disabled: !role.permissions[model][prop]?.bypass }">
                             <input type="radio"
-                              ng-disabled="!AdminManagementCtrl.newRole.permissions.users[model].bypass[bypass.control].show"
-                              ng-model="AdminManagementCtrl.newRole.permissions.users[model].bypass[bypass.control].mod"
-                              ng-click="AdminManagementCtrl.newRole.permissions.users[model].bypass[bypass.control].admin = undefined" ng-value="true" />
+                              @click="role.permissions[model][prop].bypass[bypass.control].admin = undefined; role.permissions[model][prop].bypass[bypass.control].mod = true"
+                              :disabled="role.permissions[model][prop]?.bypass ? !role.permissions[model][prop]?.bypass[bypass.control] : true"
+                              :checked="role.permissions[model][prop]?.bypass ? role.permissions[model][prop]?.bypass[bypass.control]?.mod : false" />
                             Moderated
                           </label>
                         </div>
-                      </div> -->
+                      </div>
 
                       <!-- Radio Bypass View -->
-<!--                       <div v-if="bypass.type === 'radio'">
-                        <div class="indent" v-if="role.permissions[model][prop]">
-                          <span v-for="desc in bypass.descriptions" :key="desc">
+                      <div v-if="bypass.type === 'radio'">
+                        {{role.permissions[model][prop]?.bypass}}
+                        <div class="indent" v-if="role.permissions[model][prop]?.bypass">
+                          <span v-for="(desc, index) in bypass.descriptions" :key="desc">
                             <label>
-                              <input :name="`${model}-${bypass.control}`" ng-init="AdminManagementCtrl.newRole.permissions.users[model].bypass[bypass.control] ? null : AdminManagementCtrl.newRole.permissions.users[model].bypass[bypass.control][bypass.defaultValue] = true;" type="radio" ng-model="AdminManagementCtrl.newRole.permissions.users[model].bypass[bypass.control][bypass.values[$index]]" ng-click="AdminManagementCtrl.newRole.permissions.users[model].bypass[bypass.control] = {}; AdminManagementCtrl.newRole.permissions.users[model].bypass[bypass.control][bypass.values[$index]] = true;" ng-value="true" />
+  <!--                             {{role.permissions[model][prop].bypass && bypass.values[index] === bypass.defaultValue }}/
+                              {{role.permissions[model][prop].bypass}}/
+                              {{[bypass.values[index]]}}/
+                              {{bypass.values[index] === bypass.defaultValue}}/
+                              {{bypass.defaultValue}} -->
+                              <input :name="`${model}-${bypass.control}`" type="radio" :v-model="role.permissions[model][prop].bypass" @click="role.permissions[model][prop].bypass[bypass.control] = { [bypass.values[index]]: true }" :checked="bypassChecked(bypass, bypass.values[index])" />
                               {{ desc }}
                             </label>
                           </span>
                         </div>
-                      </div> -->
+                      </div>
 
                       <!-- Priority Bypass View -->
 <!--                       <div ng-if="bypass.type === 'priority'">
@@ -345,6 +351,24 @@ export default {
       v.selectedTab = model
     }
 
+    const createBypassStructure = (model, prop, details) => {
+      if (v.role.permissions[model][prop]?.allow && details.bypasses) {
+        details.bypasses.forEach(b => {
+          switch (b.type) {
+            case 'radio':
+              v.role.permissions[model][prop].bypass = { ...v.role.permissions[model][prop].bypassm, [b.control]: { [b.defaultValue]: true }}
+              break;
+            default: v.role.permissions[model][prop].bypass = {}
+          }
+        })
+      }
+    }
+
+    const bypassChecked = (bypass, prop) => {
+      console.log(bypass, prop)
+      return prop === bypass.defaultValue
+    }
+
     /* Internal Data */
     const $alertStore = inject('$alertStore')
 
@@ -381,14 +405,14 @@ export default {
       v.saveRuleBtnLabel = props.reset ? 'Reset' : 'Save'
     })
 
-    return { ...toRefs(v), permissionSections, modifyRole, setBasePermissions, close, set, selectPermissionsTab }
+    return { ...toRefs(v), permissionSections, modifyRole, setBasePermissions, close, set, selectPermissionsTab, createBypassStructure, bypassChecked }
   }
 }
 </script>
 
 <style lang="scss" scoped>
   .input-spacing { margin-bottom: .5rem; }
-  .indent { margin-left: 1.25rem; }
+  .indent, .bypass-header { margin-left: 1.25rem; }
   label { user-select: none; }
   label input[type=checkbox] { margin-bottom: .125rem; }
   .permissions-grid {
@@ -412,6 +436,8 @@ export default {
       }
 
     }
-    .permissions {  }
+    .permissions {
+      max-height: 60vh; overflow-y: scroll;
+    }
   }
 </style>
