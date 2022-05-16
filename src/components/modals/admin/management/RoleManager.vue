@@ -137,7 +137,6 @@
                   <!-- Main Permission -->
                   <div v-if="!details.type">
                     <label>
-                      {{'FUCK'}}
                       <input type="checkbox" @change="createBypassStructure(model, prop, details)" v-model="role.permissions[model][prop]" :true-value="role.permissions[model][prop] ? role.permissions[model][prop]: { allow: true }" :false-value="undefined" />
                       <span class="permission-title" v-html="details.title"></span>
                     </label>
@@ -189,16 +188,10 @@
 
                       <!-- Radio Bypass View -->
                       <div v-if="bypass.type === 'radio'">
-                        {{role.permissions[model][prop]?.bypass}}
-                        <div class="indent" v-if="role.permissions[model][prop]?.bypass">
+                        <div class="bypass-header" v-if="role.permissions[model][prop]?.bypass">
                           <span v-for="(desc, index) in bypass.descriptions" :key="desc">
                             <label>
-  <!--                             {{role.permissions[model][prop].bypass && bypass.values[index] === bypass.defaultValue }}/
-                              {{role.permissions[model][prop].bypass}}/
-                              {{[bypass.values[index]]}}/
-                              {{bypass.values[index] === bypass.defaultValue}}/
-                              {{bypass.defaultValue}} -->
-                              <input :name="`${model}-${bypass.control}`" type="radio" :v-model="role.permissions[model][prop].bypass" @click="role.permissions[model][prop].bypass[bypass.control] = { [bypass.values[index]]: true }" :checked="bypassChecked(bypass, bypass.values[index])" />
+                              <input :name="`${prop}-${bypass.control}`" type="radio" v-model="role.permissions[model][prop].bypass[bypass.control]" :value="{ [bypass.values[index]]: true }" />
                               {{ desc }}
                             </label>
                           </span>
@@ -356,17 +349,12 @@ export default {
         details.bypasses.forEach(b => {
           switch (b.type) {
             case 'radio':
-              v.role.permissions[model][prop].bypass = { ...v.role.permissions[model][prop].bypassm, [b.control]: { [b.defaultValue]: true }}
+              v.role.permissions[model][prop].bypass = { ...v.role.permissions[model][prop].bypass, [b.control]: { [b.defaultValue]: true }}
               break;
             default: v.role.permissions[model][prop].bypass = {}
           }
         })
       }
-    }
-
-    const bypassChecked = (bypass, prop) => {
-      console.log(bypass, prop)
-      return prop === bypass.defaultValue
     }
 
     /* Internal Data */
@@ -405,14 +393,13 @@ export default {
       v.saveRuleBtnLabel = props.reset ? 'Reset' : 'Save'
     })
 
-    return { ...toRefs(v), permissionSections, modifyRole, setBasePermissions, close, set, selectPermissionsTab, createBypassStructure, bypassChecked }
+    return { ...toRefs(v), permissionSections, modifyRole, setBasePermissions, close, set, selectPermissionsTab, createBypassStructure }
   }
 }
 </script>
 
 <style lang="scss" scoped>
   .input-spacing { margin-bottom: .5rem; }
-  .indent, .bypass-header { margin-left: 1.25rem; }
   label { user-select: none; }
   label input[type=checkbox] { margin-bottom: .125rem; }
   .permissions-grid {
@@ -437,7 +424,10 @@ export default {
 
     }
     .permissions {
-      max-height: 60vh; overflow-y: scroll;
+      max-height: 60vh;
+      overflow-y: scroll;
+      .indent, .bypass-header { margin-left: 1.25rem; }
+      .bypass-control { margin-left: 2.5rem; }
     }
   }
 </style>
