@@ -149,45 +149,53 @@
                             v-model="role.permissions[model][prop].bypass[bypass.control]"
                             :false-value="undefined" />
                           <input v-if="!role.permissions[model][prop]?.bypass" type="checkbox"
-                            :disabled="true"
-                            :value="false" />
+                            :disabled="!role.permissions[model][prop]?.allow"
+                            @click="role.permissions[model][prop].bypass = { [bypass.control]: true }" />
                           <span class="bypass-description" :class="{ disabled: !role.permissions[model][prop]?.allow }" v-html="bypass.description"></span>
                         </label>
                       </div>
                       <!-- Object Bypass View -->
-                      <div v-if="bypass.type === 'object' || bypass.type === 'priority' || !bypass.type">
+                      <div v-if="bypass.type === 'object' || bypass.type === 'priority' || bypass.type === 'selfMod' || !bypass.type">
                         <div class="bypass-header">
                           <label>
-                            <input v-if="role.permissions[model][prop]?.bypass" type="checkbox"
+                            <input type="checkbox" v-if="role.permissions[model][prop]?.bypass"
                               v-model="role.permissions[model][prop].bypass[bypass.control]"
-                              :true-value="role.permissions[model][prop].bypass[bypass.control] ? role.permissions[model][prop].bypass[bypass.control] : { [ bypass.type === 'priority' ? 'priority' : 'mod']: true }" :false-value="undefined" />
+                              :true-value="role.permissions[model][prop].bypass[bypass.control] ? role.permissions[model][prop].bypass[bypass.control] : { [ bypass.type === 'priority' ? 'priority' : (bypass.type === 'selfMod' ? 'selfMod' : 'mod') ]: true }" :false-value="undefined" />
                             <input v-if="!role.permissions[model][prop]?.bypass" type="checkbox"
-                              :disabled="true"
-                              :value="false" />
+                              :disabled="!role.permissions[model][prop]?.allow"
+                              @click="role.permissions[model][prop].bypass = { [bypass.control]: { [ bypass.type === 'priority' ? 'priority' : 'mod']: true } }"
+                               />
                             <span class="bypass-description" :class="{ disabled: !role.permissions[model][prop]?.allow }" v-html="bypass.description"></span>
                           </label>
                         </div>
                         <div class="bypass-control">
                           <label :class="{ disabled: !role.permissions[model][prop]?.bypass }">
                             <input type="radio"
-                              @click="role.permissions[model][prop].bypass[bypass.control].admin = true; role.permissions[model][prop].bypass[bypass.control].mod = role.permissions[model][prop].bypass[bypass.control].priority = undefined"
+                              @click="role.permissions[model][prop].bypass[bypass.control].admin = true; role.permissions[model][prop].bypass[bypass.control].mod = role.permissions[model][prop].bypass[bypass.control].priority = role.permissions[model][prop].bypass[bypass.control].selfMod = undefined"
                               :disabled="role.permissions[model][prop]?.bypass ? !role.permissions[model][prop]?.bypass[bypass.control] : true"
                               :checked="role.permissions[model][prop]?.bypass ? role.permissions[model][prop]?.bypass[bypass.control]?.admin : false" />
-                            <span class="bypass-description" :class="{ disabled: !role.permissions[model][prop]?.bypass[bypass.control] }">All</span>
+                            <span class="bypass-description" :class="{ disabled: role.permissions[model][prop]?.bypass ? !role.permissions[model][prop]?.bypass[bypass.control] : true }">All</span>
                           </label>
                           <label :class="{ disabled: !role.permissions[model][prop]?.bypass }">
                             <input type="radio"
-                              @click="role.permissions[model][prop].bypass[bypass.control].admin = role.permissions[model][prop].bypass[bypass.control].priority = undefined; role.permissions[model][prop].bypass[bypass.control].mod = true"
+                              @click="role.permissions[model][prop].bypass[bypass.control].admin = role.permissions[model][prop].bypass[bypass.control].priority = role.permissions[model][prop].bypass[bypass.control].selfMod = undefined; role.permissions[model][prop].bypass[bypass.control].mod = true"
                               :disabled="role.permissions[model][prop]?.bypass ? !role.permissions[model][prop]?.bypass[bypass.control] : true"
                               :checked="role.permissions[model][prop]?.bypass ? role.permissions[model][prop]?.bypass[bypass.control]?.mod : false" />
-                            <span class="bypass-description" :class="{ disabled: !role.permissions[model][prop]?.bypass[bypass.control] }">Moderated</span>
+                            <span class="bypass-description" :class="{ disabled: role.permissions[model][prop]?.bypass ? !role.permissions[model][prop]?.bypass[bypass.control] : true }">Moderated</span>
                           </label>
-                          <label v-if="bypass.type === 'priority'" :class="{ disabled: !role.permissions[model][prop]?.bypass }">
+                          <label v-if="bypass.type === 'priority' || bypass.type === 'selfMod'" :class="{ disabled: !role.permissions[model][prop]?.bypass }">
                             <input type="radio"
-                              @click="role.permissions[model][prop].bypass[bypass.control].admin = role.permissions[model][prop].bypass[bypass.control].mod = undefined; role.permissions[model][prop].bypass[bypass.control].priority = true"
+                              @click="role.permissions[model][prop].bypass[bypass.control].admin = role.permissions[model][prop].bypass[bypass.control].mod = role.permissions[model][prop].bypass[bypass.control].selfMod = undefined; role.permissions[model][prop].bypass[bypass.control].priority = true"
                               :disabled="role.permissions[model][prop]?.bypass ? !role.permissions[model][prop]?.bypass[bypass.control] : true"
                               :checked="role.permissions[model][prop]?.bypass ? role.permissions[model][prop]?.bypass[bypass.control]?.priority : false" />
-                            <span class="bypass-description" :class="{ disabled: !role.permissions[model][prop]?.bypass[bypass.control] }">Priority</span>
+                            <span class="bypass-description" :class="{ disabled: role.permissions[model][prop]?.bypass ? !role.permissions[model][prop]?.bypass[bypass.control] : true }">Priority</span>
+                          </label>
+                          <label v-if="bypass.type === 'selfMod'" :class="{ disabled: !role.permissions[model][prop]?.bypass }">
+                            <input type="radio"
+                              @click="role.permissions[model][prop].bypass[bypass.control].admin = role.permissions[model][prop].bypass[bypass.control].mod = role.permissions[model][prop].bypass[bypass.control].priority = undefined; role.permissions[model][prop].bypass[bypass.control].selfMod = true"
+                              :disabled="role.permissions[model][prop]?.bypass ? !role.permissions[model][prop]?.bypass[bypass.control] : true"
+                              :checked="role.permissions[model][prop]?.bypass ? role.permissions[model][prop]?.bypass[bypass.control]?.selfMod : false" />
+                            <span class="bypass-description" :class="{ disabled: role.permissions[model][prop]?.bypass ? !role.permissions[model][prop]?.bypass[bypass.control] : true }">Self Moderated</span>
                           </label>
                         </div>
                       </div>
@@ -398,9 +406,10 @@ export default {
       overflow-y: scroll;
       .disabled { color: $secondary-font-color; }
       .indent, .bypass-header { margin-left: 1.25rem; display: inline-block; }
+      .permission-title { font-weight: bold; }
       .bypass-description, .permission-title { margin-left: .25rem; }
       .bypass-control {
-        width: 45%;
+        width: 50%;
         float: right;
         display: inline-block;
         label {
