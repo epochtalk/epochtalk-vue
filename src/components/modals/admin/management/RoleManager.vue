@@ -113,6 +113,187 @@
               </div>
             </div>
 
+            <!-- Rate Limits Tab -->
+            <div v-if="selectedTab === 'rateLimiting'">
+              {{limits}}
+              <!-- Update User -->
+              <section class="boxed-section" v-if="limits.userUpdate.use = role.permissions?.users?.update?.allow">
+                <div class="header"><h6>User Update <span class="put right">PUT</span></h6></div>
+                <div class="content input-three-col">
+                  <div>
+                    <label class="desc-label" for="userUpdate-interval">Interval</label>
+                    <input type="text" class="input-text" id="userUpdate-interval" v-model="limits.userUpdate.interval" placeholder="In MS (Ex: 1000)" />
+                  </div>
+                  <div>
+                    <label class="desc-label" for="userUpdate-max-in-interval">Max In Interval</label>
+                    <input type="text" class="input-text" id="userUpdate-max-in-interval" v-model="limits.userUpdate.maxInInterval" placeholder="Ex: 1" />
+                  </div>
+                  <div>
+                    <label class="desc-label" for="userUpdate-min-difference">Min Difference</label>
+                    <input type="text" class="input-text" id="userUpdate-min-difference" v-model="limits.userUpdate.minDifference" placeholder="In MS (Ex: 100)" />
+                  </div>
+                </div>
+              </section>
+
+              <!-- Conversation Create -->
+              <section class="boxed-section" v-if="limits.conversationCreate.use = role.permissions?.conversations?.create?.allow">
+                <div class="header"><h6>Conversations Create <span class="post right">POST</span></h6></div>
+                <div class="content input-three-col">
+                  <div>
+                    <label class="desc-label" for="conversationCreate-interval">Interval</label>
+                    <input type="text" class="input-text" id="conversationCreate-interval" v-model="limits.conversationCreate.interval" placeholder="In MS (Ex: 1000)" />
+                  </div>
+                  <div>
+                    <label class="desc-label" for="conversationCreate-max-in-interval">Max In Interval</label>
+                    <input type="text" class="input-text" id="conversationCreate-max-in-interval" v-model="limits.conversationCreate.maxInInterval" placeholder="Ex: 1" />
+                  </div>
+                  <div>
+                    <label class="desc-label" for="conversationCreate-min-difference">Min Difference</label>
+                    <input type="text" class="input-text" id="conversationCreate-min-difference" v-model="limits.conversationCreate.minDifference" placeholder="In MS (Ex: 100)" />
+                  </div>
+                </div>
+              </section>
+
+              <!-- Message Create -->
+              <section class="boxed-section" v-if="limits.messageCreate.use = role.permissions?.messages?.create?.allow">
+                <div class="header"><h6>Messages Create <span class="post right">POST</span></h6></div>
+                <div class="content input-three-col">
+                  <div>
+                    <label class="desc-label" for="messageCreate-interval">Interval</label>
+                    <input type="text" class="input-text" id="messageCreate-interval" v-model="limits.messageCreate.interval" placeholder="In MS (Ex: 1000)" />
+                  </div>
+                  <div>
+                    <label class="desc-label" for="messageCreate-max-in-interval">Max In Interval</label>
+                    <input type="text" class="input-text" id="messageCreate-max-in-interval" v-model="limits.messageCreate.maxInInterval" placeholder="Ex: 1" />
+                  </div>
+                  <div>
+                    <label class="desc-label" for="messageCreate-min-difference">Min Difference</label>
+                    <input type="text" class="input-text" id="messageCreate-min-difference" v-model="limits.messageCreate.minDifference" placeholder="In MS (Ex: 100)" />
+                  </div>
+                </div>
+              </section>
+
+              <!-- Post Create -->
+              <section class="boxed-section" v-if="limits.postCreate.use = role.permissions?.posts?.create?.allow">
+                <div class="header"><h6>Posts Create <span class="post right">POST</span></h6></div>
+                <div class="content input-three-col">
+                  <div>
+                    <label class="desc-label" for="postCreate-interval">Interval</label>
+                    <input type="text" class="input-text" id="postCreate-interval" v-model="limits.postCreate.interval" placeholder="In MS (Ex: 1000)" />
+                  </div>
+                  <div>
+                    <label class="desc-label" for="postCreate-max-in-interval">Max In Interval</label>
+                    <input type="text" class="input-text" id="postCreate-max-in-interval" v-model="limits.postCreate.maxInInterval" placeholder="Ex: 1" />
+                  </div>
+                  <div>
+                    <label class="desc-label" for="postCreate-min-difference">Min Difference</label>
+                    <input type="text" class="input-text" id="postCreate-min-difference" v-model="limits.postCreate.minDifference" placeholder="In MS (Ex: 100)" />
+                  </div>
+                </div>
+              </section>
+
+              <!-- Post Update -->
+              <section class="boxed-section" v-if="limits.postUpdate.use = role.permissions?.posts?.update?.allow">
+                <div class="header"><h6>Posts Update <span class="post right">POST</span></h6></div>
+                <div class="content input-three-col">
+                  <div>
+                    <label class="desc-label" for="postUpdate-interval">Interval</label>
+                    <input type="text" class="input-text" id="postUpdate-interval" v-model="limits.postUpdate.interval" placeholder="In MS (Ex: 1000)" />
+                  </div>
+                  <div>
+                    <label class="desc-label" for="postUpdate-max-in-interval">Max In Interval</label>
+                    <input type="text" class="input-text" id="postUpdate-max-in-interval" v-model="limits.postUpdate.maxInInterval" placeholder="Ex: 1" />
+                  </div>
+                  <div>
+                    <label class="desc-label" for="postUpdate-min-difference">Min Difference</label>
+                    <input type="text" class="input-text" id="postUpdate-min-difference" v-model="limits.postUpdate.minDifference" placeholder="In MS (Ex: 100)" />
+                  </div>
+                </div>
+              </section>
+
+              <!-- Thread Create -->
+              <section class="boxed-section" v-if="limits.threadCreate.use = role.permissions?.threads?.create?.allow">
+                <div class="header"><h6>Threads Create <span class="post right">POST</span></h6></div>
+                <div class="content input-three-col">
+                  <div>
+                    <label class="desc-label" for="threadCreate-interval">Interval</label>
+                    <input type="text" class="input-text" id="threadCreate-interval" v-model="limits.threadCreate.interval" placeholder="In MS (Ex: 1000)" />
+                  </div>
+                  <div>
+                    <label class="desc-label" for="threadCreate-max-in-interval">Max In Interval</label>
+                    <input type="text" class="input-text" id="threadCreate-max-in-interval" v-model="limits.threadCreate.maxInInterval" placeholder="Ex: 1" />
+                  </div>
+                  <div>
+                    <label class="desc-label" for="threadCreate-min-difference">Min Difference</label>
+                    <input type="text" class="input-text" id="threadCreate-min-difference" v-model="limits.threadCreate.minDifference" placeholder="In MS (Ex: 100)" />
+                  </div>
+                </div>
+              </section>
+
+              <!-- Report User -->
+              <section class="boxed-section" v-if="limits.reportUser.use = role.permissions?.reports?.createUserReport?.allow">
+                <div class="header"><h6>Report Users <span class="post right">POST</span></h6></div>
+                <div class="content input-three-col">
+                  <div>
+                    <label class="desc-label" for="reportUser-interval">Interval</label>
+                    <input type="text" class="input-text" id="reportUser-interval" v-model="limits.reportUser.interval" placeholder="In MS (Ex: 1000)" />
+                  </div>
+                  <div>
+                    <label class="desc-label" for="reportUser-max-in-interval">Max In Interval</label>
+                    <input type="text" class="input-text" id="reportUser-max-in-interval" v-model="limits.reportUser.maxInInterval" placeholder="Ex: 1" />
+                  </div>
+                  <div>
+                    <label class="desc-label" for="reportUser-min-difference">Min Difference</label>
+                    <input type="text" class="input-text" id="reportUser-min-difference" v-model="limits.reportUser.minDifference" placeholder="In MS (Ex: 100)" />
+                  </div>
+                </div>
+              </section>
+
+              <!-- Report Message -->
+              <section class="boxed-section" v-if="limits.reportMessage.use = role.permissions?.reports?.createMessageReport?.allow">
+                <div class="header"><h6>Report Messages <span class="post right">POST</span></h6></div>
+                <div class="content input-three-col">
+                  <div>
+                    <label class="desc-label" for="reportMessage-interval">Interval</label>
+                    <input type="text" class="input-text" id="reportMessage-interval" v-model="limits.reportMessage.interval" placeholder="In MS (Ex: 1000)" />
+                  </div>
+                  <div>
+                    <label class="desc-label" for="reportMessage-max-in-interval">Max In Interval</label>
+                    <input type="text" class="input-text" id="reportMessage-max-in-interval" v-model="limits.reportMessage.maxInInterval" placeholder="Ex: 1" />
+                  </div>
+                  <div>
+                    <label class="desc-label" for="reportMessage-min-difference">Min Difference</label>
+                    <input type="text" class="input-text" id="reportMessage-min-difference" v-model="limits.reportMessage.minDifference" placeholder="In MS (Ex: 100)" />
+                  </div>
+                </div>
+              </section>
+
+              <!-- Report Post -->
+              <section class="boxed-section" v-if="limits.reportPost.use = role.permissions?.reports?.createPostReport?.allow">
+                <div class="header"><h6>Report Posts <span class="post right">POST</span></h6></div>
+                <div class="content input-three-col">
+                  <div>
+                    <label class="desc-label" for="reportPost-interval">Interval</label>
+                    <input type="text" class="input-text" id="reportPost-interval" v-model="limits.reportPost.interval" placeholder="In MS (Ex: 1000)" />
+                  </div>
+                  <div>
+                    <label class="desc-label" for="reportPost-max-in-interval">Max In Interval</label>
+                    <input type="text" class="input-text" id="reportPost-max-in-interval" v-model="limits.reportPost.maxInInterval" placeholder="Ex: 1" />
+                  </div>
+                  <div>
+                    <label class="desc-label" for="reportPost-min-difference">Min Difference</label>
+                    <input type="text" class="input-text" id="reportPost-min-difference" v-model="limits.reportPost.minDifference" placeholder="In MS (Ex: 100)" />
+                  </div>
+                </div>
+              </section>
+
+              <div v-if="!hasLimits()">
+                <strong>
+                  <div class="centered-text">You have no Permissions that require rate limiting.</div>
+                </strong>
+              </div>
+            </div>
+
             <!-- Permissions Tabs -->
             <div v-for="(layout, model) in layouts" :key="model">
               <div v-if="model === selectedTab" class="permissions-tab">
@@ -216,6 +397,23 @@
                   </div>
 
                 </section>
+
+                <!-- Restrict Messaging (messages tab specific) -->
+                <div v-if="selectedTab ==='messages' && role.lookup !== 'private' && role.lookup !== 'anonymous'">
+                  {{role.permissions.priorityRestrictions}}
+                  <div class="fill-row">
+                    <label>Allow user to message the following roles:</label>
+                    <ul class="roles">
+                      <li v-for="restrictRole in roles.filter(r => r.lookup !== 'private' && r.lookup !== 'anonymous')" :key="restrictRole.id">
+                        <label>
+                          <input :checked="role.permissions.invertedRestrictions.indexOf(restrictRole.priority) > -1" @click="toggleRestriction(restrictRole.priority)" type="checkbox" />
+                          {{restrictRole.name}}
+                        </label>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
               </div>
             </div>
           </div>
@@ -246,11 +444,11 @@
 import Modal from '@/components/layout/Modal.vue'
 import { reactive, toRefs, inject, watch } from 'vue'
 // import { adminApi } from '@/api'
-import { cloneDeep, set, get } from 'lodash'
+import { cloneDeep, set, get, intersection } from 'lodash'
 
 export default {
   name: 'role-manager-modal',
-  props: ['show', 'add', 'edit', 'reset', 'roles', 'layouts', 'selected'],
+  props: ['show', 'add', 'edit', 'reset', 'roles', 'layouts', 'selected', 'allPriorities'],
   emits: ['close', 'success'],
   components: { Modal },
   setup(props, { emit }) {
@@ -270,8 +468,38 @@ export default {
       emit('close')
     }
 
-    const setBasePermissions = () => v.roles.forEach(r =>
-      r.id === v.baseRoleId ? v.role.permissions = cloneDeep(r.permissions) : null)
+    const hasLimits = () => limiter.filter(limit => limit.use).length > 0
+
+    const resetLimits = roleLimits => {
+      // clear our previous values
+      limiter.map(limit => {
+        limit.interval = undefined
+        limit.maxInInterval = undefined
+        limit.minDifference = undefined
+      })
+      if (!roleLimits || roleLimits.length === 0) return
+      // set values from this role
+      roleLimits.map(limit => {
+        // find match limit in this.limiter
+        let memLimit = limiter.filter(l => l.path === limit.path && l.method === limit.method)
+        if (memLimit.length > 0) {
+          memLimit[0].interval = limit.interval
+          memLimit[0].maxInInterval = limit.maxInInterval
+          memLimit[0].minDifference = limit.minDifference
+        }
+      })
+    }
+
+    const toggleRestriction = priority => {
+      let index = v.role.permissions.invertedRestrictions.indexOf(priority)
+      if (index > -1) v.role.permissions.invertedRestrictions.splice(index, 1)
+      else v.role.permissions.invertedRestrictions.push(priority)
+
+      let intersect = intersection(v.role.permissions.invertedRestrictions, props.allPriorities)
+      if (intersect && intersect.length === props.allPriorities.length) v.role.permissions.priorityRestrictions = undefined
+      else v.role.permissions.priorityRestrictions = intersect
+    }
+
 
     const permissionSections = [
       { key: 'general', label: 'General' },
@@ -315,7 +543,8 @@ export default {
         if (!Object.keys(currentModel).length) delete v.role.permissions[v.selectedTab]
       }
       // init root obj for this permission tab
-      if (model !== 'views' && model !== 'general') v.role.permissions[model] = v.role.permissions[model] || {}
+      if (model !== 'views' && model !== 'general' && model !== 'rateLimiting')
+        v.role.permissions[model] = v.role.permissions[model] || {}
       // select tab
       v.selectedTab = model
     }
@@ -340,6 +569,17 @@ export default {
 
     /* Template Data */
     const v = reactive({
+      limits: {
+        conversationCreate: { path: '/api/conversations', method: 'POST' },
+        messageCreate: { path: '/api/messages', method: 'POST' },
+        postCreate: { path: '/api/posts', method: 'POST' },
+        postUpdate: { path: '/api/posts/{id}', method: 'POST' },
+        threadCreate: { path: '/api/threads', method: 'POST' },
+        reportUser: { path: '/api/reports/users', method: 'POST' },
+        reportMessage: { path: '/api/reports/messages', method: 'POST' },
+        reportPost: { path: '/api/reports/posts', method: 'POST' },
+        userUpdate: { path: '/api/users/{id}', method: 'PUT'}
+      },
       focusInput: null,
       baseRoleId: null,
       settingsAccess: null,
@@ -350,6 +590,19 @@ export default {
       saveRuleBtnLabel: props.reset ? 'Reset' : 'Save',
       requestSubmitted: false,
     })
+
+    // rate limiting
+    const limiter = [
+      v.limits.conversationCreate,
+      v.limits.messageCreate,
+      v.limits.postCreate,
+      v.limits.postUpdate,
+      v.limits.threadCreate,
+      v.limits.reportUser,
+      v.limits.reportMessage,
+      v.limits.reportPost,
+      v.limits.userUpdate
+    ]
 
     const initAdminPanelAccess = () => {
       set(v.role, 'permissions.modAccess.messages',
@@ -369,9 +622,10 @@ export default {
       v.roles = cloneDeep(props.roles)
       initAdminPanelAccess()
       v.saveRuleBtnLabel = props.reset ? 'Reset' : 'Save'
+      if (props.edit) resetLimits(cloneDeep(props.selected.permissions.limits))
     })
 
-    return { ...toRefs(v), permissionSections, modifyRole, setBasePermissions, close, set, selectPermissionsTab, createBypassStructure }
+    return { ...toRefs(v), permissionSections, modifyRole, setBasePermissions, close, set, selectPermissionsTab, createBypassStructure, toggleRestriction, hasLimits }
   }
 }
 </script>
