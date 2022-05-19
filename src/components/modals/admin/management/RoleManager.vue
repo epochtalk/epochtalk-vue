@@ -459,6 +459,9 @@ export default {
     }
 
     const modifyRole = () => {
+      // Set permission rate limits
+      v.role.permissions.limits = limiter.filter(l => l.interval && l.maxInInterval)
+      console.log(v.role)
       v.requestSubmitted = true
       $alertStore.success('Modify Role')
     }
