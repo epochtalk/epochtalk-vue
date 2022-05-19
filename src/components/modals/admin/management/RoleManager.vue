@@ -665,6 +665,18 @@ export default {
     .permissions {
       max-height: 60vh;
       overflow-y: scroll;
+      label { height: auto; }
+      ul {
+        columns: 3;
+        list-style-type: none;
+        li { display: block; }
+        &.roles {
+          padding: 1rem;
+          padding-top: .5rem;
+          background-color: $sub-header-color;
+          border: 1px solid $border-color;
+        }
+      }
       .disabled { color: $secondary-font-color; }
       .indent, .bypass-header { margin-left: 1.25rem; display: inline-block; }
       .permission-title { font-weight: bold; }
