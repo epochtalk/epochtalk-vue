@@ -500,6 +500,10 @@ export default {
       else v.role.permissions.priorityRestrictions = intersect
     }
 
+    const setBasePermissions = () => {
+      v.roles.forEach(r => r.id === v.baseRoleId ? v.role.permissions = cloneDeep(r.permissions) : null)
+      initAdminPanelAccess()
+    }
 
     const permissionSections = [
       { key: 'general', label: 'General' },
