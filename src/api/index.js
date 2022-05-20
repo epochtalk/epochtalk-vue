@@ -9,6 +9,11 @@ export const $axios = axios.create({
   timeout: 3000,
   crossDomain: true
 })
+export const $axios2 = axios.create({
+  baseURL: 'http://localhost:4000',
+  timeout: 3000,
+  crossDomain: true
+})
 
 const $auth = localStorageCache(0, 'app').get('auth')
 const initUser = $auth ? $auth.data : undefined
@@ -29,6 +34,34 @@ const $http = (path, opts, handleErrors) => {
       case 'patch':
         return $axios[method](path, data, opts)
       default: return $axios[method](path, opts)
+    }
+  })(method)
+
+  const reqPromise = req.then(res => res.status === 200 ? res.data : res)
+
+  if (handleErrors) {
+    return reqPromise.catch(err => {
+      const msg = get(err, 'response.data.message')
+      if (msg && msg !== 'Unauthorized') { alertStore.error(msg) }
+      return Promise.reject(err)
+    })
+  }
+  else { return reqPromise }
+}
+const $http2 = (path, opts, handleErrors) => {
+  opts = opts || {}
+  const method = (opts.method || 'get').toLowerCase()
+  delete opts.method
+  const data = opts.data
+  delete opts.data
+
+  let req = (m => {
+    switch(m) {
+      case 'post':
+      case 'put':
+      case 'patch':
+        return $axios2[method](path, data, opts)
+      default: return $axios2[method](path, opts)
     }
   })(method)
 
