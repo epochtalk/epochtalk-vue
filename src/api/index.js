@@ -258,7 +258,9 @@ export const adminApi = {
     users: (id, query) => $http(`/api/admin/roles/${id}/users`, { params: query }),
     reprioritize: data => $http(`/api/admin/roles/reprioritize`, { method: 'PUT', data }),
     addUsers: data => $http(`/api/users/roles/add`, { method: 'PUT', data }),
-    removeUser: data => $http(`/api/users/roles/remove`, { method: 'PUT', data })
+    removeUser: data => $http(`/api/users/roles/remove`, { method: 'PUT', data }),
+    add: data => $http(`/api/admin/roles/add`, { method: 'POST', data }),
+    update: data => $http(`/api/admin/roles/update`, { method: 'PUT', data })
   },
   trust: {
     getDefaultTrustList: () => $http('/api/admin/trustlist'),
