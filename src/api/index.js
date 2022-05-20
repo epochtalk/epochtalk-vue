@@ -194,8 +194,8 @@ export const authApi = {
   confirmRegistration: data => $http('/api/confirm', { method: 'POST', data }, true),
   inviteRegistration: data => $http('/api/join', { method: 'POST', data }, true),
   resetPassword: data => $http(`/api/reset`, { method: 'POST', data }, true),
-  emailAvailable: email => $http(`/api/register/email/${email}`),
-  usernameAvailable: username => $http(`/api/register/username/${username}`),
+  emailAvailable: email => $http2(`/api/register/email/${email}`),
+  usernameAvailable: username => $http2(`/api/register/username/${username}`),
   inviteExists: email => $http(`/api/invites/exists?email=${email}`),
   invite: email => $http('/api/invites', { method: 'POST', data: { email }})
 }
