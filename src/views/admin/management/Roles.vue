@@ -58,9 +58,6 @@
         </div>
       </div>
       <div class="clear"></div>
-      <span v-if="selectedRole.lookup === 'banned'">
-        Visit the <a ui-sref="^.users">Users Tab</a> to ban users
-      </span>
     </div>
     <div v-if="canViewAddUsersControl()">
       <multiselect v-model="usersToAdd.value" v-bind="usersToAdd" />
@@ -98,7 +95,6 @@
       </div>
     </div>
     <div v-if="userData.count < 1">
-      <br />
       <h5>
         This role has no users to display. {{ selectedRole.lookup === 'banned' ? '' : 'To add users to this role click use the form above.' }}
         <span v-if="selectedRole.lookup !== 'banned'">
@@ -112,7 +108,6 @@
   </div>
 
   <div v-if="selectedRole.id && selectedRole.message">
-    <br />
     <h3>{{selectedRole.name}}</h3> <br />
     <h5>{{selectedRole.message}}</h5>
   </div>
@@ -121,7 +116,7 @@
     <span></span>
   </div>
 
-  <role-manager-modal :show="addNewRole || editSelectedRole || resetSelectedRole" :add="addNewRole" :edit="editSelectedRole" :reset="resetSelectedRole" @close="addNewRole=editSelectedRole=resetSelectedRole=false" :roles="roles" :layouts="roleLayouts" :selected="modifiedRole" :all-priorities="allPriorities" />
+  <role-manager-modal :show="addNewRole || editSelectedRole || resetSelectedRole" :add="addNewRole" :edit="editSelectedRole" :reset="resetSelectedRole" :remove="removeSelectedRole" @close="addNewRole=editSelectedRole=resetSelectedRole=false" :roles="roles" :layouts="roleLayouts" :selected="modifiedRole" :all-priorities="allPriorities" @success="refreshPageData" />
 </template>
 
 <script>
@@ -251,9 +246,16 @@ export default {
     const showRole = role => {
       v.modifiedRole = role || v.newRole
       if (role) v.editSelectedRole = true
-      else v.addNewRole = true
+      else {
+        v.modifiedRole.priority = v.maxPriority + 1
+        v.addNewRole = true
+      }
     }
-    const showRemoveRole = () => {}
+    const showRemoveRole = role => {
+      v.modifiedRole = role
+      v.removeSelectedRole = true
+    }
+
     const showResetRole = role => {
       v.modifiedRole = role
       v.resetSelectedRole = true
@@ -312,7 +314,17 @@ export default {
         $alertStore.error(message)
       })
 
-    const canViewAddUsersControl = () => true
+    const canViewAddUsersControl = () => {
+      let view = false
+      if (v.selectedRole.lookup !== 'banned') {
+        if (v.controlAccess.privilegedAddRoles && v.controlAccess.privilegedAddRoles.samePriority)
+          view = v.selectedRole.priority >= v.authedUser.permissions.priority
+        else if (v.controlAccess.privilegedAddRoles && v.controlAccess.privilegedAddRoles.lowerPriority)
+          view = v.selectedRole.priority > v.authedUser.permissions.priority
+      }
+      if (v.showFilterUsers) v.showFilterUsers = view
+      return view
+    }
 
     const $auth = inject(AuthStore)
     const $alertStore = inject('$alertStore')
@@ -353,6 +365,7 @@ export default {
       addNewRole: false,
       editSelectedRole: false,
       resetSelectedRole: false,
+      removeSelectedRole: false,
       maxPriority: null,
       showFilterUsers: false,
       newRole: {},
@@ -407,7 +420,7 @@ export default {
       })
     }
 
-    return { ...toRefs(v), pageResults, reprioritizeRoles, selectRole, showRole, showRemoveRole, showResetRole, savePriority, resetPriority, searchUsers, clearSearch, addUsers, removeUser, canViewAddUsersControl, init }
+    return { ...toRefs(v), pageResults, reprioritizeRoles, selectRole, showRole, showRemoveRole, showResetRole, savePriority, resetPriority, searchUsers, clearSearch, addUsers, removeUser, canViewAddUsersControl, init, refreshPageData }
   }
 }
 </script>

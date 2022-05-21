@@ -448,27 +448,38 @@
 <script>
 import Modal from '@/components/layout/Modal.vue'
 import { reactive, toRefs, inject, watch } from 'vue'
-// import { adminApi } from '@/api'
+import { adminApi } from '@/api'
 import { cloneDeep, set, get, intersection } from 'lodash'
 
 export default {
   name: 'role-manager-modal',
-  props: ['show', 'add', 'edit', 'reset', 'roles', 'layouts', 'selected', 'allPriorities'],
+  props: ['show', 'add', 'edit', 'reset', 'remove', 'roles', 'layouts', 'selected', 'allPriorities'],
   emits: ['close', 'success'],
   components: { Modal },
   setup(props, { emit }) {
     /* Template Methods */
     const resetForm = () => {
       v.requestSubmitted = false
-      v.saveRuleBtnLabel = props.reset ? 'Reset' : 'Save'
+      v.baseRoleId = null;
+      v.role = {}
+      v.saveRuleBtnLabel = props.reset ? 'Reset' : props.remove ? 'Remove' : 'Save'
     }
 
     const modifyRole = () => {
+      v.requestSubmitted = true
       // Set permission rate limits
       v.role.permissions.limits = limiter.filter(l => l.interval && l.maxInInterval)
-      console.log(v.role)
-      v.requestSubmitted = true
-      $alertStore.success('Modify Role')
+      // Remove highlight color if not set
+      v.role.highlight_color = v.role.highlight_color ? v.role.highlight_color : undefined
+      let successMsg = `${v.role.name} successfully ${props.edit?'updated':'created'}!`
+      let errorMsg = `There was an error ${props.edit?'updating':'creating'} the role ${v.role.name}`
+      adminApi.roles[props.edit ? 'update' : 'add'](v.role)
+      .then(() => {
+        $alertStore.success(successMsg)
+        emit('success')
+      })
+      .catch(() => $alertStore.error(errorMsg))
+      .finally(close)
     }
 
     const close = () => {
@@ -599,7 +610,7 @@ export default {
       role: {},
       roles: props.roles || [],
       selectedTab: 'general',
-      saveRuleBtnLabel: props.reset ? 'Reset' : 'Save',
+      saveRuleBtnLabel: props.reset ? 'Reset' : props.remove ? 'Remove' : 'Save',
       requestSubmitted: false,
     })
 
@@ -633,7 +644,7 @@ export default {
       v.role = cloneDeep(props.selected)
       v.roles = cloneDeep(props.roles)
       initAdminPanelAccess()
-      v.saveRuleBtnLabel = props.reset ? 'Reset' : 'Save'
+      v.saveRuleBtnLabel = props.reset ? 'Reset' : props.remove ? 'Remove' : 'Save'
       if (props.edit) resetLimits(cloneDeep(props.selected.permissions.limits))
     })
 
