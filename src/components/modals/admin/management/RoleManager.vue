@@ -115,7 +115,6 @@
 
             <!-- Rate Limits Tab -->
             <div v-if="selectedTab === 'rateLimiting'">
-              {{limits}}
               <!-- Update User -->
               <section class="boxed-section" v-if="limits.userUpdate.use = role.permissions?.users?.update?.allow">
                 <div class="header"><h6>User Update <span class="put right">PUT</span></h6></div>
@@ -297,8 +296,6 @@
             <!-- Permissions Tabs -->
             <div v-for="(layout, model) in layouts" :key="model">
               <div v-if="model === selectedTab" class="permissions-tab">
-                <!-- {{layout}}<br><br> -->
-                {{role.permissions[model]}}
                 <section class="permission" v-for="(details, prop) in layout" :key="prop">
                   <!-- Title Display -->
                   <div v-if="details.type === 'title'">
@@ -400,7 +397,6 @@
 
                 <!-- Restrict Messaging (messages tab specific) -->
                 <div v-if="selectedTab ==='messages' && role.lookup !== 'private' && role.lookup !== 'anonymous'">
-                  {{role.permissions.priorityRestrictions}}
                   <div class="fill-row">
                     <label>Allow user to message the following roles:</label>
                     <ul class="roles">
@@ -426,6 +422,15 @@
             </p>
           </div>
         </div>
+
+        <div v-if="remove" class="col input-spacing">
+          <div>
+            <p>
+              Are you sure you want to remove the role named <strong>{{role.name}}</strong>? This will change will permanently delete the role and all users who have this role will be affected.
+            </p>
+          </div>
+        </div>
+
 
         <div class="col">
           <div>
