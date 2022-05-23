@@ -260,7 +260,8 @@ export const adminApi = {
     addUsers: data => $http(`/api/users/roles/add`, { method: 'PUT', data }),
     removeUser: data => $http(`/api/users/roles/remove`, { method: 'PUT', data }),
     add: data => $http(`/api/admin/roles/add`, { method: 'POST', data }),
-    update: data => $http(`/api/admin/roles/update`, { method: 'PUT', data })
+    update: data => $http(`/api/admin/roles/update`, { method: 'PUT', data }),
+    delete: id => $http(`/api/admin/roles/remove/${id}`, { method: 'DELETE' })
   },
   trust: {
     getDefaultTrustList: () => $http('/api/admin/trustlist'),
