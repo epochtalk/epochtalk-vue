@@ -467,13 +467,37 @@ export default {
 
     const modifyRole = () => {
       v.requestSubmitted = true
-      // Set permission rate limits
-      v.role.permissions.limits = limiter.filter(l => l.interval && l.maxInInterval)
-      // Remove highlight color if not set
-      v.role.highlight_color = v.role.highlight_color ? v.role.highlight_color : undefined
-      let successMsg = `${v.role.name} successfully ${props.edit?'updated':'created'}!`
-      let errorMsg = `There was an error ${props.edit?'updating':'creating'} the role ${v.role.name}`
-      adminApi.roles[props.edit ? 'update' : 'add'](v.role)
+      let requestPromise, successMsg, errorMsg
+      let cleanRole = () => {
+        if(!v.role.highlight_color || !v.role.highlightColor) {
+          delete v.role.highlight_color
+          delete v.role.highlightColor
+        }
+        if (v.role.modAccess && !Object.keys(v.role.modAccess).length) delete v.role.modAccess
+        if (v.role.adminAccess && !Object.keys(v.role.adminAccess).length) delete v.role.adminAccess
+      }
+      if (props.add || props.edit) {
+        // Set permission rate limits
+        v.role.permissions.limits = limiter.filter(l => l.interval && l.maxInInterval)
+        // Remove highlight color if not set
+        cleanRole()
+        successMsg = `${v.role.name} successfully ${props.edit?'updated':'created'}!`
+        errorMsg = `There was an error ${props.edit?'updating':'creating'} the role ${v.role.name}`
+        requestPromise = adminApi.roles[props.edit ? 'update' : 'add'](v.role)
+      }
+      else if (props.reset) {
+        v.role.permissions = {}
+        cleanRole()
+        successMsg = `${v.role.name} successfully reset to defaults!`
+        errorMsg = `There was an error resetting the role ${v.role.name}`
+        requestPromise = adminApi.roles.update(v.role)
+      }
+      else {
+        successMsg = `${v.role.name} successfully reset to defaults!`
+        errorMsg = `There was an error resetting the role ${v.role.name}`
+        requestPromise = adminApi.roles.delete(v.role.id)
+      }
+      requestPromise
       .then(() => {
         $alertStore.success(successMsg)
         emit('success')

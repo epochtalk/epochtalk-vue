@@ -27,7 +27,7 @@
             <a href="#" v-if="controlAccess.update.allow" @click.stop.prevent="showRole(element)">Edit</a>
             <span v-if="!controlAccess.update.allow">Edit</span>
             &nbsp;&nbsp;
-            <a v-if="element.id === element.lookup && controlAccess.remove.allow" href="#" @click.prevent="showRemoveRole(element)">Remove</a>
+            <a v-if="element.id === element.lookup && controlAccess.remove.allow" href="#" @click.stop.prevent="showRemoveRole(element)">Remove</a>
             <a v-if="element.id !== element.lookup" href="#" @click.stop.prevent="showResetRole(element)">Reset</a>
           </span>
         </div>
@@ -116,7 +116,7 @@
     <span></span>
   </div>
 
-  <role-manager-modal :show="addNewRole || editSelectedRole || resetSelectedRole" :add="addNewRole" :edit="editSelectedRole" :reset="resetSelectedRole" :remove="removeSelectedRole" @close="addNewRole=editSelectedRole=resetSelectedRole=false" :roles="roles" :layouts="roleLayouts" :selected="modifiedRole" :all-priorities="allPriorities" @success="refreshPageData" />
+  <role-manager-modal :show="addNewRole || editSelectedRole || resetSelectedRole || removeSelectedRole" :add="addNewRole" :edit="editSelectedRole" :reset="resetSelectedRole" :remove="removeSelectedRole" @close="addNewRole=editSelectedRole=resetSelectedRole=removeSelectedRole=false" :roles="roles" :layouts="roleLayouts" :selected="modifiedRole" :all-priorities="allPriorities" @success="refreshPageData" />
 </template>
 
 <script>
