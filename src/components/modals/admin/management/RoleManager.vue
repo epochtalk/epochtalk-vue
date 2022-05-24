@@ -660,6 +660,8 @@ export default {
         get(v.role, 'permissions.reports.pageUserReports.allow'))
       set(v.role, 'permissions.modAccess.logs',
         get(v.role, 'permissions.moderationLogs.page.allow'))
+      Object.keys(v.role.permissions.modAccess).forEach(k => v.role.permissions.modAccess[k] === undefined && delete v.role.permissions.modAccess[k])
+      if (v.role.permissions.modAccess && !Object.keys(v.role.permissions.modAccess).length) delete v.role.permissions.modAccess
       set(v.role, 'permissions.adminAccess.settings', get(v.role, 'permissions.adminAccess.settings'))
       set(v.role, 'permissions.adminAccess.management', get(v.role, 'permissions.adminAccess.management'))
     }
