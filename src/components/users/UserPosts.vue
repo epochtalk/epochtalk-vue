@@ -2,11 +2,11 @@
   <div class="user-profile-posts">
     <div class="table-actions">
       <button @click="toggleThreads(true)" :class="{'active': threads}">
-        <strong>Threads&nbsp;</strong> <span class="username">by {{user.username}}</span>
+        <strong>Threads&nbsp;</strong> <span class="username">by {{username}}</span>
       </button>
 
       <button @click="toggleThreads(false)" :class="{'active': !threads}">
-        <strong>Posts&nbsp;</strong> <span class="username">by {{user.username}}</span>
+        <strong>Posts&nbsp;</strong> <span class="username">by {{username}}</span>
       </button>
     </div>
 
@@ -22,6 +22,7 @@
       </div>
 
       <div class="no-table-contents" v-if="!postData?.posts?.length">
+        <br />
         <h4>This user has no posts to display</h4>
       </div>
 
@@ -62,6 +63,7 @@
       </div>
 
       <div class="no-table-contents" v-if="!postData?.posts.length">
+        <br />
         <h4>This user has no threads to display</h4>
       </div>
       <div v-if="postData?.posts.length">

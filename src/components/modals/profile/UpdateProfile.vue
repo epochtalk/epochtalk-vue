@@ -19,7 +19,7 @@
                   Usernames may only contain A-Z, 0-9, -, _ and .
                 </div>
               </label>
-              <input type="text" name="username" v-model="userCopy.username" placeholder="Username ( a-z, 0-9, -, _ and . )" maxlength="255" @input="formValid = false" :disabled="!canUpdateUsername()" ref="focusInput" />
+              <input type="text" name="username" v-model="userCopy.username" placeholder="Username ( a-z, 0-9, -, _ and . )" maxlength="255" @input="formValid = false" :disabled="!admin && !canUpdateUsername()" ref="focusInput" />
             </div>
 
             <div class="input-section">
@@ -70,7 +70,23 @@
             </div>
           </div>
         </div>
+        <div v-if="admin" class="fieldgroup-double">
+          <div class="fieldgroup-section">
+            <label>Email</label>
+              <input type="email" name="email" v-model="userCopy.email" unique-email="{{::AdminManagementCtrl.selectedUser.email}}"  />
 
+            <label for="website-logo-upload-btn">Avatar</label>
+            <input type="text" class="input-text upload-input" v-model="userCopy.avatar" placeholder="No Avatar" />
+            <div class="upload-err">{{ avatarError ? 'Selected image exceeds 100kB' : null }}</div>
+            <image-uploader purpose="avatar" inputId="user-avatar" @upload-success="url => { userCopy.avatar = url; avatarError = null }" @upload-error="err => avatarError = err" />
+
+          </div>
+          <div class="fieldgroup-section">
+            <label>Signature
+              <textarea type="text" rows="5" placeholder="Signature" v-model="userCopy.raw_signature" maxlength="5000"></textarea>
+            </label>
+          </div>
+        </div>
         <!-- Save Button -->
         <div class="modal-actions">
           <button @click.prevent="updateProfile()" :disabled="!formValid">
@@ -90,12 +106,13 @@ import { usersApi, authApi } from '@/api'
 import dayjs from 'dayjs'
 import { debounce } from 'lodash'
 import { websiteUrlRegex, usernameRegex } from '@/composables/utils/globalRegex'
+import ImageUploader from '@/components/images/ImageUploader.vue'
 
 export default {
   name: 'update-profile-modal',
-  props: ['show', 'user', 'canUpdateUsername'],
-  emits: ['close'],
-  components: { Modal },
+  props: ['show', 'user', 'canUpdateUsername', 'admin'],
+  emits: ['close', 'success'],
+  components: { Modal, ImageUploader },
   setup(props, { emit }) {
     /* Internal Methods */
     const checkFormValid = () => v.formValid = v.usernameUnique && v.usernameValid && v.websiteValid
@@ -115,6 +132,7 @@ export default {
       .then(() => {
         $alertStore.success(`Successfully updated profile for user ${params.username}`)
         Object.assign(v.userReactive, v.userCopy)
+        emit('success', v.userReactive)
       })
       .catch(() => v.errorMessage = 'There was a problem updating your profile information, please ensure that the form has no errors.')
       .finally(() => v.errorMessage ? null : close())
@@ -130,32 +148,28 @@ export default {
 
     /* Template Data */
     const v = reactive({
-      userCopy: {
-        username: props.user.username,
-        name: decodeHtml(props.user.name),
-        dob_formatted: dayjs.utc(props.user.dob).format('YYYY-MM-DD'),
-        btc_address: props.user.btc_address,
-        gender: decodeHtml(props.user.gender),
-        website: decodeHtml(props.user.website),
-        location: decodeHtml(props.user.location),
-        language: decodeHtml(props.user.language),
-      }, // don't want reactiveness
+      userCopy: {}, // don't want reactiveness
       userReactive: props.user,
       websiteValid: props.user.website ? websiteUrlRegex.test(props.user.website) : true,
       formValid: true,
       usernameUnique: true,
       usernameValid: true,
       focusInput: null,
-      errorMessage: ''
+      errorMessage: '',
+      avatarError: ''
     })
 
     /* Watch Data */
     watch(() => props.show, (show) => {
       if (show) {
         v.userCopy = {
+          avatar: props.admin ? props.user.avatar : undefined,
+          raw_signature: props.admin ? props.user.raw_signature : undefined,
+          email: props.admin ? props.user.email : undefined,
+          email_password: props.admin ? props.user.email_password : undefined,
           username: props.user.username,
           name: decodeHtml(props.user.name),
-          dob_formatted: dayjs.utc(props.user.dob).format('YYYY-MM-DD'),
+          dob_formatted: props.user.dob ? dayjs.utc(props.user.dob).format('YYYY-MM-DD') : '',
           btc_address: props.user.btc_address,
           gender: decodeHtml(props.user.gender),
           website: decodeHtml(props.user.website),

@@ -1,4 +1,12 @@
+const webpack = require("webpack");
+
 module.exports = {
+  devServer: {
+    host: 'localhost',
+    hot: true,
+    disableHostCheck: true,
+    https: false
+  },
   css: {
     loaderOptions: {
       scss: {
@@ -9,6 +17,13 @@ module.exports = {
     }
   },
   configureWebpack: {
+    plugins: [
+    new webpack.ProvidePlugin({
+      $: "jquery",
+      jQuery: "jquery",
+      'window.jQuery': 'jquery'
+     })
+    ],
     optimization: {
       splitChunks: {
         chunks: 'async',

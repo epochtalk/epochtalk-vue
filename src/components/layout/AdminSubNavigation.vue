@@ -9,7 +9,7 @@
       </span>
     </dl>
 
-    <div class="actions">
+    <div class="actions" v-if="checkSaveEnabled()">
       <button v-if="nav[3]?.routeName === 'ThemeSettings' && nav[3]?.active" @click="EventBus.emit('admin-preview')" :disabled="!formValid">
         <i class="fa fa-eye"></i>&nbsp;&nbsp;Preview
       </button>
@@ -38,6 +38,12 @@ export default {
 
     const $route = useRoute()
     const $auth = inject(AuthStore)
+
+    const checkSaveEnabled = () => {
+      let routeName = $route.name
+      let noSaveRoutes = ['UserManagement']
+      return noSaveRoutes.indexOf(routeName) < 0
+    }
 
     const checkActive = n => n === $route.name
     const permUtils = $auth.permissionUtils
@@ -144,7 +150,7 @@ export default {
     watch(() => $route.path, p => v.nav = nav[p.split('/')[2] || 'settings'])
     watch(() => $route.meta, m => v.routeName = m.title)
 
-    return { ...toRefs(v), EventBus }
+    return { ...toRefs(v), EventBus, checkSaveEnabled }
   }
 }
 </script>

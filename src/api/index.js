@@ -66,11 +66,22 @@ export const imagesApi = {
   imagePolicy: data => $http('/api/images/policy', { method: 'POST', data })
 }
 
+export const categoriesApi = {
+  create: data => $http('/api/categories', { method: 'POST', data}),
+  delete: data => $http('/api/categories/delete', { method: 'POST', data })
+}
+
 export const boardsApi = {
   slugToBoardId: slug => $http(`/api/boards/${slug}/id`),
   getBoards: stripped => $http(`/api/boards${stripped ? '?stripped=true' : ''}`),
   movelist: () => $http('/api/boards/movelist'),
-  unfiltered: () => $http('/api/boards/unfiltered')
+  unfiltered: () => $http('/api/boards/unfiltered'),
+  uncategorized: () => $http('/api/boards/uncategorized'),
+  find: id => $http(`/api/boards/${id}`),
+  create: data => $http('/api/boards', { method: 'POST', data }),
+  delete: data => $http('/api/boards/delete', { method: 'POST', data }),
+  update: data => $http('/api/boards', { method: 'PUT', data }),
+  updateAll: data => $http('/api/boards/all', { method: 'POST', data })
 }
 
 export const threadsApi = {
@@ -156,6 +167,8 @@ export const authApi = {
 }
 
 export const usersApi = {
+  page: query => $http('/api/users', { params: query }),
+  count: query => $http('/api/users/count', { params: query }),
   search: username => $http('/api/users/search', { params: { username } }),
   memberSearch: params => $http('/api/search/users', { params }),
   lookup: (username, params) => $http(`/api/users/lookup/${username}`, { params }),
@@ -240,6 +253,16 @@ export const banApi = {
 export const adminApi = {
   configurations: () => $http('/api/configurations'),
   updateConfigurations: data => $http('/api/configurations', { method: 'POST', data }),
+  roles: {
+    all: () => $http('/api/admin/roles/all'),
+    users: (id, query) => $http(`/api/admin/roles/${id}/users`, { params: query }),
+    reprioritize: data => $http(`/api/admin/roles/reprioritize`, { method: 'PUT', data }),
+    addUsers: data => $http(`/api/users/roles/add`, { method: 'PUT', data }),
+    removeUser: data => $http(`/api/users/roles/remove`, { method: 'PUT', data }),
+    add: data => $http(`/api/admin/roles/add`, { method: 'POST', data }),
+    update: data => $http(`/api/admin/roles/update`, { method: 'PUT', data }),
+    delete: id => $http(`/api/admin/roles/remove/${id}`, { method: 'DELETE' })
+  },
   trust: {
     getDefaultTrustList: () => $http('/api/admin/trustlist'),
     editDefaultTrustList: data => $http('/api/admin/trustlist', { method: 'POST', data }),

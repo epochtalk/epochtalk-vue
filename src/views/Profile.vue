@@ -15,13 +15,18 @@
         <div class="profile-avatar-container" :class="defaultAvatarShape">
           <a href="#" v-if="canUpdate()" @click.prevent="showEditAvatar = true" class="profile-avatar-image">
             <img :src="user.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
-            <span class="profile-user-status" :data-balloon="user.username + ' is online'" v-if="isOnline">
+            <span class="profile-user-status" :data-balloon="user.username + ' is online'" v-if="userOnline">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
                 <circle cx="24" cy="24" r="16"/>
               </svg>
             </span>
           </a>
           <img v-if="!canUpdate()" :src="user.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
+          <span v-if="!canUpdate() && userOnline" class="profile-user-status" :data-balloon="user.username + ' is online'">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+              <circle cx="24" cy="24" r="16"/>
+            </svg>
+          </span>
           <a href="#" class="edit-avatar" v-if="canUpdate()" @click.prevent="showEditAvatar = true">
             <div>Change Avatar</div>
           </a>
@@ -188,16 +193,23 @@ import UpdateSignatureModal from '@/components/modals/profile/UpdateSignature.vu
 import { usersApi, mentionsApi, messagesApi } from '@/api'
 import { useRouter } from 'vue-router'
 import { AuthStore } from '@/composables/stores/auth'
+import { isOnline } from '@/composables/services/websocket'
 
 export default {
   name: 'Profile',
   props: [ 'username', 'saveScrollPos' ],
   components: { TrustDisplay, RankDisplay, UpdateSignatureModal, UpdatePasswordModal, UpdateAvatarModal, UpdateEmailModal, DeleteAccountModal, DeactivateReactivateModal, UpdateProfileModal, QuickMessageModal, ManageBansModal, ModerationNotesModal },
   beforeRouteEnter(to, from, next) {
-    usersApi.find(to.params.username).then(u => next(vm => vm.user = u))
+    usersApi.find(to.params.username).then(u => next(vm => {
+      vm.user = u
+      isOnline(u.id, (e, d) => vm.userOnline = d.online)
+    }))
   },
   beforeRouteUpdate(to, from, next) {
-    usersApi.find(to.params.username).then(u => this.user = u)
+    usersApi.find(to.params.username).then(u => {
+      this.user = u
+      isOnline(u.id, (e, d) => this.userOnline = d.online)
+    })
     next()
   },
   setup(props) {
@@ -323,7 +335,7 @@ export default {
     const v = reactive({
       loggedIn: $auth.loggedIn,
       permUtils: $auth.permissionUtils,
-      isOnline: true,
+      userOnline: false,
       userLocalTime: null,
       user: null,
       defaultAvatar: window.default_avatar,

@@ -1,5 +1,5 @@
 import { createWebHistory, createRouter } from 'vue-router'
-import { boardsApi, threadsApi, $axios } from '@/api'
+import { usersApi, boardsApi, threadsApi, $axios } from '@/api'
 import Boards from '@/views/Boards.vue'
 import Threads from '@/views/Threads.vue'
 import ThreadsPostedIn from '@/views/ThreadsPostedIn.vue'
@@ -21,6 +21,8 @@ import AdvancedSettings from '@/views/admin/settings/Advanced.vue'
 import LegalSettings from '@/views/admin/settings/Legal.vue'
 import ThemeSettings from '@/views/admin/settings/Theme.vue'
 import BoardManagement from '@/views/admin/management/Boards.vue'
+import UserManagement from '@/views/admin/management/Users.vue'
+import RoleManagement from '@/views/admin/management/Roles.vue'
 import UserModeration from '@/views/admin/moderation/Users.vue'
 import ConfirmAccount from '@/views/ConfirmAccount.vue'
 import ResetPassword from '@/views/ResetPassword.vue'
@@ -71,13 +73,13 @@ const routes = [
   {
     path: '/admin/management/users',
     name: 'UserManagement',
-    component: BoardManagement,
+    component: UserManagement,
     meta: { requiresAuth: true, bodyClass: 'user-management', title: 'Management' }
   },
   {
     path: '/admin/management/roles',
     name: 'RoleManagement',
-    component: BoardManagement,
+    component: RoleManagement,
     meta: { requiresAuth: true, bodyClass: 'role-management', title: 'Management' }
   },
   {
@@ -199,7 +201,10 @@ const routes = [
     path: '/profile/:username/posts',
     name: 'UserPosts',
     component: UserPosts,
-    props: true,
+    props: route => ({
+      user: usersApi.find(route.params.username).then(u => u),
+      username: route.params.username
+    }),
     meta: { requiresAuth: true, bodyClass: 'user-posts' }
   },
   {
