@@ -486,7 +486,7 @@ export default {
         requestPromise = adminApi.roles[props.edit ? 'update' : 'add'](v.role)
       }
       else if (props.reset) {
-        v.role.permissions = {}
+        v.role.permissions = v.role.base_permissions
         cleanRole()
         successMsg = `${v.role.name} successfully reset to defaults!`
         errorMsg = `There was an error resetting the role ${v.role.name}`
