@@ -462,6 +462,7 @@ export default {
       v.requestSubmitted = false
       v.baseRoleId = null;
       v.role = {}
+      v.selectedTab = 'general'
       v.saveRuleBtnLabel = props.reset ? 'Reset' : props.remove ? 'Remove' : 'Save'
     }
 
