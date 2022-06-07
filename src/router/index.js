@@ -22,6 +22,7 @@ import LegalSettings from '@/views/admin/settings/Legal.vue'
 import ThemeSettings from '@/views/admin/settings/Theme.vue'
 import BoardManagement from '@/views/admin/management/Boards.vue'
 import UserManagement from '@/views/admin/management/Users.vue'
+import BannedAddressManagement from '@/views/admin/management/BannedAddresses.vue'
 import RoleManagement from '@/views/admin/management/Roles.vue'
 import UserModeration from '@/views/admin/moderation/Users.vue'
 import ConfirmAccount from '@/views/ConfirmAccount.vue'
@@ -85,7 +86,7 @@ const routes = [
   {
     path: '/admin/management/bannedaddresses',
     name: 'BannedAddressManagement',
-    component: BoardManagement,
+    component: BannedAddressManagement,
     meta: { requiresAuth: true, bodyClass: 'banned-address-management', title: 'Management' }
   },
   {
