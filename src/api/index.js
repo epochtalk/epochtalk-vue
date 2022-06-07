@@ -263,6 +263,9 @@ export const adminApi = {
     update: data => $http(`/api/admin/roles/update`, { method: 'PUT', data }),
     delete: id => $http(`/api/admin/roles/remove/${id}`, { method: 'DELETE' })
   },
+  bans: {
+    pageBannedAddresses: params => $http('/api/ban/addresses', { params })
+  },
   trust: {
     getDefaultTrustList: () => $http('/api/admin/trustlist'),
     editDefaultTrustList: data => $http('/api/admin/trustlist', { method: 'POST', data }),
