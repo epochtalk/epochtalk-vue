@@ -6,9 +6,9 @@
       </div>
       <div class="user-search column">
         <div class="nested-input-container">
-          <a v-if="query?.search" @click="clearSearch()" class="nested-clear-btn fa fa-times"></a>
-          <a @click="searchUsers()" class="nested-btn">Search</a>
-          <input class="input-text nested-input" v-model="searchStr" type="text" id="search-users" placeholder="Type a username" @keydown="$event.which === 13 && searchUsers()" @keyup="$event.which === 27 && clearSearch()" />
+          <a v-if="banData?.search" @click="clearSearch()" class="nested-clear-btn fa fa-times"></a>
+          <a @click="searchAddresses()" class="nested-btn">Search</a>
+          <input class="input-text nested-input" v-model="searchStr" type="text" id="search-users" placeholder="Search by IP Address" @keydown="$event.which === 13 && searchAddresses()" @keyup="$event.which === 27 && clearSearch()" />
         </div>
       </div>
     </div>
@@ -156,8 +156,9 @@ export default {
       $router.replace({ name: $route.name, params, query: query })
     }
 
-    const searchUsers = () => {
-      let query = { ...$route.query, search: v.searchStr, ip: v.query.ip }
+    const searchAddresses = () => {
+      if (!v.searchStr) return
+      let query = { ...$route.query, search: v.searchStr }
       delete query.page
       const params = { ...$route.params, saveScrollPos: true } // save scroll pos when sorting table
       $router.replace({ name: $route.name, params, query: query })
@@ -182,7 +183,7 @@ export default {
       searchStr: $route.query.search
     })
 
-    return { ...toRefs(v), pageResults, setFilter, getSortClass, setSortField, clearSearch, searchUsers, humanDate, deleteAddress, handleBanSuccess, handleEditSuccess, editAddress }
+    return { ...toRefs(v), pageResults, setFilter, getSortClass, setSortField, clearSearch, searchAddresses, humanDate, deleteAddress, handleBanSuccess, handleEditSuccess, editAddress }
   }
 }
 </script>
