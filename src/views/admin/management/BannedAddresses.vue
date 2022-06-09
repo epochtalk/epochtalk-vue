@@ -136,6 +136,7 @@ export default {
       if (newField === 'created_at') delete query.field // do not display default field in qs
       if (!desc) query.desc = false // only display desc if false
       const params = { ...$route.params, saveScrollPos: true } // save scroll pos when sorting table
+      if(!query.search) delete query.search
       $router.replace({ name: $route.name, params: params, query: query })
     }
 
