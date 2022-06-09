@@ -56,6 +56,7 @@
       </div>
     </div>
   </div>
+  <BannedAddressManagerModal :show="showDeleteAddress || showEditAddress" :selected="selectedAddress" :ban-address="showEditAddress" :delete-address="showDeleteAddress" @close="showDeleteAddress=showEditAddress=false" />
 </template>
 
 <script>
@@ -64,10 +65,11 @@ import { useRouter, useRoute } from 'vue-router'
 import { adminApi } from '@/api'
 import humanDate from '@/composables/filters/humanDate'
 import { AuthStore } from '@/composables/stores/auth'
+import BannedAddressManagerModal from '@/components/modals/admin/management/BannedAddressManager.vue'
 
 export default {
   name: 'BannedAddresses',
-  components: { },
+  components: { BannedAddressManagerModal },
   beforeRouteEnter(to, from, next) {
     let queryParams = {
       field: to.query.field,
@@ -100,14 +102,21 @@ export default {
       $router.replace({ name: $route.name, params: $route.params, query: query })
     }
 
-    const editAddress = address => console.log(address)
+    const editAddress = address => {
+      v.selectedAddress = address
+      v.showEditAddress = true
+    }
+
+    const deleteAddress = address => {
+      v.selectedAddress = address
+      v.showDeleteAddress = true
+    }
 
     const handleEditSuccess = user => v.users = v.users.map(u => {
       if (u.id === user.id) return { ...u, ...user }
       else return u
     })
 
-    const deleteAddress = address => console.log(address)
 
     const handleBanSuccess = user => v.users = v.users.map(u => { // update board ban info without reload
       if (u.id === user.id) u.ban_expiration = user.ban_expiration
@@ -178,8 +187,9 @@ export default {
       count: 0,
       query: {},
       user: {},
-      showManageBans: false,
-      showUpdateProfile: false,
+      selectedAddress: null,
+      showEditAddress: false,
+      showDeleteAddress: false,
       searchStr: $route.query.search
     })
 
