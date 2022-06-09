@@ -2,7 +2,7 @@
   <div class="full-width">
     <div class="admin-table-header row">
       <div class="column">
-        <button><i class="fa fa-plus-circle"></i>&nbsp;Manually Ban Addresses</button>
+        <button @click="showBanAddress=true"><i class="fa fa-plus-circle"></i>&nbsp;Manually Ban Addresses</button>
       </div>
       <div class="user-search column">
         <div class="nested-input-container">
@@ -56,7 +56,7 @@
       </div>
     </div>
   </div>
-  <BannedAddressManagerModal :show="showDeleteAddress || showEditAddress" :selected="selectedAddress" :ban-address="showEditAddress" :delete-address="showDeleteAddress" @close="showDeleteAddress=showEditAddress=false" />
+  <BannedAddressManagerModal :show="showBanAddress || showDeleteAddress || showEditAddress" :selected="selectedAddress" :ban-address="showBanAddress" :edit-address="showEditAddress" :delete-address="showDeleteAddress" @close="showBanAddress=showDeleteAddress=showEditAddress=false" />
 </template>
 
 <script>
@@ -190,6 +190,7 @@ export default {
       selectedAddress: null,
       showEditAddress: false,
       showDeleteAddress: false,
+      showBanAddress: false,
       searchStr: $route.query.search
     })
 
