@@ -45,7 +45,10 @@ export default {
       // Show for first time
       if (props.show && !open.value) {
         open.value = true
-        nextTick(() => { if (props.focusInput) props.focusInput.focus() })
+        nextTick(() => {
+          if (props.focusInput.length) props.focusInput[0].focus()
+          else props.focusInput.focus()
+        })
       }
       // Hide for first time, emit event to parent
       else if (props.show && open.value) { emit('close') }
