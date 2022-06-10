@@ -40,19 +40,33 @@
                 <input v-model="addr.decay" class="decay" type="checkbox" :checked="true" />
               </td>
               <td>
-                <input v-model="addr.weight" type="number" min="0" class="weight" placeholder="Weight" @keydown="!$event.shiftKey && ($event.which === 9 || $event.which === 13) && addressesToBan.length === (index + 1) && addressesToBan.push({ typeIp:true, weight: 50 })" />
+                <input v-model="addr.weight" type="number" min="0" class="weight" placeholder="Weight" @keydown="!$event.shiftKey && ($event.which === 9 || $event.which === 13) && addressesToBan.length === (index + 1) && addressesToBan.push({ typeIp:true, weight: 50, decay: true })" />
               </td>
             </tr>
             <tfoot>
               <tr>
-                <td colspan="4"><a class="right" @click="addressesToBan.push({ typeIp:true, weight: 50 })" href="#"><i class="fa fa-plus"></i>&nbsp;Add another address</a></td>
+                <td colspan="4"><a class="right" @click="addressesToBan.push({ typeIp:true, weight: 50, decay: true })" href="#"><i class="fa fa-plus"></i>&nbsp;Add another address</a></td>
               </tr>
             </tfoot>
           </table>
         </div>
         <div v-if="editAddress">
+          <p>Edit weight and decay properties of banned address: <strong v-html="selectedAddress.hostname || selectedAddress.ip"></strong></p>
+          <label for="addrWeight"><strong>Weight</strong></label>
+            <input type="number" id="addrWeight" name="addrWeight" v-model="selectedAddress.weight" ref="focusInput" required />
+          <label for="addrDecay"><strong>Decays</strong></label>
+          <input type="radio" name="addrDecay" id="decayYes" :value="true" v-model="selectedAddress.decay" required />
+          <label for="decayYes">Yes</label>
+          <input type="radio" name="addrDecay" id="decayNo" :value="false" v-model="selectedAddress.decay" required />
+          <label for="decayNo">No</label>
+          <br>
+          <br>
         </div>
         <div v-if="deleteAddress">
+          <p ref="focusInput">
+            Are you sure you want to delete the address <strong v-html="selectedAddress.hostname || selectedAddress.ip"></strong>?
+          </p>
+          <br>
         </div>
 
         <div class="col">
@@ -87,9 +101,9 @@ export default {
 
     const modify = () => {
       v.requestSubmitted = true
-      if (props.banAddress) console.log('ban address')
-      if (props.editAddress) console.log('edit ban address')
-      if (props.deleteAddress) console.log('delete ban address')
+      if (props.banAddress) console.log('ban address', v.addressesToBan)
+      if (props.editAddress) console.log('edit ban address', v.selectedAddress)
+      if (props.deleteAddress) console.log('delete ban address', v.selectedAddress)
       emit('success')
       close()
     }
@@ -109,15 +123,15 @@ export default {
     /* Template Data */
     const v = reactive({
       focusInput: null,
-      selected: {},
-      addressesToBan: [{ typeIp:true, weight: 50 }],
+      selectedAddress: {},
+      addressesToBan: [{ typeIp:true, weight: 50, decay: true }],
       saveRuleBtnLabel: props.deleteAddress ? 'Confirm Delete' : 'Save',
       requestSubmitted: false,
     })
 
     watch(() => props.show, () => {
       v.saveRuleBtnLabel = props.deleteAddress ? 'Confirm Delete' : 'Save'
-      v.selected = cloneDeep(props.selected)
+      v.selectedAddress = cloneDeep(props.selected)
     })
 
     return { ...toRefs(v), modify, close, checkAddresses }
