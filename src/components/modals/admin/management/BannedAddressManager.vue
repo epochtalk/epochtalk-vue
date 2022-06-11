@@ -84,8 +84,9 @@
 
 <script>
 import Modal from '@/components/layout/Modal.vue'
-import { reactive, toRefs, watch } from 'vue'
+import { reactive, toRefs, watch, inject } from 'vue'
 import { cloneDeep } from 'lodash'
+import { adminApi } from '@/api'
 
 export default {
   name: 'banned-address-manager-modal',
@@ -96,16 +97,35 @@ export default {
     /* Template Methods */
     const resetForm = () => {
       v.requestSubmitted = false
+      v.addressesToBan = [{ typeIp:true, weight: 50, decay: true }]
       v.saveRuleBtnLabel = props.deleteAddress ? 'Confirm Delete' : 'Save'
     }
 
     const modify = () => {
       v.requestSubmitted = true
-      if (props.banAddress) console.log('ban address', v.addressesToBan)
-      if (props.editAddress) console.log('edit ban address', v.selectedAddress)
-      if (props.deleteAddress) console.log('delete ban address', v.selectedAddress)
-      emit('success')
-      close()
+      let promise, successMsg, errorMsg
+      if (props.banAddress) {
+        promise = adminApi.bans.addBannedAddresses(v.addressesToBan)
+        successMsg = 'Successfully banned addresses!'
+        errorMsg = 'There was an error banning addresses'
+      }
+      else if (props.editAddress) {
+        promise = adminApi.bans.editBannedAddress(v.selectedAddress)
+        successMsg = `Successfully edited banned addresss ${v.selectedAddress.hostname || v.selectedAddress.ip}!`
+        errorMsg = `There was an error editing banned address: ${v.selectedAddress.hostname || v.selectedAddress.ip}`
+      }
+      else if (props.deleteAddress){
+        promise = adminApi.bans.deleteBannedAddress(v.selectedAddress)
+        successMsg = `Successfully deleted banned addresss ${v.selectedAddress.hostname || v.selectedAddress.ip}!`
+        errorMsg = `There was an error deleting banned address: ${v.selectedAddress.hostname || v.selectedAddress.ip}`
+      }
+
+      promise.then(() => {
+        $alertStore.success(successMsg)
+        emit('success')
+        close()
+      })
+      .catch(() => $alertStore.error(errorMsg))
     }
 
     const checkAddresses = () => {
@@ -119,6 +139,8 @@ export default {
       resetForm()
       emit('close')
     }
+
+    const $alertStore = inject('$alertStore')
 
     /* Template Data */
     const v = reactive({
