@@ -33,9 +33,9 @@
             <td v-html="address.weight"></td>
             <td v-html="humanDate(address.created_at)"></td>
             <td v-html="address.decay ? 'YES' : 'NO'"></td>
-            <td v-html="(address.updated_at | humanDate) || 'N/A'"></td>
+            <td v-html="humanDate(address.updated_at) || 'N/A'"></td>
             <td v-html="address.update_count || 0"></td>
-            <td v-html="(address.imported_at | humanDate) || 'N/A'"></td>
+            <td v-html="humanDate(address.imported_at) || 'N/A'"></td>
             <td class=user-actions>
               <button class="icon" data-balloon="Edit Address" @click="editAddress(address)">
                 <i class="fas fa-edit"></i>
@@ -56,7 +56,7 @@
       </div>
     </div>
   </div>
-  <BannedAddressManagerModal :show="showBanAddress || showDeleteAddress || showEditAddress" :selected="selectedAddress" :ban-address="showBanAddress" :edit-address="showEditAddress" :delete-address="showDeleteAddress" @close="showBanAddress=showDeleteAddress=showEditAddress=false" />
+  <BannedAddressManagerModal :show="showBanAddress || showDeleteAddress || showEditAddress" :selected="selectedAddress" :ban-address="showBanAddress" :edit-address="showEditAddress" :delete-address="showDeleteAddress" @close="showBanAddress=showDeleteAddress=showEditAddress=false" @success="reloadData()"/>
 </template>
 
 <script>
@@ -102,6 +102,18 @@ export default {
       $router.replace({ name: $route.name, params: $route.params, query: query })
     }
 
+    const reloadData = () => {
+      let queryParams = {
+        field: $route.query.field,
+        desc: $route.query.desc ? false : true,
+        limit: Number($route.query.limit) || 15,
+        page: Number($route.query.page) || 1,
+        search: $route.query.search
+      }
+      adminApi.bans.pageBannedAddresses(queryParams)
+      .then(banData => v.banData = banData)
+    }
+
     const editAddress = address => {
       v.selectedAddress = address
       v.showEditAddress = true
@@ -111,17 +123,6 @@ export default {
       v.selectedAddress = address
       v.showDeleteAddress = true
     }
-
-    const handleEditSuccess = user => v.users = v.users.map(u => {
-      if (u.id === user.id) return { ...u, ...user }
-      else return u
-    })
-
-
-    const handleBanSuccess = user => v.users = v.users.map(u => { // update board ban info without reload
-      if (u.id === user.id) u.ban_expiration = user.ban_expiration
-      return u
-    })
 
     const setSortField = newField => {
       // Convert desc query param to boolean
@@ -195,7 +196,7 @@ export default {
       searchStr: $route.query.search
     })
 
-    return { ...toRefs(v), pageResults, setFilter, getSortClass, setSortField, clearSearch, searchAddresses, humanDate, deleteAddress, handleBanSuccess, handleEditSuccess, editAddress }
+    return { ...toRefs(v), pageResults, setFilter, getSortClass, setSortField, clearSearch, searchAddresses, humanDate, deleteAddress, reloadData, editAddress }
   }
 }
 </script>
