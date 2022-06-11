@@ -264,7 +264,10 @@ export const adminApi = {
     delete: id => $http(`/api/admin/roles/remove/${id}`, { method: 'DELETE' })
   },
   bans: {
-    pageBannedAddresses: params => $http('/api/ban/addresses', { params })
+    pageBannedAddresses: params => $http('/api/ban/addresses', { params }),
+    addBannedAddresses: data => $http('/api/ban/addresses', { method: 'POST', data}),
+    editBannedAddress: data => $http('/api/ban/addresses', { method: 'PUT', data}),
+    deleteBannedAddress: query => $http('/api/ban/addresses', { method: 'DELETE', params: query })
   },
   trust: {
     getDefaultTrustList: () => $http('/api/admin/trustlist'),
