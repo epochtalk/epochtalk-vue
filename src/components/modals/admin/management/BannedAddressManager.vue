@@ -30,7 +30,7 @@
               </td>
               <td v-if="addr.typeIp">
                 <!--TODO(akinsey): Implement ip regex -->
-                <input v-model="addr.ip" type="text" ng-pattern="AdminManagementCtrl.ipRegex" class="address" placeholder="IP Address to ban" />
+                <input v-model="addr.ip" type="text" @keyup="checkFormValid" class="address" placeholder="IP Address to ban" />
               </td>
               <td v-if="!addr.typeIp">
                 <!--TODO(akinsey): Implement ip regex -->
@@ -71,7 +71,7 @@
 
         <div class="col">
           <div>
-            <button class="fill-row" @click.prevent="modify()" :disabled="requestSubmitted || (banAddress && checkAddresses())" v-html="saveRuleBtnLabel"></button>
+            <button class="fill-row" @click.prevent="modify()" :disabled="requestSubmitted || (banAddress && checkAddresses()) || !formValid" v-html="saveRuleBtnLabel"></button>
           </div>
           <div>
             <button class="fill-row negative" @click.prevent="close()" :disabled="requestSubmitted">Cancel</button>
@@ -87,6 +87,7 @@ import Modal from '@/components/layout/Modal.vue'
 import { reactive, toRefs, watch, inject } from 'vue'
 import { cloneDeep } from 'lodash'
 import { adminApi } from '@/api'
+import { basicIpRegex } from '@/composables/utils/globalRegex'
 
 export default {
   name: 'banned-address-manager-modal',
@@ -134,10 +135,14 @@ export default {
       }).length
     }
 
-
     const close = () => {
       resetForm()
       emit('close')
+    }
+
+    const checkFormValid = event => {
+      console.log(event.target.value, basicIpRegex.test(event.target.value))
+      v.formValid = basicIpRegex.test(event.target.value)
     }
 
     const $alertStore = inject('$alertStore')
@@ -145,6 +150,7 @@ export default {
     /* Template Data */
     const v = reactive({
       focusInput: null,
+      formValid: false,
       selectedAddress: {},
       addressesToBan: [{ typeIp:true, weight: 50, decay: true }],
       saveRuleBtnLabel: props.deleteAddress ? 'Confirm Delete' : 'Save',
@@ -156,7 +162,7 @@ export default {
       v.selectedAddress = cloneDeep(props.selected)
     })
 
-    return { ...toRefs(v), modify, close, checkAddresses }
+    return { ...toRefs(v), modify, close, checkAddresses, checkFormValid }
   }
 }
 </script>
