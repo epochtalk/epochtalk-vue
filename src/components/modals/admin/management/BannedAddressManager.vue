@@ -1,7 +1,9 @@
 <template>
   <modal :name="$options.name" :show="show" @close="close()" :focusInput="focusInput">
     <template v-slot:header>
-      <span v-if="banAddress">Ban Address</span>
+      <span v-if="banAddress">Manually Ban Addresses
+        <span class="info-tooltip pointer" data-balloon="Allows admins to manually ban users from registering from particular hostnames/ip addresses. Weight is used when calculating how malicious a user trying to register is. Decay will allow users to register from that particular hostname/ip after an lengthy amount of time, assuming there were no re-offences causing the same address to be banned again" data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
+      </span>
       <span v-if="editAddress">Edit Address</span>
       <span v-if="deleteAddress">Delete Address</span>
     </template>
@@ -9,9 +11,6 @@
     <template v-slot:body>
       <form class="css-form">
         <div v-if="banAddress">
-          <h3 class="thin-underline">Manually Ban Addresses
-            <span class="info-tooltip" data-balloon="Allows admins to manually ban users from registering from particular hostnames/ip addresses. Weight is used when calculating how malicious a user trying to register is. Decay will allow users to register from that particular hostname/ip after an lengthy amount of time, assuming there were no re-offences causing the same address to be banned again" data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
-          </h3>
           <table class="striped ban-addresses" width="100%">
             <thead>
               <tr>
@@ -29,15 +28,13 @@
                 </select>
               </td>
               <td v-if="addr.typeIp">
-                <!--TODO(akinsey): Implement ip regex -->
-                <input v-model="addr.ip" type="text" @keyup="checkIpValid" class="address" placeholder="IP Address to ban" />
+                <input v-model="addr.ip" type="text" class="address" placeholder="IP Address to ban" />
               </td>
               <td v-if="!addr.typeIp">
-                <!--TODO(akinsey): Implement ip regex -->
-                <input v-model="addr.hostname" type="text" ng-pattern="AdminManagementCtrl.hostnameRegex" class="address" placeholder="Hostname to ban" />
+                <input v-model="addr.hostname" type="text" class="address" placeholder="Hostname to ban" />
               </td>
-              <td>
-                <input v-model="addr.decay" class="decay" @keyup="checkHostValid" type="checkbox" :checked="true" />
+              <td class="decay">
+                <input v-model="addr.decay" type="checkbox" :checked="true" />
               </td>
               <td>
                 <input v-model="addr.weight" type="number" min="0" class="weight" placeholder="Weight" @keydown="!$event.shiftKey && ($event.which === 9 || $event.which === 13) && addressesToBan.length === (index + 1) && addressesToBan.push({ typeIp:true, weight: 50, decay: true })" />
@@ -71,7 +68,7 @@
 
         <div class="col">
           <div>
-            <button class="fill-row" @click.prevent="modify()" :disabled="requestSubmitted || (banAddress && checkAddresses()) || !formValid" v-html="saveRuleBtnLabel"></button>
+            <button class="fill-row" @click.prevent="modify()" :disabled="requestSubmitted || (banAddress && !formValid)" v-html="saveRuleBtnLabel"></button>
           </div>
           <div>
             <button class="fill-row negative" @click.prevent="close()" :disabled="requestSubmitted">Cancel</button>
@@ -85,7 +82,7 @@
 <script>
 import Modal from '@/components/layout/Modal.vue'
 import { reactive, toRefs, watch, inject } from 'vue'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, debounce } from 'lodash'
 import { adminApi } from '@/api'
 import { basicIpRegex, hostnameRegex } from '@/composables/utils/globalRegex'
 
@@ -117,7 +114,7 @@ export default {
         successMsg = `Successfully edited banned addresss ${v.selectedAddress.hostname || v.selectedAddress.ip}!`
         errorMsg = `There was an error editing banned address: ${v.selectedAddress.hostname || v.selectedAddress.ip}`
       }
-      else if (props.deleteAddress){
+      else if (props.deleteAddress) {
         promise = adminApi.bans.deleteBannedAddress(v.selectedAddress)
         successMsg = `Successfully deleted banned addresss ${v.selectedAddress.hostname || v.selectedAddress.ip}!`
         errorMsg = `There was an error deleting banned address: ${v.selectedAddress.hostname || v.selectedAddress.ip}`
@@ -142,9 +139,6 @@ export default {
       emit('close')
     }
 
-    const checkIpValid = event => v.formValid = basicIpRegex.test(event.target.value) || event.target.value === ''
-    const checkHostValid = event => v.formValid = hostnameRegex.test(event.target.value) || event.target.value === ''
-
     const $alertStore = inject('$alertStore')
 
     /* Template Data */
@@ -162,7 +156,19 @@ export default {
       v.selectedAddress = cloneDeep(props.selected)
     })
 
-    return { ...toRefs(v), modify, close, checkAddresses, checkIpValid, checkHostValid }
+    watch(() => v.addressesToBan, debounce(async () => {
+      v.formValid = true
+      v.addressesToBan.forEach(addr => v.formValid = v.formValid && (addr.typeIp && basicIpRegex.test(addr.ip) || !addr.typeIp && hostnameRegex.test(addr.hostname) && addr.weight))
+    }), { deep: true })
+
+    return { ...toRefs(v), modify, close, checkAddresses }
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.ban-addresses {
+  input, select { margin-bottom: 0; }
+  td.decay { padding-top: 1rem; }
+}
+</style>
