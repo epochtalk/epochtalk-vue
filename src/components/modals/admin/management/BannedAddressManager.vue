@@ -30,14 +30,14 @@
               </td>
               <td v-if="addr.typeIp">
                 <!--TODO(akinsey): Implement ip regex -->
-                <input v-model="addr.ip" type="text" @keyup="checkFormValid" class="address" placeholder="IP Address to ban" />
+                <input v-model="addr.ip" type="text" @keyup="checkIpValid" class="address" placeholder="IP Address to ban" />
               </td>
               <td v-if="!addr.typeIp">
                 <!--TODO(akinsey): Implement ip regex -->
                 <input v-model="addr.hostname" type="text" ng-pattern="AdminManagementCtrl.hostnameRegex" class="address" placeholder="Hostname to ban" />
               </td>
               <td>
-                <input v-model="addr.decay" class="decay" type="checkbox" :checked="true" />
+                <input v-model="addr.decay" class="decay" @keyup="checkHostValid" type="checkbox" :checked="true" />
               </td>
               <td>
                 <input v-model="addr.weight" type="number" min="0" class="weight" placeholder="Weight" @keydown="!$event.shiftKey && ($event.which === 9 || $event.which === 13) && addressesToBan.length === (index + 1) && addressesToBan.push({ typeIp:true, weight: 50, decay: true })" />
@@ -87,7 +87,7 @@ import Modal from '@/components/layout/Modal.vue'
 import { reactive, toRefs, watch, inject } from 'vue'
 import { cloneDeep } from 'lodash'
 import { adminApi } from '@/api'
-import { basicIpRegex } from '@/composables/utils/globalRegex'
+import { basicIpRegex, hostnameRegex } from '@/composables/utils/globalRegex'
 
 export default {
   name: 'banned-address-manager-modal',
@@ -106,7 +106,9 @@ export default {
       v.requestSubmitted = true
       let promise, successMsg, errorMsg
       if (props.banAddress) {
-        promise = adminApi.bans.addBannedAddresses(v.addressesToBan)
+        promise = adminApi.bans.addBannedAddresses(v.addressesToBan.filter(addr => {
+          if ((addr.ip || addr.hostname) && addr.weight) return addr
+        }))
         successMsg = 'Successfully banned addresses!'
         errorMsg = 'There was an error banning addresses'
       }
@@ -140,10 +142,8 @@ export default {
       emit('close')
     }
 
-    const checkFormValid = event => {
-      console.log(event.target.value, basicIpRegex.test(event.target.value))
-      v.formValid = basicIpRegex.test(event.target.value)
-    }
+    const checkIpValid = event => v.formValid = basicIpRegex.test(event.target.value) || event.target.value === ''
+    const checkHostValid = event => v.formValid = hostnameRegex.test(event.target.value) || event.target.value === ''
 
     const $alertStore = inject('$alertStore')
 
@@ -162,7 +162,7 @@ export default {
       v.selectedAddress = cloneDeep(props.selected)
     })
 
-    return { ...toRefs(v), modify, close, checkAddresses, checkFormValid }
+    return { ...toRefs(v), modify, close, checkAddresses, checkIpValid, checkHostValid }
   }
 }
 </script>
