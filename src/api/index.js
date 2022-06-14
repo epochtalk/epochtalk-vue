@@ -253,6 +253,11 @@ export const banApi = {
 export const adminApi = {
   configurations: () => $http('/api/configurations'),
   updateConfigurations: data => $http('/api/configurations', { method: 'POST', data }),
+  invitations: {
+    all: query => $http('/api/invites', { params: query }),
+    resend: data => $http('/api/invites/resend', { method: 'POST', data }),
+    remove: data => $http('/api/invites/remove', { method: 'POST', data })
+  },
   roles: {
     all: () => $http('/api/admin/roles/all'),
     users: (id, query) => $http(`/api/admin/roles/${id}/users`, { params: query }),
