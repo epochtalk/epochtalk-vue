@@ -22,8 +22,9 @@ import LegalSettings from '@/views/admin/settings/Legal.vue'
 import ThemeSettings from '@/views/admin/settings/Theme.vue'
 import BoardManagement from '@/views/admin/management/Boards.vue'
 import UserManagement from '@/views/admin/management/Users.vue'
-import BannedAddressManagement from '@/views/admin/management/BannedAddresses.vue'
 import RoleManagement from '@/views/admin/management/Roles.vue'
+import BannedAddressManagement from '@/views/admin/management/BannedAddresses.vue'
+import InvitationManagement from '@/views/admin/management/Invitations.vue'
 import UserModeration from '@/views/admin/moderation/Users.vue'
 import ConfirmAccount from '@/views/ConfirmAccount.vue'
 import ResetPassword from '@/views/ResetPassword.vue'
@@ -92,7 +93,7 @@ const routes = [
   {
     path: '/admin/management/invitations',
     name: 'InvitationManagement',
-    component: BoardManagement,
+    component: InvitationManagement,
     meta: { requiresAuth: true, bodyClass: 'invitation-management', title: 'Management' }
   },
   {
