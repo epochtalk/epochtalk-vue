@@ -2,7 +2,7 @@
   <div class="full-width">
     <div class="admin-table-header">
       <div class="nested-input-container">
-        <a @click="inviteUser()" class="nested-btn">Invite</a>
+        <button @click="inviteUser()" class="nested-btn" :disabled="!validEmail">Invite</button>
         <input class="input-text nested-input" v-model="emailToInvite" type="text" id="invite-user" placeholder="Type email of the person you would like to invite to the forum" @keydown="$event.which === 13 && inviteUser()" @keyup="$event.which === 27 && clearSearch()" />
       </div>
     </div>
@@ -43,10 +43,12 @@
 </template>
 
 <script>
-import { reactive, toRefs } from 'vue'
+import { reactive, toRefs, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { adminApi } from '@/api'
+import { debounce } from 'lodash'
 import humanDate from '@/composables/filters/humanDate'
+import { emailRegex } from '@/composables/utils/globalRegex'
 
 export default {
   name: 'Invitations',
@@ -103,8 +105,11 @@ export default {
 
     const v = reactive({
       inviteData: {},
-      emailToInvite: null
+      emailToInvite: null,
+      validEmail: false
     })
+
+    watch(() => v.emailToInvite, debounce(async () => v.validEmail = emailRegex.test(v.emailToInvite)))
 
     return { ...toRefs(v), pageResults, inviteUser, humanDate, deleteInvitation, reloadData, resendInvitation }
   }
@@ -122,7 +127,15 @@ export default {
   top: 0.4rem;
   @include break-mobile-sm { padding: 1.25rem 1rem 0; margin: 0 -1rem 2rem; }
 }
-.nested-input { margin-bottom: 0; }
+.nested-input-container {
+  .nested-input { margin-bottom: 0; }
+  .nested-btn, .nested-btn:focus, .nested-btn:active {
+    position: absolute;
+    line-height: 0;
+    font-size: 0.8125rem;
+  }
+}
+
 .invitations-content {
   margin-top: 6rem;
 }
