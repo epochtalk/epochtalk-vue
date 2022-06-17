@@ -90,11 +90,13 @@ export default {
     }
 
     const resendInvitation = email => {
-      console.log('Resend Invitation', email)
+      v.selectedEmail = email
+      v.showResendInvite = true
     }
 
     const deleteInvitation = email => {
-      console.log('Delete Invitation', email)
+      v.selectedEmail = email
+      v.showDeleteInvite = true
     }
 
     const inviteUser = () => {
@@ -119,7 +121,10 @@ export default {
     const v = reactive({
       inviteData: {},
       emailToInvite: null,
-      validEmail: false
+      selectedEmail: null,
+      validEmail: false,
+      showResendInvite: false,
+      showDeleteInvite: false
     })
 
     watch(() => v.emailToInvite, debounce(async () => v.validEmail = emailRegex.test(v.emailToInvite)))
