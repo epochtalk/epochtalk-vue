@@ -128,12 +128,6 @@ export default {
       .catch(() => $alertStore.error(errorMsg))
     }
 
-    const checkAddresses = () => {
-      return !v.addressesToBan.filter(addr => {
-        if ((addr.ip || addr.hostname) && addr.weight) return addr
-      }).length
-    }
-
     const close = () => {
       resetForm()
       emit('close')
@@ -161,7 +155,7 @@ export default {
       v.addressesToBan.forEach(addr => v.formValid = v.formValid && (addr.typeIp && basicIpRegex.test(addr.ip) || !addr.typeIp && hostnameRegex.test(addr.hostname) && addr.weight))
     }), { deep: true })
 
-    return { ...toRefs(v), modify, close, checkAddresses }
+    return { ...toRefs(v), modify, close }
   }
 }
 </script>
