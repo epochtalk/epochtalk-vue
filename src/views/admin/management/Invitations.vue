@@ -6,10 +6,10 @@
         <input class="input-text nested-input" v-model="emailToInvite" type="text" id="invite-user" placeholder="Type email of the person you would like to invite to the forum" @keydown="$event.which === 13 && inviteUser()" @keyup="$event.which === 27 && clearSearch()" />
       </div>
     </div>
-    <div class="invitations-content fill-row centered-text" v-if="inviteData?.data?.length < 1">
+    <div class="invitations-content fill-row centered-text" v-if="inviteData?.invitations?.length < 1">
       <h4>No user invitations to display</h4>
     </div>
-    <div class="invitations-content fill-row" v-if="inviteData?.invitations?.length > 0">
+    <div class="invitations-content fill-row" v-if="inviteData?.invitations?.length">
       <table class="underlined" width="100%">
         <thead>
           <th>Email</th>
@@ -43,9 +43,9 @@
 </template>
 
 <script>
-import { reactive, toRefs, watch } from 'vue'
+import { reactive, toRefs, watch, inject } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { adminApi } from '@/api'
+import { adminApi, authApi } from '@/api'
 import { debounce } from 'lodash'
 import humanDate from '@/composables/filters/humanDate'
 import { emailRegex } from '@/composables/utils/globalRegex'
@@ -65,7 +65,7 @@ export default {
       limit: Number(to.query.limit) || 15,
       page: Number(to.query.page) || 1
     }
-    adminApi.bans.pageBannedAddresses(queryParams)
+    adminApi.invitations.all(queryParams)
     .then(inviteData => {
       this.inviteData = inviteData
       next()
@@ -83,8 +83,10 @@ export default {
         limit: Number($route.query.limit) || 15,
         page: Number($route.query.page) || 1
       }
-      adminApi.bans.pageBannedAddresses(queryParams)
-      .then(inviteData => v.inviteData = inviteData)
+      adminApi.invitations.all(queryParams)
+      .then(inviteData => {
+        v.inviteData = inviteData
+      })
     }
 
     const resendInvitation = email => {
@@ -96,12 +98,23 @@ export default {
     }
 
     const inviteUser = () => {
-      if (!v.emailToInvite) return
-      console.log('invite ', v.emailToInvite)
+      authApi.invite(v.emailToInvite)
+      .then(() => {
+        $alertStore.success(`Successfully sent invite to ${v.emailToInvite}!`)
+        v.emailToInvite = null
+        reloadData()
+      })
+      .catch(err => {
+        let msg = `There was an error inviting ${v.emailToInvite}`
+        if (err.response.status === 400) msg += ', ensure this email is valid'
+        else if (err.response.status === 422) msg = err.response.data.message
+        $alertStore.error(msg)
+      })
     }
 
     const $router = useRouter()
     const $route = useRoute()
+    const $alertStore = inject('$alertStore')
 
     const v = reactive({
       inviteData: {},
