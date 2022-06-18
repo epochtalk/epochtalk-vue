@@ -40,6 +40,7 @@
       </div>
     </div>
   </div>
+  <InvitationManagerModal :selected="selectedEmail" :show="showResendInvite || showDeleteInvite" :resendInvite="showResendInvite" :deleteInvite="showDeleteInvite" @success="reloadData()" @close="showResendInvite=showDeleteInvite=false"  />
 </template>
 
 <script>
@@ -49,9 +50,11 @@ import { adminApi, authApi } from '@/api'
 import { debounce } from 'lodash'
 import humanDate from '@/composables/filters/humanDate'
 import { emailRegex } from '@/composables/utils/globalRegex'
+import InvitationManagerModal from '@/components/modals/admin/management/InvitationManager.vue'
 
 export default {
   name: 'Invitations',
+  components: { InvitationManagerModal },
   beforeRouteEnter(to, from, next) {
     let queryParams = {
       limit: Number(to.query.limit) || 15,
