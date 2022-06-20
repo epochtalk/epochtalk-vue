@@ -25,6 +25,7 @@ import UserManagement from '@/views/admin/management/Users.vue'
 import RoleManagement from '@/views/admin/management/Roles.vue'
 import BannedAddressManagement from '@/views/admin/management/BannedAddresses.vue'
 import InvitationManagement from '@/views/admin/management/Invitations.vue'
+import LogModeration from '@/views/admin/moderation/Logs.vue'
 import UserModeration from '@/views/admin/moderation/Users.vue'
 import ConfirmAccount from '@/views/ConfirmAccount.vue'
 import ResetPassword from '@/views/ResetPassword.vue'
@@ -124,7 +125,7 @@ const routes = [
   {
     path: '/admin/moderation/logs',
     name: 'LogModeration',
-    component: UserModeration,
+    component: LogModeration,
     meta: { requiresAuth: true, bodyClass: 'log-moderation', title: 'Moderation' }
   },
   {

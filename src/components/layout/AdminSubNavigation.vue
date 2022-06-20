@@ -41,7 +41,7 @@ export default {
 
     const checkSaveEnabled = () => {
       let routeName = $route.name
-      let noSaveRoutes = ['UserManagement', 'RoleManagement', 'BannedAddressManagement', 'InvitationManagement']
+      let noSaveRoutes = ['UserManagement', 'RoleManagement', 'BannedAddressManagement', 'InvitationManagement', 'LogModeration', 'UserModeration', 'PostModeration', 'MessageModeration', 'BoardBanModeration']
       return noSaveRoutes.indexOf(routeName) < 0
     }
 
