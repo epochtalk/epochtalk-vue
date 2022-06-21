@@ -143,7 +143,7 @@ export default {
   position: absolute;
   left: 0;
   right: 0;
-  padding: 1rem;
+  padding: 2rem;
   padding-top: 2rem;
   top: 0.4rem;
   @include break-mobile-sm { padding: 1.25rem 1rem 0; margin: 0 -1rem 2rem; }
