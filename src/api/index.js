@@ -258,6 +258,9 @@ export const adminApi = {
     resend: data => $http('/api/invites/resend', { method: 'POST', data }),
     remove: data => $http('/api/invites/remove', { method: 'POST', data })
   },
+  logs: {
+    page: params => $http('/api/admin/modlog', { params })
+  },
   roles: {
     all: () => $http('/api/admin/roles/all'),
     users: (id, query) => $http(`/api/admin/roles/${id}/users`, { params: query }),
