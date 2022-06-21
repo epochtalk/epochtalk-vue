@@ -176,21 +176,8 @@ table.underlined {
   tr {
     border-bottom: 1px solid $border-color-alt;
     vertical-align: top;
-    &.selectable-row { @include no-select; }
-    &.selectable-row:hover { background-color: $sub-header-color; }
-    &.active-row, &.active-row:nth-of-type(even) { background-color: $color-primary; }
-    &.active-row.selectable-row:hover { background-color: $color-primary }
-    &.active-row td { color: $button-text-color; }
-    &.active-row td a, &.active-row td button { color: darken($color-primary-alt, 10%); }
-    &.active-row td a:hover, &.active-row td button:not([disabled]):hover { color: $color-primary-alt; }
     &:nth-of-type(even) { background: transparent; }
     &:nth td { padding-top: 1.5rem; padding-bottom: 1.5rem; }
-    &.active-row td.left-icon-col { color: $button-text-color; }
-    td.left-icon-col {
-      @include pad(0 0 0 0.5rem);
-      color: $secondary-font-color;
-      padding-top: 0.5rem;
-    }
     td {
       padding-top: 0.5rem;
       padding-right: 0.5rem;
