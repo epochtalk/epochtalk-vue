@@ -577,6 +577,7 @@ export default {
       { key: 'legal', label: 'Legal' },
       { key: 'ads', label: 'Ads' },
       { key: 'mentions', label: 'Mentions' },
+      { key: 'moderationLogs', label: 'Mod Log' },
       { key: 'motd', label: 'Announcements' }
     ]
 
