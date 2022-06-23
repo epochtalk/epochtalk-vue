@@ -39,6 +39,7 @@ import NProgress from 'nprogress'
 import { nextTick } from 'vue'
 import { localStorageAuth } from '@/composables/stores/auth'
 import BanStore from '@/composables/stores/ban'
+import PermissionUtils from '@/composables/utils/permissions'
 
 const routes = [
   {
@@ -47,6 +48,31 @@ const routes = [
     name: 'GeneralSettings',
     component: GeneralSettings,
     meta: { requiresAuth: true, bodyClass: 'general-settings', title: 'Settings' },
+    beforeEnter: (to, from, next) => {
+      let permUtil = new PermissionUtils(localStorageAuth().data)
+      if (permUtil.hasPermission('adminAccess.settings')) {
+        if (permUtil.hasPermission('adminAccess.settings.general')) next()
+        else if (permUtil.hasPermission('adminAccess.settings.advanced')) next({ name: 'AdvancedSettings'})
+        else if (permUtil.hasPermission('adminAccess.settings.theme')) next({ name: 'ThemeSettings'})
+        else if (permUtil.hasPermission('adminAccess.settings.legal')) next({ name: 'LegalSettings'})
+        else next({ name: 'Boards' })
+      }
+      else if (permUtil.hasPermission('adminAccess.management')) {
+        if (permUtil.hasPermission('adminAccess.management.boards')) next({ name: 'BoardManagement'})
+        else if (permUtil.hasPermission('adminAccess.management.users')) next({ name: 'UserManagement'})
+        else if (permUtil.hasPermission('adminAccess.management.roles')) next({ name: 'RoleManagement'})
+        else if (permUtil.hasPermission('adminAccess.management.bannedAddresses')) next({ name: 'BannedAddressManagement'})
+        else if (permUtil.hasPermission('adminAccess.management.invitations')) next({ name: 'InvitationManagement'})
+        else next({ name: 'Boards' })
+      }
+      else if (permUtil.hasPermission('modAccess')) {
+        if (permUtil.hasPermission('modAccess.users')) next({ name: 'UserModeration' })
+        else if (permUtil.hasPermission('modAccess.posts')) next({ name: 'PostModeration' })
+        else if (permUtil.hasPermission('modAccess.messages')) next({ name: 'MessageModeration' })
+        else next({ name: 'Boards' })
+      }
+      else next({ name: 'Boards' })
+    }
   },
   {
     path: '/admin/settings/advanced',

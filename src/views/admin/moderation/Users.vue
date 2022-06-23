@@ -1,5 +1,4 @@
 <template>
-  <div>{{JSON.stringify(config, null, 2)}}</div>
   <div class="testContainer">
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Iste debitis animi exercitationem facilis repellat recusandae sed consequatur natus? Itaque consequuntur placeat cum eligendi nostrum quos laborum nihil sit suscipit adipisci.</p>
 
@@ -9,19 +8,21 @@
 
 <script>
 import { reactive, toRefs, onMounted, onUnmounted } from 'vue'
-import { adminApi } from '@/api'
+// import { adminApi } from '@/api'
 import EventBus from '@/composables/services/event-bus'
 
 export default {
   name: 'BoardManagement',
   beforeRouteEnter(to, from, next) {
-    adminApi.configurations().then(data => next(vm => vm.config = data))
+    next()
+    // adminApi.configurations().then(data => next(vm => vm.config = data))
   },
   beforeRouteUpdate(to, from, next) {
-    adminApi.configurations().then(data => {
-      this.config = data
-      next()
-    })
+    // adminApi.configurations().then(data => {
+    //   this.config = data
+    //   next()
+    // })
+    next()
   },
   setup() {
     const saveListener = () => {
