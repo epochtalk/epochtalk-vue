@@ -1,7 +1,7 @@
 <template>
   <ul class="menu-left">
     <li v-if="permUtils.hasPermission('adminAccess.settings')">
-      <router-link :to="{ path: '/admin/settings' }" class="menu-btn" :class="{ 'menu-btn-selected': checkActive('/admin/settings') }">
+      <router-link :to="{ path: '/admin/settings' }" class="menu-btn" :class="{ 'menu-btn-selected': checkActive('/admin/settings') || checkActivePath('/admin') }">
         <i class="fa fa-cogs"></i><span class="hide-mobile">&nbsp;&nbsp;&nbsp;Settings</span>
       </router-link>
     </li>
@@ -32,10 +32,11 @@ export default {
     const $auth = inject(AuthStore)
 
     const checkActive = basePath => $route.path.indexOf(basePath) === 0
+    const checkActivePath = basePath => $route.path === basePath
 
     const permUtils = $auth.permissionUtils
 
-    return { checkActive, permUtils }
+    return { checkActive, checkActivePath, permUtils }
   }
 }
 </script>
