@@ -15,12 +15,14 @@
       </div>
       <ul>
         <li @click="showMobileMenu = false" v-if="permissionUtils.hasPermission('adminAccess')">
-          <router-link :to="{ name: 'GeneralSettings' }">
+          <router-link :to="{ path: '/admin' }">
             <i class="fa fa-cogs" aria-hidden="true"></i>Admin Panel
           </router-link>
         </li>
         <li @click="showMobileMenu = false" v-if="permissionUtils.hasPermission('modAccess') && !permissionUtils.hasPermission('adminAccess')">
-          <a href="#"><i class="fa fa-cogs" aria-hidden="true"></i>Mod Panel</a>
+          <router-link :to="{ path: '/admin' }">
+            <i class="fa fa-cogs" aria-hidden="true"></i>Mod Panel
+          </router-link>
         </li>
         <li @click="showMobileMenu = false" v-if="isPatroller()">
           <router-link :to="{ name: 'Patrol' }"><i class="fa fa-binoculars" aria-hidden="true"></i>Patrol</router-link>
@@ -188,12 +190,14 @@
               </div>
               <ul id="user-dropdown">
                 <li v-if="permissionUtils.hasPermission('adminAccess')">
-                  <router-link :to="{ name: 'GeneralSettings' }">
+                  <router-link :to="{ path: '/admin' }">
                     Admin Panel
                   </router-link>
                 </li>
                 <li v-if="permissionUtils.hasPermission('modAccess') && !permissionUtils.hasPermission('adminAccess')">
-                  <a href="#">Mod Panel</a>
+                  <router-link :to="{ path: '/admin' }">
+                    Mod Panel
+                  </router-link>
                 </li>
                 <li v-if="isPatroller()">
                   <router-link :to="{ name: 'Patrol' }">Patrol</router-link>
