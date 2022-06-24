@@ -14,14 +14,11 @@
         </svg>
       </div>
       <ul>
-        <li @click="showMobileMenu = false" v-if="permissionUtils.hasPermission('adminAccess')">
+        <li @click="showMobileMenu = false" v-if="permissionUtils.hasPermission('adminAccess') || permissionUtils.hasPermission('modAccess')">
           <router-link :to="{ path: '/admin' }">
-            <i class="fa fa-cogs" aria-hidden="true"></i>Admin Panel
-          </router-link>
-        </li>
-        <li @click="showMobileMenu = false" v-if="permissionUtils.hasPermission('modAccess') && !permissionUtils.hasPermission('adminAccess')">
-          <router-link :to="{ path: '/admin' }">
-            <i class="fa fa-cogs" aria-hidden="true"></i>Mod Panel
+            <i class="fa fa-cogs" aria-hidden="true"></i>
+            <span v-if="Object.keys(permissionUtils.hasPermission('adminAccess')).length">Admin Panel</span>
+            <span v-if="Object.keys(permissionUtils.hasPermission('modAccess')).length && !Object.keys(permissionUtils.hasPermission('adminAccess')).length">Mod Panel</span>
           </router-link>
         </li>
         <li @click="showMobileMenu = false" v-if="isPatroller()">
@@ -189,14 +186,10 @@
                 </router-link>
               </div>
               <ul id="user-dropdown">
-                <li v-if="permissionUtils.hasPermission('adminAccess')">
+                <li v-if="permissionUtils.hasPermission('adminAccess') || permissionUtils.hasPermission('modAccess')">
                   <router-link :to="{ path: '/admin' }">
-                    Admin Panel
-                  </router-link>
-                </li>
-                <li v-if="permissionUtils.hasPermission('modAccess') && !permissionUtils.hasPermission('adminAccess')">
-                  <router-link :to="{ path: '/admin' }">
-                    Mod Panel
+                    <span v-if="Object.keys(permissionUtils.hasPermission('adminAccess')).length">Admin Panel</span>
+                    <span v-if="Object.keys(permissionUtils.hasPermission('modAccess')).length && !Object.keys(permissionUtils.hasPermission('adminAccess')).length">Mod Panel</span>
                   </router-link>
                 </li>
                 <li v-if="isPatroller()">
