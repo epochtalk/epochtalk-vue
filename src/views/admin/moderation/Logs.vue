@@ -89,6 +89,16 @@
       </div>
     </div>
   </div>
+
+  <modal :name="$options.name" :show="showRawObjectModal" @close="showRawObjectModal=false;selectedLog=null">
+    <template v-slot:header>
+      Raw Log Object
+    </template>
+
+    <template v-slot:body>
+      <pre class="json" v-html="syntaxHighlight(selectedLog)"></pre>
+    </template>
+  </modal>
 </template>
 
 <script>
@@ -96,23 +106,44 @@ import { reactive, toRefs } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { adminApi } from '@/api'
 import humanDate from '@/composables/filters/humanDate'
+import dayjs from 'dayjs'
+import Modal from '@/components/layout/Modal.vue'
 
 export default {
   name: 'LogModeration',
+  components: { Modal },
   beforeRouteEnter(to, from, next) {
     let queryParams = {
       limit: Number(to.query.limit) || undefined,
-      page: Number(to.query.page) || undefined
+      page: Number(to.query.page) || undefined,
+      mod: to.query.mod,
+      action: to.query.action,
+      keyword: to.query.keyword,
+      bdate: to.query.bdate ? dayjs.utc(to.query.bdate).format('YYYY-MM-DD') : undefined,
+      adate: to.query.adate ?  dayjs.utc(to.query.adate).format('YYYY-MM-DD') : undefined,
+      sdate: to.query.sdate ?  dayjs.utc(to.query.sdate).format('YYYY-MM-DD') : undefined,
+      edate: to.query.edate ?  dayjs.utc(to.query.edate).format('YYYY-MM-DD') : undefined
     }
-    adminApi.logs.page(queryParams).then(data => next(vm => vm.logData = data))
+    adminApi.logs.page(queryParams).then(data => next(vm => {
+      vm.logData = data
+      vm.init(queryParams)
+    }))
   },
   beforeRouteUpdate(to, from, next) {
     let queryParams = {
       limit: Number(to.query.limit) || undefined,
-      page: Number(to.query.page) || undefined
+      page: Number(to.query.page) || undefined,
+      mod: to.query.mod,
+      action: to.query.action,
+      keyword: to.query.keyword,
+      bdate: to.query.bdate ?  dayjs.utc(to.query.bdate).format('YYYY-MM-DD') : undefined,
+      adate: to.query.adate ?  dayjs.utc(to.query.adate).format('YYYY-MM-DD') : undefined,
+      sdate: to.query.sdate ?  dayjs.utc(to.query.sdate).format('YYYY-MM-DD') : undefined,
+      edate: to.query.edate ?  dayjs.utc(to.query.edate).format('YYYY-MM-DD') : undefined
     }
     adminApi.logs.page(queryParams).then(data => {
       this.logData = data
+      this.init(queryParams)
       next()
     })
   },
@@ -123,11 +154,65 @@ export default {
       $router.replace({ name: $route.name, params: $route.params, query: query })
     }
 
-    const filterResults = () => console.log('filterResults')
-    const clearFilter = () => console.log('clearFilter')
-    const showRawObject = () => console.log('showRawObject')
-    const disableFilter = () => false
-    const disableClear = () => false
+    const filterResults = () => {
+      let query = { ...$route.query, ...v.filter }
+      query = {
+        ...query,
+        bdate: query.bdate ? new Date(query.bdate) : undefined,
+        adate: query.adate ? new Date(query.adate) : undefined,
+        sdate: query.sdate ? new Date(query.sdate) : undefined,
+        edate: query.edate ? new Date(query.edate) : undefined
+      }
+      Object.keys(query).forEach(k => { if (!query[k]) delete query[k] })
+      $router.replace({ name: $route.name, params: $route.params, query: query })
+    }
+
+    const clearFilter = () => $router.replace({ name: $route.name, params: $route.params })
+
+    const showRawObject = log => {
+      v.selectedLog = Object.assign({}, log)
+      delete v.selectedLog.action_display_text
+      delete v.selectedLog.action_display_url
+      v.showRawObjectModal = true
+    }
+
+    const syntaxHighlight = json => {
+      if (typeof json !== 'string') json = JSON.stringify(json, undefined, 2)
+      json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g, match => {
+        let cls = 'number'
+        if (/^"/.test(match)) {
+          if (/:$/.test(match)) cls = 'key'
+          else cls = 'string'
+        }
+        else if (/true|false/.test(match)) cls = 'boolean'
+        else if (/null/.test(match)) cls = 'null'
+        return `<span class="${cls}">${match}</span>`
+      })
+    }
+
+    const disableFilter = () => {
+      return (!v.filter.mod && !v.filter.action && !v.filter.keyword && !v.filter.bdate && !v.filter.adate && !v.filter.sdate && !v.filter.edate) ||
+        (v.selectedDateFilterType === 'before' && !v.filter.bdate) ||
+        (v.selectedDateFilterType === 'after' && !v.filter.adate) ||
+        (v.selectedDateFilterType === 'between' && (!v.filter.sdate || !v.filter.edate))
+    }
+
+    const disableClear = () => {
+      let query = $route.query
+      return !(query.mod || query.action || query.keyword || query.bdate || query.adate || query.sdate || query.edate)
+    }
+
+    const init = query => {
+      v.filter = { ...query }
+      delete v.filter.page
+      delete v.filter.limit
+      if (!v.filter.action) v.filter.action = null
+      if (query.bdate) v.selectedDateFilterType = 'before'
+      else if (query.adate) v.selectedDateFilterType = 'after'
+      else if (query.sdate && query.edate) v.selectedDateFilterType = 'between'
+      else v.selectedDateFilterType = null
+    }
 
     const actionTypes = [
       {
@@ -308,12 +393,12 @@ export default {
 
     const v = reactive({
       logData: {},
-      filter: {
-        action: null
-      },
-      selectedDateFilterType: null
+      filter: {},
+      selectedLog: null,
+      selectedDateFilterType: null,
+      showRawObjectModal: false
     })
-    return { ...toRefs(v), humanDate, dateFilterTypes, actionTypes, filterResults, clearFilter, disableClear, disableFilter, showRawObject, pageResults }
+    return { ...toRefs(v), init, humanDate, dateFilterTypes, actionTypes, filterResults, clearFilter, disableClear, disableFilter, showRawObject, pageResults, syntaxHighlight }
   }
 }
 </script>
@@ -331,8 +416,8 @@ export default {
 }
 .log-filter {
   span { display: inline-block; margin-bottom: 0.5rem; }
-  input, select { margin:0; height: 2rem; line-height: 1rem; padding: 0 0.25rem; width: auto; display: inline-block; }
-  select { padding-right: 1.5rem; }
+  input, select { margin: 0; height: 2rem; line-height: 1rem; padding: 0 0.25rem; width: auto; display: inline-block; }
+  select { padding-right: 1.5rem; height: 2.3125rem; }
   button, button:focus {
     display: inline-block;
     margin-right: 0.2rem;
@@ -378,5 +463,17 @@ table.underlined {
 
     td input { margin-bottom: 0; }
   }
+}
+pre.json {
+  padding: 1rem;
+  font-size: 0.875rem;
+  background-color: $sub-header-color;
+  overflow: scroll;
+  max-height: 65vh;
+  .string { color: #ff5722; }
+  .number { color: #4caf50; }
+  .boolean { color: #e91e63; }
+  .null { color: #9c27b0; }
+  .key { color: #2196f3; }
 }
 </style>
