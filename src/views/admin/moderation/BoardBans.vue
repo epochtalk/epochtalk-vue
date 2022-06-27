@@ -2,7 +2,11 @@
   <div class="full-width">
     <div class="admin-table-header row">
       <div class="column">
-        Hey
+        <select name="boards" v-model="boardFilter" @change="filterBoards()" class="boards-select">
+          <optgroup v-for="(boards, parentName) in boardsMovelist" :label="parentName" :key="parentName">
+            <option v-for="board in boards" :value="board" :key="decode(board.name)">{{decode(board.name)}}</option>
+          </optgroup>
+        </select>
       </div>
       <div class="column">
         Hey
@@ -13,24 +17,38 @@
 
 <script>
 import { reactive, toRefs } from 'vue'
-// import { adminApi } from '@/api'
+import { boardsApi } from '@/api'
+import { groupBy } from 'lodash'
+import decode from '@/composables/filters/decode'
 
 export default {
   name: 'BoardBanModeration',
   beforeRouteEnter(to, from, next) {
-    next()
-    // adminApi.configurations().then(data => next(vm => vm.config = data))
+    boardsApi.movelist()
+    // create options groups by parent name
+    .then(ml => groupBy(ml, 'parent_name'))
+    .then(movelist => next(vm => {
+      // apply grouped boards for select listing
+      vm.boardsMovelist = movelist
+    }))
   },
   beforeRouteUpdate(to, from, next) {
-    // adminApi.configurations().then(data => {
-    //   this.config = data
-    //   next()
-    // })
-    next()
+    boardsApi.movelist()
+    // create options groups by parent name
+    .then(ml => groupBy(ml, 'parent_name'))
+    .then(movelist => {
+      // apply grouped boards for select listing
+      this.boardsMovelist = movelist
+      next()
+    })
   },
   setup() {
-    const v = reactive({ config: {} })
-    return { ...toRefs(v) }
+    const filterBoards = () => {
+      console.log(v.boardFilter)
+    }
+
+    const v = reactive({ boardsMovelist: {}, boardFilter: null })
+    return { ...toRefs(v), decode, filterBoards }
   }
 }
 </script>
