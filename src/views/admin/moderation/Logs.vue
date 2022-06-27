@@ -50,10 +50,8 @@
       <button :disabled="disableFilter()" @click="filterResults()">Filter</button>
       <button :disabled="disableClear()" @click="clearFilter()">Clear</button>
     </div>
-    <div class="logs-content fill-row centered-text" v-if="!logData">
-      <h4>No logs to display</h4>
-    </div>
-    <div class="logs-content fill-row" v-if="logData">
+
+    <div class="logs-content fill-row" >
       <table class="underlined" width="100%">
         <thead>
           <th>Date</th>
@@ -62,7 +60,7 @@
           <th>Link</th>
           <th>Raw</th>
         </thead>
-        <tbody>
+        <tbody v-if="logData?.data?.length">
           <tr v-for="log in logData?.data" :key="log">
             <td v-html="humanDate(log.action_taken_at)"></td>
             <td>
@@ -81,6 +79,9 @@
           </tr>
         </tbody>
       </table>
+      <div class="fill-row centered-text" v-if="!logData?.data?.length">
+        <h4>No logs to display</h4>
+      </div>
       <div class="pagination-wrap" v-if="logData?.page > 1 || logData.next">
         <div class="pagination-simple">
           <button @click="pageResults(logData.prev)" :disabled="!logData.prev">&#10094; Prev</button>
