@@ -27,6 +27,7 @@ import BannedAddressManagement from '@/views/admin/management/BannedAddresses.vu
 import InvitationManagement from '@/views/admin/management/Invitations.vue'
 import LogModeration from '@/views/admin/moderation/Logs.vue'
 import UserModeration from '@/views/admin/moderation/Users.vue'
+import BoardBanModeration from '@/views/admin/moderation/BoardBans.vue'
 import ConfirmAccount from '@/views/ConfirmAccount.vue'
 import ResetPassword from '@/views/ResetPassword.vue'
 import Profile from '@/views/Profile.vue'
@@ -145,7 +146,7 @@ const routes = [
   {
     path: '/admin/moderation/boardbans',
     name: 'BoardBanModeration',
-    component: UserModeration,
+    component: BoardBanModeration,
     meta: { requiresAuth: true, bodyClass: 'board-ban-moderation', title: 'Moderation' }
   },
   {
