@@ -9,7 +9,11 @@
         </select>
       </div>
       <div class="column">
-        Hey
+        <div class="nested-input-container">
+          <a v-if="boardBanData?.search" @click="clearSearch()" class="nested-clear-btn fa fa-times"></a>
+          <a @click="searchBannedUsers()" class="nested-btn">Search</a>
+          <input class="input-text nested-input" v-model="searchStr" type="text" id="search-users" placeholder="Search Banned Users" @keydown="$event.which === 13 && searchBannedUsers()" @keyup="$event.which === 27 && clearSearch()" />
+        </div>
       </div>
     </div>
   </div>
@@ -17,29 +21,51 @@
 
 <script>
 import { reactive, toRefs } from 'vue'
-import { boardsApi } from '@/api'
+import { adminApi, boardsApi } from '@/api'
 import { groupBy } from 'lodash'
 import decode from '@/composables/filters/decode'
 
 export default {
   name: 'BoardBanModeration',
   beforeRouteEnter(to, from, next) {
-    boardsApi.movelist()
-    // create options groups by parent name
-    .then(ml => groupBy(ml, 'parent_name'))
-    .then(movelist => next(vm => {
-      // apply grouped boards for select listing
-      vm.boardsMovelist = movelist
-    }))
+    let queryParams = {
+      page: to.query.page || undefined,
+      limits: to.query.limit || undefined,
+      modded: to.query.modded,
+      board: to.query.board,
+      search: to.query.search
+    }
+    adminApi.bans.pageByBannedBoards(queryParams)
+    .then(data => {
+      boardsApi.movelist()
+      // create options groups by parent name
+      .then(ml => groupBy(ml, 'parent_name'))
+      .then(movelist => next(vm => {
+        vm.boardBanData = data
+        vm.boardsMovelist = movelist
+        vm.searchStr = to.query.search
+      }))
+    })
   },
   beforeRouteUpdate(to, from, next) {
-    boardsApi.movelist()
-    // create options groups by parent name
-    .then(ml => groupBy(ml, 'parent_name'))
-    .then(movelist => {
-      // apply grouped boards for select listing
-      this.boardsMovelist = movelist
-      next()
+    let queryParams = {
+      page: to.query.page || undefined,
+      limits: to.query.limit || undefined,
+      modded: to.query.modded,
+      board: to.query.board,
+      search: to.query.search
+    }
+    adminApi.bans.pageByBannedBoards(queryParams)
+    .then(data => {
+      boardsApi.movelist()
+      // create options groups by parent name
+      .then(ml => groupBy(ml, 'parent_name'))
+      .then(movelist => {
+        this.boardBanData = data
+        this.boardsMovelist = movelist
+        this.searchStr = to.query.search
+        next()
+      })
     })
   },
   setup() {
@@ -47,8 +73,17 @@ export default {
       console.log(v.boardFilter)
     }
 
-    const v = reactive({ boardsMovelist: {}, boardFilter: null })
-    return { ...toRefs(v), decode, filterBoards }
+    const searchBannedUsers = () => console.log(v.searchStr)
+    const clearSearch = () => console.log('clearSearch')
+
+    const v = reactive({
+      boardsMovelist: {},
+      boardFilter: null,
+      searchStr: null,
+      boardBanData: {}
+    })
+
+    return { ...toRefs(v), decode, filterBoards, searchBannedUsers, clearSearch }
   }
 }
 </script>
@@ -70,4 +105,5 @@ export default {
   row-gap: 0;
 }
 .column { flex: 50%; }
+.nested-btn { margin-bottom: 1rem; }
 </style>
