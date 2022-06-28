@@ -275,7 +275,8 @@ export const adminApi = {
     pageBannedAddresses: params => $http('/api/ban/addresses', { params }),
     addBannedAddresses: data => $http('/api/ban/addresses', { method: 'POST', data}),
     editBannedAddress: data => $http('/api/ban/addresses', { method: 'PUT', data}),
-    deleteBannedAddress: query => $http('/api/ban/addresses', { method: 'DELETE', params: query })
+    deleteBannedAddress: query => $http('/api/ban/addresses', { method: 'DELETE', params: query }),
+    pageByBannedBoards: params => $http('/api/users/banned', { params })
   },
   trust: {
     getDefaultTrustList: () => $http('/api/admin/trustlist'),
