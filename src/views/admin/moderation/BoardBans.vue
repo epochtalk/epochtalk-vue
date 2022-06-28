@@ -17,6 +17,49 @@
         </div>
       </div>
     </div>
+    <div class="board-ban-content">
+      <table class="underlined" width="100%">
+        <thead>
+          <th class="left-icon-col"></th>
+          <th>User</th>
+          <th>Email</th>
+          <th>Banned Boards</th>
+          <th>Action</th>
+        </thead>
+        <tbody v-if="boardBanData?.data?.length">
+          <tr v-for="boardBan in boardBanData?.data" :key="boardBan">
+            <td class="left-icon-col">
+              <i v-if="bannedFromModeratedBoard(boardBan.board_ids)" class="far fa-star"></i>
+            </td>
+            <td>
+              <router-link :to="{ path: '/profile/' + boardBan.username.toLowerCase() }" v-html="boardBan.username" />
+            </td>
+            <td><a :href="`mailto:${boardBan.email}`" target="_blank" v-html="boardBan.email"></a></td>
+            <td>
+              <span v-for="(boardName, i) in boardBan.board_names" :key="i">
+                <router-link :to="{ path: '/boards/' + boardBan.board_slugs[i] }" v-html="boardName + (i < boardBan.board_names.length - 1 ? ', ' : '') "></router-link>
+              </span>
+            </td>
+            <td>
+              <a class="pointer" @click="showManageBans(boardBan)"><i class="fas fa-ban"></i></a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="row">
+      <div class="column">
+        <div class="indicator"><i class="far fa-star"></i> Indicates a user that has been banned from a board you moderate</div>
+      </div>
+      <div class="column">
+        <div class="pagination-wrap" v-if="boardBanData?.page > 1 || boardBanData.next">
+          <div class="pagination-simple">
+            <button @click="pageResults(boardBanData.prev)" :disabled="!boardBanData.prev">&#10094; Prev</button>
+            <button @click="pageResults(boardBanData.next)" :disabled="!boardBanData.next">Next &#10095;</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -76,6 +119,8 @@ export default {
 
     const searchBannedUsers = () => console.log(v.searchStr)
     const clearSearch = () => console.log('clearSearch')
+    const showManageBans = data => console.log(data)
+    const bannedFromModeratedBoard = () => true
 
     const v = reactive({
       boardsMovelist: {},
@@ -84,12 +129,13 @@ export default {
       boardBanData: {}
     })
 
-    return { ...toRefs(v), decode, filterBoards, searchBannedUsers, clearSearch }
+    return { ...toRefs(v), decode, filterBoards, searchBannedUsers, clearSearch, showManageBans, bannedFromModeratedBoard }
   }
 }
 </script>
 
 <style lang="scss">
+.board-ban-content { margin-top: 6rem; }
 .admin-table-header {
   background-color: $sub-header-color;
   position: absolute;
@@ -107,4 +153,18 @@ export default {
 }
 .column { flex: 50%; }
 .nested-btn { margin-bottom: 1rem; }
+
+th.left-icon-col { width: 1.5rem; }
+td.left-icon-col {
+  pading: 0 0 0 0.5rem;
+  color: $secondary-font-color;
+  padding-top: 0.5rem;
+}
+
+.indicator {
+  font-size: 0.75rem;
+  margin-left: 0.5rem;
+  color: $secondary-font-color;
+  i { padding: 0 0.5rem 0 0; }
+}
 </style>
