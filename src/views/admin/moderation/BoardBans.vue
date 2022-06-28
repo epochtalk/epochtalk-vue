@@ -3,6 +3,7 @@
     <div class="admin-table-header row">
       <div class="column">
         <select name="boards" v-model="boardFilter" @change="filterBoards()" class="boards-select">
+          <option :value="null">Filter by All Boards</option>
           <optgroup v-for="(boards, parentName) in boardsMovelist" :label="parentName" :key="parentName">
             <option v-for="board in boards" :value="board" :key="decode(board.name)">{{decode(board.name)}}</option>
           </optgroup>
