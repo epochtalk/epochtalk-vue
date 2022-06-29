@@ -2,18 +2,31 @@
   <div class="full-width">
     <div class="admin-table-header row">
       <div class="column">
-        <select name="boards" v-model="boardFilter" @change="filterBoards()" class="boards-select">
-          <option :value="null">Filter by All Boards</option>
-          <optgroup v-for="(boards, parentName) in boardsMovelist" :label="parentName" :key="parentName">
-            <option v-for="board in boards" :value="board" :key="decode(board.name)">{{decode(board.name)}}</option>
+        <select name="boards" v-model="boardFilter" @change="applyFilter()" class="boards-select">
+          <option :value="null">Filter by {{ boardBanData?.modded ? 'My Moderated' : 'All'}} Boards</option>
+          <optgroup v-for="(boards, parentName) in filterBoards" :label="parentName" :key="parentName">
+            <option v-for="board in boards" :value="board.id" :key="decode(board.name)">{{decode(board.name)}}</option>
           </optgroup>
         </select>
+        <div class="row">
+          <div class="column">
+            <label v-if="!hasGlobalModPerms()" class="inline-block">
+              <input @change="applyFilter()" v-model="moddedFilter" class="pointer" type="checkbox" />
+              Show only my moderated boards
+            </label>
+          </div>
+          <div class="column">
+            <label v-if="boardBanData?.board || boardBanData?.modded" class="clear-filters">
+              <a @click="moddedFilter=boardFilter=null;applyFilter()"><i class="fa fa-times"></i> Clear Filters</a>
+            </label>
+          </div>
+        </div>
       </div>
       <div class="column">
         <div class="nested-input-container">
           <a v-if="boardBanData?.search" @click="clearSearch()" class="nested-clear-btn fa fa-times"></a>
-          <a @click="searchBannedUsers()" class="nested-btn">Search</a>
-          <input class="input-text nested-input" v-model="searchStr" type="text" id="search-users" placeholder="Search Banned Users" @keydown="$event.which === 13 && searchBannedUsers()" @keyup="$event.which === 27 && clearSearch()" />
+          <a @click="applyFilter()" class="nested-btn">Search</a>
+          <input class="input-text nested-input" v-model="searchFilter" type="text" id="search-users" placeholder="Search Banned Users" @keydown="$event.which === 13 && applyFilter()" @keyup="$event.which === 27 && clearSearch()" />
         </div>
       </div>
     </div>
@@ -64,17 +77,19 @@
 </template>
 
 <script>
-import { reactive, toRefs } from 'vue'
+import { reactive, toRefs, inject } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { adminApi, boardsApi } from '@/api'
 import { groupBy } from 'lodash'
 import decode from '@/composables/filters/decode'
+import { AuthStore } from '@/composables/stores/auth'
 
 export default {
   name: 'BoardBanModeration',
   beforeRouteEnter(to, from, next) {
     let queryParams = {
       page: to.query.page || undefined,
-      limits: to.query.limit || undefined,
+      limit: to.query.limit || undefined,
       modded: to.query.modded,
       board: to.query.board,
       search: to.query.search
@@ -82,19 +97,16 @@ export default {
     adminApi.bans.pageByBannedBoards(queryParams)
     .then(data => {
       boardsApi.movelist()
-      // create options groups by parent name
-      .then(ml => groupBy(ml, 'parent_name'))
       .then(movelist => next(vm => {
         vm.boardBanData = data
-        vm.boardsMovelist = movelist
-        vm.searchStr = to.query.search
+        vm.initFilterBoards(movelist, queryParams)
       }))
     })
   },
   beforeRouteUpdate(to, from, next) {
     let queryParams = {
       page: to.query.page || undefined,
-      limits: to.query.limit || undefined,
+      limit: to.query.limit || undefined,
       modded: to.query.modded,
       board: to.query.board,
       search: to.query.search
@@ -102,34 +114,72 @@ export default {
     adminApi.bans.pageByBannedBoards(queryParams)
     .then(data => {
       boardsApi.movelist()
-      // create options groups by parent name
-      .then(ml => groupBy(ml, 'parent_name'))
       .then(movelist => {
         this.boardBanData = data
-        this.boardsMovelist = movelist
-        this.searchStr = to.query.search
+        this.initFilterBoards(movelist, queryParams)
         next()
       })
     })
   },
   setup() {
-    const filterBoards = () => {
-      console.log(v.boardFilter)
+    const pageResults = page => {
+      let query = { ...$route.query, page: page }
+      if (query.page <= 1 || !query.page) delete query.page
+      $router.replace({ name: $route.name, params: $route.params, query: query })
     }
-
-    const searchBannedUsers = () => console.log(v.searchStr)
-    const clearSearch = () => console.log('clearSearch')
+    const applyFilter = () => {
+      let query = {
+        ...$route.query,
+        board: v.boardFilter,
+        modded: v.moddedFilter,
+        search: v.searchFilter
+      }
+      Object.keys(query).forEach(k => { if (!query[k]) delete query[k] })
+      $router.replace({ name: $route.name, params: $route.params, query: query })
+    }
+    const searchBannedUsers = () => console.log(v.searchFilter)
+    const clearSearch = () =>  {
+      v.searchFilter = null
+      applyFilter()
+    }
     const showManageBans = data => console.log(data)
-    const bannedFromModeratedBoard = () => true
+    const bannedFromModeratedBoard = boardIds => {
+      if (hasGlobalModPerms()) return true
+      return boardIds.filter(id => {
+        if (v.moderating.indexOf(id) > -1) { return id; }
+      }).length
+    }
+    const hasGlobalModPerms = () => v.permissionUtils.hasPermission('bans.banFromBoards.bypass.type.admin')
+    const $auth = inject(AuthStore)
+    const $route = useRoute()
+    const $router = useRouter()
 
     const v = reactive({
-      boardsMovelist: {},
+      authedUser: $auth.user,
+      permissionUtils: $auth.permissionUtils,
+      filterBoards: {},
+      moderating: [],
       boardFilter: null,
-      searchStr: null,
+      moddedFilter: null,
+      searchFilter: null,
       boardBanData: {}
     })
 
-    return { ...toRefs(v), decode, filterBoards, searchBannedUsers, clearSearch, showManageBans, bannedFromModeratedBoard }
+    const initFilterBoards = (boards, query) => {
+      v.filterBoards = boards
+      v.moderating = v.authedUser.moderating
+      let moderatedBoards = v.filterBoards.filter(board => {
+        if (v.moderating.indexOf(board.id) > -1) return board
+      })
+      if (v.boardBanData.modded) v.filterBoards = moderatedBoards
+      // create options groups by parent name (for select grouping)
+      v.filterBoards = groupBy(v.filterBoards, 'parent_name')
+      v.boardFilter = query.board || null
+      v.searchFilter = query.search
+      v.moddedFilter = query.modded
+    }
+
+    return { ...toRefs(v), decode, applyFilter, searchBannedUsers, clearSearch, showManageBans, bannedFromModeratedBoard, initFilterBoards, hasGlobalModPerms, pageResults }
   }
 }
 </script>
@@ -143,9 +193,22 @@ export default {
   right: 0;
   padding: 1rem;
   padding-top: 2rem;
+  padding-bottom: 0.25rem;
   top: 0.4rem;
   @include break-mobile-sm { padding: 1.25rem 1rem 0; margin: 0 -1rem 2rem; }
+  select { margin-bottom: 0; }
+  .clear-filters {
+    align-self: flex-end;
+    width: auto;
+    padding-right: 0;
+  }
+  label {
+    font-size: 0.75rem;
+    color: $secondary-font-color;
+    input { margin-bottom: 0.2rem; }
+  }
 }
+
 .row {
   display: flex;
   flex-flow: row;
