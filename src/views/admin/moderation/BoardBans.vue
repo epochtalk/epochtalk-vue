@@ -74,6 +74,9 @@
       </div>
     </div>
   </div>
+
+  <manage-bans-modal :user="selectedUser" :show="showManageBansModal" @close="showManageBansModal = false" @success="handleBanSuccess" />
+
 </template>
 
 <script>
@@ -83,9 +86,11 @@ import { adminApi, boardsApi } from '@/api'
 import { groupBy } from 'lodash'
 import decode from '@/composables/filters/decode'
 import { AuthStore } from '@/composables/stores/auth'
+import ManageBansModal from '@/components/modals/profile/ManageBans.vue'
 
 export default {
   name: 'BoardBanModeration',
+  components: { ManageBansModal },
   beforeRouteEnter(to, from, next) {
     let queryParams = {
       page: to.query.page || undefined,
@@ -137,12 +142,18 @@ export default {
       Object.keys(query).forEach(k => { if (!query[k]) delete query[k] })
       $router.replace({ name: $route.name, params: $route.params, query: query })
     }
+
+    const handleBanSuccess = () => console.log('handle ban success')
     const searchBannedUsers = () => console.log(v.searchFilter)
     const clearSearch = () =>  {
       v.searchFilter = null
       applyFilter()
     }
-    const showManageBans = data => console.log(data)
+    const showManageBans = data => {
+      v.showManageBansModal = true
+      v.selectedUser = data
+      console.log(data)
+    }
     const bannedFromModeratedBoard = boardIds => {
       if (hasGlobalModPerms()) return true
       return boardIds.filter(id => {
@@ -157,11 +168,13 @@ export default {
     const v = reactive({
       authedUser: $auth.user,
       permissionUtils: $auth.permissionUtils,
+      showManageBansModal: false,
       filterBoards: {},
       moderating: [],
       boardFilter: null,
       moddedFilter: null,
       searchFilter: null,
+      selectedUser: {},
       boardBanData: {}
     })
 
@@ -179,7 +192,7 @@ export default {
       v.moddedFilter = query.modded
     }
 
-    return { ...toRefs(v), decode, applyFilter, searchBannedUsers, clearSearch, showManageBans, bannedFromModeratedBoard, initFilterBoards, hasGlobalModPerms, pageResults }
+    return { ...toRefs(v), decode, applyFilter, handleBanSuccess, searchBannedUsers, clearSearch, showManageBans, bannedFromModeratedBoard, initFilterBoards, hasGlobalModPerms, pageResults }
   }
 }
 </script>
