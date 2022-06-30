@@ -215,6 +215,7 @@ export default {
   row-gap: 0;
 }
 .column { flex: 50%; }
+.pagination-wrap { align-self: flex-end; }
 .nested-btn { margin-bottom: 1rem; }
 
 th.left-icon-col { width: 1.5rem; }
