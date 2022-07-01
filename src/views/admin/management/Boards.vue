@@ -680,7 +680,7 @@ export default {
 </script>
 
 <style lang="scss">
-.nested-input-container { .nested-btn-disabled, .nested-btn { color: $base-background-color; } }
+.nested-input-container { .nested-btn-disabled, .nested-btn { color: $base-background-color; margin-bottom: 0; } }
 a.input-spacer, a.input-spacer.button { margin-bottom: 1rem; }
 .dd {
   position: relative;

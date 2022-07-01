@@ -2,32 +2,39 @@
   <div class="full-width">
     <div class="admin-table-header row">
       <div class="column">
-        <select name="boards" v-model="boardFilter" @change="applyFilter()" class="boards-select">
-          <option :value="null">Filter by {{ boardBanData?.modded ? 'My Moderated' : 'All'}} Boards</option>
-          <optgroup v-for="(boards, parentName) in filterBoards" :label="parentName" :key="parentName">
-            <option v-for="board in boards" :value="board.id" :key="decode(board.name)">{{decode(board.name)}}</option>
-          </optgroup>
-        </select>
         <div class="row">
           <div class="column">
-            <label v-if="!hasGlobalModPerms()" class="inline-block">
-              <input @change="applyFilter()" v-model="moddedFilter" class="pointer" type="checkbox" />
-              Show only my moderated boards
-            </label>
+            <select name="boards" v-model="boardFilter" @change="applyFilter()" class="boards-select">
+              <option :value="null">Filter by {{ boardBanData?.modded ? 'My Moderated' : 'All'}} Boards</option>
+              <optgroup v-for="(boards, parentName) in filterBoards" :label="parentName" :key="parentName">
+                <option v-for="board in boards" :value="board.id" :key="decode(board.name)">{{decode(board.name)}}</option>
+              </optgroup>
+            </select>
+            <div class="row">
+              <div class="column">
+                <label v-if="!hasGlobalModPerms()" class="inline-block">
+                  <input @change="applyFilter()" v-model="moddedFilter" class="pointer" type="checkbox" />
+                  Show only my moderated boards
+                </label>
+              </div>
+              <div class="column">
+                <label v-if="boardBanData?.board || boardBanData?.modded" class="clear-filters">
+                  <a @click="moddedFilter=boardFilter=null;applyFilter()"><i class="fa fa-times"></i> Clear Filters</a>
+                </label>
+              </div>
+            </div>
           </div>
           <div class="column">
-            <label v-if="boardBanData?.board || boardBanData?.modded" class="clear-filters">
-              <a @click="moddedFilter=boardFilter=null;applyFilter()"><i class="fa fa-times"></i> Clear Filters</a>
-            </label>
+            <div class="nested-input-container">
+              <a v-if="boardBanData?.search" @click="clearSearch()" class="nested-clear-btn fa fa-times"></a>
+              <a @click="applyFilter()" class="nested-btn">Search</a>
+              <input class="input-text nested-input" v-model="searchFilter" type="text" id="search-users" placeholder="Search Banned Users" @keydown="$event.which === 13 && applyFilter()" @keyup="$event.which === 27 && clearSearch()" />
+            </div>
           </div>
         </div>
       </div>
       <div class="column">
-        <div class="nested-input-container">
-          <a v-if="boardBanData?.search" @click="clearSearch()" class="nested-clear-btn fa fa-times"></a>
-          <a @click="applyFilter()" class="nested-btn">Search</a>
-          <input class="input-text nested-input" v-model="searchFilter" type="text" id="search-users" placeholder="Search Banned Users" @keydown="$event.which === 13 && applyFilter()" @keyup="$event.which === 27 && clearSearch()" />
-        </div>
+        <button><i class="fa fa-plus-circle"></i>&nbsp;Add New Board Ban</button>
       </div>
     </div>
     <div class="board-ban-content">
@@ -36,7 +43,7 @@
           <th class="left-icon-col"></th>
           <th>User</th>
           <th>Email</th>
-          <th>Banned Boards</th>
+          <th class="banned-boards">Banned Boards</th>
           <th>Action</th>
         </thead>
         <tbody v-if="boardBanData?.data?.length">
@@ -197,7 +204,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .board-ban-content { margin-top: 6rem; }
 .admin-table-header {
   background-color: $sub-header-color;
@@ -221,15 +228,16 @@ export default {
     input { margin-bottom: 0.2rem; }
   }
 }
-
+.banned-boards { width: 55%; }
 .row {
   display: flex;
   flex-flow: row;
   row-gap: 0;
+  min-height: 2rem;
 }
 .column { flex: 50%; }
 .pagination-wrap { align-self: flex-end; }
-.nested-btn { margin-bottom: 1rem; }
+.input-text.nested-input { margin-bottom: 0; }
 
 th.left-icon-col { width: 1.5rem; }
 td.left-icon-col {
