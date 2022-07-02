@@ -46,7 +46,8 @@ export default {
       if (props.show && !open.value) {
         open.value = true
         nextTick(() => {
-          if (props.focusInput?.length) props.focusInput[0].focus()
+          if (props.focusInput?.focusSearch) props.focusInput.focusSearch()
+          else if (props.focusInput?.length) props.focusInput[0].focus()
           else if (props.focusInput) props.focusInput.focus()
         })
       }
