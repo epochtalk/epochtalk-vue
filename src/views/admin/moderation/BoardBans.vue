@@ -34,7 +34,7 @@
         </div>
       </div>
       <div class="column">
-        <button><i class="fa fa-plus-circle"></i>&nbsp;Add New Board Ban</button>
+        <button @click="showManageBans()"><i class="fa fa-plus-circle"></i>&nbsp;Add New Board Ban</button>
       </div>
     </div>
     <div class="board-ban-content">
@@ -82,7 +82,7 @@
     </div>
   </div>
 
-  <manage-bans-modal :user="selectedUser" :show="showManageBansModal" @close="showManageBansModal = false" @success="handleBanSuccess" />
+  <manage-bans-modal :user="selectedUser" :show="showManageBansModal" @close="showManageBansModal = false" @success="refreshPageData" :disable-global-ban="true" />
 
 </template>
 
@@ -139,6 +139,19 @@ export default {
       if (query.page <= 1 || !query.page) delete query.page
       $router.replace({ name: $route.name, params: $route.params, query: query })
     }
+
+    const refreshPageData = () => {
+      let queryParams = {
+        page: $route.query.page || undefined,
+        limit: $route.query.limit || undefined,
+        modded: $route.query.modded,
+        board: $route.query.board,
+        search: $route.query.search
+      }
+      adminApi.bans.pageByBannedBoards(queryParams)
+      .then(data => v.boardBanData = data)
+    }
+
     const applyFilter = () => {
       let query = {
         ...$route.query,
@@ -150,7 +163,6 @@ export default {
       $router.replace({ name: $route.name, params: $route.params, query: query })
     }
 
-    const handleBanSuccess = () => console.log('handle ban success')
     const searchBannedUsers = () => console.log(v.searchFilter)
     const clearSearch = () =>  {
       v.searchFilter = null
@@ -159,7 +171,6 @@ export default {
     const showManageBans = data => {
       v.showManageBansModal = true
       v.selectedUser = data
-      console.log(data)
     }
     const bannedFromModeratedBoard = boardIds => {
       if (hasGlobalModPerms()) return true
@@ -199,7 +210,7 @@ export default {
       v.moddedFilter = query.modded
     }
 
-    return { ...toRefs(v), decode, applyFilter, handleBanSuccess, searchBannedUsers, clearSearch, showManageBans, bannedFromModeratedBoard, initFilterBoards, hasGlobalModPerms, pageResults }
+    return { ...toRefs(v), decode, applyFilter, refreshPageData, searchBannedUsers, clearSearch, showManageBans, bannedFromModeratedBoard, initFilterBoards, hasGlobalModPerms, pageResults }
   }
 }
 </script>
@@ -227,6 +238,7 @@ export default {
     color: $secondary-font-color;
     input { margin-bottom: 0.2rem; }
   }
+  button { height: 2.25rem; }
 }
 .banned-boards { width: 55%; }
 .row {
@@ -239,12 +251,16 @@ export default {
 .pagination-wrap { align-self: flex-end; }
 .input-text.nested-input { margin-bottom: 0; }
 
-th.left-icon-col { width: 1.5rem; }
-td.left-icon-col {
-  pading: 0 0 0 0.5rem;
-  color: $secondary-font-color;
-  padding-top: 0.5rem;
+table.underlined {
+  td { padding-left: 0; padding-right: 0; }
+  th.left-icon-col { width: 1.75rem; }
+  td.left-icon-col {
+    pading: 0 0 0 0.5rem;
+    color: $secondary-font-color;
+    padding-top: 0.5rem;
+  }
 }
+
 
 .indicator {
   font-size: 0.75rem;

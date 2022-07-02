@@ -6,7 +6,7 @@
       <form v-if="userCopy" action="." class="css-form">
         <!-- Manage Bans -->
         <label class="bold">User Information</label>
-        <table class="striped" width="100%">
+        <table v-if="userCopy.username" class="striped" width="100%">
           <tr>
             <td>Username</td>
             <td>{{ userCopy.username }}</td>
@@ -32,7 +32,9 @@
             </td>
           </tr>
         </table>
-
+        <div v-if="!userCopy.username">
+          <Multiselect ref="focusInput" v-model="userToBan.value" v-bind="userToBan" />
+        </div>
         <div v-if="canGlobalBanUser()">
           <label for="banType">
             <strong>Ban Globally</strong>
@@ -53,7 +55,7 @@
           </div>
         </div>
 
-        <div class="board-bans-list" v-if="!disableBoardBans">
+        <div class="board-bans-list" v-if="!disableBoardBans && userCopy.username">
           <label>
             <strong>Ban from my Boards</strong>
             <div class="right">
@@ -75,7 +77,7 @@
         </div>
         <!-- Save Button -->
         <div class="modal-actions">
-          <button @click.prevent="updateBan()">
+          <button @click.prevent="updateBan()" :disabled="!userCopy.username">
             Confirm
           </button>
         </div>
@@ -93,30 +95,33 @@ import humanDate from '@/composables/filters/humanDate'
 import dayjs from 'dayjs'
 import IgnoredBoardsPartial from '@/components/settings/IgnoredBoardsPartial.vue'
 import { AuthStore } from '@/composables/stores/auth'
+import Multiselect from '@vueform/multiselect'
 
 export default {
   name: 'manage-bans-modal',
-  props: ['show', 'user', 'disableBoardBans'],
+  props: ['show', 'user', 'disableBoardBans', 'disableGlobalBan'],
   emits: ['close', 'success'],
-  components: { Modal, IgnoredBoardsPartial },
+  components: { Modal, IgnoredBoardsPartial, Multiselect },
   setup(props, { emit }) {
     watch(() => props.show, show => {
       if (show) {
-        initUser()
+        v.userCopy = {}
+        v.checkedBoardInputs = []
+        props.user ? initUser() : null
         props.disableBoardBans ? initGlobalBanInfo() : init()
       }
     })
 
-    const init = () => {
+    const init = username => {
       boardsApi.getBoards(true)
       .then(d => v.boards = d.boards)
       .then(initDisabledBoards)
       .catch(() => {})
-      banApi.getBannedBoards(props.user.username)
+      if (props.user || username) banApi.getBannedBoards(username || props.user.username)
       .then(initBanInfo).catch(() => {})
     }
 
-    const initUser = () => usersApi.find(props.user.username)
+    const initUser = username => usersApi.find(username || props.user.username)
       .then(updatedUser => {
         Object.assign(v.userReactive, updatedUser)
         Object.assign(v.userCopy, cloneDeep(updatedUser))
@@ -176,7 +181,7 @@ export default {
     }
 
     /* Template Methods */
-    const canGlobalBanUser = () => v.permUtils.hasPermission('bans.ban.allow')
+    const canGlobalBanUser = () => v.permUtils.hasPermission('bans.ban.allow') && !props.disableGlobalBan
 
     const checkAll = checked => {
       if (v.authedIsAdmin) v.checkedBoardInputs = checked ? genBoardsObjFromArray(v.boards, {}, true) : {}
@@ -284,7 +289,7 @@ export default {
         )
       }
       Promise.all(promises)
-      .then(() => initUser())
+      .then(() => initUser(v.userCopy.username))
       .then(() => {
         emit('success', v.userReactive)
         close()
@@ -323,7 +328,29 @@ export default {
       disabledInputs: {},
       banUserIp: null,
       banUntil: null,
-      banSubmitted: false
+      banSubmitted: false,
+      userToBan: {
+        mode: 'single',
+        value: null,
+        placeholder: 'Type username of user to board ban',
+        noOptionsText: 'Enter a username to start lookup...',
+        minChars: 1,
+        resolveOnLoad: false,
+        delay: 0,
+        searchable: true,
+        maxHeight: 100,
+        options: async q => {
+          return await usersApi.search(q)
+          // convert array into array of objects
+          .then(d => d.map(u => ({ label: u, value: u })))
+          .catch(() => [])
+        }
+      }
+    })
+
+    watch(() => v.userToBan.value, username => {
+      initUser(username)
+      init(username)
     })
 
     return { ...toRefs(v), minDate, updateBan, canGlobalBanUser, toggleIgnoredBoard, checkAll, humanDate, close, dayjs }
