@@ -27,6 +27,7 @@ import BannedAddressManagement from '@/views/admin/management/BannedAddresses.vu
 import InvitationManagement from '@/views/admin/management/Invitations.vue'
 import LogModeration from '@/views/admin/moderation/Logs.vue'
 import UserModeration from '@/views/admin/moderation/Users.vue'
+import MessageModeration from '@/views/admin/moderation/Messages.vue'
 import BoardBanModeration from '@/views/admin/moderation/BoardBans.vue'
 import ConfirmAccount from '@/views/ConfirmAccount.vue'
 import ResetPassword from '@/views/ResetPassword.vue'
@@ -140,7 +141,7 @@ const routes = [
   {
     path: '/admin/moderation/messages',
     name: 'MessageModeration',
-    component: UserModeration,
+    component: MessageModeration,
     meta: { requiresAuth: true, bodyClass: 'message-moderation', title: 'Moderation' }
   },
   {
