@@ -3,23 +3,23 @@
     <div class="admin-table-header row">
       <div class="column">
         <div class="row">
-          <div class="moderation-users radio-button column">
+          <div class="moderation-posts radio-button column">
             <input type="radio" class="hide-radio" name="table-filter" :value="undefined" id="report-filter-0" v-model="query.filter" @click="setFilter()" />
             <label for="report-filter-0">All</label>
           </div>
-          <div class="moderation-users radio-button column">
+          <div class="moderation-posts radio-button column">
             <input type="radio" class="hide-radio" name="table-filter" :value="'pending'" id="report-filter-1" v-model="query.filter" @click="setFilter('pending')" />
             <label for="report-filter-1">Pending</label>
           </div>
-          <div class="moderation-users radio-button column">
+          <div class="moderation-posts radio-button column">
             <input type="radio" class="hide-radio" name="table-filter" :value="'reviewed'" id="report-filter-2" v-model="query.filter" @click="setFilter('reviewed')" />
             <label for="report-filter-2">Reviewed</label>
           </div>
-          <div class="moderation-users radio-button column">
+          <div class="moderation-posts radio-button column">
             <input type="radio" class="hide-radio" name="table-filter" :value="'ignored'" id="report-filter-3" v-model="query.filter" @click="setFilter('ignored')" />
             <label for="report-filter-3">Ignored</label>
           </div>
-          <div class="moderation-users radio-button column">
+          <div class="moderation-posts radio-button column">
             <input type="radio" class="hide-radio" name="table-filter" :value="'badReport'" id="report-filter-4" v-model="query.filter" @click="setFilter('badReport')" />
             <label for="report-filter-4">Bad Report</label>
           </div>
@@ -29,7 +29,7 @@
         <div class="nested-input-container" v-if="!query?.ip">
           <a v-if="query?.search" @click="clearSearch()" class="nested-clear-btn fa fa-times"></a>
           <a @click="searchReports()" class="nested-btn">Search</a>
-          <input class="input-text nested-input" v-model="searchStr" type="text" id="search-reports" placeholder="Search reported users" @keydown="$event.which === 13 && searchReports()" @keyup="$event.which === 27 && clearSearch()" />
+          <input class="input-text nested-input" v-model="searchStr" type="text" id="search-reports" placeholder="Search reported posts" @keydown="$event.which === 13 && searchReports()" @keyup="$event.which === 27 && clearSearch()" />
         </div>
       </div>
     </div>
@@ -41,7 +41,7 @@ import { reactive, toRefs } from 'vue'
 // import { adminApi } from '@/api'
 
 export default {
-  name: 'UserModeration',
+  name: 'PostModeration',
   beforeRouteEnter(to, from, next) {
     next()
     // adminApi.configurations().then(data => next(vm => vm.config = data))

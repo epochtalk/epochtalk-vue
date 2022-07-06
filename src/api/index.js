@@ -303,6 +303,11 @@ export const adminApi = {
     addRule: data => $http('/api/automoderation/rules', { method: 'POST', data }),
     updateRule: data => $http(`/api/automoderation/rules/${data.id}`, { method: 'PUT', data }),
     deleteRule: data => $http(`/api/automoderation/rules/${data.id}`, { method: 'DELETE' })
+  },
+  reports: {
+    pageReportedMessages: params => $http('/api/reports/messages', { params }),
+    pageReportedUsers: params => $http('/api/reports/users', { params }),
+    pageReportedPosts: params => $http('/api/reports/posts', { params }),
   }
 }
 
