@@ -91,8 +91,8 @@
       </table>
       <div class="pagination-wrap">
         <simple-pagination
-          v-model="currentPage"
-          :pages="pages"
+          v-model="reportData.page"
+          :pages="reportData.page_count"
           :range-size="1"
           @update:modelValue="pageResults"
         />
@@ -144,6 +144,11 @@ export default {
     const setFilter = () => console.log('setFilter')
     const clearSearch = () => console.log('clearSearch')
     const searchReports = () => console.log('searchReports')
+    const pageResults = page => {
+      let query = { ...$route.query, page: page }
+      if (query.page <= 1 || !query.page) delete query.page
+      $router.replace({ name: $route.name, params: $route.params, query: query })
+    }
 
     const setSortField = newField => {
       // Get/Set new sort field
@@ -185,7 +190,7 @@ export default {
       searchStr: null
     })
 
-    return { ...toRefs(v), setFilter, searchReports, clearSearch, setSortField, getSortClass, humanDate }
+    return { ...toRefs(v), setFilter, searchReports, clearSearch, setSortField, getSortClass, humanDate, pageResults }
   }
 }
 </script>
