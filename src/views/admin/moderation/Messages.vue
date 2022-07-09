@@ -173,7 +173,7 @@ export default {
       let sortClass = 'fa '
       const desc = v.query?.desc
       const curField = v.query?.field
-      const defaultField = field === 'username' && !curField
+      const defaultField = field === 'created_at' && !curField
       if ((defaultField || curField === field) && desc) sortClass += 'fa-sort-down'
       else if ((defaultField || curField === field) && !desc) sortClass += 'fa-sort-up'
       else sortClass += 'fa-sort'
