@@ -8,19 +8,19 @@
             <label for="report-filter-0">All</label>
           </div>
           <div class="moderation-messages radio-button column">
-            <input type="radio" class="hide-radio" name="table-filter" :value="'pending'" id="report-filter-1" v-model="query.filter" @click="setFilter('pending')" />
+            <input type="radio" class="hide-radio" name="table-filter" :value="'Pending'" id="report-filter-1" v-model="query.filter" @click="setFilter('Pending')" />
             <label for="report-filter-1">Pending</label>
           </div>
           <div class="moderation-messages radio-button column">
-            <input type="radio" class="hide-radio" name="table-filter" :value="'reviewed'" id="report-filter-2" v-model="query.filter" @click="setFilter('reviewed')" />
+            <input type="radio" class="hide-radio" name="table-filter" :value="'Reviewed'" id="report-filter-2" v-model="query.filter" @click="setFilter('Reviewed')" />
             <label for="report-filter-2">Reviewed</label>
           </div>
           <div class="moderation-messages radio-button column">
-            <input type="radio" class="hide-radio" name="table-filter" :value="'ignored'" id="report-filter-3" v-model="query.filter" @click="setFilter('ignored')" />
+            <input type="radio" class="hide-radio" name="table-filter" :value="'Ignored'" id="report-filter-3" v-model="query.filter" @click="setFilter('Ignored')" />
             <label for="report-filter-3">Ignored</label>
           </div>
           <div class="moderation-messages radio-button column">
-            <input type="radio" class="hide-radio" name="table-filter" :value="'badReport'" id="report-filter-4" v-model="query.filter" @click="setFilter('badReport')" />
+            <input type="radio" class="hide-radio" name="table-filter" :value="'Bad Report'" id="report-filter-4" v-model="query.filter" @click="setFilter('Bad Report')" />
             <label for="report-filter-4">Bad Report</label>
           </div>
         </div>
@@ -141,7 +141,11 @@ export default {
     })
   },
   setup() {
-    const setFilter = () => console.log('setFilter')
+    const setFilter = filter => {
+      let query = { filter: filter }
+      const params = { ...$route.params, saveScrollPos: true } // save scroll pos when sorting table
+      $router.replace({ name: $route.name, params, query: query })
+    }
     const clearSearch = () => console.log('clearSearch')
     const searchReports = () => console.log('searchReports')
     const pageResults = page => {
