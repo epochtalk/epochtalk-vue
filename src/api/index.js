@@ -308,6 +308,9 @@ export const adminApi = {
     pageReportedMessages: params => $http('/api/reports/messages', { params }),
     pageReportedUsers: params => $http('/api/reports/users', { params }),
     pageReportedPosts: params => $http('/api/reports/posts', { params }),
+    pageMessageNotes: (id, params) => $http(`/api/reports/messagenotes/${id}`, { params }),
+    pageUserNotes: (id, params) => $http(`/api/reports/usernotes/${id}`, { params }),
+    pagePostNotes: (id, params) => $http(`/api/reports/postnotes/${id}`, { params })
   }
 }
 
