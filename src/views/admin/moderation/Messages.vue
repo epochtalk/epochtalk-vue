@@ -34,11 +34,11 @@
       </div>
     </div>
     <div class="report-content fill-row centered-text" v-if="!query?.search && reportData?.count < 1">
-      <h4>No Messages to display in <strong>{{query?.filter}}</strong></h4>
+      <h4>No Messages to display in <strong>{{query?.filter || 'All'}}</strong></h4>
     </div>
     <div class="report-content fill-row" v-if="reportData?.count > 0 || query?.search">
       <div v-if="query?.search">
-      Displaying {{reportData?.count}} search result(s) for "<strong>{{query?.search}}</strong>" in <strong>{{query?.filter}}</strong>:<br /><br />
+      Displaying {{reportData?.count}} search result(s) for "<strong>{{query?.search}}</strong>" in <strong>{{query?.filter || 'All'}}</strong>:<br /><br />
       </div>
       <table class="underlined" width="100%">
         <thead>
@@ -51,7 +51,7 @@
           <th class="user-actions">Actions</th>
         </thead>
         <tbody>
-          <tr v-for="report in reportData.data" :key="report.id" class="selectable-row" :class="{ 'active-row' : selectedReport === report.id }" @click="selectReport(report)">
+          <tr v-for="report in reportData.data" :key="report.id" class="selectable-row" :class="{ 'active-row' : selectedReport?.id === report.id }" @click="selectReport(report)">
             <td class="hide-mobile">
               <router-link :to="{ path: '/profile/' + report.reporter_username.toLowerCase() }" v-html="report.reporter_username" />
             </td>
@@ -98,15 +98,122 @@
         />
       </div>
     </div>
+
+    <!-- Report Viewer -->
+    <div class="report-content report-details" v-if="selectedReport !== null">
+      <div class="report-details-wrap">
+        <h5 class="thin-underline">Report Details</h5>
+        <table width="100%" class="report-details">
+          <tbody>
+            <tr>
+              <td class="field">Actions</td>
+              <td class="desc">
+              <!-- Modify Report -->
+              <button class="icon" data-balloon="Modify Report Status" @click="showSetStatus(previewReport)" :disabled="!canUpdateReport()"><i class="fa fa-cog"></i></button>
+
+              <!-- Warn User -->
+              <button class="icon" data-balloon="Warn User" @click="showWarn({ id: selectedReport.offender_author_id, username: selectedReport.offender_author_username })" :disabled="!canCreateConversation()"><i class="fa fa-exclamation-circle"></i></button>
+
+              <!-- Ban User -->
+              <button class="icon" data-balloon="Manage Bans" @click="showManageBans()" :disabled="!canBanUser()"><i class="fa fa-ban"></i></button>
+
+              <button class="icon" data-balloon="Purge Message" @click="showConfirmPurge(selectedReport.offender_message_id)" :disabled="!canDeleteMessage()"><i class="fa fa-trash"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td class="field">Reported Date</td>
+              <td class="desc" v-html="humanDate(selectedReport.created_at)"></td>
+            </tr>
+            <tr v-if="selectedReport.reviewer_user_id">
+              <td class="field">Reviewed Date</td>
+              <td class="desc" v-html="humanDate(selectedReport.updated_at)"></td>
+            </tr>
+            <tr>
+              <td class="field">Current Status</td>
+              <td class="desc" v-html="selectedReport.status"></td>
+            </tr>
+            <tr>
+              <td class="field">Reported By</td>
+              <td class="desc">
+                <router-link :to="{ path: '/profile/' + selectedReport.reporter_username.toLowerCase() }" v-html="selectedReport.reporter_username" />
+              </td>
+            </tr>
+            <tr>
+              <td class="field">Reason for Report</td>
+              <td class="desc">{{selectedReport.reporter_reason}}</td>
+            </tr>
+            <tr>
+              <td class="field">Reported Message Author</td>
+              <td class="desc">
+                <router-link :to="{ path: '/profile/' + selectedReport.offender_author_username.toLowerCase() }" v-html="selectedReport.offender_author_username" />
+              </td>
+            </tr>
+            <tr>
+              <td class="field">Reported Message Sent Date</td>
+              <td class="desc" v-html="humanDate(selectedReport.offender_created_at)"></td>
+            </tr>
+            <tr>
+              <td class="field">Moderation Notes</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+        <div v-for="note in noteData?.data" :key="note?.id">
+          <div class="note-avatar-container" v-if="!note.edit">
+            <img class="note-avatar" :class="defaultAvatarShape" :src="note.avatar || defaultAvatar" />
+          </div>
+          <div class="note-details" v-if="!note.edit">
+            <span class="note-author">
+              <router-link :to="{ path: '/profile/' + note.username.toLowerCase() }" v-html="note.username" />&nbsp;</span>
+            <span class="note-date" v-html="humanDate(note.created_at)"></span>
+            <span class="note-date" v-if="note.created_at !== note.updated_at"> &mdash; Edited <span v-html="humanDate(note.updated_at)"></span></span>
+            <span class="right" v-if="authedUser.id === note.user_id"><a href="#" @click.prevent="note.edit = true; note.noteCopy = note.note">Edit</a></span>
+            <div class="note-message">{{note.note}}</div>
+          </div>
+          <div v-if="note.edit" class="note-details">
+            <a class="right" href="#" @click.prevent="updateReportNote(note)">Save</a>
+            <a class="right" href="#" @click.prevent="note.edit = undefined; note.note = note.noteCopy; note.noteCopy = undefined">Cancel&nbsp;&nbsp;&nbsp;</a>
+            <textarea rows="3" v-model="note.note" maxlength="255"></textarea>
+          </div>
+          <div class="thin-underline"></div>
+        </div>
+        <div class="pagination-slide" v-if="noteData?.count">
+          <div class="prev">
+            <button @click="pageReportNotes(-1)" :disabled="noteData?.page <= 1">❮</button>
+          </div>
+          <div class="page">{{noteData?.page}} of {{noteData?.count}}</div>
+          <div class="next">
+            <button @click="pageReportNotes(1)" :disabled="noteData?.page >= noteData?.count">❯</button>
+          </div>
+        </div>
+        <form name="$parent.form" class="css-form">
+          <textarea name="reportNote" ng-model="ModerationCtrl.reportNote" ng-disabled="ModerationCtrl.noteSubmitted" placeholder="Leave a note on this report..." rows="3" required maxlength="255"></textarea>
+          <div class="clear">
+            <button class="full-width" @click="submitReportNote()"
+              :disabled="noteSubmitted">Add Note</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Message Body Section -->
+      <div class="preview-wrap">
+        <h5 class="thin-underline">Reported Message</h5>
+        <!-- Message Body -->
+        <!-- TODO(akinsey): <div class="post-body" post-processing="ModerationCtrl.previewReport.offender_message" style-fix="true"></div> -->
+        <div v-html="selectedReport.offender_message"></div>
+      </div>
+    </div>
+
   </div>
 </template>
 
 <script>
-import { reactive, toRefs } from 'vue'
+import { reactive, toRefs, inject } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { adminApi } from '@/api'
 import SimplePagination from '@/components/layout/SimplePagination.vue'
 import humanDate from '@/composables/filters/humanDate'
+import { AuthStore } from '@/composables/stores/auth'
 
 export default {
   name: 'MessageModeration',
@@ -143,6 +250,8 @@ export default {
   setup() {
     const setFilter = filter => {
       let query = { filter: filter }
+      delete query.search
+      v.searchStr = ''
       const params = { ...$route.params, saveScrollPos: true }
       $router.replace({ name: $route.name, params, query: query })
     }
@@ -167,13 +276,13 @@ export default {
     }
     const selectReport = report => {
       let query = { ...$route.query }
-      if (v.selectedReport === report.id) {
+      if (v.selectedReport?.id === report.id) {
         v.selectedReport = null
         delete query.reportId
       }
       else {
-        v.selectedReport = report.id
-        query.reportId = v.selectedReport
+        v.selectedReport = report
+        query.reportId = v.selectedReport.id
       }
       $router.replace({ name: $route.name, params: $route.params, query: query })
     }
@@ -207,18 +316,36 @@ export default {
       return sortClass
     }
 
+    const canUpdateReport = () => true
+    const canCreateConversation = () => true
+    const canBanUser = () => true
+    const canDeleteMessage = () => true
+
+    const submitReportNote = () => console.log('submitReportNote')
+    const showWarn = () => console.log('showWarn')
+    const showManageBans = () => console.log('showManageBans')
+    const showSetStatus = () => console.log('showSetStatus')
+    const showConfirmPurge = () => console.log('showConfirmPurge')
+    const updateReportNote = () => console.log('updateReportNote')
+
     const $route = useRoute()
     const $router = useRouter()
+    const $auth = inject(AuthStore)
 
     const v = reactive({
       config: {},
+      authedUser: $auth.user,
       query: {},
       reportData: {},
+      noteData: {},
       selectedReport: null,
-      searchStr: null
+      searchStr: null,
+      noteSubmitted: false,
+      defaultAvatar: window.default_avatar,
+      defaultAvatarShape: window.default_avatar_shape
     })
 
-    return { ...toRefs(v), setFilter, searchReports, clearSearch, setSortField, getSortClass, humanDate, pageResults, selectReport }
+    return { ...toRefs(v), setFilter, searchReports, clearSearch, setSortField, getSortClass, humanDate, pageResults, selectReport, canUpdateReport, canCreateConversation, canDeleteMessage, canBanUser, showSetStatus, showWarn, showManageBans, showConfirmPurge, updateReportNote, submitReportNote, initSelectedReport }
   }
 }
 </script>
@@ -248,10 +375,47 @@ export default {
 }
 .column { flex: 50%;}
 
+.report-content {
+  margin-top: 6rem;
+
+  &.report-details {
+    display: grid;
+    grid-template-columns: 3fr 7fr;
+    grid-template-areas: "details preview";
+    grid-gap: 1rem;
+    .report-details-wrap { grid-area: details; }
+    .preview-wrap { grid-area: preview; }
+    .note-avatar-container {
+      float: left;
+      width: 5rem;
+      height: 5rem;
+      .note-avatar.circle { border-radius: 100%; object-fit: cover; width: 4.166rem; height: 4.166rem; }
+      .note-avatar.rect { width: 4.166rem; height: 4.166rem; }
+    }
+    .pagination-slide {
+      display: flex;
+      width: 100%;
+      flex-direction: row;
+      column-gap: 1rem;
+      align-items: stretch;
+      margin-bottom: .5rem;
+      .prev, .next {
+        flex: 0;
+        line-height: 2.25rem;
+        button { width: 7rem; float: right; }
+      }
+      .page {
+        flex: 1;
+        line-height: 2.25rem;
+        text-align: center;
+      }
+    }
+  }
+}
+button.icon { display: inline-block; }
 table.underlined {
   border: none;
   margin-bottom: 1rem;
-  margin-top: 6rem;
   thead {
     text-align: left;
     font-size: 0.875rem;
