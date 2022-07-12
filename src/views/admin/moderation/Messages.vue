@@ -51,7 +51,7 @@
           <th class="user-actions">Actions</th>
         </thead>
         <tbody>
-          <tr v-for="report in reportData.data" :key="report.id">
+          <tr v-for="report in reportData.data" :key="report.id" class="selectable-row" :class="{ 'active-row' : selectedReport === report.id }" @click="selectReport(report)">
             <td class="hide-mobile">
               <router-link :to="{ path: '/profile/' + report.reporter_username.toLowerCase() }" v-html="report.reporter_username" />
             </td>
@@ -143,17 +143,40 @@ export default {
   setup() {
     const setFilter = filter => {
       let query = { filter: filter }
-      const params = { ...$route.params, saveScrollPos: true } // save scroll pos when sorting table
+      const params = { ...$route.params, saveScrollPos: true }
       $router.replace({ name: $route.name, params, query: query })
     }
-    const clearSearch = () => console.log('clearSearch')
-    const searchReports = () => console.log('searchReports')
+    const clearSearch = () => {
+      let query = { ...$route.query }
+      delete query.page
+      delete query.search
+      v.searchStr = ''
+      const params = { ...$route.params, saveScrollPos: true }
+      $router.replace({ name: $route.name, params, query: query })
+    }
+    const searchReports = () => {
+      let query = { ...$route.query, search: v.searchStr }
+      delete query.page
+      const params = { ...$route.params, saveScrollPos: true }
+      $router.replace({ name: $route.name, params, query: query })
+    }
     const pageResults = page => {
       let query = { ...$route.query, page: page }
       if (query.page <= 1 || !query.page) delete query.page
       $router.replace({ name: $route.name, params: $route.params, query: query })
     }
-
+    const selectReport = report => {
+      let query = { ...$route.query }
+      if (v.selectedReport === report.id) {
+        v.selectedReport = null
+        delete query.reportId
+      }
+      else {
+        v.selectedReport = report.id
+        query.reportId = v.selectedReport
+      }
+      $router.replace({ name: $route.name, params: $route.params, query: query })
+    }
     const setSortField = newField => {
       // Get/Set new sort field
       if (newField) v.sortField = newField
@@ -191,10 +214,11 @@ export default {
       config: {},
       query: {},
       reportData: {},
+      selectedReport: null,
       searchStr: null
     })
 
-    return { ...toRefs(v), setFilter, searchReports, clearSearch, setSortField, getSortClass, humanDate, pageResults }
+    return { ...toRefs(v), setFilter, searchReports, clearSearch, setSortField, getSortClass, humanDate, pageResults, selectReport }
   }
 }
 </script>
@@ -238,7 +262,7 @@ table.underlined {
   tr {
     border-bottom: 1px solid $border-color-alt;
     vertical-align: top;
-    &.selectable-row { @include no-select; }
+    &.selectable-row { @include no-select; cursor: pointer; }
     &.selectable-row:hover { background-color: $sub-header-color; }
     &.active-row, &.active-row:nth-of-type(even) { background-color: $color-primary; }
     &.active-row.selectable-row:hover { background-color: $color-primary }
