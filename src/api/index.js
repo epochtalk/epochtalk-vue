@@ -310,7 +310,13 @@ export const adminApi = {
     pageReportedPosts: params => $http('/api/reports/posts', { params }),
     pageMessageNotes: (id, params) => $http(`/api/reports/messagenotes/${id}`, { params }),
     pageUserNotes: (id, params) => $http(`/api/reports/usernotes/${id}`, { params }),
-    pagePostNotes: (id, params) => $http(`/api/reports/postnotes/${id}`, { params })
+    pagePostNotes: (id, params) => $http(`/api/reports/postnotes/${id}`, { params }),
+    updateMessageNote: data => $http('/api/reports/messagenotes', { method: 'PUT', data}),
+    updateUserNote: data => $http('/api/reports/usernotes', { method: 'PUT', data}),
+    updatePostNote: data => $http('/api/reports/postnotes', { method: 'PUT', data}),
+    createMessageNote: data => $http('/api/reports/messagenotes', { method: 'POST', data}),
+    createUserNote: data => $http('/api/reports/usernotes', { method: 'POST', data}),
+    createPostNote: data => $http('/api/reports/postnotes', { method: 'POST', data})
   }
 }
 
