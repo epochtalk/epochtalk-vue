@@ -158,6 +158,13 @@
             </tr>
           </tbody>
         </table>
+        <form name="$parent.form" class="css-form">
+          <textarea name="reportNote" v-model="reportNote" :disabled="noteSubmitted" placeholder="Leave a note on this report..." rows="3" required maxlength="255"></textarea>
+          <div class="clear">
+            <button class="full-width" @click="submitReportNote()"
+              :disabled="noteSubmitted || !reportNote || reportNote?.length < 1">Add Note</button>
+          </div>
+        </form>
         <div v-for="note in noteData?.data" :key="note?.id">
           <div class="note-avatar-container" v-if="!note.edit">
             <img class="note-avatar" :class="defaultAvatarShape" :src="note.avatar || defaultAvatar" />
@@ -179,20 +186,13 @@
         </div>
         <div class="pagination-slide" v-if="noteData?.count">
           <div class="prev">
-            <button @click="pageReportNotes(-1)" :disabled="noteData?.page <= 1">❮</button>
+            <button @click="pageReportNotes(-1)" :disabled="noteData?.page <= 1">&#10094;</button>
           </div>
-          <div class="page">{{noteData?.page}} of {{noteData?.count}}</div>
+          <div class="page">{{noteData?.page}} of {{noteData?.page_count}}</div>
           <div class="next">
-            <button @click="pageReportNotes(1)" :disabled="noteData?.page >= noteData?.count">❯</button>
+            <button @click="pageReportNotes(1)" :disabled="noteData?.page >= noteData?.page_count">&#10095;</button>
           </div>
         </div>
-        <form name="$parent.form" class="css-form">
-          <textarea name="reportNote" ng-model="ModerationCtrl.reportNote" ng-disabled="ModerationCtrl.noteSubmitted" placeholder="Leave a note on this report..." rows="3" required maxlength="255"></textarea>
-          <div class="clear">
-            <button class="full-width" @click="submitReportNote()"
-              :disabled="noteSubmitted">Add Note</button>
-          </div>
-        </form>
       </div>
 
       <!-- Message Body Section -->
@@ -227,10 +227,26 @@ export default {
       desc: to.query.desc,
       search: to.query.search
     }
-    adminApi.reports.pageReportedMessages(queryParams).then(data => next(vm => {
-      vm.reportData = data
-      vm.query = queryParams
-    }))
+    if (to.query.reportId) {
+      let reportData
+      adminApi.reports.pageReportedMessages(queryParams)
+      .then(data => {
+        reportData = data
+        return adminApi.reports.pageMessageNotes(to.query.reportId)
+      })
+      .then(data => next(vm => {
+        vm.reportData = reportData
+        vm.noteData = data
+        vm.initSelectedReport(to.query.reportId, reportData.data)
+        vm.query = queryParams
+      }))
+    }
+    else {
+     adminApi.reports.pageReportedMessages(queryParams).then(data => next(vm => {
+       vm.reportData = data
+       vm.query = queryParams
+     }))
+    }
   },
   beforeRouteUpdate(to, from, next) {
     let queryParams = {
@@ -241,13 +257,39 @@ export default {
       desc: to.query.desc,
       search: to.query.search
     }
-    adminApi.reports.pageReportedMessages(queryParams).then(data => {
-      this.reportData = data
-      this.query = queryParams
-      next()
-    })
+    if (to.query.reportId) {
+      let reportData
+      adminApi.reports.pageReportedMessages(queryParams)
+      .then(data => {
+        reportData = data
+        return adminApi.reports.pageMessageNotes(to.query.reportId)
+      })
+      .then(data => {
+        this.reportData = reportData
+        this.noteData = data
+        this.initSelectedReport(to.query.reportId, reportData.data)
+        this.query = queryParams
+        next()
+      })
+    }
+    else {
+     adminApi.reports.pageReportedMessages(queryParams).then(data => {
+       this.reportData = data
+       this.query = queryParams
+       next()
+     })
+    }
   },
   setup() {
+    const initSelectedReport = (reportId, reports) => reports.forEach(r => reportId === r.id ? v.selectedReport = r : null)
+
+    const pageReportNotes = inc => {
+      let page = v.noteData.page + inc
+      adminApi.reports.pageMessageNotes($route.query.reportId, { page })
+      .then(d => v.noteData = d)
+      .then(() => window.scrollTo(0, document.body.scrollHeight || document.documentElement.scrollHeight))
+    }
+
     const setFilter = filter => {
       let query = { filter: filter }
       delete query.search
@@ -321,16 +363,50 @@ export default {
     const canBanUser = () => true
     const canDeleteMessage = () => true
 
-    const submitReportNote = () => console.log('submitReportNote')
     const showWarn = () => console.log('showWarn')
     const showManageBans = () => console.log('showManageBans')
     const showSetStatus = () => console.log('showSetStatus')
     const showConfirmPurge = () => console.log('showConfirmPurge')
-    const updateReportNote = () => console.log('updateReportNote')
+    const updateReportNote = note => {
+      delete note.edit
+      note.report_id = v.selectedReport.id
+      adminApi.reports.updateMessageNote(note)
+      .then(updatedNote => {
+        for (var i = 0; i < v.noteData.data.length; i++) {
+          if (v.noteData.data[i].id === note.id) {
+            v.noteData.data[i] = updatedNote
+            break
+          }
+        }
+        $alertStore.success('Note successfully updated')
+      })
+      .catch(err => {
+        note.note = note.noteCopy
+        delete note.noteCopy
+        $alertStore.error('Error: ' + err.data.message)
+      })
+    }
+
+    const submitReportNote = () => {
+      v.noteSubmitted = true;
+      let params = {
+        report_id: v.selectedReport.id,
+        user_id: v.authedUser.id,
+        note: v.reportNote
+      }
+      adminApi.reports.createMessageNote(params)
+      .then(() => {
+        v.noteSubmitted = false
+        v.reportNote = null
+        $alertStore.success('Note successfully created')
+        pageReportNotes(0)
+      })
+    }
 
     const $route = useRoute()
     const $router = useRouter()
     const $auth = inject(AuthStore)
+    const $alertStore = inject('$alertStore')
 
     const v = reactive({
       config: {},
@@ -340,12 +416,13 @@ export default {
       noteData: {},
       selectedReport: null,
       searchStr: null,
+      reportNote: null,
       noteSubmitted: false,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape
     })
 
-    return { ...toRefs(v), setFilter, searchReports, clearSearch, setSortField, getSortClass, humanDate, pageResults, selectReport, canUpdateReport, canCreateConversation, canDeleteMessage, canBanUser, showSetStatus, showWarn, showManageBans, showConfirmPurge, updateReportNote, submitReportNote, initSelectedReport }
+    return { ...toRefs(v), setFilter, searchReports, clearSearch, setSortField, getSortClass, humanDate, pageResults, selectReport, canUpdateReport, canCreateConversation, canDeleteMessage, canBanUser, showSetStatus, showWarn, showManageBans, showConfirmPurge, updateReportNote, submitReportNote, initSelectedReport, pageReportNotes }
   }
 }
 </script>
@@ -387,11 +464,18 @@ export default {
     .preview-wrap { grid-area: preview; }
     .note-avatar-container {
       float: left;
-      width: 5rem;
-      height: 5rem;
-      .note-avatar.circle { border-radius: 100%; object-fit: cover; width: 4.166rem; height: 4.166rem; }
-      .note-avatar.rect { width: 4.166rem; height: 4.166rem; }
+      width: 3.75rem;
+      height: 3.75rem;
+      .note-avatar.circle { border-radius: 100%; object-fit: cover; width: 3.125rem; height: 3.125rem; }
+      .note-avatar.rect { width: 3.125rem; height: 3.125rem; }
     }
+    .note-details {
+      font-size: 13px;
+      padding-top: 5px;
+      padding-bottom: 5px;
+      .note-date { color: $secondary-font-color; }
+    }
+    form { margin-bottom: 1rem; }
     .pagination-slide {
       display: flex;
       width: 100%;
@@ -458,6 +542,25 @@ table.underlined {
   .actions {
     display: flex;
     justify-content: flex-end;
+  }
+}
+table.report-details {
+  tr:first-child td { padding-top: 0; }
+  td.field {
+    font-size: 0.8125rem;
+    color: $secondary-font-color;
+    width: 9.375rem;
+    padding-left: 0;
+    vertical-align: top;
+    padding-right: 0.5rem;
+  }
+  td.desc {
+    font-size: 0.875rem;
+    .note {
+      font-size: 0.65rem;
+      color: $secondary-font-color;
+      margin-top: 0.25rem;
+    }
   }
 }
 </style>
