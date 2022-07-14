@@ -72,7 +72,7 @@
                 <i class="fas fa-exclamation-circle"></i>
               </button>
 
-              <button class="icon" data-balloon="Manage Bans">
+              <button class="icon" data-balloon="Manage Bans" @click.stop.prevent="showManageBans({ id: report.offender_author_id, username: report.offender_author_username, email: report.offender_author_email, created_at: report.offender_author_created_at, ban_expiration: report.offender_ban_expiration })">
                 <i class="fa fa-ban"></i>
               </button>
             </td>
@@ -115,7 +115,7 @@
               <button class="icon" data-balloon="Warn User" @click="showWarn({ id: selectedReport.offender_author_id, username: selectedReport.offender_author_username })" :disabled="!canCreateConversation()"><i class="fa fa-exclamation-circle"></i></button>
 
               <!-- Ban User -->
-              <button class="icon" data-balloon="Manage Bans" @click="showManageBans()" :disabled="!canBanUser()"><i class="fa fa-ban"></i></button>
+              <button class="icon" data-balloon="Manage Bans" @click.stop.prevent="showManageBans({ id: selectedReport.offender_author_id, username: selectedReport.offender_author_username, email: selectedReport.offender_author_email, created_at: selectedReport.offender_author_created_at, ban_expiration: selectedReport.offender_ban_expiration })" :disabled="!canBanUser()"><i class="fa fa-ban"></i></button>
 
               <button class="icon" data-balloon="Purge Message" @click="showConfirmPurge(selectedReport.offender_message_id)" :disabled="!canDeleteMessage()"><i class="fa fa-trash"></i></button>
               </td>
@@ -205,6 +205,9 @@
     </div>
 
   </div>
+
+  <manage-bans-modal :user="selectedUser" :show="showManageBansModal" @close="showManageBansModal = false" />
+
 </template>
 
 <script>
@@ -214,10 +217,11 @@ import { adminApi } from '@/api'
 import SimplePagination from '@/components/layout/SimplePagination.vue'
 import humanDate from '@/composables/filters/humanDate'
 import { AuthStore } from '@/composables/stores/auth'
+import ManageBansModal from '@/components/modals/profile/ManageBans.vue'
 
 export default {
   name: 'MessageModeration',
-  components: { SimplePagination },
+  components: { SimplePagination, ManageBansModal },
   beforeRouteEnter(to, from, next) {
     let queryParams = {
       limit: Number(to.query.limit) || undefined,
@@ -364,7 +368,10 @@ export default {
     const canDeleteMessage = () => true
 
     const showWarn = () => console.log('showWarn')
-    const showManageBans = () => console.log('showManageBans')
+    const showManageBans = user => {
+      v.selectedUser = user
+      v.showManageBansModal = true
+    }
     const showSetStatus = () => console.log('showSetStatus')
     const showConfirmPurge = () => console.log('showConfirmPurge')
     const updateReportNote = note => {
@@ -418,6 +425,8 @@ export default {
       searchStr: null,
       reportNote: null,
       noteSubmitted: false,
+      showManageBansModal: false,
+      selectedUser: {},
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape
     })
