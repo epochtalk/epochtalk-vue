@@ -206,7 +206,7 @@
 
   </div>
 
-  <manage-bans-modal :user="selectedUser" :show="showManageBansModal" @close="showManageBansModal = false" />
+  <manage-bans-modal :user="selectedUser" :show="showManageBansModal" @close="showManageBansModal = false" @success="refreshPageData" />
 
 </template>
 
@@ -285,6 +285,35 @@ export default {
     }
   },
   setup() {
+    const refreshPageData = () => {
+      let queryParams = {
+        limit: Number($route.query.limit) || undefined,
+        page: Number($route.query.page) || undefined,
+        filter: $route.query.filter,
+        field: $route.query.field,
+        desc: $route.query.desc,
+        search: $route.query.search
+      }
+      if ($route.query.reportId) {
+        adminApi.reports.pageReportedMessages(queryParams)
+        .then(data => {
+          v.reportData = data
+          return adminApi.reports.pageMessageNotes($route.query.reportId)
+        })
+        .then(data => {
+          v.noteData = data
+          initSelectedReport($route.query.reportId, v.reportData.data)
+          v.query = queryParams
+        })
+      }
+      else {
+       adminApi.reports.pageReportedMessages(queryParams).then(data => {
+         v.reportData = data
+         v.query = queryParams
+       })
+      }
+    }
+
     const initSelectedReport = (reportId, reports) => reports.forEach(r => reportId === r.id ? v.selectedReport = r : null)
 
     const pageReportNotes = inc => {
@@ -370,6 +399,8 @@ export default {
     const showWarn = () => console.log('showWarn')
     const showManageBans = user => {
       v.selectedUser = user
+      // ban_expiration must not be set if the user isnt globally banned
+      if (!v.selectedUser.ban_expiration) delete v.selectedUser.ban_expiration
       v.showManageBansModal = true
     }
     const showSetStatus = () => console.log('showSetStatus')
@@ -431,7 +462,7 @@ export default {
       defaultAvatarShape: window.default_avatar_shape
     })
 
-    return { ...toRefs(v), setFilter, searchReports, clearSearch, setSortField, getSortClass, humanDate, pageResults, selectReport, canUpdateReport, canCreateConversation, canDeleteMessage, canBanUser, showSetStatus, showWarn, showManageBans, showConfirmPurge, updateReportNote, submitReportNote, initSelectedReport, pageReportNotes }
+    return { ...toRefs(v), setFilter, searchReports, clearSearch, setSortField, getSortClass, humanDate, pageResults, selectReport, canUpdateReport, canCreateConversation, canDeleteMessage, canBanUser, showSetStatus, showWarn, showManageBans, showConfirmPurge, updateReportNote, submitReportNote, initSelectedReport, pageReportNotes, refreshPageData }
   }
 }
 </script>
