@@ -68,7 +68,7 @@
                 <i class="fas fa-cog"></i>
               </button>
 
-              <button class="icon" data-balloon="Warn User" @click="editUser(user)">
+              <button class="icon" data-balloon="Warn User" @click="showWarn({ id: report.offender_author_id, username: report.offender_author_username })">
                 <i class="fas fa-exclamation-circle"></i>
               </button>
 
@@ -207,7 +207,7 @@
   </div>
 
   <manage-bans-modal :user="selectedUser" :show="showManageBansModal" @close="showManageBansModal = false" @success="refreshPageData" />
-
+  <quick-message-modal v-if="selectedUser" :user="selectedUser" :show="showWarnModal" @close="showWarnModal = false" />
 </template>
 
 <script>
@@ -217,11 +217,12 @@ import { adminApi } from '@/api'
 import SimplePagination from '@/components/layout/SimplePagination.vue'
 import humanDate from '@/composables/filters/humanDate'
 import { AuthStore } from '@/composables/stores/auth'
+import QuickMessageModal from '@/components/modals/profile/QuickMessage.vue'
 import ManageBansModal from '@/components/modals/profile/ManageBans.vue'
 
 export default {
   name: 'MessageModeration',
-  components: { SimplePagination, ManageBansModal },
+  components: { SimplePagination, ManageBansModal, QuickMessageModal },
   beforeRouteEnter(to, from, next) {
     let queryParams = {
       limit: Number(to.query.limit) || undefined,
@@ -396,7 +397,10 @@ export default {
     const canBanUser = () => true
     const canDeleteMessage = () => true
 
-    const showWarn = () => console.log('showWarn')
+    const showWarn = user => {
+      v.selectedUser = user
+      v.showWarnModal = true
+    }
     const showManageBans = user => {
       v.selectedUser = user
       // ban_expiration must not be set if the user isnt globally banned
@@ -457,6 +461,7 @@ export default {
       reportNote: null,
       noteSubmitted: false,
       showManageBansModal: false,
+      showWarnModal: false,
       selectedUser: {},
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape
