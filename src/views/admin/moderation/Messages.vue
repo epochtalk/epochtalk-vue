@@ -64,17 +64,34 @@
             </td>
             <td class="hide-mobile">{{report.reporter_reason}}</td>
             <td class=actions>
-              <button class="icon" data-balloon="Modify Report Status">
-                <i class="fas fa-cog"></i>
-              </button>
-
-              <button class="icon" data-balloon="Warn User" @click="showWarn({ id: report.offender_author_id, username: report.offender_author_username })">
-                <i class="fas fa-exclamation-circle"></i>
-              </button>
-
               <button class="icon" data-balloon="Manage Bans" @click.stop.prevent="showManageBans({ id: report.offender_author_id, username: report.offender_author_username, email: report.offender_author_email, created_at: report.offender_author_created_at, ban_expiration: report.offender_ban_expiration })">
                 <i class="fa fa-ban"></i>
               </button>
+              <button class="icon" data-balloon="Warn User" @click.stop.prevent="showWarn({ id: report.offender_author_id, username: report.offender_author_username })">
+                <i class="fas fa-exclamation-circle"></i>
+              </button>
+              <div class="status-wrap">
+                <button class="icon pending" @click.stop.prevent="setStatus(report, 'Pending')">
+                  <i v-if="report.status === 'Pending'" class="fas fa-circle"></i>
+                  <i v-if="report.status !== 'Pending'" class="far fa-circle"></i>
+                  Pending
+                </button>
+                <button class="icon reviewed" @click.stop.prevent="setStatus(report, 'Reviewed')">
+                  <i v-if="report.status === 'Reviewed'" class="fas fa-circle"></i>
+                  <i v-if="report.status !== 'Reviewed'" class="far fa-circle"></i>
+                  Reviewed
+                </button>
+                <button class="icon ignored" @click.stop.prevent="setStatus(report, 'Ignored')">
+                  <i v-if="report.status === 'Ignored'" class="fas fa-circle"></i>
+                  <i v-if="report.status !== 'Ignored'" class="far fa-circle"></i>
+                  Ignored
+                </button>
+                <button class="icon bad-report" @click.stop.prevent="setStatus(report, 'Bad Report')">
+                  <i v-if="report.status === 'Bad Report'" class="fas fa-circle"></i>
+                  <i v-if="report.status !== 'Bad Report'" class="far fa-circle"></i>
+                  Bad Report
+                </button>
+              </div>
             </td>
 
 <!--           <td class="mod-actions">
@@ -392,6 +409,16 @@ export default {
       return sortClass
     }
 
+    const setStatus = (report, status) => {
+      if (report.status === status) return
+      let updatedReport = {
+        id: report.id,
+        reviewer_user_id: v.authedUser.id,
+        status: status
+      }
+      console.log(updatedReport)
+    }
+
     const canUpdateReport = () => true
     const canCreateConversation = () => true
     const canBanUser = () => true
@@ -467,7 +494,7 @@ export default {
       defaultAvatarShape: window.default_avatar_shape
     })
 
-    return { ...toRefs(v), setFilter, searchReports, clearSearch, setSortField, getSortClass, humanDate, pageResults, selectReport, canUpdateReport, canCreateConversation, canDeleteMessage, canBanUser, showSetStatus, showWarn, showManageBans, showConfirmPurge, updateReportNote, submitReportNote, initSelectedReport, pageReportNotes, refreshPageData }
+    return { ...toRefs(v), setFilter, searchReports, clearSearch, setSortField, getSortClass, humanDate, pageResults, selectReport, setStatus, canUpdateReport, canCreateConversation, canDeleteMessage, canBanUser, showSetStatus, showWarn, showManageBans, showConfirmPurge, updateReportNote, submitReportNote, initSelectedReport, pageReportNotes, refreshPageData }
   }
 }
 </script>
@@ -587,6 +614,21 @@ table.underlined {
   .actions {
     display: flex;
     justify-content: flex-end;
+    .status-wrap .icon {
+      &.ignored, &.pending, &.reviewed, &.bad-report {
+        padding: .1rem .25rem;
+        border-radius: 3px;
+        background: $sub-header-color;
+        font-size: .75rem;
+        border: 1px solid darken($color-primary-alt, 10%);
+      }
+    }
+    .icon {
+      &.ignored i { color: #FD8D40; }
+      &.pending i { color: #49AED0; }
+      &.reviewed i { color: #43AC6A; }
+      &.bad-report i { color: #E65239; }
+    }
   }
 }
 table.report-details {
