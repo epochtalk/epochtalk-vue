@@ -392,6 +392,7 @@ export default {
       // Update router to have new query params, watch on query params will update data
       let query = { limit: $route.query.limit, field: newField, filter: $route.query.filter, page: $route.query.page, search: v.searchStr, ip: $route.query.ip }
       if (!query.page) delete query.page // don't include page if undefined
+      if (!query.search) delete query.search // don't include search if undefined
       if (newField === 'created_at') delete query.field // do not display default field in qs
       if (desc) query.desc = true // do not display desc if false
       const params = { ...$route.params, saveScrollPos: true } // save scroll pos when sorting table
