@@ -251,7 +251,7 @@ export default {
     }
     if (to.query.reportId) {
       let reportData
-      adminApi.reports.pageReportedMessages(queryParams)
+      adminApi.reports.pageMessageReports(queryParams)
       .then(data => {
         reportData = data
         return adminApi.reports.pageMessageNotes(to.query.reportId)
@@ -264,7 +264,7 @@ export default {
       }))
     }
     else {
-     adminApi.reports.pageReportedMessages(queryParams).then(data => next(vm => {
+     adminApi.reports.pageMessageReports(queryParams).then(data => next(vm => {
        vm.reportData = data
        vm.query = queryParams
      }))
@@ -281,7 +281,7 @@ export default {
     }
     if (to.query.reportId) {
       let reportData
-      adminApi.reports.pageReportedMessages(queryParams)
+      adminApi.reports.pageMessageReports(queryParams)
       .then(data => {
         reportData = data
         return adminApi.reports.pageMessageNotes(to.query.reportId)
@@ -295,7 +295,7 @@ export default {
       })
     }
     else {
-     adminApi.reports.pageReportedMessages(queryParams).then(data => {
+     adminApi.reports.pageMessageReports(queryParams).then(data => {
        this.reportData = data
        this.query = queryParams
        next()
@@ -313,7 +313,7 @@ export default {
         search: $route.query.search
       }
       if ($route.query.reportId) {
-        adminApi.reports.pageReportedMessages(queryParams)
+        adminApi.reports.pageMessageReports(queryParams)
         .then(data => {
           v.reportData = data
           return adminApi.reports.pageMessageNotes($route.query.reportId)
@@ -325,7 +325,7 @@ export default {
         })
       }
       else {
-       adminApi.reports.pageReportedMessages(queryParams).then(data => {
+       adminApi.reports.pageMessageReports(queryParams).then(data => {
          v.reportData = data
          v.query = queryParams
        })
@@ -416,7 +416,14 @@ export default {
         reviewer_user_id: v.authedUser.id,
         status: status
       }
-      console.log(updatedReport)
+      adminApi.reports.updateMessageReport(updatedReport)
+      .then(data => {
+        report.reviewer_user_id = data.reviewer_user_id
+        report.status = data.status
+        report.updated_at = data.updated_at
+        $alertStore.success('Report status has been set to ' + status)
+      })
+
     }
 
     const canUpdateReport = () => true
