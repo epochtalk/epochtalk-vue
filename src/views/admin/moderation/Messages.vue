@@ -71,22 +71,22 @@
                 <i class="fas fa-exclamation-circle"></i>
               </button>
               <div class="status-wrap">
-                <button class="icon pending" @click.stop.prevent="setStatus(report, 'Pending')">
+                <button class="icon pending" :disabled="!canUpdateReport()" @click.stop.prevent="setStatus(report, 'Pending')">
                   <i v-if="report.status === 'Pending'" class="fas fa-circle"></i>
                   <i v-if="report.status !== 'Pending'" class="far fa-circle"></i>
                   Pending
                 </button>
-                <button class="icon reviewed" @click.stop.prevent="setStatus(report, 'Reviewed')">
+                <button class="icon reviewed" :disabled="!canUpdateReport()" @click.stop.prevent="setStatus(report, 'Reviewed')">
                   <i v-if="report.status === 'Reviewed'" class="fas fa-circle"></i>
                   <i v-if="report.status !== 'Reviewed'" class="far fa-circle"></i>
                   Reviewed
                 </button>
-                <button class="icon ignored" @click.stop.prevent="setStatus(report, 'Ignored')">
+                <button class="icon ignored" :disabled="!canUpdateReport()" @click.stop.prevent="setStatus(report, 'Ignored')">
                   <i v-if="report.status === 'Ignored'" class="fas fa-circle"></i>
                   <i v-if="report.status !== 'Ignored'" class="far fa-circle"></i>
                   Ignored
                 </button>
-                <button class="icon bad-report" @click.stop.prevent="setStatus(report, 'Bad Report')">
+                <button class="icon bad-report" :disabled="!canUpdateReport()" @click.stop.prevent="setStatus(report, 'Bad Report')">
                   <i v-if="report.status === 'Bad Report'" class="fas fa-circle"></i>
                   <i v-if="report.status !== 'Bad Report'" class="far fa-circle"></i>
                   Bad Report
