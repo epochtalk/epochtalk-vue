@@ -336,7 +336,7 @@ export default {
 
     const pageReportNotes = inc => {
       let page = v.noteData.page + inc
-      adminApi.reports.pageMessageNotes($route.query.reportId, { page })
+      adminApi.reports.pageMessageNotes(v.selectedReport.id, { page })
       .then(d => v.noteData = d)
       .then(() => window.scrollTo(0, document.body.scrollHeight || document.documentElement.scrollHeight))
     }
