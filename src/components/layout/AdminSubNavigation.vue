@@ -4,7 +4,7 @@
     <dl class="tabs">
       <span v-for="link in nav" :key="link.routeName">
         <dd class="no-select" :class="{'active': link.active}" v-if="link.permission">
-          <router-link :to="{ name: link.routeName }" v-html="link.title" />
+          <router-link :to="{ name: link.routeName, query: link.query }" v-html="link.title" />
         </dd>
       </span>
     </dl>
@@ -111,18 +111,21 @@ export default {
         {
           title: 'Users',
           routeName: 'UserModeration',
+          query: { filter: 'Pending' },
           permission: permUtils.hasPermission('modAccess.users'),
           active: computed(() => checkActive('UserModeration'))
         },
         {
           title: 'Posts',
           routeName: 'PostModeration',
+          query: { filter: 'Pending' },
           permission: permUtils.hasPermission('modAccess.posts'),
           active: computed(() => checkActive('PostModeration'))
         },
         {
           title: 'Messages',
           routeName: 'MessageModeration',
+          query: { filter: 'Pending' },
           permission: permUtils.hasPermission('modAccess.messages'),
           active: computed(() => checkActive('MessageModeration'))
         },
