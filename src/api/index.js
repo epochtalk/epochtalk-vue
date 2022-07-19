@@ -305,9 +305,12 @@ export const adminApi = {
     deleteRule: data => $http(`/api/automoderation/rules/${data.id}`, { method: 'DELETE' })
   },
   reports: {
-    pageReportedMessages: params => $http('/api/reports/messages', { params }),
-    pageReportedUsers: params => $http('/api/reports/users', { params }),
-    pageReportedPosts: params => $http('/api/reports/posts', { params }),
+    pageMessageReports: params => $http('/api/reports/messages', { params }),
+    updateMessageReport: data => $http('/api/reports/messages', { method: 'PUT', data}),
+    pageUserReports: params => $http('/api/reports/users', { params }),
+    updateUserReport: data => $http('/api/reports/users', { method: 'PUT', data}),
+    pagePostReports: params => $http('/api/reports/posts', { params }),
+    updatePostReport: data => $http('/api/reports/posts', { method: 'PUT', data}),
     pageMessageNotes: (id, params) => $http(`/api/reports/messagenotes/${id}`, { params }),
     pageUserNotes: (id, params) => $http(`/api/reports/usernotes/${id}`, { params }),
     pagePostNotes: (id, params) => $http(`/api/reports/postnotes/${id}`, { params }),
