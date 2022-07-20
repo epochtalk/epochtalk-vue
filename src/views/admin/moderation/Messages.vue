@@ -634,13 +634,13 @@ table.underlined {
         border: 1px solid darken($color-primary-alt, 10%);
       }
     }
-    .icon {
-      &.ignored i { color: #FD8D40; }
-      &.pending i { color: #49AED0; }
-      &.reviewed i { color: #43AC6A; }
-      &.bad-report i { color: #E65239; }
-    }
   }
+}
+.icon {
+  &.ignored i { color: #FD8D40; }
+  &.pending i { color: #49AED0; }
+  &.reviewed i { color: #43AC6A; }
+  &.bad-report i { color: #E65239; }
 }
 table.report-details {
   tr:first-child td { padding-top: 0; }
