@@ -346,6 +346,7 @@ export default {
       delete query.search
       v.searchStr = ''
       const params = { ...$route.params, saveScrollPos: true }
+      v.selectedReport = null
       $router.replace({ name: $route.name, params, query: query })
     }
     const clearSearch = () => {
