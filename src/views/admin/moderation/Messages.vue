@@ -126,15 +126,30 @@
               <td class="field">Actions</td>
               <td class="desc">
               <!-- Modify Report -->
-              <button class="icon" data-balloon="Modify Report Status" @click="showSetStatus(previewReport)" :disabled="!canUpdateReport()"><i class="fa fa-cog"></i></button>
+              <button class="icon pending" data-balloon="Pending" :disabled="!canUpdateReport()" @click.stop.prevent="setStatus(selectedReport, 'Pending')">
+                <i v-if="selectedReport.status === 'Pending'" class="fas fa-circle"></i>
+                <i v-if="selectedReport.status !== 'Pending'" class="far fa-circle"></i>
+              </button>
+              <button class="icon reviewed" data-balloon="Reviewed" :disabled="!canUpdateReport()" @click.stop.prevent="setStatus(selectedReport, 'Reviewed')">
+                <i v-if="selectedReport.status === 'Reviewed'" class="fas fa-circle"></i>
+                <i v-if="selectedReport.status !== 'Reviewed'" class="far fa-circle"></i>
+              </button>
+              <button class="icon ignored" data-balloon="Ignored" :disabled="!canUpdateReport()" @click.stop.prevent="setStatus(selectedReport, 'Ignored')">
+                <i v-if="selectedReport.status === 'Ignored'" class="fas fa-circle"></i>
+                <i v-if="selectedReport.status !== 'Ignored'" class="far fa-circle"></i>
+              </button>
+              <button class="icon bad-report" data-balloon="Bad Report" :disabled="!canUpdateReport()" @click.stop.prevent="setStatus(selectedReport, 'Bad Report')">
+                <i v-if="selectedReport.status === 'Bad Report'" class="fas fa-circle"></i>
+                <i v-if="selectedReport.status !== 'Bad Report'" class="far fa-circle"></i>
+              </button>
+
+              <button class="icon" data-balloon="Purge Message" @click="showConfirmPurge(selectedReport.offender_message_id)" :disabled="!canDeleteMessage()"><i class="fa fa-trash"></i></button>
 
               <!-- Warn User -->
               <button class="icon" data-balloon="Warn User" @click="showWarn({ id: selectedReport.offender_author_id, username: selectedReport.offender_author_username })" :disabled="!canCreateConversation()"><i class="fa fa-exclamation-circle"></i></button>
 
               <!-- Ban User -->
               <button class="icon" data-balloon="Manage Bans" @click.stop.prevent="showManageBans({ id: selectedReport.offender_author_id, username: selectedReport.offender_author_username, email: selectedReport.offender_author_email, created_at: selectedReport.offender_author_created_at, ban_expiration: selectedReport.offender_ban_expiration })" :disabled="!canBanUser()"><i class="fa fa-ban"></i></button>
-
-              <button class="icon" data-balloon="Purge Message" @click="showConfirmPurge(selectedReport.offender_message_id)" :disabled="!canDeleteMessage()"><i class="fa fa-trash"></i></button>
               </td>
             </tr>
             <tr>
