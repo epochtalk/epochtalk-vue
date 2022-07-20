@@ -354,12 +354,14 @@ export default {
       delete query.page
       delete query.search
       v.searchStr = ''
+      v.selectedReport = null
       const params = { ...$route.params, saveScrollPos: true }
       $router.replace({ name: $route.name, params, query: query })
     }
     const searchReports = () => {
       let query = { ...$route.query, search: v.searchStr }
       delete query.page
+      v.selectedReport = null
       const params = { ...$route.params, saveScrollPos: true }
       $router.replace({ name: $route.name, params, query: query })
     }
