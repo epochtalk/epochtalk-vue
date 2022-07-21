@@ -394,8 +394,11 @@ export default {
       else {
         v.selectedReport = report
         query.reportId = v.selectedReport.id
+        adminApi.reports.pageMessageNotes(query.reportId).then(data => v.noteData = data)
       }
-      $router.replace({ name: $route.name, params: $route.params, query: query })
+      let qs = ''
+      Object.keys(query).forEach(k => qs += qs.length ? `&${k}=${query[k]}` : `?${k}=${query[k]}`)
+      window.history.replaceState(null, null, qs)
     }
     const setSortField = newField => {
       // Get/Set new sort field
@@ -494,8 +497,9 @@ export default {
         v.noteSubmitted = false
         v.reportNote = null
         $alertStore.success('Note successfully created')
-        pageReportNotes(0)
+        return adminApi.reports.pageMessageNotes(v.selectedReport.id, { page: 1 })
       })
+      .then(d => v.noteData = d)
     }
 
     const $route = useRoute()
