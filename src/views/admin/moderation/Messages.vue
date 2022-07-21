@@ -143,7 +143,7 @@
                 <i v-if="selectedReport.status !== 'Bad Report'" class="far fa-circle"></i>
               </button>
 
-              <button class="icon" data-balloon="Purge Message" @click="showConfirmPurge(selectedReport.offender_message_id)" :disabled="!canDeleteMessage()"><i class="fa fa-trash"></i></button>
+              <button class="icon" data-balloon="Purge Message" @click="showConfirmPurgeModal = true" :disabled="!canDeleteMessage()"><i class="fa fa-trash"></i></button>
 
               <!-- Warn User -->
               <button class="icon" data-balloon="Warn User" @click="showWarn({ id: selectedReport.offender_author_id, username: selectedReport.offender_author_username })" :disabled="!canCreateConversation()"><i class="fa fa-exclamation-circle"></i></button>
@@ -240,21 +240,23 @@
 
   <manage-bans-modal :user="selectedUser" :show="showManageBansModal" @close="showManageBansModal = false" @success="refreshPageData" />
   <quick-message-modal v-if="selectedUser" :user="selectedUser" :show="showWarnModal" @close="showWarnModal = false" />
+  <confirm-modal :show="showConfirmPurgeModal" @close="showConfirmPurgeModal = false" @confirmed="purgeMessage" modal-title="Confirm Purge Message"  modal-description="Are you sure you want to purge this message? This will permanently delete the message from the sender and receiver's inbox." />
 </template>
 
 <script>
 import { reactive, toRefs, inject } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { adminApi } from '@/api'
+import { adminApi, messagesApi } from '@/api'
 import SimplePagination from '@/components/layout/SimplePagination.vue'
 import humanDate from '@/composables/filters/humanDate'
 import { AuthStore } from '@/composables/stores/auth'
 import QuickMessageModal from '@/components/modals/profile/QuickMessage.vue'
 import ManageBansModal from '@/components/modals/profile/ManageBans.vue'
+import ConfirmModal from '@/components/modals/common/Confirm.vue'
 
 export default {
   name: 'MessageModeration',
-  components: { SimplePagination, ManageBansModal, QuickMessageModal },
+  components: { SimplePagination, ManageBansModal, QuickMessageModal, ConfirmModal },
   beforeRouteEnter(to, from, next) {
     let queryParams = {
       limit: Number(to.query.limit) || undefined,
@@ -463,8 +465,10 @@ export default {
       if (!v.selectedUser.ban_expiration) delete v.selectedUser.ban_expiration
       v.showManageBansModal = true
     }
-    const showSetStatus = () => console.log('showSetStatus')
-    const showConfirmPurge = () => console.log('showConfirmPurge')
+    const purgeMessage = () => messagesApi.delete(v.selectedReport.offender_message_id)
+      .then(() => $alertStore.success('Successfully purged the reported message.'))
+      .catch(() => $alertStore.error('There was an error purging the reported message.'))
+
     const updateReportNote = note => {
       delete note.edit
       note.report_id = v.selectedReport.id
@@ -518,13 +522,14 @@ export default {
       reportNote: null,
       noteSubmitted: false,
       showManageBansModal: false,
+      showConfirmPurgeModal: false,
       showWarnModal: false,
       selectedUser: {},
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape
     })
 
-    return { ...toRefs(v), setFilter, searchReports, clearSearch, setSortField, getSortClass, humanDate, pageResults, selectReport, setStatus, canUpdateReport, canCreateConversation, canDeleteMessage, canBanUser, showSetStatus, showWarn, showManageBans, showConfirmPurge, updateReportNote, submitReportNote, initSelectedReport, pageReportNotes, refreshPageData }
+    return { ...toRefs(v), setFilter, searchReports, clearSearch, setSortField, getSortClass, humanDate, pageResults, selectReport, setStatus, canUpdateReport, canCreateConversation, canDeleteMessage, canBanUser, showWarn, showManageBans, updateReportNote, submitReportNote, initSelectedReport, pageReportNotes, refreshPageData, purgeMessage }
   }
 }
 </script>
