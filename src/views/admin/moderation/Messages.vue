@@ -440,10 +440,10 @@ export default {
 
     }
 
-    const canUpdateReport = () => true
-    const canCreateConversation = () => true
-    const canBanUser = () => true
-    const canDeleteMessage = () => true
+    const canUpdateReport = () => v.loggedIn && v.permUtils.hasPermission('reports.updateMessageReport.allow')
+    const canCreateConversation = () => v.loggedIn && v.permUtils.hasPermission('conversations.create.allow')
+    const canBanUser = () => v.loggedIn && (v.permUtils.hasPermission('bans.ban.allow') || v.permUtils.hasPermission('bans.banFromBoards.allow'))
+    const canDeleteMessage = () => v.loggedIn && v.permUtils.hasPermission('messages.delete.allow')
 
     const showWarn = user => {
       v.selectedUser = user
@@ -502,8 +502,9 @@ export default {
     const $alertStore = inject('$alertStore')
 
     const v = reactive({
-      config: {},
+      loggedIn: $auth.loggedIn,
       authedUser: $auth.user,
+      permUtils: $auth.permissionUtils,
       query: {},
       reportData: {},
       noteData: {},
