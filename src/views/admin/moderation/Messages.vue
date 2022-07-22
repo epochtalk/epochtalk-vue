@@ -604,6 +604,7 @@ table.underlined {
     background-color: transparent;
     border-bottom: $border-alt;
     th { color: $secondary-font-color; font-weight: 400; padding-bottom: 0.5rem; padding-left: 0.5rem; }
+    .user-actions { text-align: right; padding-right: 1rem; }
   }
   tr {
     border-bottom: 1px solid $border-color-alt;
