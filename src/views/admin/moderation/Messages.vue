@@ -390,7 +390,7 @@ export default {
       }
       let qs = ''
       Object.keys(query).forEach(k => qs += qs.length ? `&${k}=${query[k]}` : `?${k}=${query[k]}`)
-      window.history.replaceState(null, null, qs)
+      window.history.replaceState(window.history.state, null, qs)
     }
     const setSortField = newField => {
       // Get/Set new sort field
