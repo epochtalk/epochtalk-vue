@@ -93,16 +93,6 @@
                 </button>
               </div>
             </td>
-
-<!--           <td class="mod-actions">
-            <button class="icon" data-balloon="Modify Report Status" ng-click="ModerationCtrl.showSetStatus(messageReport)" ng-disabled="!ModerationCtrl.canUpdateUserReport()"><i class="fa fa-cog"></i></button>
-
-            <button class="icon" data-balloon="Warn User" ng-click="ModerationCtrl.showWarn({ id: messageReport.offender_author_id, username: messageReport.offender_author_username })" ng-disabled="!ModerationCtrl.canCreateConversation()"><i class="fa fa-exclamation-circle"></i></button>
-
-            <button class="icon" data-balloon="Manage Bans" ng-click="ModerationCtrl.showManageBans({ id: messageReport.offender_author_id, username: messageReport.offender_author_username, email: messageReport.offender_author_email, created_at: messageReport.offender_author_created_at, ban_expiration: messageReport.offender_ban_expiration })" ng-disabled="!ModerationCtrl.canBanUser()"><i class="fa fa-ban"></i></button>
-          </td> -->
-
-
           </tr>
         </tbody>
       </table>
