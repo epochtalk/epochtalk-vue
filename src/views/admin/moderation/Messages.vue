@@ -26,7 +26,7 @@
         </div>
       </div>
       <div class="report-search column">
-        <div class="nested-input-container" v-if="!query?.ip">
+        <div class="nested-input-container">
           <a v-if="query?.search" @click="clearSearch()" class="nested-clear-btn fa fa-times"></a>
           <a @click="searchReports()" class="nested-btn">Search</a>
           <input class="input-text nested-input" v-model="searchStr" type="text" id="search-reports" placeholder="Search reported messages" @keydown="$event.which === 13 && searchReports()" @keyup="$event.which === 27 && clearSearch()" />
@@ -253,7 +253,7 @@ export default {
       page: Number(to.query.page) || undefined,
       filter: to.query.filter,
       field: to.query.field,
-      desc: to.query.desc,
+      desc: to.query.desc ? false : true,
       search: to.query.search
     }
     if (to.query.reportId) {
@@ -283,7 +283,7 @@ export default {
       page: Number(to.query.page) || undefined,
       filter: to.query.filter,
       field: to.query.field,
-      desc: to.query.desc,
+      desc: to.query.desc ? false : true,
       search: to.query.search
     }
     if (to.query.reportId) {
@@ -316,7 +316,7 @@ export default {
         page: Number($route.query.page) || undefined,
         filter: $route.query.filter,
         field: $route.query.field,
-        desc: $route.query.desc,
+        desc: $route.query.desc ? false : true,
         search: $route.query.search
       }
       if ($route.query.reportId) {
@@ -403,7 +403,7 @@ export default {
       if (defaultField || newField === $route.query.field) desc = !desc
       else desc = true // Sort field changed, default to desc true
       // Update router to have new query params, watch on query params will update data
-      let query = { limit: $route.query.limit, field: newField, filter: $route.query.filter, page: $route.query.page, search: v.searchStr, ip: $route.query.ip }
+      let query = { limit: $route.query.limit, field: newField, filter: $route.query.filter, page: $route.query.page, search: v.searchStr }
       if (!query.page) delete query.page // don't include page if undefined
       if (!query.search) delete query.search // don't include search if undefined
       if (newField === 'created_at') delete query.field // do not display default field in qs
@@ -558,6 +558,7 @@ export default {
     grid-template-columns: 3fr 7fr;
     grid-template-areas: "details preview";
     grid-gap: 1rem;
+    margin-top: 4rem;
     .report-details-wrap { grid-area: details; }
     .preview-wrap { grid-area: preview; }
     .note-avatar-container {
