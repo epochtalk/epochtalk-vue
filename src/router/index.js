@@ -357,6 +357,10 @@ router.beforeEach(to => {
       query: { redirect: to.fullPath }
     })
   }
+  else {
+    to.meta.authedUser = localStorageAuth().data
+    to.meta.permUtils = new PermissionUtils(to.meta.authedUser)
+  }
 })
 
 router.afterEach(to => {
