@@ -24,17 +24,25 @@
             <label for="report-filter-4">Bad Report</label>
           </div>
         </div>
+        <div class="row">
+          <div class="column">
+            <label v-if="!hasGlobalModPerms()" class="inline-block">
+              <input @change="setModdedFilter()" v-model="moddedFilter" class="pointer" type="checkbox" />
+              Show only my moderated boards
+            </label>
+          </div>
+        </div>
       </div>
       <div class="report-search column">
-        <div class="nested-input-container" v-if="!query?.ip">
+        <div class="nested-input-container">
           <a v-if="query?.search" @click="clearSearch()" class="nested-clear-btn fa fa-times"></a>
           <a @click="searchReports()" class="nested-btn">Search</a>
-          <input class="input-text nested-input" v-model="searchStr" type="text" id="search-reports" placeholder="Search reported messages" @keydown="$event.which === 13 && searchReports()" @keyup="$event.which === 27 && clearSearch()" />
+          <input class="input-text nested-input" v-model="searchStr" type="text" id="search-reports" placeholder="Search reported posts" @keydown="$event.which === 13 && searchReports()" @keyup="$event.which === 27 && clearSearch()" />
         </div>
       </div>
     </div>
     <div class="report-content fill-row centered-text" v-if="!query?.search && reportData?.count < 1">
-      <h4>No Messages to display in <strong>{{query?.filter || 'All'}}</strong></h4>
+      <h4>No Posts to display in <strong>{{query?.filter || 'All'}}</strong></h4>
     </div>
     <div class="report-content fill-row" v-if="reportData?.count > 0 || query?.search">
       <div v-if="query?.search">
@@ -141,9 +149,11 @@
                 <i v-if="selectedReport.status !== 'Bad Report'" class="far fa-circle"></i>
               </button>
 
-              <button class="icon" data-balloon="Purge Message" @click="showConfirmPurgeModal = true" :disabled="!canDeleteMessage()"><i class="fa fa-trash"></i></button>
+              <button class="icon" data-balloon="Purge Post" @click="showConfirmPurgeModal = true" :disabled="!canPurgePost()"><i class="fa fa-trash"></i></button>
 
-              <button class="icon" data-balloon="Edit Message" @click="showEditor = true" :disabled="!canUpdatePost()"><i class="fa fa-edit"></i></button>
+              <button class="icon" :data-balloon="`${previewPost.deleted ? 'Unhide' : 'Hide'} Post`" @click="showConfirmHideModal = true" :disabled="!canHidePost()"><i class="fa" :class="previewPost.deleted ? 'fa-eye' : 'fa-eye-slash'"></i></button>
+
+              <button class="icon" data-balloon="Edit Post" @click="showEditor = true" :disabled="!canUpdatePost()"><i class="fa fa-edit"></i></button>
 
               <!-- Warn User -->
               <button class="icon" data-balloon="Warn User" @click="showWarn({ id: selectedReport.offender_author_id, username: selectedReport.offender_author_username })" :disabled="!canCreateConversation()"><i class="fa fa-exclamation-circle"></i></button>
@@ -246,7 +256,8 @@
 
   <manage-bans-modal :user="selectedUser" :show="showManageBansModal" @close="showManageBansModal = false" @success="refreshPageData" />
   <quick-message-modal v-if="selectedUser" :user="selectedUser" :show="showWarnModal" @close="showWarnModal = false" />
-  <confirm-modal :show="showConfirmPurgeModal" @close="showConfirmPurgeModal = false" @confirmed="purgePost" modal-title="Confirm Purge Post" modal-description="Are you sure you want to purge this post? This will permanently remove the post from the forum and will no longer be visible in the thread." />
+  <confirm-modal :show="showConfirmPurgeModal" @close="showConfirmPurgeModal = false" @confirmed="purgePost" modal-title="Confirm Purge Post" modal-description="Are you sure you want to purge this post? This will permanently remove the post from the forum and will no longer be visible in the thread. This will also permanently delete this post report." />
+  <confirm-modal :show="showConfirmHideModal" @close="showConfirmHideModal = false" @confirmed="hidePost" :modal-title="`Confirm ${previewPost.deleted ? 'Unhide' : 'Hide'} Post`" modal-description="Are you sure you want to hide this post? This will hide the post and it will no longer be visible in the thread to regular users. Moderators and admins will still be able to see hidden posts." />
 </template>
 
 <script>
@@ -271,8 +282,9 @@ export default {
       page: Number(to.query.page) || undefined,
       filter: to.query.filter,
       field: to.query.field,
-      desc: to.query.desc,
-      search: to.query.search
+      desc: to.query.desc ? false : true,
+      search: to.query.search,
+      mod_id: to.query.modded === 'true' && !to.meta.permUtils.globalModeratorCheck() ? to.meta.authedUser.id : undefined
     }
     if (to.query.reportId) {
       let reportData
@@ -301,8 +313,9 @@ export default {
       page: Number(to.query.page) || undefined,
       filter: to.query.filter,
       field: to.query.field,
-      desc: to.query.desc,
-      search: to.query.search
+      desc: to.query.desc ? false : true,
+      search: to.query.search,
+      mod_id: to.query.modded === 'true' && !to.meta.permUtils.globalModeratorCheck() ? to.meta.authedUser.id : undefined
     }
     if (to.query.reportId) {
       let reportData
@@ -334,8 +347,9 @@ export default {
         page: Number($route.query.page) || undefined,
         filter: $route.query.filter,
         field: $route.query.field,
-        desc: $route.query.desc,
-        search: $route.query.search
+        desc: $route.query.desc ? false : true,
+        search: $route.query.search,
+        mod_id: $route.query.modded === 'true' && !hasGlobalModPerms() ? v.authedUser.id : undefined
       }
       if ($route.query.reportId) {
         adminApi.reports.pagePostReports(queryParams)
@@ -369,8 +383,17 @@ export default {
       .then(() => window.scrollTo(0, document.body.scrollHeight || document.documentElement.scrollHeight))
     }
 
+    const setModdedFilter = () => {
+      let query = {...$route.query, modded: v.moddedFilter }
+      if (!query.modded) delete query.modded
+      const params = { ...$route.params, saveScrollPos: true }
+      v.selectedReport = null
+      $router.replace({ name: $route.name, params, query: query })
+    }
+
     const setFilter = filter => {
-      let query = { filter: filter }
+      let query = { filter: filter, modded: v.moddedFilter }
+      if (!query.modded) delete query.modded
       delete query.search
       v.searchStr = ''
       const params = { ...$route.params, saveScrollPos: true }
@@ -426,7 +449,7 @@ export default {
       if (defaultField || newField === $route.query.field) desc = !desc
       else desc = true // Sort field changed, default to desc true
       // Update router to have new query params, watch on query params will update data
-      let query = { limit: $route.query.limit, field: newField, filter: $route.query.filter, page: $route.query.page, search: v.searchStr, ip: $route.query.ip }
+      let query = { limit: $route.query.limit, field: newField, filter: $route.query.filter, page: $route.query.page, search: v.searchStr, modded: $route.query.modded }
       if (!query.page) delete query.page // don't include page if undefined
       if (!query.search) delete query.search // don't include search if undefined
       if (newField === 'created_at') delete query.field // do not display default field in qs
@@ -463,25 +486,57 @@ export default {
 
     }
 
-    const canUpdateReport = () => v.loggedIn && v.permUtils.hasPermission('reports.updatePostReport.allow')
-    const canUpdatePost = () => v.loggedIn && v.permUtils.hasPermission('posts.update.allow')
-    const canCreateConversation = () => v.loggedIn && v.permUtils.hasPermission('conversations.create.allow')
-    const canBanUser = () => v.loggedIn && (v.permUtils.hasPermission('bans.ban.allow') || v.permUtils.hasPermission('bans.banFromBoards.allow'))
-    const canDeleteMessage = () => v.loggedIn && v.permUtils.hasPermission('messages.delete.allow')
+    const canUpdateReport = () => v.loggedIn &&
+      v.permUtils.hasPermission('reports.updatePostReport.allow')
+
+    const canCreateConversation = () => v.loggedIn &&
+      v.permUtils.hasPermission('conversations.create.allow')
+
+    const canBanUser = () => v.loggedIn &&
+      (v.permUtils.hasPermission('bans.ban.allow') || v.permUtils.hasPermission('bans.banFromBoards.allow'))
+
+    const canUpdatePost = () => v.loggedIn &&
+      v.selectedReport &&
+      v.permUtils.hasPermission('posts.update.allow') &&
+      (moderatesBoard(v.selectedReport.board_id) || hasGlobalModPerms())
+
+    const canHidePost = () => v.loggedIn &&
+      v.selectedReport &&
+      !v.selectedReport.offender_thread_starter &&
+      v.permUtils.hasPermission('posts.delete.allow') &&
+      (moderatesBoard(v.selectedReport.board_id) || hasGlobalModPerms())
+
+    const canPurgePost = () => v.loggedIn &&
+      v.selectedReport &&
+      !v.selectedReport.offender_thread_starter &&
+      v.permUtils.hasPermission('posts.purge.allow') &&
+      (moderatesBoard(v.selectedReport.board_id) || hasGlobalModPerms())
 
     const showWarn = user => {
       v.selectedUser = user
       v.showWarnModal = true
     }
+
     const showManageBans = user => {
       v.selectedUser = user
       // ban_expiration must not be set if the user isnt globally banned
       if (!v.selectedUser.ban_expiration) delete v.selectedUser.ban_expiration
       v.showManageBansModal = true
     }
-    const purgePost = () => postsApi.delete(v.selectedReport.offender_message_id)
-      .then(() => $alertStore.success('Successfully purged the reported message.'))
-      .catch(() => $alertStore.error('There was an error purging the reported message.'))
+
+    const hidePost = () => {
+      let hidden = v.previewPost.deleted
+      let requestPromise = hidden ? postsApi.undelete : postsApi.delete
+      requestPromise(v.previewPost.id)
+        .then(() => $alertStore.success(`Successfully ${hidden ? 'unhid' : 'hid'} the reported post.`))
+        .then(() => v.previewPost.deleted = !hidden)
+        .catch(() => $alertStore.error(`There was an error ${hidden ? 'unhidding' : 'hidding'} the reported post.`))
+    }
+
+    const purgePost = () => postsApi.purge(v.previewPost.id)
+      .then(() => $alertStore.success('Successfully purged the reported post.'))
+      .then(() => refreshPageData())
+      .catch(() => $alertStore.error('There was an error purging the reported post.'))
 
     const updatePost = post => postsApi.update(post)
       .then(data => v.previewPost = data)
@@ -545,16 +600,18 @@ export default {
       selectedReport: null,
       searchStr: null,
       reportNote: null,
+      moddedFilter: null,
       noteSubmitted: false,
       showManageBansModal: false,
       showConfirmPurgeModal: false,
+      showConfirmHideModal: false,
       showWarnModal: false,
       selectedUser: {},
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape
     })
 
-    return { ...toRefs(v), setFilter, searchReports, clearSearch, setSortField, getSortClass, humanDate, pageResults, selectReport, setStatus, canUpdateReport, canUpdatePost, canCreateConversation, canDeleteMessage, canBanUser, showWarn, showManageBans, updateReportNote, submitReportNote, initSelectedReport, pageReportNotes, refreshPageData, purgePost, decode, updatePost, moderatesBoard, hasGlobalModPerms }
+    return { ...toRefs(v), setFilter, setModdedFilter, searchReports, clearSearch, setSortField, getSortClass, humanDate, pageResults, selectReport, setStatus, canUpdateReport, canUpdatePost, canCreateConversation, canHidePost, canPurgePost, canBanUser, showWarn, showManageBans, updateReportNote, submitReportNote, initSelectedReport, pageReportNotes, refreshPageData, purgePost, hidePost, decode, updatePost, moderatesBoard, hasGlobalModPerms }
   }
 }
 </script>
@@ -567,7 +624,7 @@ export default {
   right: 0;
   padding: 1rem;
   padding-top: 2rem;
-  padding-bottom: 2rem;
+  padding-bottom: 0.25rem;
   top: 0.4rem;
   .nested-input { margin-bottom: 0; }
   .radio-button label {
@@ -575,12 +632,18 @@ export default {
     height: 2.25rem;
     border-radius: 3px;
   }
+  label {
+    font-size: 0.75rem;
+    color: $secondary-font-color;
+    input { margin-bottom: 0.2rem; }
+  }
   @include break-mobile-sm { padding: 1.25rem 1rem 0; margin: 0 -1rem 2rem; }
 }
 .row {
   display: flex;
   flex-flow: row;
   row-gap: 0;
+  min-height: 2rem;
 }
 .column { flex: 50%;}
 
@@ -592,6 +655,7 @@ export default {
     grid-template-columns: 3fr 7fr;
     grid-template-areas: "details preview";
     grid-gap: 1rem;
+    margin-top: 4rem;
     .report-details-wrap { grid-area: details; }
     .preview-wrap { grid-area: preview; }
     .note-avatar-container {
