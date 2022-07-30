@@ -619,10 +619,15 @@ table.underlined {
       padding-top: 0.5rem;
     }
     td {
-      padding-top: 0.5rem;
       padding-right: 0.5rem;
-      padding-bottom: 0.5rem;
       vertical-align: top;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      padding-right: 0.5rem;
+      padding-top: 0.25rem;
+      padding-bottom: 0.25rem;
+      font-size: 0.75rem;
 
       &:last-child {
         padding-right: 0;
