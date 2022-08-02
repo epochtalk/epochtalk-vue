@@ -41,7 +41,7 @@ export default {
 
     const checkSaveEnabled = () => {
       let routeName = $route.name
-      let noSaveRoutes = ['UserManagement', 'RoleManagement', 'BannedAddressManagement', 'InvitationManagement', 'LogModeration', 'UserModeration', 'PostModeration', 'MessageModeration', 'BoardBanModeration']
+      let noSaveRoutes = ['UserManagement', 'RoleManagement', 'BannedAddressManagement', 'InvitationManagement', 'LogModeration', 'UserModeration', 'PostModeration', 'MessageModeration', 'BoardBanModeration', 'ProfilePreview']
       return noSaveRoutes.indexOf(routeName) < 0
     }
 
@@ -113,7 +113,7 @@ export default {
           routeName: 'UserModeration',
           query: { filter: 'Pending' },
           permission: permUtils.hasPermission('modAccess.users'),
-          active: computed(() => checkActive('UserModeration'))
+          active: computed(() => checkActive('UserModeration') || checkActive('ProfilePreview'))
         },
         {
           title: 'Posts',
