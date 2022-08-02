@@ -52,7 +52,7 @@
           <th class="user-actions">Actions</th>
         </thead>
         <tbody>
-          <tr v-for="report in reportData.data" :key="report.id" class="selectable-row" :class="{ 'active-row' : selectedReport?.id === report.id }" @click="selectReport(report)">
+          <tr v-for="report in reportData.data" :key="report.id" class="selectable-row" :class="{ 'active-row' : selectedReport?.id === report.id }" @click="selectReport(report, $event)">
             <td class="hide-mobile">
               <router-link :to="{ path: '/profile/' + report.reporter_username.toLowerCase() }" v-html="report.reporter_username" />
             </td>
@@ -221,7 +221,7 @@
       <div class="preview-wrap">
         <h5 class="thin-underline">Reported User</h5>
         <!-- User Profile -->
-        <div v-html="selectedReport.offender_username"></div>
+        <router-view></router-view>
       </div>
     </div>
 
@@ -351,7 +351,7 @@ export default {
       v.searchStr = ''
       const params = { ...$route.params, saveScrollPos: true }
       v.selectedReport = null
-      $router.replace({ name: $route.name, params, query: query })
+      $router.replace({ name: 'UserModeration', params, query: query })
     }
     const clearSearch = () => {
       let query = { ...$route.query }
@@ -360,30 +360,33 @@ export default {
       v.searchStr = ''
       v.selectedReport = null
       const params = { ...$route.params, saveScrollPos: true }
-      $router.replace({ name: $route.name, params, query: query })
+      $router.replace({ name: 'UserModeration', params, query: query })
     }
     const searchReports = () => {
       let query = { ...$route.query, search: v.searchStr }
       delete query.page
       v.selectedReport = null
       const params = { ...$route.params, saveScrollPos: true }
-      $router.replace({ name: $route.name, params, query: query })
+      $router.replace({ name: 'UserModeration', params, query: query })
     }
     const pageResults = page => {
       let query = { ...$route.query, page: page }
       if (query.page <= 1 || !query.page) delete query.page
       $router.replace({ name: $route.name, params: $route.params, query: query })
     }
-    const selectReport = report => {
+    const selectReport = (report, event) => {
+      if (event.path[0].nodeName === 'A') return
       let query = { ...$route.query }
       if (v.selectedReport?.id === report.id) {
         v.selectedReport = null
         delete query.reportId
+        $router.replace({ name: 'UserModeration', params: { ...$route.params, saveScrollPos: true }, query })
       }
       else {
         v.selectedReport = report
         query.reportId = v.selectedReport.id
         adminApi.reports.pageUserNotes(query.reportId).then(data => v.noteData = data)
+        $router.replace({ name: 'ProfilePreview', params: { username: report.offender_username, saveScrollPos: true }, query })
       }
       let qs = ''
       Object.keys(query).forEach(k => qs += qs.length ? `&${k}=${query[k]}` : `?${k}=${query[k]}`)
