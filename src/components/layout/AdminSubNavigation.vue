@@ -165,6 +165,7 @@ export default {
     display: flex;
     background: $base-background-color;
     border-bottom: 1px solid $breadcrumbs-border-color;
+    .active { pointer-events: none; }
     .tabs {
       flex: 1 0 50%;
     }
