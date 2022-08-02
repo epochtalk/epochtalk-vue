@@ -132,6 +132,12 @@ const routes = [
     name: 'UserModeration',
     component: UserModeration,
     meta: { requiresAuth: true, bodyClass: 'user-moderation', title: 'Moderation' },
+    children: [{
+      path: ':username',
+      name: 'ProfilePreview',
+      component: Profile,
+      props: true
+    }]
   },
   {
     path: '/admin/moderation/posts',
