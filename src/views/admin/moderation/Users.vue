@@ -379,7 +379,7 @@ export default {
       $router.replace({ name: $route.name, params: $route.params, query: query })
     }
     const selectReport = (report, event) => {
-      if (event.path[0].nodeName === 'A') return
+      if (event.composedPath()[0].nodeName === 'A') return
       let query = { ...$route.query }
       if (v.selectedReport?.id === report.id) {
         v.selectedReport = null
