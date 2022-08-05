@@ -134,9 +134,15 @@ const routes = [
     meta: { requiresAuth: true, bodyClass: 'user-moderation', title: 'Moderation' },
     children: [{
       path: ':username',
-      name: 'ProfilePreview',
+      name: 'UserModeration.ProfilePreview',
       component: Profile,
-      props: true
+      props: true,
+      children: [{
+        path: '',
+        name: 'UserModeration.ProfilePreview.UserPosts',
+        component: UserPosts,
+        props: true
+      }]
     }]
   },
   {
@@ -231,6 +237,7 @@ const routes = [
     meta: { requiresAuth: true, bodyClass: 'profile' },
     children: [{
       path: '',
+      name: 'Profile.UserPosts',
       component: UserPosts,
       props: true
     }]
