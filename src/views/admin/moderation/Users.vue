@@ -232,7 +232,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, inject } from 'vue'
+import { reactive, toRefs, onMounted, onUnmounted, inject } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { adminApi } from '@/api'
 import SimplePagination from '@/components/layout/SimplePagination.vue'
@@ -240,6 +240,7 @@ import humanDate from '@/composables/filters/humanDate'
 import { AuthStore } from '@/composables/stores/auth'
 import QuickMessageModal from '@/components/modals/profile/QuickMessage.vue'
 import ManageBansModal from '@/components/modals/profile/ManageBans.vue'
+import EventBus from '@/composables/services/event-bus'
 
 export default {
   name: 'UserModeration',
@@ -307,6 +308,9 @@ export default {
     }
   },
   setup() {
+    onMounted(() => EventBus.on('ban-success', refreshPageData))
+    onUnmounted(() => EventBus.off('ban-success', refreshPageData))
+
     const refreshPageData = () => {
       let queryParams = {
         limit: Number($route.query.limit) || undefined,
@@ -386,7 +390,7 @@ export default {
         v.selectedReport = report
         query.reportId = v.selectedReport.id
         adminApi.reports.pageUserNotes(query.reportId).then(data => v.noteData = data)
-        $router.replace({ name: 'ProfilePreview', params: { username: report.offender_username, saveScrollPos: true }, query })
+        $router.replace({ name: 'UserModeration.ProfilePreview.UserPosts', params: { username: report.offender_username, saveScrollPos: true }, query })
       }
       let qs = ''
       Object.keys(query).forEach(k => qs += qs.length ? `&${k}=${query[k]}` : `?${k}=${query[k]}`)

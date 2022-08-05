@@ -89,6 +89,7 @@
 <script>
 import Modal from '@/components/layout/Modal.vue'
 import { reactive, toRefs, inject, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { cloneDeep, difference } from 'lodash'
 import { boardsApi, banApi, usersApi } from '@/api'
 import humanDate from '@/composables/filters/humanDate'
@@ -96,6 +97,7 @@ import dayjs from 'dayjs'
 import IgnoredBoardsPartial from '@/components/settings/IgnoredBoardsPartial.vue'
 import { AuthStore } from '@/composables/stores/auth'
 import Multiselect from '@vueform/multiselect'
+import EventBus from '@/composables/services/event-bus'
 
 export default {
   name: 'manage-bans-modal',
@@ -292,6 +294,7 @@ export default {
       .then(() => initUser(v.userCopy.username))
       .then(() => {
         emit('success', v.userReactive)
+        if ($route.name === 'UserModeration.ProfilePreview.UserPosts') EventBus.emit('ban-success')
         close()
       })
       .catch(() => close())
@@ -312,6 +315,7 @@ export default {
     /* Internal Data */
     const $alertStore = inject('$alertStore')
     const $auth = inject(AuthStore)
+    const $route = useRoute()
 
     /* Template Data */
     const v = reactive({
