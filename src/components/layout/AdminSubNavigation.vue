@@ -41,11 +41,12 @@ export default {
 
     const checkSaveEnabled = () => {
       let routeName = $route.name
-      let noSaveRoutes = ['UserManagement', 'RoleManagement', 'BannedAddressManagement', 'InvitationManagement', 'LogModeration', 'UserModeration', 'PostModeration', 'MessageModeration', 'BoardBanModeration', 'ProfilePreview']
+      let noSaveRoutes = ['UserManagement', 'RoleManagement', 'BannedAddressManagement', 'InvitationManagement', 'LogModeration', 'UserModeration', 'PostModeration', 'MessageModeration', 'BoardBanModeration', 'UserModeration.ProfilePreview.UserPosts', 'UserModeration.ProfilePreview']
       return noSaveRoutes.indexOf(routeName) < 0
     }
 
-    const checkActive = n => n === $route.name
+    const checkActive = n => n === $route.name || $route.name.indexOf(n) === 0
+
     const permUtils = $auth.permissionUtils
 
     const nav = {
