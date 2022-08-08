@@ -1273,3 +1273,162 @@ input[disabled].toggle-switch:checked + label:after { background-color: lighten(
     }
   }
 }
+
+/* Admin Panel Report Views - Common SCSS */
+.admin {
+  .row {
+    display: flex;
+    flex-flow: row;
+    row-gap: 0;
+  }
+  .column { flex: 50%;}
+  button.icon { display: inline-block; }
+}
+
+.admin-table-header {
+  background-color: $sub-header-color;
+  position: absolute;
+  left: 0;
+  right: 0;
+  padding: 1rem;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+  top: 0.4rem;
+  .nested-input { margin-bottom: 0; }
+  .radio-button label {
+    text-align: center;
+    height: 2.25rem;
+    border-radius: 3px;
+  }
+  @include break-mobile-sm { padding: 1.25rem 1rem 0; margin: 0 -1rem 2rem; }
+}
+
+.report-content {
+  margin-top: 6rem;
+  &.report-details {
+    display: grid;
+    grid-template-columns: 3fr 7fr;
+    grid-template-areas: "details preview";
+    grid-gap: 1rem;
+    margin-top: 4rem;
+    .report-details-wrap { grid-area: details; }
+    .preview-wrap { grid-area: preview; }
+    .note-avatar-container {
+      float: left;
+      width: 3.75rem;
+      height: 3.75rem;
+      .note-avatar.circle { border-radius: 100%; object-fit: cover; width: 3.125rem; height: 3.125rem; }
+      .note-avatar.rect { width: 3.125rem; height: 3.125rem; }
+    }
+    .note-details {
+      font-size: 13px;
+      padding-top: 5px;
+      padding-bottom: 5px;
+      .note-date { color: $secondary-font-color; }
+    }
+    form { margin-bottom: 1rem; }
+    .pagination-slide {
+      display: flex;
+      width: 100%;
+      flex-direction: row;
+      column-gap: 1rem;
+      align-items: stretch;
+      margin-bottom: .5rem;
+      .prev, .next {
+        flex: 0;
+        line-height: 2.25rem;
+        button { width: 7rem; float: right; }
+      }
+      .page {
+        flex: 1;
+        line-height: 2.25rem;
+        text-align: center;
+      }
+    }
+  }
+}
+
+table.underlined {
+  border: none;
+  margin-bottom: 1rem;
+  thead {
+    text-align: left;
+    font-size: 0.875rem;
+    background-color: transparent;
+    border-bottom: $border-alt;
+    th { color: $secondary-font-color; font-weight: 400; padding-bottom: 0.5rem; padding-left: 0.5rem; }
+    .user-actions { text-align: right; padding-right: 1rem; }
+  }
+  tr {
+    border-bottom: 1px solid $border-color-alt;
+    vertical-align: top;
+    &.selectable-row { @include no-select; cursor: pointer; }
+    &.selectable-row:hover { background-color: $sub-header-color; }
+    &.active-row, &.active-row:nth-of-type(even) { background-color: $color-primary; }
+    &.active-row.selectable-row:hover { background-color: $color-primary }
+    &.active-row td { color: $button-text-color; }
+    &.active-row td a, &.active-row td button { color: darken($color-primary-alt, 10%); }
+    &.active-row td a:hover, &.active-row td button:not([disabled]):hover { color: $color-primary-alt; }
+    &:nth-of-type(even) { background: transparent; }
+    &:nth td { padding-top: 1.5rem; padding-bottom: 1.5rem; }
+    &.active-row td.left-icon-col { color: $button-text-color; }
+    td.left-icon-col {
+      padding: 0 0 0 .5rem;
+      color: $secondary-font-color;
+      padding-top: 0.5rem;
+    }
+    td {
+      padding-right: 0.5rem;
+      vertical-align: top;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      padding-right: 0.5rem;
+      padding-top: 0.25rem;
+      padding-bottom: 0.25rem;
+      font-size: 0.75rem;
+      &:last-child { padding-right: 0; }
+    }
+    td input { margin-bottom: 0; }
+  }
+
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    .status-wrap .icon {
+      &.ignored, &.pending, &.reviewed, &.bad-report {
+        padding: .1rem .25rem;
+        border-radius: 3px;
+        background: $sub-header-color;
+        font-size: .75rem;
+        border: 1px solid darken($color-primary-alt, 10%);
+      }
+    }
+  }
+}
+.icon {
+  &.ignored i { color: #FD8D40; }
+  &.pending i { color: #49AED0; }
+  &.reviewed i { color: #43AC6A; }
+  &.bad-report i { color: #E65239; }
+}
+
+table.report-details {
+  tr:first-child td { padding-top: 0; }
+  td.field {
+    font-size: 0.8125rem;
+    color: $secondary-font-color;
+    width: 9.375rem;
+    padding-left: 0;
+    vertical-align: top;
+    padding-right: 0.5rem;
+  }
+  td.desc {
+    font-size: 0.875rem;
+    .note {
+      font-size: 0.65rem;
+      color: $secondary-font-color;
+      margin-top: 0.25rem;
+    }
+  }
+}
