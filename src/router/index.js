@@ -23,7 +23,13 @@ import ThemeSettings from '@/views/admin/settings/Theme.vue'
 import BoardManagement from '@/views/admin/management/Boards.vue'
 import UserManagement from '@/views/admin/management/Users.vue'
 import RoleManagement from '@/views/admin/management/Roles.vue'
+import BannedAddressManagement from '@/views/admin/management/BannedAddresses.vue'
+import InvitationManagement from '@/views/admin/management/Invitations.vue'
+import LogModeration from '@/views/admin/moderation/Logs.vue'
 import UserModeration from '@/views/admin/moderation/Users.vue'
+import PostModeration from '@/views/admin/moderation/Posts.vue'
+import MessageModeration from '@/views/admin/moderation/Messages.vue'
+import BoardBanModeration from '@/views/admin/moderation/BoardBans.vue'
 import ConfirmAccount from '@/views/ConfirmAccount.vue'
 import ResetPassword from '@/views/ResetPassword.vue'
 import Profile from '@/views/Profile.vue'
@@ -36,6 +42,7 @@ import NProgress from 'nprogress'
 import { nextTick } from 'vue'
 import { localStorageAuth } from '@/composables/stores/auth'
 import BanStore from '@/composables/stores/ban'
+import PermissionUtils from '@/composables/utils/permissions'
 
 const routes = [
   {
@@ -44,6 +51,31 @@ const routes = [
     name: 'GeneralSettings',
     component: GeneralSettings,
     meta: { requiresAuth: true, bodyClass: 'general-settings', title: 'Settings' },
+    beforeEnter: (to, from, next) => {
+      let permUtil = new PermissionUtils(localStorageAuth().data)
+      if (permUtil.hasPermission('adminAccess.settings')) {
+        if (permUtil.hasPermission('adminAccess.settings.general')) next()
+        else if (permUtil.hasPermission('adminAccess.settings.advanced')) next({ name: 'AdvancedSettings'})
+        else if (permUtil.hasPermission('adminAccess.settings.theme')) next({ name: 'ThemeSettings'})
+        else if (permUtil.hasPermission('adminAccess.settings.legal')) next({ name: 'LegalSettings'})
+        else next({ name: 'Boards' })
+      }
+      else if (permUtil.hasPermission('adminAccess.management')) {
+        if (permUtil.hasPermission('adminAccess.management.boards')) next({ name: 'BoardManagement'})
+        else if (permUtil.hasPermission('adminAccess.management.users')) next({ name: 'UserManagement'})
+        else if (permUtil.hasPermission('adminAccess.management.roles')) next({ name: 'RoleManagement'})
+        else if (permUtil.hasPermission('adminAccess.management.bannedAddresses')) next({ name: 'BannedAddressManagement'})
+        else if (permUtil.hasPermission('adminAccess.management.invitations')) next({ name: 'InvitationManagement'})
+        else next({ name: 'Boards' })
+      }
+      else if (permUtil.hasPermission('modAccess')) {
+        if (permUtil.hasPermission('modAccess.users')) next({ name: 'UserModeration' })
+        else if (permUtil.hasPermission('modAccess.posts')) next({ name: 'PostModeration' })
+        else if (permUtil.hasPermission('modAccess.messages')) next({ name: 'MessageModeration' })
+        else next({ name: 'Boards' })
+      }
+      else next({ name: 'Boards' })
+    }
   },
   {
     path: '/admin/settings/advanced',
@@ -85,13 +117,13 @@ const routes = [
   {
     path: '/admin/management/bannedaddresses',
     name: 'BannedAddressManagement',
-    component: BoardManagement,
+    component: BannedAddressManagement,
     meta: { requiresAuth: true, bodyClass: 'banned-address-management', title: 'Management' }
   },
   {
     path: '/admin/management/invitations',
     name: 'InvitationManagement',
-    component: BoardManagement,
+    component: InvitationManagement,
     meta: { requiresAuth: true, bodyClass: 'invitation-management', title: 'Management' }
   },
   {
@@ -100,29 +132,41 @@ const routes = [
     name: 'UserModeration',
     component: UserModeration,
     meta: { requiresAuth: true, bodyClass: 'user-moderation', title: 'Moderation' },
+    children: [{
+      path: ':username',
+      name: 'UserModeration.ProfilePreview',
+      component: Profile,
+      props: true,
+      children: [{
+        path: '',
+        name: 'UserModeration.ProfilePreview.UserPosts',
+        component: UserPosts,
+        props: true
+      }]
+    }]
   },
   {
     path: '/admin/moderation/posts',
     name: 'PostModeration',
-    component: UserModeration,
+    component: PostModeration,
     meta: { requiresAuth: true, bodyClass: 'post-moderation', title: 'Moderation' }
   },
   {
     path: '/admin/moderation/messages',
     name: 'MessageModeration',
-    component: UserModeration,
+    component: MessageModeration,
     meta: { requiresAuth: true, bodyClass: 'message-moderation', title: 'Moderation' }
   },
   {
     path: '/admin/moderation/boardbans',
     name: 'BoardBanModeration',
-    component: UserModeration,
+    component: BoardBanModeration,
     meta: { requiresAuth: true, bodyClass: 'board-ban-moderation', title: 'Moderation' }
   },
   {
     path: '/admin/moderation/logs',
     name: 'LogModeration',
-    component: UserModeration,
+    component: LogModeration,
     meta: { requiresAuth: true, bodyClass: 'log-moderation', title: 'Moderation' }
   },
   {
@@ -193,6 +237,7 @@ const routes = [
     meta: { requiresAuth: true, bodyClass: 'profile' },
     children: [{
       path: '',
+      name: 'Profile.UserPosts',
       component: UserPosts,
       props: true
     }]
@@ -324,6 +369,10 @@ router.beforeEach(to => {
       },
       query: { redirect: to.fullPath }
     })
+  }
+  else {
+    to.meta.authedUser = localStorageAuth().data
+    to.meta.permUtils = new PermissionUtils(to.meta.authedUser)
   }
 })
 

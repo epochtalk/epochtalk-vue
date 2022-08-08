@@ -4,7 +4,7 @@
     <dl class="tabs">
       <span v-for="link in nav" :key="link.routeName">
         <dd class="no-select" :class="{'active': link.active}" v-if="link.permission">
-          <router-link :to="{ name: link.routeName }" v-html="link.title" />
+          <router-link :to="{ name: link.routeName, query: link.query }" v-html="link.title" />
         </dd>
       </span>
     </dl>
@@ -41,11 +41,12 @@ export default {
 
     const checkSaveEnabled = () => {
       let routeName = $route.name
-      let noSaveRoutes = ['UserManagement']
+      let noSaveRoutes = ['UserManagement', 'RoleManagement', 'BannedAddressManagement', 'InvitationManagement', 'LogModeration', 'UserModeration', 'PostModeration', 'MessageModeration', 'BoardBanModeration', 'UserModeration.ProfilePreview.UserPosts', 'UserModeration.ProfilePreview']
       return noSaveRoutes.indexOf(routeName) < 0
     }
 
-    const checkActive = n => n === $route.name
+    const checkActive = n => n === $route.name || $route.name.indexOf(n) === 0
+
     const permUtils = $auth.permissionUtils
 
     const nav = {
@@ -111,18 +112,21 @@ export default {
         {
           title: 'Users',
           routeName: 'UserModeration',
+          query: { filter: 'Pending' },
           permission: permUtils.hasPermission('modAccess.users'),
-          active: computed(() => checkActive('UserModeration'))
+          active: computed(() => checkActive('UserModeration') || checkActive('ProfilePreview'))
         },
         {
           title: 'Posts',
           routeName: 'PostModeration',
+          query: { filter: 'Pending' },
           permission: permUtils.hasPermission('modAccess.posts'),
           active: computed(() => checkActive('PostModeration'))
         },
         {
           title: 'Messages',
           routeName: 'MessageModeration',
+          query: { filter: 'Pending' },
           permission: permUtils.hasPermission('modAccess.messages'),
           active: computed(() => checkActive('MessageModeration'))
         },
@@ -162,6 +166,7 @@ export default {
     display: flex;
     background: $base-background-color;
     border-bottom: 1px solid $breadcrumbs-border-color;
+    .active { pointer-events: none; }
     .tabs {
       flex: 1 0 50%;
     }

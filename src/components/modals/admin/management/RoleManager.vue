@@ -462,6 +462,7 @@ export default {
       v.requestSubmitted = false
       v.baseRoleId = null;
       v.role = {}
+      v.selectedTab = 'general'
       v.saveRuleBtnLabel = props.reset ? 'Reset' : props.remove ? 'Remove' : 'Save'
     }
 
@@ -486,7 +487,7 @@ export default {
         requestPromise = adminApi.roles[props.edit ? 'update' : 'add'](v.role)
       }
       else if (props.reset) {
-        v.role.permissions = {}
+        v.role.permissions = v.role.base_permissions
         cleanRole()
         successMsg = `${v.role.name} successfully reset to defaults!`
         errorMsg = `There was an error resetting the role ${v.role.name}`
@@ -576,6 +577,7 @@ export default {
       { key: 'legal', label: 'Legal' },
       { key: 'ads', label: 'Ads' },
       { key: 'mentions', label: 'Mentions' },
+      { key: 'moderationLogs', label: 'Mod Log' },
       { key: 'motd', label: 'Announcements' }
     ]
 
@@ -660,6 +662,8 @@ export default {
         get(v.role, 'permissions.reports.pageUserReports.allow'))
       set(v.role, 'permissions.modAccess.logs',
         get(v.role, 'permissions.moderationLogs.page.allow'))
+      Object.keys(v.role.permissions.modAccess).forEach(k => v.role.permissions.modAccess[k] === undefined && delete v.role.permissions.modAccess[k])
+      if (v.role.permissions.modAccess && !Object.keys(v.role.permissions.modAccess).length) delete v.role.permissions.modAccess
       set(v.role, 'permissions.adminAccess.settings', get(v.role, 'permissions.adminAccess.settings'))
       set(v.role, 'permissions.adminAccess.management', get(v.role, 'permissions.adminAccess.management'))
     }

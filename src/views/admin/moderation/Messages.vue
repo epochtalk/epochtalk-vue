@@ -29,12 +29,12 @@
         <div class="nested-input-container">
           <a v-if="query?.search" @click="clearSearch()" class="nested-clear-btn fa fa-times"></a>
           <a @click="searchReports()" class="nested-btn">Search</a>
-          <input class="input-text nested-input" v-model="searchStr" type="text" id="search-reports" placeholder="Search reported users" @keydown="$event.which === 13 && searchReports()" @keyup="$event.which === 27 && clearSearch()" />
+          <input class="input-text nested-input" v-model="searchStr" type="text" id="search-reports" placeholder="Search reported messages" @keydown="$event.which === 13 && searchReports()" @keyup="$event.which === 27 && clearSearch()" />
         </div>
       </div>
     </div>
     <div class="report-content fill-row centered-text" v-if="!query?.search && reportData?.count < 1">
-      <h4>No Users to display in <strong>{{query?.filter || 'All'}}</strong></h4>
+      <h4>No Messages to display in <strong>{{query?.filter || 'All'}}</strong></h4>
     </div>
     <div class="report-content fill-row" v-if="reportData?.count > 0 || query?.search">
       <div v-if="query?.search">
@@ -45,31 +45,29 @@
           <th class="pointer hide-mobile" @click="setSortField('reporter_username')"><span :class="getSortClass('reporter_username')"></span>&nbsp;Reported By</th>
           <th class="pointer" @click="setSortField('created_at')"><span :class="getSortClass('created_at')"></span>&nbsp;Reported Date</th>
           <th class="pointer" @click="setSortField('status')"><span :class="getSortClass('status')"></span>&nbsp;Status</th>
-          <th class="pointer" @click="setSortField('offender_username')"><span :class="getSortClass('offender_username')"></span>&nbsp;Reported User</th>
-          <th class="pointer hide-mobile" @click="setSortField('offender_email')"><span :class="getSortClass('offender_email')"></span>&nbsp;Email</th>
-          <th class="pointer hide-mobile" @click="setSortField('offender_created_at')"><span :class="getSortClass('offender_created_at')"></span>&nbsp;Register Date</th>
+          <th class="pointer hide-mobile" @click="setSortField('offender_created_at')"><span :class="getSortClass('offender_created_at')"></span>&nbsp;Sent Date</th>
+          <th class="pointer" @click="setSortField('offender_author_username')"><span :class="getSortClass('offender_author_username')"></span>&nbsp;Author</th>
           <th class="reason">Reason</th>
           <th class="user-actions">Actions</th>
         </thead>
         <tbody>
-          <tr v-for="report in reportData.data" :key="report.id" class="selectable-row" :class="{ 'active-row' : selectedReport?.id === report.id }" @click="selectReport(report, $event)">
+          <tr v-for="report in reportData.data" :key="report.id" class="selectable-row" :class="{ 'active-row' : selectedReport?.id === report.id }" @click="selectReport(report)">
             <td class="hide-mobile">
               <router-link :to="{ path: '/profile/' + report.reporter_username.toLowerCase() }" v-html="report.reporter_username" />
             </td>
             <td>{{humanDate(report.created_at, true)}}</td>
             <td v-html="report.status"></td>
+            <td class="hide-mobile">{{humanDate(report.offender_created_at, true)}}</td>
             <td>
-              <router-link :to="{ path: '/profile/' + report.offender_username.toLowerCase() }" v-html="report.offender_username" />
+              <router-link :to="{ path: '/profile/' + report.offender_author_username.toLowerCase() }" v-html="report.offender_author_username" />
               &nbsp;&nbsp;&nbsp;<i v-if="report.offender_ban_expiration || report.offender_board_banned" class="fa fa-user-times"></i>
             </td>
-            <td class="hide-mobile"><a :href="`mailto:${report.offender_email}`" target="_blank" v-html="report.offender_email"></a></td>
-            <td class="hide-mobile">{{humanDate(report.offender_created_at, true)}}</td>
             <td class="hide-mobile">{{report.reporter_reason}}</td>
             <td class=actions>
-              <button class="icon" data-balloon="Manage Bans" @click.stop.prevent="showManageBans({ id: report.offender_author_id, username: report.offender_username, email: report.offender_author_email, created_at: report.offender_author_created_at, ban_expiration: report.offender_ban_expiration })">
+              <button class="icon" data-balloon="Manage Bans" @click.stop.prevent="showManageBans({ id: report.offender_author_id, username: report.offender_author_username, email: report.offender_author_email, created_at: report.offender_author_created_at, ban_expiration: report.offender_ban_expiration })">
                 <i class="fa fa-ban"></i>
               </button>
-              <button class="icon" data-balloon="Warn User" @click.stop.prevent="showWarn({ id: report.offender_author_id, username: report.offender_username })">
+              <button class="icon" data-balloon="Warn User" @click.stop.prevent="showWarn({ id: report.offender_author_id, username: report.offender_author_username })">
                 <i class="fas fa-exclamation-circle"></i>
               </button>
               <div class="status-wrap">
@@ -135,11 +133,13 @@
                 <i v-if="selectedReport.status !== 'Bad Report'" class="far fa-circle"></i>
               </button>
 
+              <button class="icon" data-balloon="Purge Message" @click="showConfirmPurgeModal = true" :disabled="!canDeleteMessage()"><i class="fa fa-trash"></i></button>
+
               <!-- Warn User -->
-              <button class="icon" data-balloon="Warn User" @click="showWarn({ id: selectedReport.offender_author_id, username: selectedReport.offender_username })" :disabled="!canCreateConversation()"><i class="fa fa-exclamation-circle"></i></button>
+              <button class="icon" data-balloon="Warn User" @click="showWarn({ id: selectedReport.offender_author_id, username: selectedReport.offender_author_username })" :disabled="!canCreateConversation()"><i class="fa fa-exclamation-circle"></i></button>
 
               <!-- Ban User -->
-              <button class="icon" data-balloon="Manage Bans" @click.stop.prevent="showManageBans({ id: selectedReport.offender_author_id, username: selectedReport.offender_username, email: selectedReport.offender_author_email, created_at: selectedReport.offender_author_created_at, ban_expiration: selectedReport.offender_ban_expiration })" :disabled="!canBanUser()"><i class="fa fa-ban"></i></button>
+              <button class="icon" data-balloon="Manage Bans" @click.stop.prevent="showManageBans({ id: selectedReport.offender_author_id, username: selectedReport.offender_author_username, email: selectedReport.offender_author_email, created_at: selectedReport.offender_author_created_at, ban_expiration: selectedReport.offender_ban_expiration })" :disabled="!canBanUser()"><i class="fa fa-ban"></i></button>
               </td>
             </tr>
             <tr>
@@ -165,13 +165,13 @@
               <td class="desc">{{selectedReport.reporter_reason}}</td>
             </tr>
             <tr>
-              <td class="field">Reported User</td>
+              <td class="field">Reported Message Author</td>
               <td class="desc">
-                <router-link :to="{ path: '/profile/' + selectedReport.offender_username.toLowerCase() }" v-html="selectedReport.offender_username" />
+                <router-link :to="{ path: '/profile/' + selectedReport.offender_author_username.toLowerCase() }" v-html="selectedReport.offender_author_username" />
               </td>
             </tr>
             <tr>
-              <td class="field">Reported User Register Date</td>
+              <td class="field">Reported Message Sent Date</td>
               <td class="desc" v-html="humanDate(selectedReport.offender_created_at)"></td>
             </tr>
             <tr>
@@ -217,11 +217,12 @@
         </div>
       </div>
 
-      <!-- User Profile Section -->
+      <!-- Message Body Section -->
       <div class="preview-wrap">
-        <h5 class="thin-underline">Reported User</h5>
-        <!-- User Profile -->
-        <router-view></router-view>
+        <h5 class="thin-underline">Reported Message</h5>
+        <!-- Message Body -->
+        <!-- TODO(akinsey): <div class="post-body" post-processing="ModerationCtrl.previewReport.offender_message" style-fix="true"></div> -->
+        <div v-html="selectedReport.offender_message"></div>
       </div>
     </div>
 
@@ -229,22 +230,23 @@
 
   <manage-bans-modal :user="selectedUser" :show="showManageBansModal" @close="showManageBansModal = false" @success="refreshPageData" />
   <quick-message-modal v-if="selectedUser" :user="selectedUser" :show="showWarnModal" @close="showWarnModal = false" />
+  <confirm-modal :show="showConfirmPurgeModal" @close="showConfirmPurgeModal = false" @confirmed="purgeMessage" modal-title="Confirm Purge Message"  modal-description="Are you sure you want to purge this message? This will permanently delete the message from the sender and receiver's inbox." />
 </template>
 
 <script>
-import { reactive, toRefs, onMounted, onUnmounted, inject } from 'vue'
+import { reactive, toRefs, inject } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { adminApi } from '@/api'
+import { adminApi, messagesApi } from '@/api'
 import SimplePagination from '@/components/layout/SimplePagination.vue'
 import humanDate from '@/composables/filters/humanDate'
 import { AuthStore } from '@/composables/stores/auth'
 import QuickMessageModal from '@/components/modals/profile/QuickMessage.vue'
 import ManageBansModal from '@/components/modals/profile/ManageBans.vue'
-import EventBus from '@/composables/services/event-bus'
+import ConfirmModal from '@/components/modals/common/Confirm.vue'
 
 export default {
-  name: 'UserModeration',
-  components: { SimplePagination, ManageBansModal, QuickMessageModal },
+  name: 'MessageModeration',
+  components: { SimplePagination, ManageBansModal, QuickMessageModal, ConfirmModal },
   beforeRouteEnter(to, from, next) {
     let queryParams = {
       limit: Number(to.query.limit) || undefined,
@@ -256,10 +258,10 @@ export default {
     }
     if (to.query.reportId) {
       let reportData
-      adminApi.reports.pageUserReports(queryParams)
+      adminApi.reports.pageMessageReports(queryParams)
       .then(data => {
         reportData = data
-        return adminApi.reports.pageUserNotes(to.query.reportId)
+        return adminApi.reports.pageMessageNotes(to.query.reportId)
       })
       .then(data => next(vm => {
         vm.reportData = reportData
@@ -269,7 +271,7 @@ export default {
       }))
     }
     else {
-     adminApi.reports.pageUserReports(queryParams).then(data => next(vm => {
+     adminApi.reports.pageMessageReports(queryParams).then(data => next(vm => {
        vm.reportData = data
        vm.query = queryParams
      }))
@@ -286,10 +288,10 @@ export default {
     }
     if (to.query.reportId) {
       let reportData
-      adminApi.reports.pageUserReports(queryParams)
+      adminApi.reports.pageMessageReports(queryParams)
       .then(data => {
         reportData = data
-        return adminApi.reports.pageUserNotes(to.query.reportId)
+        return adminApi.reports.pageMessageNotes(to.query.reportId)
       })
       .then(data => {
         this.reportData = reportData
@@ -300,7 +302,7 @@ export default {
       })
     }
     else {
-     adminApi.reports.pageUserReports(queryParams).then(data => {
+     adminApi.reports.pageMessageReports(queryParams).then(data => {
        this.reportData = data
        this.query = queryParams
        next()
@@ -308,9 +310,6 @@ export default {
     }
   },
   setup() {
-    onMounted(() => EventBus.on('ban-success', refreshPageData))
-    onUnmounted(() => EventBus.off('ban-success', refreshPageData))
-
     const refreshPageData = () => {
       let queryParams = {
         limit: Number($route.query.limit) || undefined,
@@ -321,10 +320,10 @@ export default {
         search: $route.query.search
       }
       if ($route.query.reportId) {
-        adminApi.reports.pageUserReports(queryParams)
+        adminApi.reports.pageMessageReports(queryParams)
         .then(data => {
           v.reportData = data
-          return adminApi.reports.pageUserNotes($route.query.reportId)
+          return adminApi.reports.pageMessageNotes($route.query.reportId)
         })
         .then(data => {
           v.noteData = data
@@ -333,7 +332,7 @@ export default {
         })
       }
       else {
-       adminApi.reports.pageUserReports(queryParams).then(data => {
+       adminApi.reports.pageMessageReports(queryParams).then(data => {
          v.reportData = data
          v.query = queryParams
        })
@@ -344,7 +343,7 @@ export default {
 
     const pageReportNotes = inc => {
       let page = v.noteData.page + inc
-      adminApi.reports.pageUserNotes(v.selectedReport.id, { page })
+      adminApi.reports.pageMessageNotes(v.selectedReport.id, { page })
       .then(d => v.noteData = d)
       .then(() => window.scrollTo(0, document.body.scrollHeight || document.documentElement.scrollHeight))
     }
@@ -355,7 +354,7 @@ export default {
       v.searchStr = ''
       const params = { ...$route.params, saveScrollPos: true }
       v.selectedReport = null
-      $router.replace({ name: 'UserModeration', params, query: query })
+      $router.replace({ name: $route.name, params, query: query })
     }
     const clearSearch = () => {
       let query = { ...$route.query }
@@ -364,33 +363,30 @@ export default {
       v.searchStr = ''
       v.selectedReport = null
       const params = { ...$route.params, saveScrollPos: true }
-      $router.replace({ name: 'UserModeration', params, query: query })
+      $router.replace({ name: $route.name, params, query: query })
     }
     const searchReports = () => {
       let query = { ...$route.query, search: v.searchStr }
       delete query.page
       v.selectedReport = null
       const params = { ...$route.params, saveScrollPos: true }
-      $router.replace({ name: 'UserModeration', params, query: query })
+      $router.replace({ name: $route.name, params, query: query })
     }
     const pageResults = page => {
       let query = { ...$route.query, page: page }
       if (query.page <= 1 || !query.page) delete query.page
       $router.replace({ name: $route.name, params: $route.params, query: query })
     }
-    const selectReport = (report, event) => {
-      if (event.composedPath()[0].nodeName === 'A') return
+    const selectReport = report => {
       let query = { ...$route.query }
       if (v.selectedReport?.id === report.id) {
         v.selectedReport = null
         delete query.reportId
-        $router.replace({ name: 'UserModeration', params: { ...$route.params, saveScrollPos: true }, query })
       }
       else {
         v.selectedReport = report
         query.reportId = v.selectedReport.id
-        adminApi.reports.pageUserNotes(query.reportId).then(data => v.noteData = data)
-        $router.replace({ name: 'UserModeration.ProfilePreview.UserPosts', params: { username: report.offender_username, saveScrollPos: true }, query })
+        adminApi.reports.pageMessageNotes(query.reportId).then(data => v.noteData = data)
       }
       let qs = ''
       Object.keys(query).forEach(k => qs += qs.length ? `&${k}=${query[k]}` : `?${k}=${query[k]}`)
@@ -434,7 +430,7 @@ export default {
         reviewer_user_id: v.authedUser.id,
         status: status
       }
-      adminApi.reports.updateUserReport(updatedReport)
+      adminApi.reports.updateMessageReport(updatedReport)
       .then(data => {
         report.reviewer_user_id = data.reviewer_user_id
         report.status = data.status
@@ -444,9 +440,10 @@ export default {
 
     }
 
-    const canUpdateReport = () => v.loggedIn && v.permUtils.hasPermission('reports.updateUserReport.allow')
+    const canUpdateReport = () => v.loggedIn && v.permUtils.hasPermission('reports.updateMessageReport.allow')
     const canCreateConversation = () => v.loggedIn && v.permUtils.hasPermission('conversations.create.allow')
     const canBanUser = () => v.loggedIn && (v.permUtils.hasPermission('bans.ban.allow') || v.permUtils.hasPermission('bans.banFromBoards.allow'))
+    const canDeleteMessage = () => v.loggedIn && v.permUtils.hasPermission('messages.delete.allow')
 
     const showWarn = user => {
       v.selectedUser = user
@@ -458,11 +455,14 @@ export default {
       if (!v.selectedUser.ban_expiration) delete v.selectedUser.ban_expiration
       v.showManageBansModal = true
     }
+    const purgeMessage = () => messagesApi.delete(v.selectedReport.offender_message_id)
+      .then(() => $alertStore.success('Successfully purged the reported message.'))
+      .catch(() => $alertStore.error('There was an error purging the reported message.'))
 
     const updateReportNote = note => {
       delete note.edit
       note.report_id = v.selectedReport.id
-      adminApi.reports.updateUserNote(note)
+      adminApi.reports.updateMessageNote(note)
       .then(updatedNote => {
         for (var i = 0; i < v.noteData.data.length; i++) {
           if (v.noteData.data[i].id === note.id) {
@@ -486,12 +486,12 @@ export default {
         user_id: v.authedUser.id,
         note: v.reportNote
       }
-      adminApi.reports.createUserNote(params)
+      adminApi.reports.createMessageNote(params)
       .then(() => {
         v.noteSubmitted = false
         v.reportNote = null
         $alertStore.success('Note successfully created')
-        return adminApi.reports.pageUserNotes(v.selectedReport.id, { page: 1 })
+        return adminApi.reports.pageMessageNotes(v.selectedReport.id, { page: 1 })
       })
       .then(d => v.noteData = d)
     }
@@ -520,7 +520,7 @@ export default {
       defaultAvatarShape: window.default_avatar_shape
     })
 
-    return { ...toRefs(v), setFilter, searchReports, clearSearch, setSortField, getSortClass, humanDate, pageResults, selectReport, setStatus, canUpdateReport, canCreateConversation, canBanUser, showWarn, showManageBans, updateReportNote, submitReportNote, initSelectedReport, pageReportNotes, refreshPageData }
+    return { ...toRefs(v), setFilter, searchReports, clearSearch, setSortField, getSortClass, humanDate, pageResults, selectReport, setStatus, canUpdateReport, canCreateConversation, canDeleteMessage, canBanUser, showWarn, showManageBans, updateReportNote, submitReportNote, initSelectedReport, pageReportNotes, refreshPageData, purgeMessage }
   }
 }
 </script>

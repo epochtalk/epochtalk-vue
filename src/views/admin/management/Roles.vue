@@ -3,7 +3,7 @@
     <h3>Create and Edit Roles
       <span class="info-tooltip" data-balloon="Add new roles or customize existing roles by editing below. Drag and drop the roles below to order by priority. The lower the number, the higher the priority of the role. This allows for roles of a higher priority to take action upon those of lower priority." data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
     </h3><br />
-    <div v-if="controlAccess.add.allow" class="roles add-role">
+    <div v-if="controlAccess?.add?.allow" class="roles add-role">
       <div class="nested-input-container">
         <a @click.prevent="showRole()" class="pointer nested-btn">Add</a>
         <input class="nested-input" v-model="newRole.name" type="text" id="add-role" placeholder="Enter new role name" @keydown="$event.which === 13 && showRole()" />
@@ -24,18 +24,18 @@
           <span v-html="element.name"></span>
           <span v-html="element.description"></span>
           <span>
-            <a href="#" v-if="controlAccess.update.allow" @click.stop.prevent="showRole(element)">Edit</a>
-            <span v-if="!controlAccess.update.allow">Edit</span>
+            <a href="#" v-if="controlAccess?.update?.allow" @click.stop.prevent="showRole(element)">Edit</a>
+            <span v-if="!controlAccess?.update?.allow">Edit</span>
             &nbsp;&nbsp;
-            <a v-if="element.id === element.lookup && controlAccess.remove.allow" href="#" @click.stop.prevent="showRemoveRole(element)">Remove</a>
+            <a v-if="element.id === element.lookup && controlAccess?.remove?.allow" href="#" @click.stop.prevent="showRemoveRole(element)">Remove</a>
             <a v-if="element.id !== element.lookup" href="#" @click.stop.prevent="showResetRole(element)">Reset</a>
           </span>
         </div>
       </template>
       <template #footer>
         <div class="actions">
-          <div v-if="controlAccess.reprioritize.allow" class="right"><button @click="resetPriority()">Reset Priority</button></div>
-          <div v-if="controlAccess.reprioritize.allow" class="right"><button @click="savePriority()">Save Priority</button>&nbsp;&nbsp;&nbsp;</div>
+          <div v-if="controlAccess?.reprioritize?.allow" class="right"><button @click="resetPriority()">Reset Priority</button></div>
+          <div v-if="controlAccess?.reprioritize?.allow" class="right"><button @click="savePriority()">Save Priority</button>&nbsp;&nbsp;&nbsp;</div>
         </div>
       </template>
     </draggable>

@@ -112,6 +112,7 @@ export const postsApi = {
   lock: postId => $http(`/api/posts/${postId}/lock`, { method: 'POST'}),
   unlock: postId => $http(`/api/posts/${postId}/unlock`, { method: 'POST'}),
   byThread: params => $http('/api/posts', { params }),
+  find: id => $http(`/api/posts/${id}`),
   byUser: params => $http(`/api/posts/user/${params.username}`, { params }),
   startedByUser: params => $http(`/api/posts/user/${params.username}/started`, { params }),
   slugToPostId: slug => $http(`/api/posts/${slug}/id`),
@@ -253,6 +254,14 @@ export const banApi = {
 export const adminApi = {
   configurations: () => $http('/api/configurations'),
   updateConfigurations: data => $http('/api/configurations', { method: 'POST', data }),
+  invitations: {
+    all: query => $http('/api/invites', { params: query }),
+    resend: data => $http('/api/invites/resend', { method: 'POST', data }),
+    remove: data => $http('/api/invites/remove', { method: 'POST', data })
+  },
+  logs: {
+    page: params => $http('/api/admin/modlog', { params })
+  },
   roles: {
     all: () => $http('/api/admin/roles/all'),
     users: (id, query) => $http(`/api/admin/roles/${id}/users`, { params: query }),
@@ -262,6 +271,13 @@ export const adminApi = {
     add: data => $http(`/api/admin/roles/add`, { method: 'POST', data }),
     update: data => $http(`/api/admin/roles/update`, { method: 'PUT', data }),
     delete: id => $http(`/api/admin/roles/remove/${id}`, { method: 'DELETE' })
+  },
+  bans: {
+    pageBannedAddresses: params => $http('/api/ban/addresses', { params }),
+    addBannedAddresses: data => $http('/api/ban/addresses', { method: 'POST', data}),
+    editBannedAddress: data => $http('/api/ban/addresses', { method: 'PUT', data}),
+    deleteBannedAddress: query => $http('/api/ban/addresses', { method: 'DELETE', params: query }),
+    pageByBannedBoards: params => $http('/api/users/banned', { params })
   },
   trust: {
     getDefaultTrustList: () => $http('/api/admin/trustlist'),
@@ -288,6 +304,23 @@ export const adminApi = {
     addRule: data => $http('/api/automoderation/rules', { method: 'POST', data }),
     updateRule: data => $http(`/api/automoderation/rules/${data.id}`, { method: 'PUT', data }),
     deleteRule: data => $http(`/api/automoderation/rules/${data.id}`, { method: 'DELETE' })
+  },
+  reports: {
+    pageMessageReports: params => $http('/api/reports/messages', { params }),
+    updateMessageReport: data => $http('/api/reports/messages', { method: 'PUT', data}),
+    pageUserReports: params => $http('/api/reports/users', { params }),
+    updateUserReport: data => $http('/api/reports/users', { method: 'PUT', data}),
+    pagePostReports: params => $http('/api/reports/posts', { params }),
+    updatePostReport: data => $http('/api/reports/posts', { method: 'PUT', data}),
+    pageMessageNotes: (id, params) => $http(`/api/reports/messagenotes/${id}`, { params }),
+    pageUserNotes: (id, params) => $http(`/api/reports/usernotes/${id}`, { params }),
+    pagePostNotes: (id, params) => $http(`/api/reports/postnotes/${id}`, { params }),
+    updateMessageNote: data => $http('/api/reports/messagenotes', { method: 'PUT', data}),
+    updateUserNote: data => $http('/api/reports/usernotes', { method: 'PUT', data}),
+    updatePostNote: data => $http('/api/reports/postnotes', { method: 'PUT', data}),
+    createMessageNote: data => $http('/api/reports/messagenotes', { method: 'POST', data}),
+    createUserNote: data => $http('/api/reports/usernotes', { method: 'POST', data}),
+    createPostNote: data => $http('/api/reports/postnotes', { method: 'POST', data})
   }
 }
 

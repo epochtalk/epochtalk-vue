@@ -373,7 +373,7 @@ export default {
     watch(() => props.post, p => {
       if (p) {
         if (p.body.length) v.editMode = true
-        if (p.position !== 1) p.title = 'RE: ' + props.thread.title
+        if (p.position !== 1) p.title = props.thread ? 'RE: ' + props.thread.title : p.title
         nextTick(() => v.posting.post = p)
       }
     })
