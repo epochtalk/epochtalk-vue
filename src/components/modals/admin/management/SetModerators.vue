@@ -1,68 +1,44 @@
 <template>
-  <modal :name="$options.name" :show="show" @close="close()" :focusInput="focusInput">
-    <template v-slot:header>
-      Manage Moderators of <span v-html="board.name"></span>
-    </template>
+  <modal :name="$options.name" :show="show" @close="close()">
+    <template v-slot:header>Manage Moderators of {{boardName}}</template>
 
     <template v-slot:body>
-      <form class="css-form">
-        <div v-if="usersWithBadPermissions && !usersWithBadPermissions.length">
-          <label>Current Moderators</label>
-          <div class="clear">
-            <ul class="mod-list" v-if="mods.length" >
-              <li v-for="mod in mods" :key="mod.username">
-                <div><span v-html="mod.username"></span>&nbsp;<a href="" @click.prevent="markModForRemoval(mod.username)"><i class="fa fa-times-circle"></i></a></div>
-              </li>
-            </ul>
-          </div>
-          <p v-if="!mods.length">This board has no moderators.</p>
-          <br />
-          <div class="clear">
-            <label>Add Moderators
-              <span class="info-tooltip" data-balloon="Type the names of users you want to add as moderators to this board. This will add the user as a moderator, but you have to ensure the user has permissions to moderate via the roles management view" data-balloon-pos="down" data-balloon-length="large" data-balloon-break><i class="fa fa-info-circle"></i></span>
-            </label>
-            <Multiselect v-model="modsToAdd.value" v-bind="modsToAdd" />
-          </div>
-          <label>Note: Moderator changes will take affect upon clicking save changes.</label>
-          <div class="col">
-            <div>
-              <button class="fill-row" @click.prevent="saveModChanges()" :disabled="!modsToAdd.value.length && !modsToRemove.length" v-html="saveRuleBtnLabel"></button>
-            </div>
-            <div>
-              <button class="fill-row negative" @click.prevent="close()">Cancel</button>
-            </div>
-          </div>
+      <form v-if="!modsWithBadPermissions.length" action="." class="css-form">
+        <label>Current Moderators of {{boardName}} </label>
+        <div v-if="!moderators?.length" class="no-mods">There are currently no moderators assigned to this board</div>
+        <div v-for="mod in moderators" :key="mod.id" class="multiselect-tag mod-tags">
+          {{mod.username}} <i @click.prevent="removeModerator(mod.username)"></i>
         </div>
-
-        <div v-if="usersWithBadPermissions && usersWithBadPermissions.length">
-          <p>
-            User(s) were successfully added to the list of moderators for <strong><span v-html="board.name"></span></strong> but the following user(s) do not have a role with moderation permissions assigned:
-          </p>
-          <ul class="indent">
-            <li v-for="username in usersWithBadPermissions" :key="username">
-              <a href="#" v-html="username"></a>
-            </li>
-          </ul>
-          <p>
-             Visit the <a href="#">Roles Management</a> page to add a moderation type role. The user(s) will appear in the list of board moderators, but until an appropriate role is assigned they will not be able to perform any moderation tasks.
-          </p>
-          <div class="col">
-            <div>
-              <button class="fill-row" @click.prevent="usersWithBadPermissions = []; close()">Okay</button>
-            </div>
-          </div>
-        </div>
+        <label>Moderators to Add</label>
+        <Multiselect v-model="modTagsInput.value" v-bind="modTagsInput" />
+        <br>
+        <label>
+          <strong>Note:</strong> Moderator changes will take affect upon clicking save changes.
+        </label>
+        <button class="fill" @click.prevent="setModerators()" type="submit" :disabled="!modsToRemove.length && !modTagsInput.value.length">
+          Save Changes
+        </button>
       </form>
+      <div v-if="modsWithBadPermissions.length">
+        <label>Successfully updated list of moderators for <strong>{{boardName}}</strong> but the following user{{ modsWithBadPermissions.length > 1 ? 's do not ' : ' does not ' }}have a role with moderation permissions assigned:
+        </label>
+        <ul class="mod-list-bp">
+          <li v-for="mod in modsWithBadPermissions" :key="mod">{{mod}}</li>
+        </ul>
+        <label>Visit the Roles Management page to add a moderation type role. The user{{ modsWithBadPermissions.length > 1 ? 's ' : ' ' }}will appear in the list of board moderators, but until an appropriate role is assigned they will not be able to perform any moderation tasks.</label><br>
+        <button class="fill" @click.prevent="close()">Okay</button>
+      </div>
     </template>
   </modal>
 </template>
 
 <script>
 import Modal from '@/components/layout/Modal.vue'
-import { reactive, toRefs, watch, inject } from 'vue'
-import { cloneDeep, get, some, remove, filter } from 'lodash'
-import { adminApi, usersApi } from '@/api'
+import { cloneDeep, intersection, remove } from 'lodash'
+import { reactive, toRefs, inject, watch } from 'vue'
 import Multiselect from '@vueform/multiselect'
+import { adminApi, usersApi } from '@/api'
+import { AuthStore } from '@/composables/stores/auth'
 
 export default {
   name: 'set-moderators-modal',
@@ -71,84 +47,82 @@ export default {
   components: { Modal, Multiselect },
   setup(props, { emit }) {
     /* Template Methods */
-    const markModForRemoval = username => {
-      v.modsToRemove.push(username)
-      remove(v.mods, m => m.username === username)
-    }
+    const setModerators = () => {
+      const modsToAdd = v.modTagsInput.value
+      const modsToRemove = v.modsToRemove
+      const mods = props.board.moderators
 
-    const checkPermissions = mods => {
-      // check that the user has at least one of these permissions set
-      const modPermissions = [
-        'boards.update.allow',
-        'posts.update.bypass',
-        'posts.delete.bypass',
-        'posts.purge.bypass',
-        'posts.find.bypass',
-        'posts.create.bypass',
-        'threads.title.bypass',
-        'threads.createPoll.bypass.owner.admin',
-        'threads.editPoll.bypass.owner.admin',
-        'threads.lockPoll.bypass.owner.admin',
-        'threads.lock.bypass.owner.admin',
-        'threads.move.bypass.owner.admin',
-        'threads.purge.bypass.owner.admin',
-        'threads.sticky.bypass.owner.admin',
-        'threads.title.bypass.owner.admin'
-      ]
-      return filter(mods.map(m => {
-        let hasSomeModePrivileges = some(m.roles.map(r => {
-          let hasModPermission = false
-          modPermissions.forEach(perm => {
-            if (get(r.custom_permissions, perm)) hasModPermission = true
-          })
-          return hasModPermission
-        }))
-        return hasSomeModePrivileges ? undefined : m.username
-      }), undefined)
-    }
-
-    const saveModChanges = () => {
-      let removeParams = { usernames: v.modsToRemove, board_id: props.board.id }
-      let addParams = { usernames: v.modsToAdd.value, board_id: props.board.id }
-      return new Promise(resolve => { // remove moderators if needed
-        if (!removeParams.usernames.length) return resolve()
-        let promise = adminApi.moderators.remove(removeParams)
-        .then(users => users.forEach(u => remove(v.modsCopy, m => m.username === u.username)))
-        return resolve(promise)
+      // figure out which are duplicates
+      const inter = intersection(modsToAdd, modsToRemove)
+      inter.forEach(interName => {
+        remove(modsToAdd, name => name === interName)
+        remove(modsToRemove, name => name === interName)
       })
-      .then(() => { // add moderators if needed
-        if (!addParams.usernames.length) return
-        return adminApi.moderators.add(addParams)
+
+      // build save params
+      let addData = {
+        usernames: modsToAdd,
+        board_id: props.board.id
+      }
+      let removeData = {
+        usernames: modsToRemove,
+        board_id: props.board.id
+      }
+      // remove moderators if needed
+      return new Promise(resolve => {
+        if (!modsToRemove.length) return resolve()
+        let promise = adminApi.moderators.remove(removeData)
         .then(users => {
-          users.forEach(u => v.modsCopy.push({ username: u.username, id: u.id }))
+          users.forEach(u => remove(mods, mod => mod.username === u.username))
           return users
         })
-        .then(checkPermissions)
-        .then(bpUsers => v.usersWithBadPermissions = bpUsers)
+        return resolve(promise)
       })
+      // add moderators if needed
       .then(() => {
-        v.mods = cloneDeep(v.modsCopy)
-        emit('success', v.mods)
+        if (!modsToAdd.length) return
+        return adminApi.moderators.add(addData)
+        .then(users => {
+          users.forEach(user => mods.push({ username: user.username, id: user.id }))
+          return users
+        })
+        .then(users => $auth.permissionUtils.checkModPermissions(users))
+        .then(bpUsers => v.modsWithBadPermissions = bpUsers)
       })
+      .then(() => v.moderators = cloneDeep(mods))
+      .then(() => emit('success', v.moderators))
       .then(() => $alertStore.success(`Successfully updated ${props.board.name} moderators`))
       .catch(() => $alertStore.error(`There was an error updating ${props.board.name} moderators`))
-      .finally(() => { if (!v.usersWithBadPermissions.length) close() })
+      .finally(() => { if (!v.modsWithBadPermissions.length) close() })
     }
 
-    const close = () => emit('close')
+    const removeModerator = username => {
+      const oldLen = v.moderators.length
+      v.moderators = v.moderators.filter(u => u.username !== username)
+      if (v.moderators.length < oldLen) v.modsToRemove.push(username)
+    }
+
+    const close = () => {
+      emit('close')
+      v.modTagsInput.value = []
+      v.modsToRemove = []
+      v.modsWithBadPermissions = []
+    }
+
+    /* Internal Data */
     const $alertStore = inject('$alertStore')
+    const $auth = inject(AuthStore)
+
     /* Template Data */
     const v = reactive({
-      focusInput: null,
-      mods: null,
-      modsCopy: null,
-      saveRuleBtnLabel: 'Save',
+      boardName: props.board.name,
+      moderators: props.board.moderators,
       modsToRemove: [],
-      usersWithBadPermissions: [],
-      modsToAdd: {
+      modsWithBadPermissions: [],
+      modTagsInput: {
         mode: 'tags',
         value: [],
-        placeholder: 'Type username of user(s) to add as moderator',
+        placeholder: 'Type username of moderator(s) to add',
         noOptionsText: 'Enter a username to start lookup...',
         minChars: 1,
         resolveOnLoad: false,
@@ -157,57 +131,44 @@ export default {
         maxHeight: 100,
         options: async q => {
           return await usersApi.search(q)
+          // filter out existing mods
+          .then(d => d.filter(u => !v.moderators.find(o => o.username === u)))
           // convert array into array of objects
-          .then(d => d.map(u => ({ label: u, value: u })))
-          .catch(() => [])
+          .then(d => d.reduce((o, k) => (o[k] = k, o), {}))
         }
       }
     })
 
     watch(() => props.show, () => {
       v.modsToRemove = []
-      v.modsToAdd.value = []
-      v.mods = cloneDeep(props.board.moderators)
-      v.modsCopy = cloneDeep(props.board.moderators)
+      v.modTagsInput.value = []
+      v.moderators = cloneDeep(props.board.moderators)
+      v.boardName = cloneDeep(props.board.name)
     })
 
-    return { ...toRefs(v), saveModChanges, markModForRemoval, close }
+    return { ...toRefs(v), setModerators, removeModerator, close }
   }
 }
 </script>
 
-<style lang="scss" scoped>
-  .input-spacing { margin-bottom: 1rem; }
-  .clear { clear: both; }
-  .col {
-    display: flex;
-    flex-direction: row;
-    align-items: stretch;
-    width: 100%;
-    column-gap: 0.5rem;
-    div {
-      flex: 1;
-      button { width: 100%; }
-    }
+<style src="@vueform/multiselect/themes/default.css"></style>
+<style lang="scss">
+.no-mods { margin-bottom: .45rem; }
+.mod-list-bp {
+  margin-top: 1rem;
+  display: block;
+  padding-left: 0;
+  font-size: 0.6375rem;
+  margin-left: 2rem;
+}
+.mod-tags {
+  display: inline-flex;
+  &.multiselect-tag {
+    background: #2299DD;
+    i:before { color: $base-background-color; }
   }
-  ul {
-    &.mod-list {
-      margin: 0;
-      padding: 0;
-      list-style-type: none;
-      list-style-image: none;
-      li { float: left; margin: 0.25rem 0; }
-      li div {
-        @include border-radius(2px);
-        margin: 0 0.25rem;
-        color: #fff;
-        padding: 0.4rem 1rem;
-        background: #2299DD;
-        font-size: 1rem;
-        font-weight: bold;
-        a, a:hover, a:active, a:visited { color: #fff; }
-      }
-    }
-    &.indent { margin-left: 2rem; margin-bottom: 1rem; }
-  }
+}
+.multiselect-tag { background: $color-primary; }
+.multiselect-tag i:before { color: $color-primary-alt; }
+.multiselect-options { overflow-x: hidden; }
 </style>

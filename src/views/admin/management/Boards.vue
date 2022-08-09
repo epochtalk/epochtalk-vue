@@ -22,7 +22,7 @@
     <render-nestable :key="uncompiledBoardHtml" id="nestable-boards" :setBoardDelete="setBoardDelete" :setBoardMods="setBoardMods" :setBoardEdit="setBoardEdit" :uncompiled="uncompiledBoardHtml" />
   </div>
   <board-manager-modal :show="showAddBoard || showEditBoard || showDeleteBoard || showDeleteCat || showEditCat" :editCat="showEditCat" :deleteCat="showDeleteCat" :addBoard="showAddBoard" :editBoard="showEditBoard" :editBoardMods="showEditBoardMods" :deleteBoard="showDeleteBoard" :selected="selected" @close="showAddBoard=showEditBoard=showEditBoardMods=showDeleteBoard=showDeleteCat=showEditCat=false" @success="handleBoardManagerSuccess"/>
-  <set-moderators-modal :show="showEditBoardMods" :board="selected" @close="showEditBoardMods=false" @success="mods => nestableMap[selectedDataId].moderators = mods" />
+  <set-moderators-modal  :show="showEditBoardMods" :board="selected || {}" @close="showEditBoardMods=false" @success="mods => nestableMap[selectedDataId].moderators = mods" />
 </template>
 
 <script>
@@ -305,8 +305,8 @@ export default {
       v.selectedDataId = id
     }
     const setBoardMods = id => {
-      v.showEditBoardMods = true
       v.selected = v.nestableMap[id]
+      v.showEditBoardMods = true
       v.selectedDataId = id
     }
 

@@ -234,7 +234,7 @@
 <script>
 import { useRoute, useRouter } from 'vue-router'
 import Pagination from '@/components/layout/Pagination.vue'
-import SetModeratorsModal from '@/components/modals/threads/SetModerators.vue'
+import SetModeratorsModal from '@/components/modals/admin/management/SetModerators.vue'
 import humanDate from '@/composables/filters/humanDate'
 import decode from '@/composables/filters/decode'
 import truncate from '@/composables/filters/truncate'
