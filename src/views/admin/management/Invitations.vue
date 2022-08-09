@@ -138,64 +138,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.admin-table-header {
-  background-color: $sub-header-color;
+.invitations-content { margin-top: 6rem; }
+.nested-btn {
   position: absolute;
-  left: 0;
-  right: 0;
-  padding: 2rem;
-  padding-top: 2rem;
-  top: 0.4rem;
-  @include break-mobile-sm { padding: 1.25rem 1rem 0; margin: 0 -1rem 2rem; }
-}
-.nested-input-container {
-  .nested-input { margin-bottom: 0; }
-  .nested-btn, .nested-btn:focus, .nested-btn:active {
-    position: absolute;
-    line-height: 0;
-    font-size: 0.8125rem;
-  }
-}
-
-.invitations-content {
-  margin-top: 6rem;
-}
-table.underlined {
-  border: none;
-  margin-bottom: 1rem;
-  thead {
-    text-align: left;
-    font-size: 0.875rem;
-    background-color: transparent;
-    border-bottom: $border-alt;
-    th { color: $secondary-font-color; font-weight: 400; padding-bottom: 0.5rem; padding-left: 0.5rem; }
-    th.left-icon-col { width: 1.5rem; }
-    // th.mod-actions { width: 5.25rem; }
-    // th.user-actions { width: 8rem; }
-  }
-  tr {
-    border-bottom: 1px solid $border-color-alt;
-    vertical-align: top;
-    &:nth-of-type(even) { background: transparent; }
-    &:nth td { padding-top: 1.5rem; padding-bottom: 1.5rem; }
-    td {
-      padding-top: 0.5rem;
-      padding-right: 0.5rem;
-      padding-bottom: 0.5rem;
-      vertical-align: top;
-
-      &:last-child {
-        padding-right: 0;
-      }
-    }
-
-    td input { margin-bottom: 0; }
-  }
-
-  .user-actions,
-  .mod-actions {
-    display: flex;
-    justify-content: flex-end;
-  }
+  line-height: 0;
 }
 </style>

@@ -1274,7 +1274,7 @@ input[disabled].toggle-switch:checked + label:after { background-color: lighten(
   }
 }
 
-/* Admin Panel Report Views - Common SCSS */
+/* Admin Panel Views - Common SCSS */
 .admin {
   .row {
     display: flex;
@@ -1284,7 +1284,18 @@ input[disabled].toggle-switch:checked + label:after { background-color: lighten(
   .column { flex: 50%;}
   button.icon { display: inline-block; }
 }
-
+pre.json {
+  padding: 1rem;
+  font-size: 0.875rem;
+  background-color: $sub-header-color;
+  overflow: scroll;
+  max-height: 65vh;
+  .string { color: #ff5722; }
+  .number { color: #4caf50; }
+  .boolean { color: #e91e63; }
+  .null { color: #9c27b0; }
+  .key { color: #2196f3; }
+}
 .admin-table-header {
   background-color: $sub-header-color;
   position: absolute;
@@ -1299,6 +1310,11 @@ input[disabled].toggle-switch:checked + label:after { background-color: lighten(
     text-align: center;
     height: 2.25rem;
     border-radius: 3px;
+  }
+  label.sub-action {
+    font-size: 0.75rem;
+    color: $secondary-font-color;
+    input { margin-bottom: 0.2rem; }
   }
   @include break-mobile-sm { padding: 1.25rem 1rem 0; margin: 0 -1rem 2rem; }
 }
@@ -1391,8 +1407,13 @@ table.underlined {
     }
     td input { margin-bottom: 0; }
   }
-
-  .actions {
+  th.left-icon-col { width: 1.75rem; }
+  td.left-icon-col {
+    pading: 0 0 0 0.5rem;
+    color: $secondary-font-color;
+    padding-top: 0.5rem;
+  }
+  .actions, .user-actions, .mod-actions {
     display: flex;
     justify-content: flex-end;
     .status-wrap .icon {

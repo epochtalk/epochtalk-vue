@@ -617,14 +617,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.admin-table-header {
-  padding-bottom: 0.25rem;
-  label.sub-action {
-    font-size: 0.75rem;
-    color: $secondary-font-color;
-    input { margin-bottom: 0.2rem; }
-  }
-}
+.admin-table-header { padding-bottom: 0.25rem;}
 .row {
   display: flex;
   flex-flow: row;

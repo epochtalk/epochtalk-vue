@@ -404,17 +404,8 @@ export default {
 }
 </script>
 
-<style lang="scss">
-.admin-table-header {
-  background-color: $sub-header-color;
-  position: absolute;
-  left: 0;
-  right: 0;
-  padding: 2rem;
-  padding-bottom: 1rem;
-  top: 0.4rem;
-  @include break-mobile-sm { padding: 1.25rem 1rem 0; margin: 0 -1rem 2rem; }
-}
+<style lang="scss" scoped>
+.admin.admin-table-header { padding-bottom: 0rem; }
 .log-filter {
   span { display: inline-block; margin-bottom: 0.5rem; }
   input, select { margin: 0; height: 2rem; line-height: 1rem; padding: 0 0.25rem; width: auto; display: inline-block; }
@@ -428,53 +419,5 @@ export default {
   }
   span { margin-right: 0.2rem; }
 }
-.logs-content {
-  margin-top: 6rem;
-}
-
-table.underlined {
-  border: none;
-  margin-bottom: 1rem;
-  thead {
-    text-align: left;
-    font-size: 0.875rem;
-    background-color: transparent;
-    border-bottom: $border-alt;
-    th { color: $secondary-font-color; font-weight: 400; padding-bottom: 0.5rem; padding-left: 0.5rem; }
-    th.left-icon-col { width: 1.5rem; }
-  }
-  tr {
-    border-bottom: 1px solid $border-color-alt;
-    vertical-align: top;
-    &:nth-of-type(even) { background: transparent; }
-    &:nth td { padding-top: 1.5rem; padding-bottom: 1.5rem; }
-    td {
-      padding-top: 0.5rem;
-      padding-right: 0.5rem;
-      padding-bottom: 0.5rem;
-      vertical-align: top;
-      word-wrap: break-word;
-      font-size: 0.75rem;
-      line-height: 0.75rem;
-
-      &:last-child {
-        padding-right: 0;
-      }
-    }
-
-    td input { margin-bottom: 0; }
-  }
-}
-pre.json {
-  padding: 1rem;
-  font-size: 0.875rem;
-  background-color: $sub-header-color;
-  overflow: scroll;
-  max-height: 65vh;
-  .string { color: #ff5722; }
-  .number { color: #4caf50; }
-  .boolean { color: #e91e63; }
-  .null { color: #9c27b0; }
-  .key { color: #2196f3; }
-}
+.logs-content { margin-top: 6rem; }
 </style>
