@@ -308,6 +308,7 @@ export default {
     }
   },
   setup() {
+    /* Internal Methods */
     onMounted(() => EventBus.on('ban-success', refreshPageData))
     onUnmounted(() => EventBus.off('ban-success', refreshPageData))
 
@@ -342,6 +343,7 @@ export default {
 
     const initSelectedReport = (reportId, reports) => reports.forEach(r => reportId === r.id ? v.selectedReport = r : null)
 
+    /* Template Methods */
     const pageReportNotes = inc => {
       let page = v.noteData.page + inc
       adminApi.reports.pageUserNotes(v.selectedReport.id, { page })
@@ -496,11 +498,13 @@ export default {
       .then(d => v.noteData = d)
     }
 
+    /* Internal Data */
     const $route = useRoute()
     const $router = useRouter()
     const $auth = inject(AuthStore)
     const $alertStore = inject('$alertStore')
 
+    /* Template Data */
     const v = reactive({
       loggedIn: $auth.loggedIn,
       authedUser: $auth.user,

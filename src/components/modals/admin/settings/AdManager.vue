@@ -112,10 +112,7 @@ export default {
   components: { Modal },
   setup(props, { emit }) {
     /* Template Methods */
-    const resetForm = () => {
-      v.requestSubmitted = false
-      // v.saveRuleBtnLabel = props.remove ? 'Confirm Delete' : 'Save'
-    }
+    const resetForm = () => v.requestSubmitted = false
 
     const createNewRound = () => {
       v.requestSubmitted = true
@@ -212,10 +209,7 @@ export default {
       currentFactoid: props.factoid || { text : '' }
     })
 
-    // watch(() => props.show, () => {
-    //   v.newRank = props.edit || props.remove ? cloneDeep(props.selected) : {}
-    // })
-
+    /* Watch Data */
     watch(() => props.round, r => v.round = r)
     watch(() => props.ad, a => v.currentAd = a)
     watch(() => props.factoid, f => v.currentFactoid = f)

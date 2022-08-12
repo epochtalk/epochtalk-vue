@@ -9,7 +9,7 @@
       <span>who</span>
 
       <span data-balloon="Mod Action Performed">
-        <select @keydown="$event.which === 13 && filterResults()" v-model="filter.action" ng-options="action.value as action.desc group by action.group for action in ModerationCtrl.actionTypes">
+        <select @keydown="$event.which === 13 && filterResults()" v-model="filter.action">
           <option :value="null">Did Anything</option>
           <optgroup v-for="group in actionTypes" :label="group.groupName" :key="group.groupName">
             <option v-for="action in group.actions" :value="action.value" :key="action.desc">{{action.desc}}</option>
@@ -149,6 +149,19 @@ export default {
     })
   },
   setup() {
+    /* Internal Methods */
+    const init = query => {
+      v.filter = { ...query }
+      delete v.filter.page
+      delete v.filter.limit
+      if (!v.filter.action) v.filter.action = null
+      if (query.bdate) v.selectedDateFilterType = 'before'
+      else if (query.adate) v.selectedDateFilterType = 'after'
+      else if (query.sdate && query.edate) v.selectedDateFilterType = 'between'
+      else v.selectedDateFilterType = null
+    }
+
+    /* Template Methods */
     const pageResults = page => {
       let query = { ...$route.query, page: page }
       if (query.page <= 1 || !query.page) delete query.page
@@ -204,202 +217,191 @@ export default {
       return !(query.mod || query.action || query.keyword || query.bdate || query.adate || query.sdate || query.edate)
     }
 
-    const init = query => {
-      v.filter = { ...query }
-      delete v.filter.page
-      delete v.filter.limit
-      if (!v.filter.action) v.filter.action = null
-      if (query.bdate) v.selectedDateFilterType = 'before'
-      else if (query.adate) v.selectedDateFilterType = 'after'
-      else if (query.sdate && query.edate) v.selectedDateFilterType = 'between'
-      else v.selectedDateFilterType = null
-    }
-
-    const actionTypes = [
-      {
-        groupName: 'User Report Actions',
-        actions: [
-          { value: 'reports.updateUserReport',
-            desc: 'Updated a User Report Status' },
-          { value: 'reports.createUserReportNote',
-            desc: 'Created a User Report Note' },
-          { value: 'reports.updateUserReportNote',
-            desc: 'Updated a User Report Note' }
-        ]
-      },
-      {
-        groupName: 'Post Report Actions',
-        actions: [
-          { value: 'reports.updatePostReport',
-            desc: 'Updated a Post Report Status' },
-          { value: 'reports.createPostReportNote',
-            desc: 'Created a Post Report Note' },
-          { value: 'reports.updatePostReportNote',
-            desc: 'Updated a Post Report Note' }
-        ]
-      },
-      {
-        groupName: 'Message Report Actions',
-        actions: [
-          { value: 'reports.updateMessageReport',
-            desc: 'Updated a Message Report Status' },
-          { value: 'reports.createMessageReportNote',
-            desc: 'Created a Message Report Note' },
-          { value: 'reports.updateMessageReportNote',
-            desc: 'Updated a Message Report Note' }
-        ]
-      },
-      {
-        groupName: 'Role Actions',
-        actions: [
-          { value: 'adminRoles.add',
-            desc: 'Added a New Role' },
-          { value: 'adminRoles.remove',
-            desc: 'Removed a Role' },
-          { value: 'adminRoles.update',
-            desc: 'Updated a Role' },
-          { value: 'adminRoles.reprioritize',
-            desc: 'Reprioritized Roles' }
-        ]
-      },
-      {
-        groupName: 'Settings Actions',
-        actions: [
-          { value: 'adminSettings.update',
-            desc: 'Updated Settings' },
-          { value: 'adminSettings.addToBlacklist',
-            desc: 'Added to IP Blacklist' },
-          { value: 'adminSettings.updateBlacklist',
-            desc: 'Updated a IP Blacklist Rule' },
-          { value: 'adminSettings.deleteFromBlacklist',
-            desc: 'Deleted a IP Blacklist Rule' },
-          { value: 'adminSettings.setTheme',
-            desc: 'Set the Forum Theme' },
-          { value: 'adminSettings.resetTheme',
-            desc: 'Reverted to the Default Forum Theme' }
-        ]
-      },
-      {
-        groupName: 'User Actions',
-        actions: [
-          { value: 'users.update',
-            desc: 'Updated User' },
-          { value: 'adminUsers.addRoles',
-            desc: 'Added a Role to User' },
-          { value: 'adminUsers.removeRoles',
-            desc: 'Removed a Role from User' },
-          { value: 'users.delete',
-            desc: 'Deleted User' },
-          { value: 'users.deactivate',
-            desc: 'Deactivated User' },
-          { value: 'users.reactivate',
-            desc: 'Reactivated User' },
-          { value: 'userNotes.create',
-            desc: 'Created User Moderation Note' },
-          { value: 'userNotes.update',
-            desc: 'Updated User Moderation Note' },
-          { value: 'userNotes.delete',
-            desc: 'Deleted User Moderation Note' }
-        ]
-      },
-      {
-        groupName: 'Banning Actions',
-        actions: [
-          { value: 'bans.ban',
-            desc: 'Banned User' },
-          { value: 'bans.unban',
-            desc: 'Unbanned User' },
-          { value: 'bans.banFromBoards',
-            desc: 'Banned User From Board(s)' },
-          { value: 'bans.unbanFromBoards',
-            desc: 'Unbanned User From Board(s)' },
-          { value: 'bans.addAddresses',
-            desc: 'Banned an Address' },
-          { value: 'bans.editAddress',
-            desc: 'Edited a Banned Address' },
-          { value: 'bans.deleteAddress',
-            desc: 'Deleted a Banned Address' }
-        ]
-      },
-      {
-        groupName: 'Board Actions',
-        actions: [
-          { value: 'adminBoards.updateCategories',
-            desc: 'Updated Boards/Categories' },
-          { value: 'adminModerators.add',
-            desc: 'Added Moderator(s)' },
-          { value: 'adminModerators.remove',
-            desc: 'Removed Moderator(s)' },
-          { value: 'boards.create',
-            desc: 'Created Board' },
-          { value: 'boards.update',
-            desc: 'Updated Board' },
-          { value: 'boards.delete',
-            desc: 'Deleted Board' }
-        ]
-      },
-      {
-        groupName: 'Thread Actions',
-        actions: [
-          { value: 'threads.title',
-            desc: 'Edited Thread Title' },
-          { value: 'threads.sticky',
-            desc: 'Stickied/Unstickied Thread' },
-          { value: 'threads.lock',
-            desc: 'Locked/Unlocked Thread' },
-          { value: 'threads.move',
-            desc: 'Moved Thread' },
-          { value: 'threads.purge',
-            desc: 'Purged Thread' },
-          { value: 'threads.createPoll',
-            desc: 'Created Thread Poll' },
-          { value: 'threads.editPoll',
-            desc: 'Edited Thread Poll' },
-          { value: 'threads.lockPoll',
-            desc: 'Locked Thread Poll' }
-        ]
-      },
-      {
-        groupName: 'Post Actions',
-        actions: [
-          { value: 'posts.update',
-            desc: 'Edited User\'s Post' },
-          { value: 'posts.delete',
-            desc: 'Hid User\'s Post' },
-          { value: 'posts.undelete',
-            desc: 'Unhid User\'s Post' },
-          { value: 'posts.purge',
-            desc: 'Purged User\'s Post' }
-        ]
-      },
-      {
-        groupName: 'Messaging Actions',
-        actions: [
-         { value: 'conversations.delete',
-           desc: 'Deleted Conversation' },
-         { value: 'messages.delete',
-           desc: 'Deleted Message' }
-        ],
-      }
-    ]
-
-    const dateFilterTypes = {
-      between: 'Between',
-      after: 'After',
-      before: 'Before'
-    }
-
+    /* Internal Data */
     const $route = useRoute()
     const $router = useRouter()
 
+    /* Template Data */
     const v = reactive({
       logData: {},
       filter: {},
       selectedLog: null,
       selectedDateFilterType: null,
-      showRawObjectModal: false
+      showRawObjectModal: false,
+      dateFilterTypes: {
+        between: 'Between',
+        after: 'After',
+        before: 'Before'
+      },
+      actionTypes: [
+        {
+          groupName: 'User Report Actions',
+          actions: [
+            { value: 'reports.updateUserReport',
+              desc: 'Updated a User Report Status' },
+            { value: 'reports.createUserReportNote',
+              desc: 'Created a User Report Note' },
+            { value: 'reports.updateUserReportNote',
+              desc: 'Updated a User Report Note' }
+          ]
+        },
+        {
+          groupName: 'Post Report Actions',
+          actions: [
+            { value: 'reports.updatePostReport',
+              desc: 'Updated a Post Report Status' },
+            { value: 'reports.createPostReportNote',
+              desc: 'Created a Post Report Note' },
+            { value: 'reports.updatePostReportNote',
+              desc: 'Updated a Post Report Note' }
+          ]
+        },
+        {
+          groupName: 'Message Report Actions',
+          actions: [
+            { value: 'reports.updateMessageReport',
+              desc: 'Updated a Message Report Status' },
+            { value: 'reports.createMessageReportNote',
+              desc: 'Created a Message Report Note' },
+            { value: 'reports.updateMessageReportNote',
+              desc: 'Updated a Message Report Note' }
+          ]
+        },
+        {
+          groupName: 'Role Actions',
+          actions: [
+            { value: 'adminRoles.add',
+              desc: 'Added a New Role' },
+            { value: 'adminRoles.remove',
+              desc: 'Removed a Role' },
+            { value: 'adminRoles.update',
+              desc: 'Updated a Role' },
+            { value: 'adminRoles.reprioritize',
+              desc: 'Reprioritized Roles' }
+          ]
+        },
+        {
+          groupName: 'Settings Actions',
+          actions: [
+            { value: 'adminSettings.update',
+              desc: 'Updated Settings' },
+            { value: 'adminSettings.addToBlacklist',
+              desc: 'Added to IP Blacklist' },
+            { value: 'adminSettings.updateBlacklist',
+              desc: 'Updated a IP Blacklist Rule' },
+            { value: 'adminSettings.deleteFromBlacklist',
+              desc: 'Deleted a IP Blacklist Rule' },
+            { value: 'adminSettings.setTheme',
+              desc: 'Set the Forum Theme' },
+            { value: 'adminSettings.resetTheme',
+              desc: 'Reverted to the Default Forum Theme' }
+          ]
+        },
+        {
+          groupName: 'User Actions',
+          actions: [
+            { value: 'users.update',
+              desc: 'Updated User' },
+            { value: 'adminUsers.addRoles',
+              desc: 'Added a Role to User' },
+            { value: 'adminUsers.removeRoles',
+              desc: 'Removed a Role from User' },
+            { value: 'users.delete',
+              desc: 'Deleted User' },
+            { value: 'users.deactivate',
+              desc: 'Deactivated User' },
+            { value: 'users.reactivate',
+              desc: 'Reactivated User' },
+            { value: 'userNotes.create',
+              desc: 'Created User Moderation Note' },
+            { value: 'userNotes.update',
+              desc: 'Updated User Moderation Note' },
+            { value: 'userNotes.delete',
+              desc: 'Deleted User Moderation Note' }
+          ]
+        },
+        {
+          groupName: 'Banning Actions',
+          actions: [
+            { value: 'bans.ban',
+              desc: 'Banned User' },
+            { value: 'bans.unban',
+              desc: 'Unbanned User' },
+            { value: 'bans.banFromBoards',
+              desc: 'Banned User From Board(s)' },
+            { value: 'bans.unbanFromBoards',
+              desc: 'Unbanned User From Board(s)' },
+            { value: 'bans.addAddresses',
+              desc: 'Banned an Address' },
+            { value: 'bans.editAddress',
+              desc: 'Edited a Banned Address' },
+            { value: 'bans.deleteAddress',
+              desc: 'Deleted a Banned Address' }
+          ]
+        },
+        {
+          groupName: 'Board Actions',
+          actions: [
+            { value: 'adminBoards.updateCategories',
+              desc: 'Updated Boards/Categories' },
+            { value: 'adminModerators.add',
+              desc: 'Added Moderator(s)' },
+            { value: 'adminModerators.remove',
+              desc: 'Removed Moderator(s)' },
+            { value: 'boards.create',
+              desc: 'Created Board' },
+            { value: 'boards.update',
+              desc: 'Updated Board' },
+            { value: 'boards.delete',
+              desc: 'Deleted Board' }
+          ]
+        },
+        {
+          groupName: 'Thread Actions',
+          actions: [
+            { value: 'threads.title',
+              desc: 'Edited Thread Title' },
+            { value: 'threads.sticky',
+              desc: 'Stickied/Unstickied Thread' },
+            { value: 'threads.lock',
+              desc: 'Locked/Unlocked Thread' },
+            { value: 'threads.move',
+              desc: 'Moved Thread' },
+            { value: 'threads.purge',
+              desc: 'Purged Thread' },
+            { value: 'threads.createPoll',
+              desc: 'Created Thread Poll' },
+            { value: 'threads.editPoll',
+              desc: 'Edited Thread Poll' },
+            { value: 'threads.lockPoll',
+              desc: 'Locked Thread Poll' }
+          ]
+        },
+        {
+          groupName: 'Post Actions',
+          actions: [
+            { value: 'posts.update',
+              desc: 'Edited User\'s Post' },
+            { value: 'posts.delete',
+              desc: 'Hid User\'s Post' },
+            { value: 'posts.undelete',
+              desc: 'Unhid User\'s Post' },
+            { value: 'posts.purge',
+              desc: 'Purged User\'s Post' }
+          ]
+        },
+        {
+          groupName: 'Messaging Actions',
+          actions: [
+           { value: 'conversations.delete',
+             desc: 'Deleted Conversation' },
+           { value: 'messages.delete',
+             desc: 'Deleted Message' }
+          ],
+        }
+      ]
     })
-    return { ...toRefs(v), init, humanDate, dateFilterTypes, actionTypes, filterResults, clearFilter, disableClear, disableFilter, showRawObject, pageResults, syntaxHighlight }
+    return { ...toRefs(v), init, humanDate, filterResults, clearFilter, disableClear, disableFilter, showRawObject, pageResults, syntaxHighlight }
   }
 }
 </script>

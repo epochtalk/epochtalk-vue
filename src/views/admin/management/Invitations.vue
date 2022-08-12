@@ -75,6 +75,7 @@ export default {
     })
   },
   setup() {
+    /* Template Methods */
     const pageResults = page => {
       let query = { ...$route.query, page: page }
       if (query.page <= 1 || !query.page) delete query.page
@@ -117,10 +118,12 @@ export default {
       })
     }
 
+    /* Internal Data */
     const $router = useRouter()
     const $route = useRoute()
     const $alertStore = inject('$alertStore')
 
+    /* Template Data */
     const v = reactive({
       inviteData: {},
       emailToInvite: null,
@@ -130,6 +133,7 @@ export default {
       showDeleteInvite: false
     })
 
+    /* Watch Data */
     watch(() => v.emailToInvite, debounce(async () => v.validEmail = emailRegex.test(v.emailToInvite)))
 
     return { ...toRefs(v), pageResults, inviteUser, humanDate, deleteInvitation, reloadData, resendInvitation }

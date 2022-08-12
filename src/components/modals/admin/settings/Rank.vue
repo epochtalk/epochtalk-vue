@@ -96,6 +96,7 @@ export default {
       requestSubmitted: false,
     })
 
+    /* Watch Data */
     watch(() => props.show, () => {
       v.saveRuleBtnLabel = props.remove ? 'Confirm Delete' : 'Save'
       v.newRank = props.edit || props.remove ? cloneDeep(props.selected) : {}

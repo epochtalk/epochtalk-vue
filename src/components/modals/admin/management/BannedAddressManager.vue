@@ -145,6 +145,7 @@ export default {
       requestSubmitted: false,
     })
 
+    /* Watch Data */
     watch(() => props.show, () => {
       v.saveRuleBtnLabel = props.deleteAddress ? 'Confirm Delete' : 'Save'
       v.selectedAddress = cloneDeep(props.selected)

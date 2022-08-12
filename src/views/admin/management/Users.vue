@@ -158,6 +158,7 @@ export default {
     })
   },
   setup() {
+    /* Template Methods */
     const pageResults = page => {
       let query = { ...$route.query, page: page }
       if (query.page === 1 || !query.page) delete query.page
@@ -240,10 +241,12 @@ export default {
       $router.replace({ name: $route.name, params, query: query })
     }
 
+    /* Internal Data */
     const $router = useRouter()
     const $route = useRoute()
     const $auth = inject(AuthStore)
 
+    /* Template Data */
     const v = reactive({
       controlAccess: $auth.permissionUtils.getModPanelControlAccess(),
       currentPage: Number($route.query.page) || 1,

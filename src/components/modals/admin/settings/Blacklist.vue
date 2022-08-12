@@ -182,6 +182,7 @@ export default {
       errorMessage: ''
     })
 
+    /* Watch Data */
     watch(() => props.show, () => {
       v.saveRuleBtnLabel = 'Save'
       if (props.add) v.rule = { type: 0 }

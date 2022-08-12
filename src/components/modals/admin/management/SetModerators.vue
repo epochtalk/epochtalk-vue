@@ -139,6 +139,7 @@ export default {
       }
     })
 
+    /* Watch Data */
     watch(() => props.show, () => {
       v.modsToRemove = []
       v.modTagsInput.value = []

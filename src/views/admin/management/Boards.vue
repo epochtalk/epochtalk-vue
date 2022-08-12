@@ -75,6 +75,16 @@ export default {
     .catch(() => {})
   },
   setup() {
+    /* Internal Methods */
+    onMounted(() => {
+      EventBus.on('admin-save', saveListener)
+      EventBus.on('admin-reset', resetListener)
+    })
+    onUnmounted(() => {
+      EventBus.off('admin-save', saveListener)
+      EventBus.off('admin-reset', resetListener)
+    })
+
     const resetListener = () => {
       v.catDataId = 0
       v.boardDataId = 9999
@@ -208,150 +218,7 @@ export default {
       .catch(err => console.log(err))
     }
 
-    onMounted(() => {
-      EventBus.on('admin-save', saveListener)
-      EventBus.on('admin-reset', resetListener)
-    })
-    onUnmounted(() => {
-      EventBus.off('admin-save', saveListener)
-      EventBus.off('admin-reset', resetListener)
-    })
-
-    /* Page Actions */
-    const addCategory = () => {
-      if (!v.newCatName) return
-      normalizeData()
-      // Add new category to vue controlled list of categories
-      let newCat = {
-        boards: [],
-        created_at: null,
-        id: v.newCatId++,
-        imported_at: null,
-        meta: null,
-        name: v.newCatName,
-        postable_by: null,
-        updated_at: null,
-        view_order: 0,
-        modified: true
-      }
-      v.newCategories.push(newCat) // add new cat to array of newly added cats
-      v.catListData.unshift(newCat) // add newCat to catListData, triggers rebuild of html
-      v.newCatName = '' // clear input for category name
-    }
-
-    /* Modal Actions */
-    const handleBoardManagerSuccess = ({ type, data }) => {
-      if (type === 'addBoard') addBoard(data)
-      if (type === 'editBoard') editBoard(data)
-      if (type === 'deleteBoard') deleteBoard()
-      if (type === 'deleteCat') deleteCat()
-      if (type === 'editCat') editCat(data)
-    }
-
-    const addBoard = board => {
-      normalizeData() // Normalize data between vue and jquery
-      v.uncatListData.unshift(board) // triggers recompilation of nestable components/html
-    }
-    const editBoard = board => {
-      // Update nestable map to contain edited board info
-      board.modified = true
-      v.nestableMap[v.selectedDataId] = board
-      normalizeData() // Normalize data between vue and jquery
-    }
-    const deleteBoard = () => {
-      normalizeData()
-      let board = v.nestableMap[v.selectedDataId]
-      // Update nestable map to contain deleted board info
-      board.deleted = true
-      normalizeData() // normalize again after flagging deleted
-    }
-    const deleteCat = () => {
-      normalizeData()
-      let cat = v.nestableMap[v.selectedDataId]
-      cat.deleted = true
-      normalizeData() // normalize again after flagging deleted
-    }
-    const editCat = category => {
-      let editCatEl = window.$(`li[data-id="${v.selectedDataId}"]`) // get parent cat element
-      let childrenDataIds = [...editCatEl.children().find('[data-id]')].map(i => i.dataset.id)
-      // Iterate through all cat children and update viewable_by to match category
-      childrenDataIds.forEach(nestableId => {
-        let board = v.nestableMap[nestableId]
-        board.viewable_by = category.viewable_by
-        board.modified = true
-      })
-      v.nestableMap[v.selectedDataId] = category // update category
-      normalizeData() // normalize data after changes
-    }
-
-    const setCatDelete = id => {
-      v.showDeleteCat = true
-      v.selected = v.nestableMap[id]
-      v.selectedDataId = id
-    }
-    const setCatEdit = id => {
-      v.showEditCat = true
-      v.selected = v.nestableMap[id]
-      v.selectedDataId = id
-    }
-    const setBoardDelete = id => {
-      v.showDeleteBoard = true
-      v.selected = v.nestableMap[id]
-      v.selectedDataId = id
-    }
-    const setBoardEdit = id => {
-      v.showEditBoard = true
-      v.selected = v.nestableMap[id]
-      v.selectedDataId = id
-    }
-    const setBoardMods = id => {
-      v.selected = v.nestableMap[id]
-      v.showEditBoardMods = true
-      v.selectedDataId = id
-    }
-
-    const $alertStore = inject('$alertStore')
-
-    /* Nestable function calls */
-    const expandAll = () => window.$('#nestable-categories').nestable('expandAll')
-    const collapseAll = () => window.$('#nestable-categories').nestable('collapseAll')
-
-    /* Template Data */
-    const v = reactive({
-      serializedCats: null,
-      serializedBoards: null,
-      selected: null,
-      selectedDataId: null,
-      catListDataCopy: null,
-      uncatListDataCopy: null,
-      nestableMap: {},
-      catsDataIdMap: {}, // DataId keyed by cat.view_order which is unique
-      boardsDataIdMap: {}, // DataID keyed by board.slug TODO(akinsey): not unique prior to req
-      catDataId: 0,
-      newCatId: 99999,
-      boardDataId: 9999,
-      catListData: null,
-      nestableOpts: { protectedRoot: true, maxDepth: 5, group: 1 },
-      catListId: 'categorized-boards',
-      uncatListId: 'uncategorized-boards',
-      newBoard: { viewable_by: null, postable_by: null, description: '', name: '' },
-      uncatListData: null,
-      newCatName: '',
-      newCategories: [],
-      deletedCategories: [],
-      newBoards: [],
-      editedBoards: [],
-      deletedBoards: [],
-      uncompiledCatHtml: '',
-      uncompiledBoardHtml: '',
-      showAddBoard: false,
-      showEditBoard: false,
-      showEditBoardMods: false,
-      showDeleteBoard: false,
-      showEditCat: false,
-      showDeleteCat: false
-    })
-    /* Data Normalization Helper Methods */
+    // -- Data Normalization Helper Methods
     // Normalize data, take nestable data and use it to update uncatListData and catListData
     // needs to be called when any action to boards or cats are performed
     const normalizeData = () => {
@@ -669,6 +536,141 @@ export default {
         if (board.children && board.children.length > 0) buildEntries(board.children, boardId, boardMapping)
       })
     }
+
+    /* Template Methods */
+    const addCategory = () => {
+      if (!v.newCatName) return
+      normalizeData()
+      // Add new category to vue controlled list of categories
+      let newCat = {
+        boards: [],
+        created_at: null,
+        id: v.newCatId++,
+        imported_at: null,
+        meta: null,
+        name: v.newCatName,
+        postable_by: null,
+        updated_at: null,
+        view_order: 0,
+        modified: true
+      }
+      v.newCategories.push(newCat) // add new cat to array of newly added cats
+      v.catListData.unshift(newCat) // add newCat to catListData, triggers rebuild of html
+      v.newCatName = '' // clear input for category name
+    }
+
+    const handleBoardManagerSuccess = ({ type, data }) => { // Handle Modal Success
+      if (type === 'addBoard') addBoard(data)
+      if (type === 'editBoard') editBoard(data)
+      if (type === 'deleteBoard') deleteBoard()
+      if (type === 'deleteCat') deleteCat()
+      if (type === 'editCat') editCat(data)
+    }
+
+    const addBoard = board => {
+      normalizeData() // Normalize data between vue and jquery
+      v.uncatListData.unshift(board) // triggers recompilation of nestable components/html
+    }
+    const editBoard = board => {
+      // Update nestable map to contain edited board info
+      board.modified = true
+      v.nestableMap[v.selectedDataId] = board
+      normalizeData() // Normalize data between vue and jquery
+    }
+    const deleteBoard = () => {
+      normalizeData()
+      let board = v.nestableMap[v.selectedDataId]
+      // Update nestable map to contain deleted board info
+      board.deleted = true
+      normalizeData() // normalize again after flagging deleted
+    }
+    const deleteCat = () => {
+      normalizeData()
+      let cat = v.nestableMap[v.selectedDataId]
+      cat.deleted = true
+      normalizeData() // normalize again after flagging deleted
+    }
+    const editCat = category => {
+      let editCatEl = window.$(`li[data-id="${v.selectedDataId}"]`) // get parent cat element
+      let childrenDataIds = [...editCatEl.children().find('[data-id]')].map(i => i.dataset.id)
+      // Iterate through all cat children and update viewable_by to match category
+      childrenDataIds.forEach(nestableId => {
+        let board = v.nestableMap[nestableId]
+        board.viewable_by = category.viewable_by
+        board.modified = true
+      })
+      v.nestableMap[v.selectedDataId] = category // update category
+      normalizeData() // normalize data after changes
+    }
+
+    const setCatDelete = id => {
+      v.showDeleteCat = true
+      v.selected = v.nestableMap[id]
+      v.selectedDataId = id
+    }
+    const setCatEdit = id => {
+      v.showEditCat = true
+      v.selected = v.nestableMap[id]
+      v.selectedDataId = id
+    }
+    const setBoardDelete = id => {
+      v.showDeleteBoard = true
+      v.selected = v.nestableMap[id]
+      v.selectedDataId = id
+    }
+    const setBoardEdit = id => {
+      v.showEditBoard = true
+      v.selected = v.nestableMap[id]
+      v.selectedDataId = id
+    }
+    const setBoardMods = id => {
+      v.selected = v.nestableMap[id]
+      v.showEditBoardMods = true
+      v.selectedDataId = id
+    }
+
+    // Nestable function calls
+    const expandAll = () => window.$('#nestable-categories').nestable('expandAll')
+    const collapseAll = () => window.$('#nestable-categories').nestable('collapseAll')
+
+    /* Internal Data */
+    const $alertStore = inject('$alertStore')
+
+    /* Template Data */
+    const v = reactive({
+      serializedCats: null,
+      serializedBoards: null,
+      selected: null,
+      selectedDataId: null,
+      catListDataCopy: null,
+      uncatListDataCopy: null,
+      nestableMap: {},
+      catsDataIdMap: {}, // DataId keyed by cat.view_order which is unique
+      boardsDataIdMap: {}, // DataID keyed by board.slug TODO(akinsey): not unique prior to req
+      catDataId: 0,
+      newCatId: 99999,
+      boardDataId: 9999,
+      catListData: null,
+      nestableOpts: { protectedRoot: true, maxDepth: 5, group: 1 },
+      catListId: 'categorized-boards',
+      uncatListId: 'uncategorized-boards',
+      newBoard: { viewable_by: null, postable_by: null, description: '', name: '' },
+      uncatListData: null,
+      newCatName: '',
+      newCategories: [],
+      deletedCategories: [],
+      newBoards: [],
+      editedBoards: [],
+      deletedBoards: [],
+      uncompiledCatHtml: '',
+      uncompiledBoardHtml: '',
+      showAddBoard: false,
+      showEditBoard: false,
+      showEditBoardMods: false,
+      showDeleteBoard: false,
+      showEditCat: false,
+      showDeleteCat: false
+    })
 
     /* Watch Data */
     watch(() => v.catListData, generateNestableCatData, { deep: true })

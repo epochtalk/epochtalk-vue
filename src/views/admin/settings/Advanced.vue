@@ -264,17 +264,7 @@ export default {
     })
   },
   setup() {
-    const reloadBlacklist = () => adminApi.blacklist.get().then(bl => v.blacklist = bl)
-    const reloadRanks = () => adminApi.ranks.get().then(r => v.ranks = r)
-    const reloadAutoModeration = () => adminApi.autoModeration.getRules().then(r => v.rules = r)
-
-    const saveListener = () => {
-      adminApi.updateConfigurations(v.config)
-      .then(() => $alertStore.success('Successfully updated rate limit settings!'))
-      .catch(() => $alertStore.error('Error saving rate limit settings'))
-    }
-    const resetListener = () => v.config = cloneDeep(v.originalConfig)
-
+    /* Internal Methods */
     onMounted(() => {
       EventBus.on('admin-save', saveListener)
       EventBus.on('admin-reset', resetListener)
@@ -283,14 +273,28 @@ export default {
       EventBus.off('admin-save', saveListener)
       EventBus.off('admin-reset', resetListener)
     })
+    const saveListener = () => {
+      adminApi.updateConfigurations(v.config)
+      .then(() => $alertStore.success('Successfully updated rate limit settings!'))
+      .catch(() => $alertStore.error('Error saving rate limit settings'))
+    }
+    const resetListener = () => v.config = cloneDeep(v.originalConfig)
 
+    /* Template Methods */
+    const reloadBlacklist = () => adminApi.blacklist.get().then(bl => v.blacklist = bl)
+    const reloadRanks = () => adminApi.ranks.get().then(r => v.ranks = r)
+    const reloadAutoModeration = () => adminApi.autoModeration.getRules().then(r => v.rules = r)
+
+    // TODO(akinsey): Implement permissions
     const canDeleteAutoModRule = () => true
     const canViewAutoModRules = () => true
     const canCreateAutoModRule = () => true
     const canEditAutoModRule = () => true
 
+    /* Internal Data */
     const $alertStore = inject('$alertStore')
 
+    /* Template Data */
     const v = reactive({
       config: null,
       originalConfig: null,

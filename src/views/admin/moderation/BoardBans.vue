@@ -133,6 +133,22 @@ export default {
     })
   },
   setup() {
+    /* Internal Methods */
+    const initFilterBoards = (boards, query) => {
+      v.filterBoards = boards
+      v.moderating = v.authedUser.moderating
+      let moderatedBoards = v.filterBoards.filter(board => {
+        if (v.moderating.indexOf(board.id) > -1) return board
+      })
+      if (v.boardBanData.modded) v.filterBoards = moderatedBoards
+      // create options groups by parent name (for select grouping)
+      v.filterBoards = groupBy(v.filterBoards, 'parent_name')
+      v.boardFilter = query.board || null
+      v.searchFilter = query.search
+      v.moddedFilter = query.modded
+    }
+
+    /* Template Methods */
     const pageResults = page => {
       let query = { ...$route.query, page: page }
       if (query.page <= 1 || !query.page) delete query.page
@@ -178,10 +194,13 @@ export default {
       }).length
     }
     const hasGlobalModPerms = () => v.permissionUtils.hasPermission('bans.banFromBoards.bypass.type.admin')
+
+    /* Internal Data */
     const $auth = inject(AuthStore)
     const $route = useRoute()
     const $router = useRouter()
 
+    /* Template Data */
     const v = reactive({
       authedUser: $auth.user,
       permissionUtils: $auth.permissionUtils,
@@ -194,20 +213,6 @@ export default {
       selectedUser: {},
       boardBanData: {}
     })
-
-    const initFilterBoards = (boards, query) => {
-      v.filterBoards = boards
-      v.moderating = v.authedUser.moderating
-      let moderatedBoards = v.filterBoards.filter(board => {
-        if (v.moderating.indexOf(board.id) > -1) return board
-      })
-      if (v.boardBanData.modded) v.filterBoards = moderatedBoards
-      // create options groups by parent name (for select grouping)
-      v.filterBoards = groupBy(v.filterBoards, 'parent_name')
-      v.boardFilter = query.board || null
-      v.searchFilter = query.search
-      v.moddedFilter = query.modded
-    }
 
     return { ...toRefs(v), decode, applyFilter, refreshPageData, searchBannedUsers, clearSearch, showManageBans, bannedFromModeratedBoard, initFilterBoards, hasGlobalModPerms, pageResults }
   }

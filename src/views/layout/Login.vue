@@ -62,6 +62,7 @@ export default {
       })
     }
 
+    // TODO(akinsey): Implement oath google login
     const signInWithGoogle = () => console.log('Sign in with Google!')
 
 

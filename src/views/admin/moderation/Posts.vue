@@ -341,6 +341,13 @@ export default {
     }
   },
   setup() {
+    /* Internal Methods */
+    const initSelectedReport = (reportId, reports) => {
+      reports.forEach(r => reportId === r.id ? v.selectedReport = r : null)
+      if (v.selectedReport) postsApi.find(v.selectedReport.offender_post_id).then(data => v.previewPost = data)
+    }
+
+    /* Template Methods */
     const refreshPageData = () => {
       let queryParams = {
         limit: Number($route.query.limit) || undefined,
@@ -369,11 +376,6 @@ export default {
          v.query = queryParams
        })
       }
-    }
-
-    const initSelectedReport = (reportId, reports) => {
-      reports.forEach(r => reportId === r.id ? v.selectedReport = r : null)
-      if (v.selectedReport) postsApi.find(v.selectedReport.offender_post_id).then(data => v.previewPost = data)
     }
 
     const pageReportNotes = inc => {
@@ -583,11 +585,13 @@ export default {
     const moderatesBoard = boardId => v.permUtils.moderatesBoard(boardId)
     const hasGlobalModPerms = () => v.permUtils.globalModeratorCheck()
 
+    /* Internal Data */
     const $route = useRoute()
     const $router = useRouter()
     const $auth = inject(AuthStore)
     const $alertStore = inject('$alertStore')
 
+    /* Template Data */
     const v = reactive({
       loggedIn: $auth.loggedIn,
       authedUser: $auth.user,

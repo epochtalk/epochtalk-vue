@@ -207,6 +207,17 @@ export default {
     })
   },
   setup() {
+    /* Internal Methods */
+    onMounted(() => {
+      EventBus.on('admin-preview', previewListener)
+      EventBus.on('admin-save', saveListener)
+      EventBus.on('admin-reset', resetListener)
+    })
+    onUnmounted(() => {
+      EventBus.off('admin-preview', previewListener)
+      EventBus.off('admin-save', saveListener)
+      EventBus.off('admin-reset', resetListener)
+    })
     const saveListener = () => {
       addVarPostFix()
       themeApi.save(v.themeCopy)
@@ -232,16 +243,6 @@ export default {
       .then(() => $alertStore.success('Previewing theme locally!'))
       .catch(() => $alertStore.error('Error previewing theme'))
     }
-    onMounted(() => {
-      EventBus.on('admin-preview', previewListener)
-      EventBus.on('admin-save', saveListener)
-      EventBus.on('admin-reset', resetListener)
-    })
-    onUnmounted(() => {
-      EventBus.off('admin-preview', previewListener)
-      EventBus.off('admin-save', saveListener)
-      EventBus.off('admin-reset', resetListener)
-    })
 
     const validColor = str => {
       // Do not allow these values
@@ -282,9 +283,7 @@ export default {
       return image.style.color !== 'rgb(255, 255, 255)'
     }
 
-    const baseFontSizeRegex = /^([1][0-8])$/
-    const baseLineHeightRegex = /^(?:2(?:\.00?0?)?|[1](?:\.[0-9]([0-9])?([0-9])?)?|1?\.[1-9])$/
-
+    /* Template Methods */
     const loadTheme = theme => console.log(theme)
     const revert = () => {
       themeApi.reset().then(resetTheme => {
@@ -317,8 +316,12 @@ export default {
       v.themeCopy['base-line-height'] = v.themeCopy['base-line-height'] + 'rem';
     }
 
+    /* Internal Data */
+    const baseFontSizeRegex = /^([1][0-8])$/
+    const baseLineHeightRegex = /^(?:2(?:\.00?0?)?|[1](?:\.[0-9]([0-9])?([0-9])?)?|1?\.[1-9])$/
     const $alertStore = inject('$alertStore')
 
+    /* Template Data */
     const v = reactive({
       originalConfig: null,
       config: null,
@@ -329,7 +332,7 @@ export default {
       defaultAvatarShapeCircle: null
     })
 
-    // Form Validation
+    /* Watch Data */
     let watchColorProps = ['base-background-color', 'base-font-color', 'border-color', 'color-primary', 'header-bg-color', 'header-font-color', 'input-background-color', 'input-font-color', 'secondary-font-color', 'sub-header-color']
     watchColorProps.forEach(p => watch(() => v.theme[p], val => v.formValid[p] = validColor(val)))
     watch(() => v.theme['base-font-size'], val => v.formValid['base-font-size'] = baseFontSizeRegex.test(val))
