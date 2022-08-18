@@ -73,6 +73,7 @@
         <a href="#" @click.prevent="showAutoModAddModal = true" class="right" v-if="canCreateAutoModRule()">
           <i class="fa fa-plus"></i>&nbsp;&nbsp;Add Rule
         </a>
+        <span v-if="!canCreateAutoModRule()" class="right"><i class="disabled fa fa-plus"></i>&nbsp;&nbsp;Add Rule</span>
       </h5>
 
       <table class="striped rulesTable" width="100%">
@@ -96,10 +97,12 @@
               <a href="#" @click.prevent="showAutoModEditModal = true; selectedAutoModRule = rule" v-if="canEditAutoModRule()">
                 <i class="fas fa-edit"></i>
               </a>
+              <span v-if="!canEditAutoModRule()"><i class="disabled fas fa-edit"></i></span>
               &nbsp;&nbsp;&nbsp;
               <a href="#" @click.prevent="showAutoModDeleteModal = true; selectedAutoModRule = rule" v-if="canDeleteAutoModRule()">
                 <i class="fa fa-trash"></i>
               </a>
+              <span v-if="!canDeleteAutoModRule()"><i class="disabled fa fa-trash"></i></span>
             </td>
           </tr>
         </tbody>
@@ -238,6 +241,7 @@ import { cloneDeep } from 'lodash'
 import BlacklistModal from '@/components/modals/admin/settings/Blacklist.vue'
 import RankModal from '@/components/modals/admin/settings/Rank.vue'
 import AutoModerationModal from '@/components/modals/admin/settings/AutoModeration.vue'
+import { AuthStore } from '@/composables/stores/auth'
 
 export default {
   name: 'AdvancedSettings',
@@ -285,18 +289,20 @@ export default {
     const reloadRanks = () => adminApi.ranks.get().then(r => v.ranks = r)
     const reloadAutoModeration = () => adminApi.autoModeration.getRules().then(r => v.rules = r)
 
-    // TODO(akinsey): Implement permissions
-    const canDeleteAutoModRule = () => true
-    const canViewAutoModRules = () => true
-    const canCreateAutoModRule = () => true
-    const canEditAutoModRule = () => true
+    const canDeleteAutoModRule = () => v.permUtils.hasPermission('autoModeration.removeRule.allow')
+    const canViewAutoModRules = () => v.permUtils.hasPermission('autoModeration.rules.allow')
+    const canCreateAutoModRule = () => v.permUtils.hasPermission('autoModeration.addRule.allow')
+    const canEditAutoModRule = () => v.permUtils.hasPermission('autoModeration.editRule.allow')
 
     /* Internal Data */
     const $alertStore = inject('$alertStore')
+    const $auth = inject(AuthStore)
 
     /* Template Data */
     const v = reactive({
+      authedUser: $auth.user,
       config: null,
+      permUtils: $auth.permissionUtils,
       originalConfig: null,
       defaultTrustData: {},
       blacklist: [],
@@ -322,6 +328,7 @@ export default {
 </script>
 
 <style lang="scss">
+  i.disabled { color: $secondary-font-color-light; }
   .advanced-settings .full-width { grid-column: 1/3; }
   .input-three-col {
     display: grid;
