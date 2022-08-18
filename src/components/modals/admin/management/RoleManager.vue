@@ -457,6 +457,22 @@ export default {
   emits: ['close', 'success'],
   components: { Modal },
   setup(props, { emit }) {
+    /* Internal Methods */
+    const initAdminPanelAccess = () => {
+      set(v.role, 'permissions.modAccess.messages',
+        get(v.role, 'permissions.reports.pageMessageReports.allow'))
+      set(v.role, 'permissions.modAccess.posts',
+        get(v.role, 'permissions.reports.pagePostReports.allow'))
+      set(v.role, 'permissions.modAccess.users',
+        get(v.role, 'permissions.reports.pageUserReports.allow'))
+      set(v.role, 'permissions.modAccess.logs',
+        get(v.role, 'permissions.moderationLogs.page.allow'))
+      Object.keys(v.role.permissions.modAccess).forEach(k => v.role.permissions.modAccess[k] === undefined && delete v.role.permissions.modAccess[k])
+      if (v.role.permissions.modAccess && !Object.keys(v.role.permissions.modAccess).length) delete v.role.permissions.modAccess
+      set(v.role, 'permissions.adminAccess.settings', get(v.role, 'permissions.adminAccess.settings'))
+      set(v.role, 'permissions.adminAccess.management', get(v.role, 'permissions.adminAccess.management'))
+    }
+
     /* Template Methods */
     const resetForm = () => {
       v.requestSubmitted = false
@@ -549,38 +565,6 @@ export default {
       initAdminPanelAccess()
     }
 
-    const permissionSections = [
-      { key: 'general', label: 'General' },
-      { key: 'views', label: 'Views' },
-      { key: 'users', label: 'Users' },
-      { key: 'userNotes', label: 'User Notes' },
-      { key: 'bans', label: 'Bans' },
-      { key: 'invitations', label: 'Invitations' },
-      { key: 'configurations', label: 'Configurations' },
-      { key: 'themes', label: 'Themes' },
-      { key: 'blacklist', label: 'Blacklist' },
-      { key: 'portal', label: 'Portal' },
-      { key: 'reports', label: 'Reports' },
-      { key: 'roles', label: 'Roles' },
-      { key: 'rank', label: 'Ranks' },
-      { key: 'categories', label: 'Categories' },
-      { key: 'boards', label: 'Boards' },
-      { key: 'threads', label: 'Threads' },
-      { key: 'posts', label: 'Posts' },
-      { key: 'conversations', label: 'Conversations' },
-      { key: 'messages', label: 'Messages' },
-      { key: 'watchlist', label: 'Watchlist' },
-      { key: 'moderators', label: 'Moderators' },
-      { key: 'autoModeration', label: 'Auto Moderation' },
-      { key: 'rateLimiting', label: 'Rate Limits' },
-      { key: 'userTrust', label: 'Trust' },
-      { key: 'legal', label: 'Legal' },
-      { key: 'ads', label: 'Ads' },
-      { key: 'mentions', label: 'Mentions' },
-      { key: 'moderationLogs', label: 'Mod Log' },
-      { key: 'motd', label: 'Announcements' }
-    ]
-
     const selectPermissionsTab = model => {
       // NOTE: Work around since vue will not create nested props for v-model
       // clear permission model if no permissions were set in previous tab
@@ -613,9 +597,6 @@ export default {
       }
     }
 
-    /* Internal Data */
-    const $alertStore = inject('$alertStore')
-
     /* Template Data */
     const v = reactive({
       limits: {
@@ -638,9 +619,42 @@ export default {
       selectedTab: 'general',
       saveRuleBtnLabel: props.reset ? 'Reset' : props.remove ? 'Remove' : 'Save',
       requestSubmitted: false,
+      permissionSections: [
+        { key: 'general', label: 'General' },
+        { key: 'views', label: 'Views' },
+        { key: 'users', label: 'Users' },
+        { key: 'userNotes', label: 'User Notes' },
+        { key: 'bans', label: 'Bans' },
+        { key: 'invitations', label: 'Invitations' },
+        { key: 'configurations', label: 'Configurations' },
+        { key: 'themes', label: 'Themes' },
+        { key: 'blacklist', label: 'Blacklist' },
+        { key: 'portal', label: 'Portal' },
+        { key: 'reports', label: 'Reports' },
+        { key: 'roles', label: 'Roles' },
+        { key: 'rank', label: 'Ranks' },
+        { key: 'categories', label: 'Categories' },
+        { key: 'boards', label: 'Boards' },
+        { key: 'threads', label: 'Threads' },
+        { key: 'posts', label: 'Posts' },
+        { key: 'conversations', label: 'Conversations' },
+        { key: 'messages', label: 'Messages' },
+        { key: 'watchlist', label: 'Watchlist' },
+        { key: 'moderators', label: 'Moderators' },
+        { key: 'autoModeration', label: 'Auto Moderation' },
+        { key: 'rateLimiting', label: 'Rate Limits' },
+        { key: 'userTrust', label: 'Trust' },
+        { key: 'legal', label: 'Legal' },
+        { key: 'ads', label: 'Ads' },
+        { key: 'mentions', label: 'Mentions' },
+        { key: 'moderationLogs', label: 'Mod Log' },
+        { key: 'motd', label: 'Announcements' }
+      ]
     })
 
-    // rate limiting
+    /* Internal Data */
+    const $alertStore = inject('$alertStore')
+
     const limiter = [
       v.limits.conversationCreate,
       v.limits.messageCreate,
@@ -653,21 +667,7 @@ export default {
       v.limits.userUpdate
     ]
 
-    const initAdminPanelAccess = () => {
-      set(v.role, 'permissions.modAccess.messages',
-        get(v.role, 'permissions.reports.pageMessageReports.allow'))
-      set(v.role, 'permissions.modAccess.posts',
-        get(v.role, 'permissions.reports.pagePostReports.allow'))
-      set(v.role, 'permissions.modAccess.users',
-        get(v.role, 'permissions.reports.pageUserReports.allow'))
-      set(v.role, 'permissions.modAccess.logs',
-        get(v.role, 'permissions.moderationLogs.page.allow'))
-      Object.keys(v.role.permissions.modAccess).forEach(k => v.role.permissions.modAccess[k] === undefined && delete v.role.permissions.modAccess[k])
-      if (v.role.permissions.modAccess && !Object.keys(v.role.permissions.modAccess).length) delete v.role.permissions.modAccess
-      set(v.role, 'permissions.adminAccess.settings', get(v.role, 'permissions.adminAccess.settings'))
-      set(v.role, 'permissions.adminAccess.management', get(v.role, 'permissions.adminAccess.management'))
-    }
-
+    /* Watch Data */
     watch(() => props.show, () => {
       v.role = cloneDeep(props.selected)
       v.roles = cloneDeep(props.roles)
@@ -676,7 +676,7 @@ export default {
       if (props.edit) resetLimits(cloneDeep(props.selected.permissions.limits))
     })
 
-    return { ...toRefs(v), permissionSections, modifyRole, setBasePermissions, close, set, selectPermissionsTab, createBypassStructure, toggleRestriction, hasLimits }
+    return { ...toRefs(v), modifyRole, setBasePermissions, close, set, selectPermissionsTab, createBypassStructure, toggleRestriction, hasLimits }
   }
 }
 </script>

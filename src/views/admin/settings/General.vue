@@ -11,9 +11,9 @@
     <div class="setting-row switch">
       <div class="switch-desc">
         <label for="public-forum">
-          Public Forum
+          Private Forum
         </label>
-        <label class="desc-label" for="public-forum">Allow guests to view forum content without registering</label>
+        <label class="desc-label" for="public-forum">Guests must register to view forum content</label>
       </div>
       <div class="switch-block">
         <!-- ng-true-value="false" ng-false-value="true" -->
@@ -288,14 +288,7 @@ export default {
     })
   },
   setup() {
-    const saveListener = () => {
-      adminApi.updateConfigurations(v.config)
-      .then(() => motdApi.save(v.motdData))
-      .then(() => $alertStore.success('Successfully updated forum settings!'))
-      .catch(() => $alertStore.error('Error saving forum settings'))
-    }
-    const resetListener = () => v.config = cloneDeep(v.originalConfig)
-
+    /* Internal Methods */
     onMounted(() => {
       EventBus.on('admin-save', saveListener)
       EventBus.on('admin-reset', resetListener)
@@ -305,8 +298,18 @@ export default {
       EventBus.off('admin-reset', resetListener)
     })
 
+    const saveListener = () => {
+      adminApi.updateConfigurations(v.config)
+      .then(() => motdApi.save(v.motdData))
+      .then(() => $alertStore.success('Successfully updated forum settings!'))
+      .catch(() => $alertStore.error('Error saving forum settings'))
+    }
+    const resetListener = () => v.config = cloneDeep(v.originalConfig)
+
+    /* Internal Data */
     const $alertStore = inject('$alertStore')
 
+    /* Template Methods */
     const v = reactive({
       originalConfig: null,
       config: null,

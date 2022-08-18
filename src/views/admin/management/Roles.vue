@@ -178,6 +178,57 @@ export default {
     })
   },
   setup() {
+    /* Internal Methods */
+    onMounted(() => {
+      EventBus.on('admin-save', savePriority)
+      EventBus.on('admin-reset', resetPriority)
+    })
+    onUnmounted(() => {
+      EventBus.off('admin-save', savePriority)
+      EventBus.off('admin-reset', resetPriority)
+    })
+
+    const init = function(roleId) {
+      v.selectedRole = roleId ? v.roles.filter(r => r.id === roleId)[0] : {}
+      v.showFilterUsers = !!v.searchStr
+      if (v.userData && v.userData.users) {
+        v.userData.users.forEach(user => {
+          user.remove = false
+          if (v.controlAccess.privilegedRemoveRoles && v.controlAccess.privilegedRemoveRoles.samePriority) {
+            user.remove = user.priority >= v.authedUser.permissions.priority
+          }
+          else if (v.controlAccess.privilegedRemoveRoles && v.controlAccess.privilegedRemoveRoles.lowerPriority) {
+            user.remove = user.priority > v.authedUser.permissions.priority
+          }
+        })
+      }
+
+      v.roles.forEach(r => { // remove private and anoymous priorities
+        if (r.lookup !== 'private' && r.lookup !== 'anonymous')
+          v.allPriorities.push(r.priority)
+
+        if (!v.maxPriority) v.maxPriority = r.priority;
+        else v.maxPriority = v.maxPriority < r.priority ? r.priority : v.maxPriority
+
+        if (r.lookup === 'user') {
+          r.message = 'The ' + r.name + ' role is assigned by default.  By default all new registered users are considered users.  The userbase of this role may not be manually edited.  Permission changes to this role will affect all users without another role assigned.';
+        }
+        if (r.lookup === 'anonymous') {
+          r.message = 'The ' + r.name + ' role is assigned by default to forum visitors who are not authenticated.  The user base of this role may not be manually edited.  Permission changes to this role will affect all unauthenticated users visiting the forum.';
+        }
+        if (r.lookup === 'private') {
+          r.message = 'The ' + r.name + ' role is assigned by default to forum visitors who are not authenticated.  This role is only used if the "Public Forum" is set to off via the forum settings page.  This requires all visitors to log in before they can view the forum content.  The user base of this role may not be manually edited.  Permission changes to this role will affect all unauthenticated users visiting the forum.';
+        }
+
+        // Invert Priority Restrictions
+        r.permissions.invertedRestrictions = v.allPriorities
+        if (r.permissions.priorityRestrictions && r.permissions.priorityRestrictions.length) {
+          r.permissions.invertedRestrictions = intersection(v.allPriorities, r.permissions.priorityRestrictions)
+        }
+      })
+    }
+
+    /* Template Methods */
     const refreshPageData = () => {
       let queryParams = {
         limit: Number($route.query.limit) || 15,
@@ -210,14 +261,6 @@ export default {
         })
     }
 
-    onMounted(() => {
-      EventBus.on('admin-save', savePriority)
-      EventBus.on('admin-reset', resetPriority)
-    })
-    onUnmounted(() => {
-      EventBus.off('admin-save', savePriority)
-      EventBus.off('admin-reset', resetPriority)
-    })
     const savePriority = () => adminApi.roles.reprioritize(v.roles)
       .then(() => {
         $alertStore.success('Roles successfully reprioritized!')
@@ -326,23 +369,14 @@ export default {
       return view
     }
 
+    /* Internal Data */
     const $auth = inject(AuthStore)
     const $alertStore = inject('$alertStore')
     const $route = useRoute()
     const $router = useRouter()
 
+    /* Template Data */
     const v = reactive({
-      controlAccess: {
-        ...$auth.permissionUtils.getControlAccessWithPriority('roles'),
-        privilegedRemoveRoles: {
-          samePriority: $auth.permissionUtils.hasPermission('users.removeRole.bypass.priority.same'),
-          lowerPriorty: $auth.permissionUtils.hasPermission('users.removeRole.bypass.priority.less')
-        },
-        privilegedAddRoles: {
-          samePriority: $auth.permissionUtils.hasPermission('users.addRoles.bypass.priority.same'),
-          lowerPriorty: $auth.permissionUtils.hasPermission('users.addRoles.bypass.priority.less')
-        }
-      },
       authedUser: $auth.user,
       currentPage: Number($route.query.page) || 1,
       pages: null,
@@ -377,48 +411,19 @@ export default {
       roles: [],
       rolesCopy: [],
       roleLayouts: [],
-      selectedRole: {}
-    })
-
-    const init = function(roleId) {
-      v.selectedRole = roleId ? v.roles.filter(r => r.id === roleId)[0] : {}
-      v.showFilterUsers = !!v.searchStr
-      if (v.userData && v.userData.users) {
-        v.userData.users.forEach(user => {
-          user.remove = false
-          if (v.controlAccess.privilegedRemoveRoles && v.controlAccess.privilegedRemoveRoles.samePriority) {
-            user.remove = user.priority >= v.authedUser.permissions.priority
-          }
-          else if (v.controlAccess.privilegedRemoveRoles && v.controlAccess.privilegedRemoveRoles.lowerPriority) {
-            user.remove = user.priority > v.authedUser.permissions.priority
-          }
-        })
+      selectedRole: {},
+      controlAccess: {
+        ...$auth.permissionUtils.getControlAccessWithPriority('roles'),
+        privilegedRemoveRoles: {
+          samePriority: $auth.permissionUtils.hasPermission('users.removeRole.bypass.priority.same'),
+          lowerPriorty: $auth.permissionUtils.hasPermission('users.removeRole.bypass.priority.less')
+        },
+        privilegedAddRoles: {
+          samePriority: $auth.permissionUtils.hasPermission('users.addRoles.bypass.priority.same'),
+          lowerPriorty: $auth.permissionUtils.hasPermission('users.addRoles.bypass.priority.less')
+        }
       }
-
-      v.roles.forEach(r => { // remove private and anoymous priorities
-        if (r.lookup !== 'private' && r.lookup !== 'anonymous')
-          v.allPriorities.push(r.priority)
-
-        if (!v.maxPriority) v.maxPriority = r.priority;
-        else v.maxPriority = v.maxPriority < r.priority ? r.priority : v.maxPriority
-
-        if (r.lookup === 'user') {
-          r.message = 'The ' + r.name + ' role is assigned by default.  By default all new registered users are considered users.  The userbase of this role may not be manually edited.  Permission changes to this role will affect all users without another role assigned.';
-        }
-        if (r.lookup === 'anonymous') {
-          r.message = 'The ' + r.name + ' role is assigned by default to forum visitors who are not authenticated.  The user base of this role may not be manually edited.  Permission changes to this role will affect all unauthenticated users visiting the forum.';
-        }
-        if (r.lookup === 'private') {
-          r.message = 'The ' + r.name + ' role is assigned by default to forum visitors who are not authenticated.  This role is only used if the "Public Forum" is set to off via the forum settings page.  This requires all visitors to log in before they can view the forum content.  The user base of this role may not be manually edited.  Permission changes to this role will affect all unauthenticated users visiting the forum.';
-        }
-
-        // Invert Priority Restrictions
-        r.permissions.invertedRestrictions = v.allPriorities
-        if (r.permissions.priorityRestrictions && r.permissions.priorityRestrictions.length) {
-          r.permissions.invertedRestrictions = intersection(v.allPriorities, r.permissions.priorityRestrictions)
-        }
-      })
-    }
+    })
 
     return { ...toRefs(v), pageResults, reprioritizeRoles, selectRole, showRole, showRemoveRole, showResetRole, savePriority, resetPriority, searchUsers, clearSearch, addUsers, removeUser, canViewAddUsersControl, init, refreshPageData }
   }

@@ -42,13 +42,7 @@ export default {
     })
   },
   setup() {
-    const saveListener = () => {
-      legalApi.save(v.legal)
-      .then(() => $alertStore.success('Successfully updated legal settings!'))
-      .catch(() => $alertStore.error('Error saving legal settings'))
-    }
-    const resetListener = () => v.legal = cloneDeep(v.originalLegal)
-
+    /* Internal Methods */
     onMounted(() => {
       EventBus.on('admin-save', saveListener)
       EventBus.on('admin-reset', resetListener)
@@ -57,9 +51,17 @@ export default {
       EventBus.off('admin-save', saveListener)
       EventBus.off('admin-reset', resetListener)
     })
+    const saveListener = () => {
+      legalApi.save(v.legal)
+      .then(() => $alertStore.success('Successfully updated legal settings!'))
+      .catch(() => $alertStore.error('Error saving legal settings'))
+    }
+    const resetListener = () => v.legal = cloneDeep(v.originalLegal)
 
+    /* Internal Data */
     const $alertStore = inject('$alertStore')
 
+    /* Template Data */
     const v = reactive({
       originalLegal: null,
       legal: null

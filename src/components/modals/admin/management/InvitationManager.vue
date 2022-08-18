@@ -76,6 +76,7 @@ export default {
       emit('close')
     }
 
+    /* Internal Data */
     const $alertStore = inject('$alertStore')
 
     /* Template Data */
@@ -86,6 +87,7 @@ export default {
       requestSubmitted: false,
     })
 
+    /* Watch Data */
     watch(() => props.show, () => {
       v.saveRuleBtnLabel = props.deleteInvite ? 'Confirm Delete' : 'Confirm Resend'
       v.selectedEmail = cloneDeep(props.selected)

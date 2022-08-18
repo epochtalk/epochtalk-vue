@@ -123,7 +123,9 @@ export default {
   emits: ['close', 'success'],
   components: { Modal },
   setup(props, { emit }) {
+    /* Internal Methods */
     onBeforeMount(() => adminApi.roles.all().then(r => v.roles = sortBy(r.roles, 'priority')))
+
     /* Template Methods */
     const resetForm = () => {
       v.requestSubmitted = false
@@ -163,6 +165,7 @@ export default {
       requestSubmitted: false,
     })
 
+    /* Watch Data */
     watch(() => props.show, () => {
       v.saveRuleBtnLabel = props.deleteCat || props.deleteBoard ? 'Confirm Delete' : 'Save'
       v.data = props.addBoard || props.deleteCat || props.deleteBoard || props.editCat || props.editBoard ? cloneDeep(props.selected) : {}

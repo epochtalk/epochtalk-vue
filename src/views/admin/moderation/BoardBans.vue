@@ -12,7 +12,7 @@
             </select>
             <div class="row">
               <div class="column">
-                <label v-if="!hasGlobalModPerms()" class="inline-block">
+                <label v-if="!hasGlobalModPerms()" class="sub-action inline-block">
                   <input @change="applyFilter()" v-model="moddedFilter" class="pointer" type="checkbox" />
                   Show only my moderated boards
                 </label>
@@ -83,7 +83,6 @@
   </div>
 
   <manage-bans-modal :user="selectedUser" :show="showManageBansModal" @close="showManageBansModal = false" @success="refreshPageData" :disable-global-ban="true" />
-
 </template>
 
 <script>
@@ -134,6 +133,22 @@ export default {
     })
   },
   setup() {
+    /* Internal Methods */
+    const initFilterBoards = (boards, query) => {
+      v.filterBoards = boards
+      v.moderating = v.authedUser.moderating
+      let moderatedBoards = v.filterBoards.filter(board => {
+        if (v.moderating.indexOf(board.id) > -1) return board
+      })
+      if (v.boardBanData.modded) v.filterBoards = moderatedBoards
+      // create options groups by parent name (for select grouping)
+      v.filterBoards = groupBy(v.filterBoards, 'parent_name')
+      v.boardFilter = query.board || null
+      v.searchFilter = query.search
+      v.moddedFilter = query.modded
+    }
+
+    /* Template Methods */
     const pageResults = page => {
       let query = { ...$route.query, page: page }
       if (query.page <= 1 || !query.page) delete query.page
@@ -179,10 +194,13 @@ export default {
       }).length
     }
     const hasGlobalModPerms = () => v.permissionUtils.hasPermission('bans.banFromBoards.bypass.type.admin')
+
+    /* Internal Data */
     const $auth = inject(AuthStore)
     const $route = useRoute()
     const $router = useRouter()
 
+    /* Template Data */
     const v = reactive({
       authedUser: $auth.user,
       permissionUtils: $auth.permissionUtils,
@@ -196,20 +214,6 @@ export default {
       boardBanData: {}
     })
 
-    const initFilterBoards = (boards, query) => {
-      v.filterBoards = boards
-      v.moderating = v.authedUser.moderating
-      let moderatedBoards = v.filterBoards.filter(board => {
-        if (v.moderating.indexOf(board.id) > -1) return board
-      })
-      if (v.boardBanData.modded) v.filterBoards = moderatedBoards
-      // create options groups by parent name (for select grouping)
-      v.filterBoards = groupBy(v.filterBoards, 'parent_name')
-      v.boardFilter = query.board || null
-      v.searchFilter = query.search
-      v.moddedFilter = query.modded
-    }
-
     return { ...toRefs(v), decode, applyFilter, refreshPageData, searchBannedUsers, clearSearch, showManageBans, bannedFromModeratedBoard, initFilterBoards, hasGlobalModPerms, pageResults }
   }
 }
@@ -218,15 +222,8 @@ export default {
 <style lang="scss" scoped>
 .board-ban-content { margin-top: 6rem; }
 .admin-table-header {
-  background-color: $sub-header-color;
-  position: absolute;
-  left: 0;
-  right: 0;
-  padding: 1rem;
-  padding-top: 2rem;
   padding-bottom: 0.25rem;
   top: 0.4rem;
-  @include break-mobile-sm { padding: 1.25rem 1rem 0; margin: 0 -1rem 2rem; }
   select { margin-bottom: 0; }
   .clear-filters {
     align-self: flex-end;
@@ -250,17 +247,6 @@ export default {
 .column { flex: 50%; }
 .pagination-wrap { align-self: flex-end; }
 .input-text.nested-input { margin-bottom: 0; }
-
-table.underlined {
-  td { padding-left: 0; padding-right: 0; }
-  th.left-icon-col { width: 1.75rem; }
-  td.left-icon-col {
-    pading: 0 0 0 0.5rem;
-    color: $secondary-font-color;
-    padding-top: 0.5rem;
-  }
-}
-
 
 .indicator {
   font-size: 0.75rem;
