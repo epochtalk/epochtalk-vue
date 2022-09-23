@@ -405,7 +405,7 @@ export default {
       }
       &.rect img {
         object-fit: cover;
-        height: calc(#{$avatar-width / 1.5});
+        height: calc(#{$avatar-width} / 1.5);
       }
     }
     .edit-avatar { font-size: $font-size-sm; }
@@ -647,7 +647,7 @@ export default {
       .stats .stat-text { font-size: 1rem; }
     }
   }
-  .profile-posts, & {
+  .profile-posts {
     .profile-row .pagination-wrap, .profile-row .pagination-wrap ul.pagination {
       float: none;
       text-align: center;

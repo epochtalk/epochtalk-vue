@@ -1,3 +1,5 @@
+@use "sass:math";
+
 @import url('https://fonts.googleapis.com/css?family=Roboto:300,400,700,900&display=swap');
 
 // grid layout
@@ -31,7 +33,7 @@ $font-size-tiny:  0.6375rem;
 
 @function brightness($color) {
   @if type-of($color) == color {
-    @return (red($color) * 0.299 + green($color) * 0.587 + blue($color) * 0.114) / 255 * 100%;
+    @return math.div(red($color) * 0.299 + green($color) * 0.587 + blue($color) * 0.114, 255) * 100%;
   }
   @else { @return unquote("brightness(#{$color})"); }
 }

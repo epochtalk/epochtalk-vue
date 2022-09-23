@@ -216,7 +216,7 @@ export default {
     margin-right: .5rem
   }
   &.circle img { @include border-radius(100%); }
-  &.rect img { height: calc(#{($avatar-width  * .666)/ 1.5}); }
+  &.rect img { height: calc(#{($avatar-width  * .666)}/ 1.5); }
 }
 
 .members-header th { text-align: left; }
