@@ -1403,7 +1403,7 @@ ad-viewer {
         }
       }
       &.rect {
-        height: calc(#{$postUserWidth / 1.5});
+        height: calc(#{$postUserWidth} / 1.5);
 
         img {
           object-fit: cover;
