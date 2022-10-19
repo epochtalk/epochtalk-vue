@@ -1113,7 +1113,7 @@ $postWidth__mobile: calc(100vw - 2rem);
   word-wrap: break-word;
   overflow-wrap: break-word;
   .imageContainer.loaded { background: none; }
-  .imageContainer { background: url('/static/img/loading.gif') no-repeat center; display: inline;}
+  .imageContainer { }
   ul, ol { @include pad(0 0 0 1.15rem); }
   ul { white-space: normal }
   img.loaded { opacity: 1; }
