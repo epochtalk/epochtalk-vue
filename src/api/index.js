@@ -9,7 +9,7 @@ export const $axios = axios.create({
   crossDomain: true
 })
 export const $axios2 = axios.create({
-  baseURL: 'http://localhost:4000',
+  baseURL: process.env.VUE_APP_BACKEND_URL,
   timeout: 3000,
   crossDomain: true
 })
