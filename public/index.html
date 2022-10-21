@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+    <link rel="icon" href="/favicon.ico">
     <title><%= htmlWebpackPlugin.options.title %></title>
   </head>
   <body>
@@ -14,10 +14,25 @@
     <div id="app"></div>
     <div id="modals"></div>
     <!-- built files will be auto injected -->
-    <script type="text/javascript" async>
-      let script = document.createElement('script')
-      script.src = '<%= BASE_URL %>config.js'
-      document.write(script.outerHTML)
+    <script id="config-remote" async>
+      window.configScript = document.createElement('script')
+      window.configScript.src = '<%= process.env.VUE_APP_BACKEND_URL%>/config.js'
+      window.configScript.type = 'text/javascript'
+
+      // Try to append config from backend
+      document.write(window.configScript.outerHTML)
+    </script>
+    <script id="config-local" async>
+      // If backend not loaded, load local config with sane defaults
+      if (!window.backend_url) {
+        document.querySelector('script[src~=\'' + window.configScript.src + '\']').remove()
+        window.configScript.src = '/config.js'
+        document.write(window.configScript.outerHTML)
+      }
+      // cleanup
+      delete window.configScript
+      document.getElementById('config-remote').remove()
+      document.getElementById('config-local').remove()
     </script>
   </body>
 </html>
