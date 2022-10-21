@@ -175,12 +175,12 @@ export const watchlistApi = {
 }
 
 export const authApi = {
-  login: data => $http('/api/login', { method: 'POST', data }, true)
+  login: data => $http2('/api/login', { method: 'POST', data }, true)
   .then(user => {
     $axios.defaults.headers.common['Authorization'] = `BEARER ${user.token}`
     return user
   }),
-  logout: () => $http('/api/logout', { method: 'DELETE' }, true)
+  logout: () => $http2('/api/logout', { method: 'DELETE' }, true)
   .then(user => {
     delete $axios.defaults.headers.common['Authorization']
     return user
