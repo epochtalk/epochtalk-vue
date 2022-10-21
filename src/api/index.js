@@ -8,6 +8,11 @@ export const $axios = axios.create({
   timeout: 3000,
   crossDomain: true
 })
+export const $axios2 = axios.create({
+  baseURL: 'http://localhost:4000',
+  timeout: 3000,
+  crossDomain: true
+})
 
 const $auth = localStorageCache(0, 'app').get('auth')
 const initUser = $auth ? $auth.data : undefined
@@ -28,6 +33,34 @@ const $http = (path, opts, handleErrors) => {
       case 'patch':
         return $axios[method](path, data, opts)
       default: return $axios[method](path, opts)
+    }
+  })(method)
+
+  const reqPromise = req.then(res => res.status === 200 ? res.data : res)
+
+  if (handleErrors) {
+    return reqPromise.catch(err => {
+      const msg = get(err, 'response.data.message')
+      if (msg && msg !== 'Unauthorized') { alertStore.error(msg) }
+      return Promise.reject(err)
+    })
+  }
+  else { return reqPromise }
+}
+const $http2 = (path, opts, handleErrors) => {
+  opts = opts || {}
+  const method = (opts.method || 'get').toLowerCase()
+  delete opts.method
+  const data = opts.data
+  delete opts.data
+
+  let req = (m => {
+    switch(m) {
+      case 'post':
+      case 'put':
+      case 'patch':
+        return $axios2[method](path, data, opts)
+      default: return $axios2[method](path, opts)
     }
   })(method)
 
@@ -141,27 +174,27 @@ export const watchlistApi = {
 }
 
 export const authApi = {
-  login: data => $http('/api/login', { method: 'POST', data }, true)
+  login: data => $http2('/api/login', { method: 'POST', data }, true)
   .then(user => {
     $axios.defaults.headers.common['Authorization'] = `BEARER ${user.token}`
     return user
   }),
-  logout: () => $http('/api/logout', { method: 'DELETE' }, true)
+  logout: () => $http2('/api/logout', { method: 'DELETE' }, true)
   .then(user => {
     delete $axios.defaults.headers.common['Authorization']
     return user
   }),
-  register: data => $http('/api/register', { method: 'POST', data }, true)
+  register: data => $http2('/api/register', { method: 'POST', data }, true)
   .then(user => {
     $axios.defaults.headers.common['Authorization'] = `BEARER ${user.token}`
     return user
   }),
-  authenticate: () => $http('/api/authenticate'),
-  confirmRegistration: data => $http('/api/confirm', { method: 'POST', data }, true),
+  authenticate: () => $http2('/api/authenticate'),
+  confirmRegistration: data => $http2('/api/confirm', { method: 'POST', data }, true),
   inviteRegistration: data => $http('/api/join', { method: 'POST', data }, true),
   resetPassword: data => $http(`/api/reset`, { method: 'POST', data }, true),
-  emailAvailable: email => $http(`/api/register/email/${email}`),
-  usernameAvailable: username => $http(`/api/register/username/${username}`),
+  emailAvailable: email => $http2(`/api/register/email/${email}`),
+  usernameAvailable: username => $http2(`/api/register/username/${username}`),
   inviteExists: email => $http(`/api/invites/exists?email=${email}`),
   invite: email => $http('/api/invites', { method: 'POST', data: { email }})
 }
