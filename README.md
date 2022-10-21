@@ -59,6 +59,7 @@
 
 ### Start vue project
 * change directories into `epochtalk-vue`
+* setup environment variables `cp example.env .env`
 * run the server `yarn serve`
 * to access new site visit `localhost:8000`
 * to access old site/admin panel visit `localhost:8080`
