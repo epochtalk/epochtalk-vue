@@ -47,10 +47,9 @@ $font-size-tiny:  0.6375rem;
     @return if(abs($color-brightness - $light-text-brightness) > abs($color-brightness - $dark-text-brightness), $light, $dark);
   }
 }
-
-@import 'default-variables';
+@import '~@/assets/scss/_default-variables.scss';
 // @import '../../../../content/sass/_custom-variables';
-@import 'preview-variables';
+@import '~@/assets/scss/preview-variables';
 
 // Placeholder text color
 $placeholder-text-color: lighten($header-bg-color, 20%);

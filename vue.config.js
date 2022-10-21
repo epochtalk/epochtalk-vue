@@ -4,7 +4,7 @@ module.exports = {
   devServer: {
     host: 'localhost',
     hot: true,
-    disableHostCheck: true,
+    allowedHosts: 'all',
     https: false
   },
   css: {
@@ -28,12 +28,12 @@ module.exports = {
       splitChunks: {
         chunks: 'async',
         minSize: 30000,
-        maxSize: 0,
+        maxSize: 500000,
         minChunks: 1,
         maxAsyncRequests: 5,
         maxInitialRequests: 3,
         automaticNameDelimiter: '~',
-        name: true,
+        name: false,
         cacheGroups: {
           vendors: {
             test: /[\\/]node_modules[\\/]/, // this is what you are looking for
