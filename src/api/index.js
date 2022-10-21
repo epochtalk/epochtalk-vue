@@ -185,13 +185,13 @@ export const authApi = {
     delete $axios.defaults.headers.common['Authorization']
     return user
   }),
-  register: data => $http('/api/register', { method: 'POST', data }, true)
+  register: data => $http2('/api/register', { method: 'POST', data }, true)
   .then(user => {
     $axios.defaults.headers.common['Authorization'] = `BEARER ${user.token}`
     return user
   }),
-  authenticate: () => $http('/api/authenticate'),
-  confirmRegistration: data => $http('/api/confirm', { method: 'POST', data }, true),
+  authenticate: () => $http2('/api/authenticate'),
+  confirmRegistration: data => $http2('/api/confirm', { method: 'POST', data }, true),
   inviteRegistration: data => $http('/api/join', { method: 'POST', data }, true),
   resetPassword: data => $http(`/api/reset`, { method: 'POST', data }, true),
   emailAvailable: email => $http2(`/api/register/email/${email}`),
