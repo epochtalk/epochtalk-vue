@@ -2,12 +2,21 @@ import alertStore from '@/composables/stores/alert'
 import NotificationStore from '@/composables/stores/notifications'
 import { clearUser, AuthStore } from '@/composables/stores/auth'
 import { provide, inject, reactive } from 'vue'
+import { Socket as PhoenixSocket } from 'phoenix'
+
+const socketUrl = process.env.VUE_APP_BACKEND_URL.replace('http://', 'ws://') + '/socket'
+
+const socketInstance = new PhoenixSocket(socketUrl, {
+  logger: (kind, msg, data) => {
+   if (window.websocket_logs) console.log(`${kind}: ${msg}`, data)
+  }
+})
 
 const socketcluster = require('socketcluster-client')
 
 // Public channel idenitfier and general options
 let options = { waitForAuth: true }
-let userChannel
+let userChannel, userChannelNew
 let publicChannel
 let session = reactive({ user: {} })
 
@@ -25,6 +34,27 @@ export const WebsocketService = Symbol(WEBSOCKET_KEY)
 
 // API Functions
 export const socketLogin = socketUser => {
+  console.log("HERERERERERERE")
+  console.log(socketInstance.connectionState()
+    )
+  let connAvaiable = socketInstance && (socketInstance.connectionState() === 'open' ||
+                         socketInstance.connectionState() === 'connecting')
+  console.log(connAvaiable)
+  if (socketInstance.connectionState() === 'closed') {
+    socketInstance.params.token = socketUser.token
+    console.log(socketInstance.connect())
+    socketInstance.connect()
+  console.log(socketInstance)
+
+    console.log('Phoenix Socket connected!')
+  } else if (!connAvaiable) {
+    socketInstance.connect()
+    console.log('PhoenixSocket reconnected!')
+  } else {
+    console.warn('Trying to connect to a connected socket.')
+  }
+console.log(socketInstance)
+
   Object.assign(session.user, socketUser)
   socket.authenticate(socketUser.token)
   NotificationStore.refresh()
@@ -48,7 +78,7 @@ export const watchPublicChannel = handler => {
 
 export const watchUserChannel = handler => {
   if (window.websocket_logs) console.log('Watching user channel.')
-  if (userChannel) userChannel.watch(handler)
+  if (userChannel && userChannelNew) userChannel.watch(handler)
   else setTimeout(() => watchUserChannel(handler), 1000)
 }
 
@@ -71,34 +101,34 @@ export default {
 
     // Channel Subscribe
     socket.on('subscribe', channelName => {
-     if (JSON.parse(channelName).type === 'role') {
-       socket.watch(channelName, d => {
-         if (window.websocket_logs) console.log('Received role channel message.', d)
-         $auth.reauthenticate()
-       })
-     }
-     else if (JSON.parse(channelName).type === 'user') {
-       socket.watch(channelName, d => {
-         if (window.websocket_logs) console.log('Received user channel message', d)
-         if (d.action === 'reauthenticate') $auth.reauthenticate()
-         else if (d.action === 'logout' && d.sessionId === socket.getAuthToken().sessionId) {
-           $auth.logout()
-           clearUser() // Handles clearing authed user from a out of focus tab
-           alertStore.warn('You have been logged out from another window.')
-         }
-         else if (d.action === 'newMessage') { NotificationStore.refresh() }
-         else if (d.action === 'refreshMentions') {
-           NotificationStore.refresh()
-           NotificationStore.refreshMentionsList()
-         }
-       })
-     }
-     else if (JSON.parse(channelName).type === 'public') {
+      if (JSON.parse(channelName).type === 'role') {
+        socket.watch(channelName, d => {
+          if (window.websocket_logs) console.log('Received role channel message.', d)
+          $auth.reauthenticate()
+        })
+      }
+      else if (JSON.parse(channelName).type === 'user') {
+        socket.watch(channelName, d => {
+          if (window.websocket_logs) console.log('Received user channel message', d)
+          if (d.action === 'reauthenticate') $auth.reauthenticate()
+          else if (d.action === 'logout' && d.sessionId === socket.getAuthToken().sessionId) {
+            $auth.logout()
+            clearUser() // Handles clearing authed user from a out of focus tab
+            alertStore.warn('You have been logged out from another window.')
+          }
+          else if (d.action === 'newMessage') { NotificationStore.refresh() }
+          else if (d.action === 'refreshMentions') {
+            NotificationStore.refresh()
+            NotificationStore.refreshMentionsList()
+          }
+        })
+      }
+      else if (JSON.parse(channelName).type === 'public') {
       // Placeholder for future public notifications if necessary
-     }
-     else window.websocket_logs ? console.log('Not watching', channelName) : null
+      }
+      else window.websocket_logs ? console.log('Not watching', channelName) : null
 
-     if (window.websocket_logs) console.log('Websocket subscribed to', channelName, 'with watchers', socket.watchers(channelName))
+      if (window.websocket_logs) console.log('Websocket subscribed to', channelName, 'with watchers', socket.watchers(channelName))
     })
 
     // Channel Unsubscribe
@@ -106,12 +136,12 @@ export default {
      if (window.websocket_logs) console.log('Websocket unsubscribed from', channelName, socket.watchers(channelName))
 
      // disconnect all watchers from the channel
-     socket.unwatch(channelName)
+      socket.unwatch(channelName)
     })
 
     // Socket Authentication
     socket.on('authenticate', () => {
-     if (window.websocket_logs) console.log('Authenticated WebSocket Connection')
+      if (window.websocket_logs) console.log('Authenticated WebSocket Connection')
 
      // Emit LoggedIn event to socket server
      socket.emit('loggedIn')
@@ -129,7 +159,15 @@ export default {
      }
     })
 
+
     socket.on('connect', status => status.isAuthenticated ? socket.emit('loggedIn') : null)
+
+    socketInstance.onOpen(() => {
+     socketInstance.channel('user:notifications', {}).join()
+            .receive("ok", resp => { console.log("Joined successfully", resp) })
+            .receive("error", resp => { console.log("Unable to join", resp) })
+
+    })
 
     // always subscribe to the public channel
     publicChannel = socket.subscribe(publicChannelKey, { waitForAuth: false })
@@ -141,7 +179,7 @@ export default {
       watchUserChannel,
       unwatchUserChannel,
       watchPublicChannel,
-      isOnline,
+      isOnline
     })
   },
   render() { return this.$slots.default() } // renderless component
