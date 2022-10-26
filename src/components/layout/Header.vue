@@ -56,8 +56,8 @@
             <i class="fa fa-eye" aria-hidden="true"></i>Watchlist
           </router-link>
         </li>
-        <li @click="showMobileMenu = false">
-          <a v-if="permissionUtils.hasPermission('invitations.invite')" @click="showInvite = true">
+        <li v-if="permissionUtils.hasPermission('invitations.invite')" @click="showMobileMenu = false">
+          <a href="#" @click.prevent="showInvite = true">
             <i class="fa fa-user-plus" aria-hidden="true"></i>Invite Users
           </a>
         </li>
@@ -211,8 +211,8 @@
                 <li>
                   <router-link :to="{ name: 'Watchlist' }">Watchlist</router-link>
                 </li>
-                <li>
-                  <a v-if="permissionUtils.hasPermission('invitations.invite')" @click.prevent="showInvite = true">
+                <li v-if="permissionUtils.hasPermission('invitations.invite')">
+                  <a href="#" @click.prevent="showInvite = true">
                     Invite User
                   </a>
                 </li>

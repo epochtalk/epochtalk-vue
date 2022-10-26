@@ -16,8 +16,7 @@ export const $axios2 = axios.create({
 
 const $auth = localStorageCache(0, 'app').get('auth')
 const initUser = $auth ? $auth.data : undefined
-if (initUser) { $axios.defaults.headers.common['Authorization'] = `BEARER ${initUser.token}` }
-
+if (initUser) { $axios2.defaults.headers.common['Authorization'] = `BEARER ${initUser.token}` }
 /* provided methods */
 const $http = (path, opts, handleErrors) => {
   opts = opts || {}
@@ -176,20 +175,20 @@ export const watchlistApi = {
 export const authApi = {
   login: data => $http2('/api/login', { method: 'POST', data }, true)
   .then(user => {
-    $axios.defaults.headers.common['Authorization'] = `BEARER ${user.token}`
+    $axios2.defaults.headers.common['Authorization'] = `BEARER ${user.token}`
     return user
   }),
   logout: () => $http2('/api/logout', { method: 'DELETE' }, true)
   .then(user => {
-    delete $axios.defaults.headers.common['Authorization']
+    delete $axios2.defaults.headers.common['Authorization']
     return user
   }),
   register: data => $http2('/api/register', { method: 'POST', data }, true)
   .then(user => {
-    $axios.defaults.headers.common['Authorization'] = `BEARER ${user.token}`
+    $axios2.defaults.headers.common['Authorization'] = `BEARER ${user.token}`
     return user
   }),
-  authenticate: () => $http2('/api/authenticate'),
+  authenticate: () => $http2('/api/authenticate', {}, false),
   confirmRegistration: data => $http2('/api/confirm', { method: 'POST', data }, true),
   inviteRegistration: data => $http('/api/join', { method: 'POST', data }, true),
   resetPassword: data => $http(`/api/reset`, { method: 'POST', data }, true),
