@@ -34,40 +34,37 @@ export const WebsocketService = Symbol(WEBSOCKET_KEY)
 
 // API Functions
 export const socketLogin = socketUser => {
-  console.log("HERERERERERERE")
-  console.log(socketInstance.connectionState()
-    )
-  let connAvaiable = socketInstance && (socketInstance.connectionState() === 'open' ||
-                         socketInstance.connectionState() === 'connecting')
-  console.log(connAvaiable)
+  let connAvaiable = socketInstance && (
+    socketInstance.connectionState() === 'open' ||
+    socketInstance.connectionState() === 'connecting'
+  )
+  socketInstance.params.token = socketUser.token
   if (socketInstance.connectionState() === 'closed') {
-    socketInstance.params.token = socketUser.token
-    console.log(socketInstance.connect())
     socketInstance.connect()
-  console.log(socketInstance)
-
-    console.log('Phoenix Socket connected!')
-  } else if (!connAvaiable) {
-    socketInstance.connect()
-    console.log('PhoenixSocket reconnected!')
+    if (window.websocket_logs) console.log('Phoenix Socket connected')
+  } else if (connAvaiable) {
+    if (window.websocket_logs) console.log('Phoenix Socket already connected')
   } else {
-    console.warn('Trying to connect to a connected socket.')
+    socketInstance.connect()
+    if (window.websocket_logs) console.log('Phoenix Socket reconnected')
   }
-console.log(socketInstance)
 
   Object.assign(session.user, socketUser)
-  socket.authenticate(socketUser.token)
-  NotificationStore.refresh()
-  NotificationStore.refreshMentionsList()
+  // NotificationStore.refresh()
+  // NotificationStore.refreshMentionsList()
 }
 
 export const socketLogout = socketUser => {
-  socket.subscriptions().forEach(channel => {
-    if (channel !== publicChannelKey) socket.unsubscribe(channel)
-  })
   Object.assign(session.user, socketUser)
-  socket.deauthenticate()
-  socket.emit('loggedOut')
+  socketInstance.disconnect()
+  if (window.websocket_logs) console.log('Phoenix Socket disconnected')
+
+  // socket.subscriptions().forEach(channel => {
+  //   if (channel !== publicChannelKey) socket.unsubscribe(channel)
+  // })
+  // Object.assign(session.user, socketUser)
+  // socket.deauthenticate()
+  // socket.emit('loggedOut')
 }
 
 export const watchPublicChannel = handler => {
@@ -143,29 +140,44 @@ export default {
     socket.on('authenticate', () => {
       if (window.websocket_logs) console.log('Authenticated WebSocket Connection')
 
-     // Emit LoggedIn event to socket server
-     socket.emit('loggedIn')
+      // Emit LoggedIn event to socket server
+      socket.emit('loggedIn')
 
-     // subscribe to user channel
-     let userChannelKey = JSON.stringify({ type: 'user', id: session.user.id })
-     userChannel = socket.subscribe(userChannelKey, options)
+      // subscribe to user channel
+      let userChannelKey = JSON.stringify({ type: 'user', id: session.user.id })
+      userChannel = socket.subscribe(userChannelKey, options)
 
-     // subscribe to roles channels
-     if (session.user.roles) {
-       session.user.roles.forEach(role => {
-         let channel = JSON.stringify({ type: 'role', id: role })
-         socket.subscribe(channel, options)
-       })
-     }
+      // subscribe to roles channels
+      if (session.user.roles) {
+        session.user.roles.forEach(role => {
+          let channel = JSON.stringify({ type: 'role', id: role })
+          socket.subscribe(channel, options)
+        })
+      }
     })
 
 
-    socket.on('connect', status => status.isAuthenticated ? socket.emit('loggedIn') : null)
+    // socket.on('connect', status => status.isAuthenticated ? socket.emit('loggedIn') : null)
 
     socketInstance.onOpen(() => {
-     socketInstance.channel('user:notifications', {}).join()
-            .receive("ok", resp => { console.log("Joined successfully", resp) })
-            .receive("error", resp => { console.log("Unable to join", resp) })
+      userChannel = socketInstance.channel('user:' + session.user.id, {})
+
+      userChannel.on('reauthenticate', $auth.reauthenticate)
+
+      userChannel.on('logout', payload => {
+        console.log("Server Token", payload.token)
+        console.log("Frontend Token", session.user.token)
+        if (payload.token === session.user.token) {
+          $auth.logout()
+          clearUser() // Handles clearing authed user from a out of focus tab
+          alertStore.warn('You have been logged out from another window.')
+        }
+      })
+
+      userChannel.join()
+        .receive("ok", resp => { console.log("Joined successfully", resp) })
+        .receive("error", resp => { console.log("Unable to join", resp) })
+        .receive("timeout", () => console.log("Networking issue...") )
 
     })
 
