@@ -3,6 +3,7 @@ import NotificationStore from '@/composables/stores/notifications'
 import { clearUser, AuthStore } from '@/composables/stores/auth'
 import { provide, inject, reactive } from 'vue'
 import { Socket as PhoenixSocket } from 'phoenix'
+import { $axios2 } from '@/api'
 
 const socketUrl = process.env.VUE_APP_BACKEND_URL.replace('http://', 'ws://') + '/socket'
 
@@ -56,6 +57,8 @@ export const socketLogin = socketUser => {
 
 export const socketLogout = socketUser => {
   if (socketInstance.connectionState() === 'open') {
+    // Remove token from axios
+    delete $axios2.defaults.headers.common['Authorization']
     Object.assign(session.user, socketUser)
     socketInstance.disconnect()
     if (window.websocket_logs) console.log('Phoenix Socket disconnected')
@@ -154,24 +157,24 @@ export default {
 
     // socket.on('connect', status => status.isAuthenticated ? socket.emit('loggedIn') : null)
     socketInstance.onOpen(() => {
+      if (!userChannel) {
+        userChannel = socketInstance.channel('user:' + session.user.id, {})
 
-      userChannel = socketInstance.channel('user:' + session.user.id, {})
+        userChannel.on('reauthenticate', $auth.reauthenticate)
 
-      userChannel.on('reauthenticate', $auth.reauthenticate)
+        userChannel.on('logout', payload => {
+          // Logout all sessions sharing the same token (usually an entire device)
+          if (payload.token === session.user.token) $auth.websocketLogout()
+        })
 
-      userChannel.on('logout', payload => {
-        // Logout all sessions sharing the same token (usually an entire device)
-        if (payload.token === session.user.token) $auth.websocketLogout()
-      })
-
-      userChannel.join()
-        .receive("ok", resp => { console.log("Joined successfully", resp) })
-        .receive("error", resp => { console.log("Unable to join", resp) })
-        .receive("timeout", () => console.log("Networking issue...") )
-
+        userChannel.join()
+          .receive("ok", resp => { console.log("Joined successfully", resp) })
+          .receive("error", resp => { console.log("Unable to join", resp) })
+          .receive("timeout", () => console.log("Networking issue...") )
+      }
     })
 
-    // always subscribe to the public channel
+    // // always subscribe to the public channel
     publicChannel = socket.subscribe(publicChannelKey, { waitForAuth: false })
 
     /* Provide Store Data */
