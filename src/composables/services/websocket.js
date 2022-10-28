@@ -50,21 +50,16 @@ export const socketLogin = socketUser => {
   }
 
   Object.assign(session.user, socketUser)
-  // NotificationStore.refresh()
-  // NotificationStore.refreshMentionsList()
+  NotificationStore.refresh()
+  NotificationStore.refreshMentionsList()
 }
 
 export const socketLogout = socketUser => {
-  Object.assign(session.user, socketUser)
-  socketInstance.disconnect()
-  if (window.websocket_logs) console.log('Phoenix Socket disconnected')
-
-  // socket.subscriptions().forEach(channel => {
-  //   if (channel !== publicChannelKey) socket.unsubscribe(channel)
-  // })
-  // Object.assign(session.user, socketUser)
-  // socket.deauthenticate()
-  // socket.emit('loggedOut')
+  if (socketInstance.connectionState() === 'open') {
+    Object.assign(session.user, socketUser)
+    socketInstance.disconnect()
+    if (window.websocket_logs) console.log('Phoenix Socket disconnected')
+  }
 }
 
 export const watchPublicChannel = handler => {
@@ -158,20 +153,15 @@ export default {
 
 
     // socket.on('connect', status => status.isAuthenticated ? socket.emit('loggedIn') : null)
-
     socketInstance.onOpen(() => {
+
       userChannel = socketInstance.channel('user:' + session.user.id, {})
 
       userChannel.on('reauthenticate', $auth.reauthenticate)
 
       userChannel.on('logout', payload => {
-        console.log("Server Token", payload.token)
-        console.log("Frontend Token", session.user.token)
-        if (payload.token === session.user.token) {
-          $auth.logout()
-          clearUser() // Handles clearing authed user from a out of focus tab
-          alertStore.warn('You have been logged out from another window.')
-        }
+        // Logout all sessions sharing the same token (usually an entire device)
+        if (payload.token === session.user.token) $auth.websocketLogout()
       })
 
       userChannel.join()

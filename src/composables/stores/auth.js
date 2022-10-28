@@ -61,12 +61,14 @@ export default {
     const logout = () => authApi.logout()
       .then(() => userCleanup(`Goodbye ${user.username}, you have successfully logged out!`))
 
+    const websocketLogout = () => { if (user.token) userCleanup() }
+
     const userCleanup = msg => {
       delete user.token // clear token to invalidate session immediately
       $appCache.delete(AUTH_KEY)
       $prefs.clear()
       BanStore.clearBanNotice()
-      $alertStore.warn(msg)
+      if (msg) $alertStore.warn(msg)
       // redirect to home on logout
       if ($route.meta.requiresAuth && $route.path !== '/') $router.push({ path: '/' })
       // delay clearing reactive user to give css transitions time to complete
@@ -120,6 +122,7 @@ export default {
       reauthenticate,
       login,
       logout,
+      websocketLogout,
       register,
       confirmRegistration,
       inviteRegistration,
