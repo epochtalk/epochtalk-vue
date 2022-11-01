@@ -266,8 +266,8 @@ export const mentionsApi = {
 }
 
 export const notificationsApi = {
-  dismiss: data => $http('/api/notifications/dismiss', { method: 'POST', data }),
-  counts: params => $http('/api/notifications/counts', { params })
+  dismiss: data => $http2('/api/notifications/dismiss', { method: 'POST', data }),
+  counts: params => $http2('/api/notifications/counts', { params })
 }
 
 export const breadcrumbsApi = {
