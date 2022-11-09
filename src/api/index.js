@@ -256,7 +256,7 @@ export const reportsApi = {
 }
 
 export const mentionsApi = {
-  page: params => $http('/api/mentions', { params }),
+  page: params => $http2('/api/mentions', { params }),
   pageIgnored: params => $http('/api/mentions/ignored', { params }),
   ignore: data => $http(`/api/mentions/ignore`, { method: 'POST', data }),
   unignore: data => $http(`/api/mentions/unignore`, { method: 'POST', data }),
