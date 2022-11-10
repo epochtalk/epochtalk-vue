@@ -17,7 +17,7 @@ const socketcluster = require('socketcluster-client')
 
 // Public channel idenitfier and general options
 let options = { waitForAuth: true }
-let userChannel, userChannelNew
+let userChannel, userChannelNew, roleChannel
 let publicChannel
 let session = reactive({ user: {} })
 
@@ -29,26 +29,14 @@ const socket = socketcluster.connect({
 })
 
 const WEBSOCKET_KEY = 'websocket'
-const publicChannelKey = JSON.stringify({ type: 'public' })
 
 export const WebsocketService = Symbol(WEBSOCKET_KEY)
 
 // API Functions
 export const socketLogin = socketUser => {
-  let connAvaiable = socketInstance && (
-    socketInstance.connectionState() === 'open' ||
-    socketInstance.connectionState() === 'connecting'
-  )
   socketInstance.params.token = socketUser.token
-  if (socketInstance.connectionState() === 'closed') {
-    socketInstance.connect()
-    if (window.websocket_logs) console.log('Phoenix Socket connected')
-  } else if (connAvaiable) {
-    if (window.websocket_logs) console.log('Phoenix Socket already connected')
-  } else {
-    socketInstance.connect()
-    if (window.websocket_logs) console.log('Phoenix Socket reconnected')
-  }
+  socketInstance.disconnect() // disconnect
+  socketInstance.connect() // reconnect to retrigger onOpen event
 
   Object.assign(session.user, socketUser)
   NotificationStore.refresh()
@@ -60,20 +48,21 @@ export const socketLogout = socketUser => {
     // Remove token from axios
     delete $axios2.defaults.headers.common['Authorization']
     Object.assign(session.user, socketUser)
-    socketInstance.disconnect()
-    if (window.websocket_logs) console.log('Phoenix Socket disconnected')
+    delete socketInstance.params.token
+    socketInstance.disconnect() // disconnect
+    socketInstance.connect() // reconnect to retrigger onOpen event
   }
 }
 
-export const watchPublicChannel = handler => {
-  if (window.websocket_logs) console.log('Watching public channel.')
-  if (publicChannel) publicChannel.watch(handler)
-  else setTimeout(() => watchPublicChannel(handler), 1000)
+export const setMotdMessageHandler = handler => {
+  if (window.websocket_logs) console.log('Watching \'public\' channel for \'announcement\' message.')
+  if (publicChannel) publicChannel.on('announcement', handler)
+  else setTimeout(() => setMotdMessageHandler(handler), 1000)
 }
 
 export const watchUserChannel = handler => {
   if (window.websocket_logs) console.log('Watching user channel.')
-  if (userChannel && userChannelNew) userChannel.watch(handler)
+  if (userChannel) userChannel.watch(handler)
   else setTimeout(() => watchUserChannel(handler), 1000)
 }
 
@@ -154,28 +143,55 @@ export default {
       }
     })
 
+    socketInstance.connect()
 
     // socket.on('connect', status => status.isAuthenticated ? socket.emit('loggedIn') : null)
     socketInstance.onOpen(() => {
-      if (!userChannel) {
-        userChannel = socketInstance.channel('user:' + session.user.id, {})
+      publicChannel = publicChannel ? publicChannel : socketInstance.channel('user:public', {})
 
-        userChannel.on('reauthenticate', $auth.reauthenticate)
+      publicChannel.join()
+        .receive("ok", resp => { console.log("Joined 'user:public' channel successfully", resp) })
+        .receive("error", resp => { console.log("Unable to join 'user:public' channel", resp) })
+        .receive("timeout", () => console.log("Networking issue..."))
 
-        userChannel.on('logout', payload => {
+      if (!roleChannel && session.user.token) {
+        roleChannel = socketInstance.channel('user:role', {})
+
+        // Reauthenticate if user has role to fetch updated permissions
+        roleChannel.on('update', payload => {
+          let roles = session.user ? session.user.roles : []
+          if (roles.includes(payload.lookup)) $auth.reauthenticate()
+        })
+
+        roleChannel.join()
+          .receive("ok", resp => { console.log("Joined 'user:role' channel successfully", resp) })
+          .receive("error", resp => { console.log("Unable to join 'user:role' channel", resp) })
+          .receive("timeout", () => console.log("Networking issue..."))
+      }
+      if (!userChannelNew && session.user.token) {
+        userChannelNew = socketInstance.channel('user:' + session.user.id, {})
+
+        userChannelNew.on('reauthenticate', $auth.reauthenticate)
+
+        userChannelNew.on('newMessage', NotificationStore.refresh)
+
+        userChannelNew.on('refreshMentions', () => {
+          NotificationStore.refresh()
+          NotificationStore.refreshMentionsList()
+        })
+
+        userChannelNew.on('logout', payload => {
           // Logout all sessions sharing the same token (usually an entire device)
           if (payload.token === session.user.token) $auth.websocketLogout()
         })
 
-        userChannel.join()
-          .receive("ok", resp => { console.log("Joined successfully", resp) })
-          .receive("error", resp => { console.log("Unable to join", resp) })
+        userChannelNew.join()
+          .receive("ok", resp => { console.log("Joined 'user:" + session.user.id + "' channel successfully", resp) })
+          .receive("error", resp => { console.log("Unable to join 'user:" + session.user.id + "' channel", resp) })
           .receive("timeout", () => console.log("Networking issue...") )
       }
     })
 
-    // // always subscribe to the public channel
-    publicChannel = socket.subscribe(publicChannelKey, { waitForAuth: false })
 
     /* Provide Store Data */
     return provide(WebsocketService, {
@@ -183,7 +199,7 @@ export default {
       socketLogout,
       watchUserChannel,
       unwatchUserChannel,
-      watchPublicChannel,
+      setMotdMessageHandler,
       isOnline
     })
   },

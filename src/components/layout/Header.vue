@@ -275,7 +275,7 @@ import BanStore from '@/composables/stores/ban'
 import NotificationsStore from '@/composables/stores/notifications'
 import humanDate from '@/composables/filters/humanDate'
 import { motdApi } from '@/api'
-import { watchPublicChannel } from '@/composables/services/websocket'
+import { setMotdMessageHandler } from '@/composables/services/websocket'
 
 export default {
   components: { AdminNavigation, AdminSubNavigation, Breadcrumbs, LoginModal, InviteModal, RegisterModal, Alert },
@@ -283,7 +283,7 @@ export default {
     onBeforeMount(() => {
       let fetchMotd = () => motdApi.get().then(d => v.motdData = d).catch(() => {})
       fetchMotd()
-      watchPublicChannel(d => d.action === 'announcement' ? fetchMotd() : null)
+      setMotdMessageHandler(fetchMotd)
     })
     /* Internal Methods */
     const scrollHeader = () => {
