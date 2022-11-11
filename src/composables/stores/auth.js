@@ -27,8 +27,6 @@ export const AuthStore = Symbol(AUTH_KEY)
 
 export const localStorageAuth = () => appCache.get(AUTH_KEY) || { data: emtpyUser }
 
-export const clearUser = () => Object.assign(user, cloneDeep(emtpyUser))
-
 export default {
   setup() {
     /* Internal Data */
