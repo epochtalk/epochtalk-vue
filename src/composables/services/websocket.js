@@ -51,21 +51,48 @@ export const socketLogout = socketUser => {
   }
 }
 
-export const setMotdMessageHandler = handler => {
-  if (window.websocket_logs) console.log('Watching \'public\' channel for \'announcement\' message.')
+export const addAnnouncementListener = handler => {
+  if (window.websocket_logs) console.log('Listening on \'public\' channel for \'announcement\' message.')
   if (publicChannel) publicChannel.on('announcement', handler)
-  else setTimeout(() => setMotdMessageHandler(handler), 1000)
+  else setTimeout(() => addAnnouncementListener(handler), 1000)
 }
 
-export const watchUserChannel = () => {
-  if (window.websocket_logs) console.log('Watching user channel.')
-  // if (userChannel) userChannel.watch(handler)
-  // else setTimeout(() => watchUserChannel(handler), 1000)
+export const addMentionListener = handler => {
+  if (window.websocket_logs) console.log('Listening on \'user:' + session.user.id + '\' channel for \'refreshMentions\' message.')
+  if (userChannel) userChannel.on('refreshMentions', handler)
+  else setTimeout(() => addMentionListener(handler), 1000)
 }
 
-export const unwatchUserChannel = () => {
-  if (window.websocket_logs) console.log('Unwatching user channel.')
-  // if (userChannel) userChannel.unwatch(handler)
+// NOTE: channel.on(msg, handler) is supposed to return a ref that
+// can be used to turn off a specific handler, but it doesn't.
+// This is a work around: turn off all handlers, reset default handler
+export const removeMentionListener = () => {
+  if (window.websocket_logs) console.log('No longer listening on \'user:' + session.user.id + '\' channel for \'refreshMentions\' message.')
+  if (userChannel) {
+    // turn off all channel handlers for this message
+    userChannel.off('refreshMentions')
+    // re-add default message handler for this channel
+    userChannel.on('refreshMentions', () => {
+      NotificationStore.refresh()
+      NotificationStore.refreshMentionsList()
+    })
+  }
+}
+
+export const addMessageListener = handler => {
+  if (window.websocket_logs) console.log('Listening on \'user:' + session.user.id + '\' channel for \'newMessage\' message.')
+  if (userChannel) userChannel.on('newMessage', handler)
+  else setTimeout(() => addMessageListener(handler), 1000)
+}
+
+export const removeMessageListener = () => {
+  if (window.websocket_logs) console.log('No longer listening on \'user:' + session.user.id + '\' channel for \'newMessage\' message.')
+  if (userChannel) {
+    // turn off all channel handlers for this message
+    userChannel.off('newMessage')
+    // re-add default message handler for this channel
+    userChannel.on('newMessage', NotificationStore.refresh)
+  }
 }
 
 export const isOnline = () => { // (socketUser, callback) => {
@@ -118,9 +145,11 @@ export default {
     return provide(WebsocketService, {
       socketLogin,
       socketLogout,
-      watchUserChannel,
-      unwatchUserChannel,
-      setMotdMessageHandler,
+      addAnnouncementListener,
+      addMentionListener,
+      addMessageListener,
+      removeMentionListener,
+      removeMessageListener,
       isOnline
     })
   },

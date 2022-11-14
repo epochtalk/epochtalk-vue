@@ -163,7 +163,7 @@ import DeleteMessageModal from '@/components/modals/messages/DeleteMessage.vue'
 import ReportMessageModal from '@/components/modals/messages/ReportMessage.vue'
 import Editor from '@/components/layout/Editor.vue'
 // import { avatarHighlight, usernameHighlight, userRoleHighlight } from '@/composables/utils/userUtils'
-import { watchUserChannel, unwatchUserChannel } from '@/composables/services/websocket'
+import { addMessageListener, removeMessageListener } from '@/composables/services/websocket'
 
 export default {
   name: 'Messages',
@@ -198,7 +198,7 @@ export default {
     next()
   },
   beforeRouteLeave(to, from, next) {
-    unwatchUserChannel(this.userChannelHandler)
+    removeMessageListener()
     next()
   },
   setup() {
@@ -372,11 +372,10 @@ export default {
       }
     })
 
-    const userChannelHandler = data => data.action === 'newMessage' ? loadConversation(v.selectedConversationId) : null
+    const newMessageHandler = () => v.selectedConversationId ? loadConversation(v.selectedConversationId) : null
+    addMessageListener(newMessageHandler)
 
-    watchUserChannel(userChannelHandler)
-
-    return { ...toRefs(v), reload, createMessage, createConversation, loadRecentMessages, preloadConversation, loadConversation, loadMoreMessages, canDeleteConversation, canDeleteMessage, addQuote, canCreateConversation, canCreateMessage, deleteMessageSuccess, listMessageReceivers, humanDate, userChannelHandler }
+    return { ...toRefs(v), reload, createMessage, createConversation, loadRecentMessages, preloadConversation, loadConversation, loadMoreMessages, canDeleteConversation, canDeleteMessage, addQuote, canCreateConversation, canCreateMessage, deleteMessageSuccess, listMessageReceivers, humanDate }
   }
 }
 </script>

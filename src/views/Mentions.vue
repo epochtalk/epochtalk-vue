@@ -95,7 +95,7 @@ import { localStoragePrefs } from '@/composables/stores/prefs'
 import humanDate from '@/composables/filters/humanDate'
 import { useRoute, useRouter } from 'vue-router'
 import NotificationsStore from '@/composables/stores/notifications'
-import { watchUserChannel, unwatchUserChannel } from '@/composables/services/websocket'
+import { addMentionListener, removeMentionListener } from '@/composables/services/websocket'
 
 export default {
   name: 'Mentions',
@@ -117,7 +117,7 @@ export default {
     next()
   },
   beforeRouteLeave(to, from, next) {
-    unwatchUserChannel(this.userChannelHandler)
+    removeMentionListener()
     next()
   },
   setup() {
@@ -149,11 +149,9 @@ export default {
     })
 
     // Websocket Handling
-    const userChannelHandler = data => data.action === 'refreshMentions' ? refreshMentions() : null
+    addMentionListener(refreshMentions)
 
-    watchUserChannel(userChannelHandler)
-
-    return { ...toRefs(v), humanDate, pageResults, dismissNotifications, deleteMention, userChannelHandler }
+    return { ...toRefs(v), humanDate, pageResults, dismissNotifications, deleteMention }
   }
 }
 </script>
