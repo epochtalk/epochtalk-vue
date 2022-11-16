@@ -8,16 +8,17 @@ import { $axios2 } from '@/api'
 let userChannel, roleChannel, publicChannel
 let session = reactive({ user: {} })
 
+window.websocket_logs = true
 // Initiate the connection to the websocket server
 const socketUrl = process.env.VUE_APP_BACKEND_URL.replace('http://', 'ws://') + '/socket'
-const socketInstance = new PhoenixSocket(socketUrl, {
+const socket = new PhoenixSocket(socketUrl, {
   logger: (kind, msg, data) => {
    if (window.websocket_logs) console.log(`${kind}: ${msg}`, data)
   }
 })
 
 // Connect to websocket server
-socketInstance.connect()
+socket.connect()
 
 // Vue Provide Symbol
 const WEBSOCKET_KEY = 'websocket'
@@ -26,10 +27,10 @@ export const WebsocketService = Symbol(WEBSOCKET_KEY)
 // API Functions
 export const socketLogin = socketUser => {
   let reconnectWithToken = () => {
-    if (socketInstance.connectionState() === 'open') {
-      socketInstance.disconnect(() => {
-        socketInstance.params.token = socketUser.token
-        socketInstance.connect()
+    if (socket.connectionState() === 'open') {
+      socket.disconnect(() => {
+        socket.params.token = socketUser.token
+        socket.connect()
       }, 1000, 'Disconnected to attempt authorized socket connection.') // disconnect
     }
     else setTimeout(() => reconnectWithToken(), 1000)
@@ -41,13 +42,13 @@ export const socketLogin = socketUser => {
 }
 
 export const socketLogout = socketUser => {
-  if (socketInstance.connectionState() === 'open') {
+  if (socket.connectionState() === 'open') {
     // Remove token from axios
     delete $axios2.defaults.headers.common['Authorization']
     Object.assign(session.user, socketUser)
-    delete socketInstance.params.token
-    if (socketInstance.isConnected()) socketInstance.disconnect() // disconnect
-    socketInstance.connect() // reconnect to retrigger onOpen event
+    delete socket.params.token
+    if (socket.isConnected()) socket.disconnect() // disconnect
+    socket.connect() // reconnect to retrigger onOpen event
   }
 }
 
@@ -95,26 +96,31 @@ export const removeMessageListener = () => {
   }
 }
 
-export const isOnline = () => { // (socketUser, callback) => {
-  // if (socket.state === 'open') socket.emit('isOnline', socketUser, callback)
-  // else setTimeout(() => isOnline(socketUser, callback), 1000)
+export const isOnline = (userId, callback) => {
+  if (socket.connectionState() === 'open') {
+    publicChannel.push("is_online", { user_id: userId })
+      .receive("ok", payload => callback(undefined, payload))
+      .receive("error", err => callback(err))
+      .receive("timeout", () => callback("Websocket request to check if user(" + userId + ") is online, timed out"))
+  }
+  else setTimeout(() => isOnline(userId, callback), 1000)
 }
 
 export default {
   setup() {
     const $auth = inject(AuthStore)
 
-    socketInstance.onOpen(() => {
+    socket.onOpen(() => {
       // Join Public Channel
       if (publicChannel) publicChannel.leave() // leave if already connected
-      publicChannel = socketInstance.channel('user:public')
+      publicChannel = socket.channel('user:public')
       publicChannel.join()
 
       // Authenticated Channels
-      if (socketInstance.params.token) {
+      if (socket.params.token) {
         // Join Role Channel
         if (roleChannel) roleChannel.leave() // leave if already connected
-        roleChannel = socketInstance.channel('user:role')
+        roleChannel = socket.channel('user:role')
         roleChannel.join()
 
         roleChannel.on('update', payload => {
@@ -125,7 +131,7 @@ export default {
 
         // Join User Channel
         if (userChannel) userChannel.leave() // leave if already connected
-        userChannel = socketInstance.channel('user:' + session.user.id)
+        userChannel = socket.channel('user:' + session.user.id)
         userChannel.join()
 
         userChannel.on('reauthenticate', $auth.reauthenticate)
