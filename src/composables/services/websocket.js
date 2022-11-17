@@ -123,7 +123,7 @@ export default {
         roleChannel = socket.channel('user:role')
         roleChannel.join()
 
-        roleChannel.on('update', payload => {
+        roleChannel.on('permissionsChanged', payload => {
           let roles = session.user ? session.user.roles : []
           // Reauthenticate if user has role, so updated permissions are fetched
           if (roles.includes(payload.lookup)) $auth.reauthenticate()
