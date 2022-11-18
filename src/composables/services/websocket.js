@@ -8,7 +8,6 @@ import { $axios2 } from '@/api'
 let userChannel, roleChannel, publicChannel
 let session = reactive({ user: {} })
 
-window.websocket_logs = true
 // Initiate the connection to the websocket server
 const socketUrl = process.env.VUE_APP_BACKEND_URL.replace('http://', 'ws://') + '/socket'
 const socket = new PhoenixSocket(socketUrl, {
