@@ -16,8 +16,7 @@ export const $axios2 = axios.create({
 
 const $auth = localStorageCache(0, 'app').get('auth')
 const initUser = $auth ? $auth.data : undefined
-if (initUser) { $axios.defaults.headers.common['Authorization'] = `BEARER ${initUser.token}` }
-
+if (initUser) { $axios2.defaults.headers.common['Authorization'] = `BEARER ${initUser.token}` }
 /* provided methods */
 const $http = (path, opts, handleErrors) => {
   opts = opts || {}
@@ -176,20 +175,20 @@ export const watchlistApi = {
 export const authApi = {
   login: data => $http2('/api/login', { method: 'POST', data }, true)
   .then(user => {
-    $axios.defaults.headers.common['Authorization'] = `BEARER ${user.token}`
+    $axios2.defaults.headers.common['Authorization'] = `BEARER ${user.token}`
     return user
   }),
   logout: () => $http2('/api/logout', { method: 'DELETE' }, true)
   .then(user => {
-    delete $axios.defaults.headers.common['Authorization']
+    delete $axios2.defaults.headers.common['Authorization']
     return user
   }),
   register: data => $http2('/api/register', { method: 'POST', data }, true)
   .then(user => {
-    $axios.defaults.headers.common['Authorization'] = `BEARER ${user.token}`
+    $axios2.defaults.headers.common['Authorization'] = `BEARER ${user.token}`
     return user
   }),
-  authenticate: () => $http2('/api/authenticate'),
+  authenticate: () => $http2('/api/authenticate', {}, false),
   confirmRegistration: data => $http2('/api/confirm', { method: 'POST', data }, true),
   inviteRegistration: data => $http('/api/join', { method: 'POST', data }, true),
   resetPassword: data => $http(`/api/reset`, { method: 'POST', data }, true),
@@ -210,7 +209,7 @@ export const usersApi = {
   delete: userId => $http(`/api/users/${userId}`, { method: 'DELETE' }),
   deactivate: userId => $http(`/api/users/${userId}/deactivate`, { method: 'POST' }),
   reactivate: userId => $http(`/api/users/${userId}/reactivate`, { method: 'POST' }),
-  preferences: () => $http('/api/users/preferences'),
+  preferences: () => $http2('/api/users/preferences'),
   pageIgnored: params => $http('/api/ignoreUsers/ignored', { params }),
   notes: params => $http('/api/user/notes', { params }),
   createNote: data => $http('/api/user/notes', { method: 'POST', data }),
@@ -257,7 +256,7 @@ export const reportsApi = {
 }
 
 export const mentionsApi = {
-  page: params => $http('/api/mentions', { params }),
+  page: params => $http2('/api/mentions', { params }),
   pageIgnored: params => $http('/api/mentions/ignored', { params }),
   ignore: data => $http(`/api/mentions/ignore`, { method: 'POST', data }),
   unignore: data => $http(`/api/mentions/unignore`, { method: 'POST', data }),
@@ -267,8 +266,8 @@ export const mentionsApi = {
 }
 
 export const notificationsApi = {
-  dismiss: data => $http('/api/notifications/dismiss', { method: 'POST', data }),
-  counts: params => $http('/api/notifications/counts', { params })
+  dismiss: data => $http2('/api/notifications/dismiss', { method: 'POST', data }),
+  counts: params => $http2('/api/notifications/counts', { params })
 }
 
 export const breadcrumbsApi = {

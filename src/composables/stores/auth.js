@@ -1,6 +1,6 @@
 import { provide, computed, inject, reactive, readonly } from 'vue'
 import { cloneDeep } from 'lodash'
-import { authApi } from '@/api'
+import { authApi, $axios2 } from '@/api'
 import { PreferencesStore } from '@/composables/stores/prefs'
 import { socketLogout, socketLogin } from '@/composables/services/websocket'
 import PermissionUtils from '@/composables/utils/permissions'
@@ -27,8 +27,6 @@ export const AuthStore = Symbol(AUTH_KEY)
 
 export const localStorageAuth = () => appCache.get(AUTH_KEY) || { data: emtpyUser }
 
-export const clearUser = () => Object.assign(user, cloneDeep(emtpyUser))
-
 export default {
   setup() {
     /* Internal Data */
@@ -47,7 +45,6 @@ export default {
         $prefs.fetch()
         socketLogin(user)
       }).catch(() => userCleanup(`Goodbye ${user.username}, your session has expired`))
-
     const login = (username, password, rememberMe) => authApi.login({ username, password, rememberMe })
       .then(dbUser => {
         $appCache.set(AUTH_KEY, dbUser)
@@ -61,12 +58,15 @@ export default {
     const logout = () => authApi.logout()
       .then(() => userCleanup(`Goodbye ${user.username}, you have successfully logged out!`))
 
+    const websocketLogout = () => { if (user.token) userCleanup() }
+
     const userCleanup = msg => {
       delete user.token // clear token to invalidate session immediately
+      delete $axios2.defaults.headers.common['Authorization'] // clear token from axios
       $appCache.delete(AUTH_KEY)
       $prefs.clear()
       BanStore.clearBanNotice()
-      $alertStore.warn(msg)
+      if (msg) $alertStore.warn(msg)
       // redirect to home on logout
       if ($route.meta.requiresAuth && $route.path !== '/') $router.push({ path: '/' })
       // delay clearing reactive user to give css transitions time to complete
@@ -120,6 +120,7 @@ export default {
       reauthenticate,
       login,
       logout,
+      websocketLogout,
       register,
       confirmRegistration,
       inviteRegistration,

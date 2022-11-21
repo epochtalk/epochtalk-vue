@@ -1,5 +1,5 @@
 import { createWebHistory, createRouter } from 'vue-router'
-import { usersApi, boardsApi, threadsApi, $axios } from '@/api'
+import { usersApi, boardsApi, threadsApi, $axios, $axios2 } from '@/api'
 import Boards from '@/views/Boards.vue'
 import Threads from '@/views/Threads.vue'
 import ThreadsPostedIn from '@/views/ThreadsPostedIn.vue'
@@ -386,8 +386,31 @@ router.afterEach(to => {
   else { document.body.className = '' }
 })
 
-$axios.interceptors.response.use(res => res, err => {
+$axios2.interceptors.response.use(res => res, err => {
   console.log(err)
+  if(err.response) { // Server still responding, just getting errors from api calls
+    switch (err.response.status) {
+      case 401:
+        if (router.currentRoute._value.meta.requiresAuth) router.push({ name: 'Login'})
+        break
+      case 403:
+        if (router.currentRoute._value.meta.ignoreAxiosInterceptor) break
+        if (err.response.statusText === 'Forbidden' || err.response.data.error === 'Forbidden') {
+          router.push({ name: 'Forbidden'})
+        }
+        break
+      case 404:
+        router.push({ name: 'NotFound'})
+        break
+      default:
+        break
+    }
+  }
+  else router.push({ name: 'ServiceUnavailable'}) // API is down, 503
+  return Promise.reject(err)
+})
+
+$axios.interceptors.response.use(res => res, err => {
   if(err.response) { // Server still responding, just getting errors from api calls
     switch (err.response.status) {
       case 401:

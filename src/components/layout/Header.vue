@@ -56,8 +56,8 @@
             <i class="fa fa-eye" aria-hidden="true"></i>Watchlist
           </router-link>
         </li>
-        <li @click="showMobileMenu = false">
-          <a v-if="permissionUtils.hasPermission('invitations.invite')" @click="showInvite = true">
+        <li v-if="permissionUtils.hasPermission('invitations.invite')" @click="showMobileMenu = false">
+          <a href="#" @click.prevent="showInvite = true">
             <i class="fa fa-user-plus" aria-hidden="true"></i>Invite Users
           </a>
         </li>
@@ -211,8 +211,8 @@
                 <li>
                   <router-link :to="{ name: 'Watchlist' }">Watchlist</router-link>
                 </li>
-                <li>
-                  <a v-if="permissionUtils.hasPermission('invitations.invite')" @click.prevent="showInvite = true">
+                <li v-if="permissionUtils.hasPermission('invitations.invite')">
+                  <a href="#" @click.prevent="showInvite = true">
                     Invite User
                   </a>
                 </li>
@@ -275,7 +275,7 @@ import BanStore from '@/composables/stores/ban'
 import NotificationsStore from '@/composables/stores/notifications'
 import humanDate from '@/composables/filters/humanDate'
 import { motdApi } from '@/api'
-import { watchPublicChannel } from '@/composables/services/websocket'
+import { addAnnouncementListener } from '@/composables/services/websocket'
 
 export default {
   components: { AdminNavigation, AdminSubNavigation, Breadcrumbs, LoginModal, InviteModal, RegisterModal, Alert },
@@ -283,7 +283,7 @@ export default {
     onBeforeMount(() => {
       let fetchMotd = () => motdApi.get().then(d => v.motdData = d).catch(() => {})
       fetchMotd()
-      watchPublicChannel(d => d.action === 'announcement' ? fetchMotd() : null)
+      addAnnouncementListener(fetchMotd)
     })
     /* Internal Methods */
     const scrollHeader = () => {

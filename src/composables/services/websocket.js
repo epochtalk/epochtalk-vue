@@ -1,147 +1,161 @@
-import alertStore from '@/composables/stores/alert'
 import NotificationStore from '@/composables/stores/notifications'
-import { clearUser, AuthStore } from '@/composables/stores/auth'
+import { AuthStore } from '@/composables/stores/auth'
 import { provide, inject, reactive } from 'vue'
+import { Socket as PhoenixSocket } from 'phoenix'
+import { $axios2 } from '@/api'
 
-const socketcluster = require('socketcluster-client')
-
-// Public channel idenitfier and general options
-let options = { waitForAuth: true }
-let userChannel
-let publicChannel
+// Variable initializations
+let userChannel, roleChannel, publicChannel
 let session = reactive({ user: {} })
 
 // Initiate the connection to the websocket server
-const socket = socketcluster.connect({
-  hostname: 'localhost',
-  port: 23958,
-  autoReconnect: true
+const socketUrl = process.env.VUE_APP_BACKEND_URL.replace('http://', 'ws://') + '/socket'
+const socket = new PhoenixSocket(socketUrl, {
+  logger: (kind, msg, data) => {
+   if (window.websocket_logs) console.log(`${kind}: ${msg}`, data)
+  }
 })
 
-const WEBSOCKET_KEY = 'websocket'
-const publicChannelKey = JSON.stringify({ type: 'public' })
+// Connect to websocket server
+socket.connect()
 
+// Vue Provide Symbol
+const WEBSOCKET_KEY = 'websocket'
 export const WebsocketService = Symbol(WEBSOCKET_KEY)
 
 // API Functions
 export const socketLogin = socketUser => {
+  let reconnectWithToken = () => {
+    if (socket.connectionState() === 'open') {
+      socket.disconnect(() => {
+        socket.params.token = socketUser.token
+        socket.connect()
+      }, 1000, 'Disconnected to attempt authorized socket connection.') // disconnect
+    }
+    else setTimeout(() => reconnectWithToken(), 1000)
+  }
+  reconnectWithToken()
   Object.assign(session.user, socketUser)
-  socket.authenticate(socketUser.token)
   NotificationStore.refresh()
   NotificationStore.refreshMentionsList()
 }
 
 export const socketLogout = socketUser => {
-  socket.subscriptions().forEach(channel => {
-    if (channel !== publicChannelKey) socket.unsubscribe(channel)
-  })
-  Object.assign(session.user, socketUser)
-  socket.deauthenticate()
-  socket.emit('loggedOut')
+  if (socket.connectionState() === 'open') {
+    // Remove token from axios
+    delete $axios2.defaults.headers.common['Authorization']
+    Object.assign(session.user, socketUser)
+    delete socket.params.token
+    if (socket.isConnected()) socket.disconnect() // disconnect
+    socket.connect() // reconnect to retrigger onOpen event
+  }
 }
 
-export const watchPublicChannel = handler => {
-  if (window.websocket_logs) console.log('Watching public channel.')
-  if (publicChannel) publicChannel.watch(handler)
-  else setTimeout(() => watchPublicChannel(handler), 1000)
+export const addAnnouncementListener = handler => {
+  if (window.websocket_logs) console.log('Listening on \'public\' channel for \'announcement\' message.')
+  if (publicChannel) publicChannel.on('announcement', handler)
+  else setTimeout(() => addAnnouncementListener(handler), 1000)
 }
 
-export const watchUserChannel = handler => {
-  if (window.websocket_logs) console.log('Watching user channel.')
-  if (userChannel) userChannel.watch(handler)
-  else setTimeout(() => watchUserChannel(handler), 1000)
+export const addMentionListener = handler => {
+  if (window.websocket_logs) console.log('Listening on \'user:' + session.user.id + '\' channel for \'refreshMentions\' message.')
+  if (userChannel) userChannel.on('refreshMentions', handler)
+  else setTimeout(() => addMentionListener(handler), 1000)
 }
 
-export const unwatchUserChannel = handler => {
-  if (window.websocket_logs) console.log('Unwatching user channel.')
-  if (userChannel) userChannel.unwatch(handler)
+// NOTE: channel.on(msg, handler) is supposed to return a ref that
+// can be used to turn off a specific handler, but it doesn't.
+// This is a work around: turn off all handlers, reset default handler
+export const removeMentionListener = () => {
+  if (window.websocket_logs) console.log('No longer listening on \'user:' + session.user.id + '\' channel for \'refreshMentions\' message.')
+  if (userChannel) {
+    // turn off all channel handlers for this message
+    userChannel.off('refreshMentions')
+    // re-add default message handler for this channel
+    userChannel.on('refreshMentions', () => {
+      NotificationStore.refresh()
+      NotificationStore.refreshMentionsList()
+    })
+  }
 }
 
-export const isOnline = (socketUser, callback) => {
-  if (socket.state === 'open') socket.emit('isOnline', socketUser, callback)
-  else setTimeout(() => isOnline(socketUser, callback), 1000)
+export const addMessageListener = handler => {
+  if (window.websocket_logs) console.log('Listening on \'user:' + session.user.id + '\' channel for \'newMessage\' message.')
+  if (userChannel) userChannel.on('newMessage', handler)
+  else setTimeout(() => addMessageListener(handler), 1000)
+}
+
+export const removeMessageListener = () => {
+  if (window.websocket_logs) console.log('No longer listening on \'user:' + session.user.id + '\' channel for \'newMessage\' message.')
+  if (userChannel) {
+    // turn off all channel handlers for this message
+    userChannel.off('newMessage')
+    // re-add default message handler for this channel
+    userChannel.on('newMessage', NotificationStore.refresh)
+  }
+}
+
+export const isOnline = (userId, callback) => {
+  if (socket.connectionState() === 'open') {
+    publicChannel.push("is_online", { user_id: userId })
+      .receive("ok", payload => callback(undefined, payload))
+      .receive("error", err => callback(err))
+      .receive("timeout", () => callback("Websocket request to check if user(" + userId + ") is online, timed out"))
+  }
+  else setTimeout(() => isOnline(userId, callback), 1000)
 }
 
 export default {
   setup() {
     const $auth = inject(AuthStore)
 
-    // Socket Error logging
-    socket.on('error', err => window.websocket_logs ? console.log('Websocket error:', err) : null)
+    socket.onOpen(() => {
+      // Join Public Channel
+      if (publicChannel) publicChannel.leave() // leave if already connected
+      publicChannel = socket.channel('user:public')
+      publicChannel.join()
 
-    // Channel Subscribe
-    socket.on('subscribe', channelName => {
-     if (JSON.parse(channelName).type === 'role') {
-       socket.watch(channelName, d => {
-         if (window.websocket_logs) console.log('Received role channel message.', d)
-         $auth.reauthenticate()
-       })
-     }
-     else if (JSON.parse(channelName).type === 'user') {
-       socket.watch(channelName, d => {
-         if (window.websocket_logs) console.log('Received user channel message', d)
-         if (d.action === 'reauthenticate') $auth.reauthenticate()
-         else if (d.action === 'logout' && d.sessionId === socket.getAuthToken().sessionId) {
-           $auth.logout()
-           clearUser() // Handles clearing authed user from a out of focus tab
-           alertStore.warn('You have been logged out from another window.')
-         }
-         else if (d.action === 'newMessage') { NotificationStore.refresh() }
-         else if (d.action === 'refreshMentions') {
-           NotificationStore.refresh()
-           NotificationStore.refreshMentionsList()
-         }
-       })
-     }
-     else if (JSON.parse(channelName).type === 'public') {
-      // Placeholder for future public notifications if necessary
-     }
-     else window.websocket_logs ? console.log('Not watching', channelName) : null
+      // Authenticated Channels
+      if (socket.params.token) {
+        // Join Role Channel
+        if (roleChannel) roleChannel.leave() // leave if already connected
+        roleChannel = socket.channel('user:role')
+        roleChannel.join()
 
-     if (window.websocket_logs) console.log('Websocket subscribed to', channelName, 'with watchers', socket.watchers(channelName))
+        roleChannel.on('permissionsChanged', payload => {
+          let roles = session.user ? session.user.roles : []
+          // Reauthenticate if user has role, so updated permissions are fetched
+          if (roles.includes(payload.lookup)) $auth.reauthenticate()
+        })
+
+        // Join User Channel
+        if (userChannel) userChannel.leave() // leave if already connected
+        userChannel = socket.channel('user:' + session.user.id)
+        userChannel.join()
+
+        userChannel.on('reauthenticate', $auth.reauthenticate)
+        userChannel.on('newMessage', NotificationStore.refresh)
+        userChannel.on('refreshMentions', () => {
+          NotificationStore.refresh()
+          NotificationStore.refreshMentionsList()
+        })
+        userChannel.on('logout', payload => {
+          // Logout all sessions sharing the same token (usually an entire device)
+          if (payload.token === session.user.token) $auth.websocketLogout()
+        })
+      }
     })
-
-    // Channel Unsubscribe
-    socket.on('unsubscribe', channelName => {
-     if (window.websocket_logs) console.log('Websocket unsubscribed from', channelName, socket.watchers(channelName))
-
-     // disconnect all watchers from the channel
-     socket.unwatch(channelName)
-    })
-
-    // Socket Authentication
-    socket.on('authenticate', () => {
-     if (window.websocket_logs) console.log('Authenticated WebSocket Connection')
-
-     // Emit LoggedIn event to socket server
-     socket.emit('loggedIn')
-
-     // subscribe to user channel
-     let userChannelKey = JSON.stringify({ type: 'user', id: session.user.id })
-     userChannel = socket.subscribe(userChannelKey, options)
-
-     // subscribe to roles channels
-     if (session.user.roles) {
-       session.user.roles.forEach(role => {
-         let channel = JSON.stringify({ type: 'role', id: role })
-         socket.subscribe(channel, options)
-       })
-     }
-    })
-
-    socket.on('connect', status => status.isAuthenticated ? socket.emit('loggedIn') : null)
-
-    // always subscribe to the public channel
-    publicChannel = socket.subscribe(publicChannelKey, { waitForAuth: false })
 
     /* Provide Store Data */
     return provide(WebsocketService, {
       socketLogin,
       socketLogout,
-      watchUserChannel,
-      unwatchUserChannel,
-      watchPublicChannel,
-      isOnline,
+      addAnnouncementListener,
+      addMentionListener,
+      addMessageListener,
+      removeMentionListener,
+      removeMessageListener,
+      isOnline
     })
   },
   render() { return this.$slots.default() } // renderless component
