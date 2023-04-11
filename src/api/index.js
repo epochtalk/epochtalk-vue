@@ -103,7 +103,7 @@ export const categoriesApi = {
 }
 
 export const boardsApi = {
-  slugToBoardId: slug => $http(`/api/boards/${slug}/id`),
+  slugToBoardId: slug => $http2(`/api/boards/${slug}/id`),
   getBoards: stripped => $http2(`/api/boards${stripped ? '?stripped=true' : ''}`),
   movelist: () => $http('/api/boards/movelist'),
   unfiltered: () => $http('/api/boards/unfiltered'),
@@ -124,7 +124,7 @@ export const threadsApi = {
   unlock: threadId => $http(`/api/threads/${threadId}/lock`, { data: { status: false }, method: 'POST'}),
   sticky: threadId => $http(`/api/threads/${threadId}/sticky`, { data: { status: true}, method: 'POST'}),
   unsticky: threadId => $http(`/api/threads/${threadId}/sticky`, { data: { status: false }, method: 'POST'}),
-  byBoard: params => $http('/api/threads', { params }),
+  byBoard: params => $http2('/api/threads', { params }),
   postedIn: params => $http('/api/threads/posted', { params }),
   slugToThreadId: slug => $http(`/api/threads/${slug}/id`),
   notifications: () => $http('api/threadnotifications'),
