@@ -64,7 +64,9 @@
           <tr v-for="log in logData?.data" :key="log">
             <td v-html="humanDate(log.action_taken_at)"></td>
             <td>
-              <router-link :to="{ path: '/profile/' + log.mod_username.toLowerCase() }" v-html="log.mod_username" />
+              <router-link :to="{ path: '/profile/' + log.mod_username.toLowerCase() }">
+                <div v-html="log.mod_username"></div>
+              </router-link>
             </td>
             <td v-html="log.action_display_text"></td>
             <td>

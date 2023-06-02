@@ -4,7 +4,7 @@
       <ProvideWebsocket>
         <ProvideBreadcrumbs>
           <div id="wrapper" :class="{ 'admin': adminMode }">
-            <Header></Header>
+            <HeaderComponent></HeaderComponent>
             <main>
               <div id="public-content">
                 <router-view />
@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import Header from '@/components/layout/Header.vue'
+import HeaderComponent from './components/layout/HeaderComponent.vue'
 import ProvidePreferences from '@/composables/stores/prefs'
 import ProvideAuth from '@/composables/stores/auth'
 import ProvideWebsocket from '@/composables/services/websocket'
@@ -28,7 +28,7 @@ import { useRoute } from 'vue-router'
 
 export default {
   name: 'Epochtalk',
-  components: { Header, ProvidePreferences, ProvideWebsocket, ProvideBreadcrumbs, ProvideAuth },
+  components: { HeaderComponent, ProvidePreferences, ProvideWebsocket, ProvideBreadcrumbs, ProvideAuth },
   setup() {
     const v = reactive({ adminMode: false })
     const $route = useRoute()

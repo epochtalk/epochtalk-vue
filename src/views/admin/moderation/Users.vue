@@ -54,12 +54,16 @@
         <tbody>
           <tr v-for="report in reportData.data" :key="report.id" class="selectable-row" :class="{ 'active-row' : selectedReport?.id === report.id }" @click="selectReport(report, $event)">
             <td class="hide-mobile">
-              <router-link :to="{ path: '/profile/' + report.reporter_username.toLowerCase() }" v-html="report.reporter_username" />
+              <router-link :to="{ path: '/profile/' + report.reporter_username.toLowerCase() }">
+                <div v-html="report.reporter_username"></div>
+              </router-link>
             </td>
             <td>{{humanDate(report.created_at, true)}}</td>
             <td v-html="report.status"></td>
             <td>
-              <router-link :to="{ path: '/profile/' + report.offender_username.toLowerCase() }" v-html="report.offender_username" />
+              <router-link :to="{ path: '/profile/' + report.offender_username.toLowerCase() }">
+                <div v-html="report.offender_username"></div>
+              </router-link>
               &nbsp;&nbsp;&nbsp;<i v-if="report.offender_ban_expiration || report.offender_board_banned" class="fa fa-user-times"></i>
             </td>
             <td class="hide-mobile"><a :href="`mailto:${report.offender_email}`" target="_blank" v-html="report.offender_email"></a></td>
@@ -157,7 +161,9 @@
             <tr>
               <td class="field">Reported By</td>
               <td class="desc">
-                <router-link :to="{ path: '/profile/' + selectedReport.reporter_username.toLowerCase() }" v-html="selectedReport.reporter_username" />
+                <router-link :to="{ path: '/profile/' + selectedReport.reporter_username.toLowerCase() }">
+                  <div v-html="selectedReport.reporter_username"></div>
+                </router-link>
               </td>
             </tr>
             <tr>
@@ -167,7 +173,9 @@
             <tr>
               <td class="field">Reported User</td>
               <td class="desc">
-                <router-link :to="{ path: '/profile/' + selectedReport.offender_username.toLowerCase() }" v-html="selectedReport.offender_username" />
+                <router-link :to="{ path: '/profile/' + selectedReport.offender_username.toLowerCase() }">
+                  <div v-html="selectedReport.offender_username"></div>
+                </router-link>
               </td>
             </tr>
             <tr>
@@ -193,7 +201,9 @@
           </div>
           <div class="note-details" v-if="!note.edit">
             <span class="note-author">
-              <router-link :to="{ path: '/profile/' + note.username.toLowerCase() }" v-html="note.username" />&nbsp;</span>
+              <router-link :to="{ path: '/profile/' + note.username.toLowerCase() }">
+                <div v-html="note.username"></div>
+              </router-link>&nbsp;</span>
             <span class="note-date" v-html="humanDate(note.created_at)"></span>
             <span class="note-date" v-if="note.created_at !== note.updated_at"> &mdash; Edited <span v-html="humanDate(note.updated_at)"></span></span>
             <span class="right" v-if="authedUser.id === note.user_id"><a href="#" @click.prevent="note.edit = true; note.noteCopy = note.note">Edit</a></span>

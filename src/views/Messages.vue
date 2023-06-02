@@ -101,7 +101,9 @@
               </div>
               <div class="title">
                 <div class="title-username-role">
-                  <router-link class="username" :to="{ path: '/profile/' + message.sender_username.toLowerCase() }" v-html="message.sender_username"></router-link>
+                  <router-link class="username" :to="{ path: '/profile/' + message.sender_username.toLowerCase() }">
+                    <span v-html="message.sender_username"></span>
+                  </router-link>
                   <span class="badge alert user-role info-tooltip" v-if="message.sender_newbie_alert && (message.sender_id !== authedUser.id)" data-balloon="!!! WARNING: This user is a newbie. If you are expecting a message from a more veteran member, then this is an imposter !!!" data-balloon-pos="down" data-balloon-length="large" data-balloon-break>
                     <i class="fa fa-info-circle"></i>
                     Newbie Alert!

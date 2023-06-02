@@ -52,12 +52,16 @@
               <i v-if="bannedFromModeratedBoard(boardBan.board_ids)" class="far fa-star"></i>
             </td>
             <td>
-              <router-link :to="{ path: '/profile/' + boardBan.username.toLowerCase() }" v-html="boardBan.username" />
+              <router-link :to="{ path: '/profile/' + boardBan.username.toLowerCase() }">
+                <span v-html="boardBan.username"></span>
+              </router-link>
             </td>
             <td><a :href="`mailto:${boardBan.email}`" target="_blank" v-html="boardBan.email"></a></td>
             <td>
               <span v-for="(boardName, i) in boardBan.board_names" :key="i">
-                <router-link :to="{ path: '/boards/' + boardBan.board_slugs[i] }" v-html="boardName + (i < boardBan.board_names.length - 1 ? ', ' : '') "></router-link>
+                <router-link :to="{ path: '/boards/' + boardBan.board_slugs[i] }">
+                  <span v-html="boardName + (i < boardBan.board_names.length - 1 ? ', ' : '') "></span>
+                </router-link>
               </span>
             </td>
             <td>

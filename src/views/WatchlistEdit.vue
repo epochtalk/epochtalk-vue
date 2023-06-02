@@ -40,7 +40,9 @@
         <tbody>
           <tr v-for="board in boards" :key="board.id">
             <td class="title">
-             <router-link :to="{ name: 'Threads', params: { boardSlug: board.slug, boardId: board.id } }" v-html="board.name"></router-link>
+              <router-link :to="{ name: 'Threads', params: { boardSlug: board.slug, boardId: board.id } }">
+                <span v-html="board.name"></span>
+              </router-link>
             </td>
             <td class="threads-views-mobile">
               <span class="value" v-html="board.thread_count || 0"></span>&nbsp;threads, &nbsp;
@@ -98,7 +100,9 @@
         <tbody>
           <tr v-for="thread in threads" :key="thread.id">
             <td class="title">
-              <router-link :to="{ name: 'Posts', params: { threadSlug: thread.slug, threadId: thread.id } }" v-html="thread.title"></router-link>
+              <router-link :to="{ name: 'Posts', params: { threadSlug: thread.slug, threadId: thread.id } }">
+                <span v-html="thread.title"></span>
+              </router-link>
               <span class="parent-board">In Board: <strong><span v-html="thread.board_name"></span></strong></span>
             </td>
             <td class="threads-views-mobile">

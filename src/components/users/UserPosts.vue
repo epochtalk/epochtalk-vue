@@ -38,7 +38,9 @@
               <td :data-balloon="decode(post.thread_title)" data-balloon-pos="top">
                 <div class="truncate-title">
                   <span v-if="post.hidden && !post._deleted"><i class="fa fa-eye-slash"></i></span>
-                  <router-link v-if="!post._deleted" class="thread-title"  :title="decode(post.thread_title)" :to="{ name: 'Posts', params: { threadSlug: post.thread_slug, threadId: post.thread_id }, query: { start: post.position }, hash: `#${post.id}` }" v-html="decode(post.thread_title)"></router-link>
+                  <router-link v-if="!post._deleted" class="thread-title"  :title="decode(post.thread_title)" :to="{ name: 'Posts', params: { threadSlug: post.thread_slug, threadId: post.thread_id }, query: { start: post.position }, hash: `#${post.id}` }">
+                    <span v-html="decode(post.thread_title)"></span>
+                  </router-link>
                   <span v-if="post._deleted">Deleted</span>
                 </div>
                 <div class="post" @click="post.open = !post.open">
@@ -78,7 +80,9 @@
               <td :data-balloon="decode(post.thread_title)" data-balloon-pos="top">
                 <div class="truncate-title">
                   <span v-if="post.hidden && !post._deleted"><i class="fa fa-eye-slash"></i></span>
-                  <router-link v-if="!post._deleted" class="thread-title"  :title="decode(post.thread_title)" :to="{ name: 'Posts', params: { threadSlug: post.thread_slug, threadId: post.thread_id }, query: { start: post.position }, hash: `#${post.id}` }" v-html="decode(post.thread_title)"></router-link>
+                  <router-link v-if="!post._deleted" class="thread-title"  :title="decode(post.thread_title)" :to="{ name: 'Posts', params: { threadSlug: post.thread_slug, threadId: post.thread_id }, query: { start: post.position }, hash: `#${post.id}` }">
+                    <span v-html="decode(post.thread_title)"></span>
+                  </router-link>
                   <span v-if="post._deleted">Deleted</span>
                 </div>
                 <div class="post" @click="post.open = !post.open">

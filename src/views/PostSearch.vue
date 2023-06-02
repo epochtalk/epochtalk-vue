@@ -35,13 +35,13 @@
             <!-- Post Title -->
             <div class="thread-title">
               <h5>
-                <router-link :title="decode(post.thread_title)" :to="{ name: 'Posts', params: { threadSlug: post.thread_slug, threadId: post.thread_id }, query: { start: post.position }, hash: `#${post.id}` }" v-html="decode(post.thread_title)"></router-link>
+                <router-link :title="decode(post.thread_title)" :to="{ name: 'Posts', params: { threadSlug: post.thread_slug, threadId: post.thread_id }, query: { start: post.position }, hash: `#${post.id}` }"><span v-html="decode(post.thread_title)"></span></router-link>
               </h5>
               <span v-if="post.user.online" :data-balloon="post.user.username + ' is online'" class="online green"><i class="fas fa-circle"></i></span>
               <span v-if="!post.user.online" class="online green"><i class="far fa-circle"></i></span>
-              <router-link :to="{ path: '/profile/' + post.user.username.toLowerCase() }" class="username" v-html="post.user.username" />
+              <router-link :to="{ path: '/profile/' + post.user.username.toLowerCase() }" class="username"><span v-html="decode(post.thread_title)"></span></router-link>
               <div class="posted-in">posted in</div>
-              <router-link class="board-name" :to="{ name: 'Threads', params: { boardSlug: post.board_slug, boardId: post.board_id } }" v-html="post.board_name" />
+              <router-link class="board-name" :to="{ name: 'Threads', params: { boardSlug: post.board_slug, boardId: post.board_id } }"><span v-html="post.board_name"></span></router-link>
               <div class="timestamp">{{ humanDate(post.created_at) }}</div>
               <div class="clear"></div>
             </div>

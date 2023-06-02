@@ -158,7 +158,9 @@
           <!-- Post Title -->
           <div class="post-title">
             <div class="post-title-user">
-              <span class="username" :data-balloon="post.user.role_name || 'User'"><router-link :to="{ path: '/profile/' + post.user.username.toLowerCase() }" v-html="post.user.username" /></span>
+              <span class="username" :data-balloon="post.user.role_name || 'User'"><router-link :to="{ path: '/profile/' + post.user.username.toLowerCase() }">
+                <span v-html="post.user.username"></span>
+              </router-link></span>
               <div :title="post.user.name" v-if="post.user.name" class="display-name">
                 <span>{{truncate(post.user.name, 33)}}</span>
                 <span class="hide-mobile">&nbsp;&mdash;&nbsp;</span>
