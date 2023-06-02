@@ -4,7 +4,9 @@
     <dl class="tabs">
       <span v-for="link in nav" :key="link.routeName">
         <dd class="no-select" :class="{'active': link.active}" v-if="link.permission">
-          <router-link :to="{ name: link.routeName, query: link.query }" v-html="link.title" />
+          <router-link :to="{ name: link.routeName, query: link.query }">
+            <span v-html="link.title"></span>
+          </router-link>
         </dd>
       </span>
     </dl>

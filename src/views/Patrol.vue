@@ -35,7 +35,9 @@
           <!-- Post Title -->
           <div class="post-title">
             <div class="post-title-user">
-              <router-link :to="{ path: '/profile/' + post.user.username.toLowerCase() }" class="username" :data-balloon="post.user.role_name || 'User'" :style="usernameHighlight(post.user.highlight_color)" v-html="post.user.username"></router-link>
+              <router-link :to="{ path: '/profile/' + post.user.username.toLowerCase() }" class="username" :data-balloon="post.user.role_name || 'User'" :style="usernameHighlight(post.user.highlight_color)">
+                <span v-html="post.user.username"></span>
+              </router-link>
               <div :title="post.user.name" v-if="post.user.name" class="display-name">
                 <span v-html="truncate(post.user.name, 33)"></span>
                 <span class="hide-mobile">&nbsp;&mdash;&nbsp;</span>
@@ -43,7 +45,7 @@
               <div :title="post.user.role_name || 'User'" class="user-role" v-html="post.user.role_name || 'User'" :style="userRoleHighlight(post.user.highlight_color)"></div>
               <div class="timestamp">
                 <span v-html="humanDate(post.created_at)"></span>
-                <span v-if="showEditDate(post) && post?.metadata?.edited_by_username" v-html="'&nbsp;&mdash;&nbsp;Edited ' + humanDate(post.updated_at) + ' by '"></span><router-link :to="{ path: '/profile/' + post?.metadata?.edited_by_username.toLowerCase() }" v-if="showEditDate(post) && post?.metadata?.edited_by_username" v-html="post?.metadata?.edited_by_username"></router-link>
+                <span v-if="showEditDate(post) && post?.metadata?.edited_by_username" v-html="'&nbsp;&mdash;&nbsp;Edited ' + humanDate(post.updated_at) + ' by '"></span><router-link :to="{ path: '/profile/' + post?.metadata?.edited_by_username.toLowerCase() }" v-if="showEditDate(post) && post?.metadata?.edited_by_username"><span v-html="post?.metadata?.edited_by_username"></span></router-link>
                 <span v-if="showEditDate(post) && !post?.metadata?.edited_by_username" v-html="'&nbsp;&mdash;&nbsp;Edited ' + humanDate(post.updated_at )"></span>
               </div>
             </div>
@@ -119,10 +121,14 @@
           <div class="thread-title">
             <span v-for="(breadcrumb, index) in post.breadcrumbs" :key="index" :class="{ active: index === (post.breadcrumbs.length - 1) }">
               <span v-if="breadcrumb.label">
-                <router-link :to="{ name: `${breadcrumbShim[breadcrumb.state]}`, params: breadcrumb.opts.boardSlug ? {...breadcrumb.opts} : undefined, hash: breadcrumb.opts['#'] ? `#${breadcrumb.opts['#']}` : undefined  }" v-if="index !== (post.breadcrumbs.length - 1) && breadcrumb.state" :title="breadcrumb.label" v-html="breadcrumb.label"></router-link>
+                <router-link :to="{ name: `${breadcrumbShim[breadcrumb.state]}`, params: breadcrumb.opts.boardSlug ? {...breadcrumb.opts} : undefined, hash: breadcrumb.opts['#'] ? `#${breadcrumb.opts['#']}` : undefined  }" v-if="index !== (post.breadcrumbs.length - 1) && breadcrumb.state" :title="breadcrumb.label">
+                  <span v-html="breadcrumb.label"></span>
+                </router-link>
                 <strong v-if="index !== (post.breadcrumbs.length - 1)">&nbsp;/&nbsp;</strong>
                 <strong v-if="index === (post.breadcrumbs.length - 1)">
-                  <router-link :to="{ name: 'Posts', params: { threadSlug: post.slug, threadId: post.thread_id }, query: { start: post.position}, hash: `#${post.id}` }" v-html="post.thread_title"></router-link></strong>
+                  <router-link :to="{ name: 'Posts', params: { threadSlug: post.slug, threadId: post.thread_id }, query: { start: post.position}, hash: `#${post.id}` }">
+                    <span v-html="post.thread_title"></span>
+                  </router-link></strong>
               </span>
             </span>
           </div>

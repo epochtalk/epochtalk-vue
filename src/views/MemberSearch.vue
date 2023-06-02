@@ -30,7 +30,9 @@
               <router-link :to="{ path: '/profile/' + user.username.toLowerCase() }" :class="defaultAvatarShape" class="search-users user-avatar hide-mobile" href="">
                 <img :src="user.avatar || defaultAvatar">
               </router-link>
-              <router-link :to="{ path: '/profile/' + user.username.toLowerCase() }" v-html="user.username" />
+              <router-link :to="{ path: '/profile/' + user.username.toLowerCase() }">
+                <span v-html="user.username"></span>
+              </router-link>
             </td>
             <td v-html="user.role"></td>
             <td v-html="user.post_count"></td>

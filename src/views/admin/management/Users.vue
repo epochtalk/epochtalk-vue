@@ -55,7 +55,9 @@
         </thead>
         <tbody>
           <tr v-for="user in users" :key="user.username">
-            <td><router-link :to="{ path: '/profile/' + user.username.toLowerCase() }" v-html="user.username" />
+            <td><router-link :to="{ path: '/profile/' + user.username.toLowerCase() }">
+              <span v-html="user.username"></span>
+            </router-link>
             <i v-if="user.ban_expiration" class="fa fa-user-times right"></i>
             </td>
             <td class="email-column" :class="{'hide-mobile': query?.filter === 'banned' }"><a :href="`mailto:${user.email}`" v-html="user.email"></a></td>

@@ -66,16 +66,22 @@
               <i v-if="moderatesBoard(report.board_id) || hasGlobalModPerms()" class="far fa-star"></i>
             </td>
             <td class="hide-mobile">
-              <router-link :to="{ path: '/profile/' + report.reporter_username.toLowerCase() }" v-html="report.reporter_username" />
+              <router-link :to="{ path: '/profile/' + report.reporter_username.toLowerCase() }">
+                <span v-html="report.reporter_username"></span>
+              </router-link>
             </td>
             <td>{{humanDate(report.created_at, true)}}</td>
             <td v-html="report.status"></td>
             <td>
-              <router-link :title="decode(report.offender_title)" :to="{ name: 'Posts', params: { threadSlug: report.offender_thread_slug, threadId: report.offender_thread_id }, query: { start: report.offender_post_position }, hash: `#${report.offender_post_id}` }" v-html="decode(report.offender_title)" onclick="event.stopPropagation()"></router-link>
+              <router-link :title="decode(report.offender_title)" :to="{ name: 'Posts', params: { threadSlug: report.offender_thread_slug, threadId: report.offender_thread_id }, query: { start: report.offender_post_position }, hash: `#${report.offender_post_id}` }" onclick="event.stopPropagation()">
+                <span v-html="decode(report.offender_title)"></span>
+              </router-link>
             </td>
             <td class="hide-mobile">{{humanDate(report.offender_created_at, true)}}</td>
             <td>
-              <router-link :to="{ path: '/profile/' + report.offender_author_username.toLowerCase() }" v-html="report.offender_author_username" />
+              <router-link :to="{ path: '/profile/' + report.offender_author_username.toLowerCase() }">
+                <span v-html="report.offender_author_username"></span>
+              </router-link>
               &nbsp;&nbsp;&nbsp;<i v-if="report.offender_ban_expiration || report.offender_board_banned" class="fa fa-user-times"></i>
             </td>
             <td class="hide-mobile">{{report.reporter_reason}}</td>
@@ -177,7 +183,9 @@
             <tr>
               <td class="field">Reported By</td>
               <td class="desc">
-                <router-link :to="{ path: '/profile/' + selectedReport.reporter_username.toLowerCase() }" v-html="selectedReport.reporter_username" />
+                <router-link :to="{ path: '/profile/' + selectedReport.reporter_username.toLowerCase() }">
+                  <span v-html="selectedReport.reporter_username"></span>
+                </router-link>
               </td>
             </tr>
             <tr>
@@ -187,13 +195,17 @@
             <tr>
               <td class="field">Reported Post</td>
               <td class="desc">
-                <router-link :title="decode(selectedReport.offender_title)" :to="{ name: 'Posts', params: { threadSlug: selectedReport.offender_thread_slug, threadId: selectedReport.offender_thread_id }, query: { start: selectedReport.offender_post_position }, hash: `#${selectedReport.offender_post_id}` }" v-html="decode(selectedReport.offender_title)" onclick="event.stopPropagation()"></router-link>
+                <router-link :title="decode(selectedReport.offender_title)" :to="{ name: 'Posts', params: { threadSlug: selectedReport.offender_thread_slug, threadId: selectedReport.offender_thread_id }, query: { start: selectedReport.offender_post_position }, hash: `#${selectedReport.offender_post_id}` }" onclick="event.stopPropagation()">
+                  <span v-html="decode(selectedReport.offender_title)"></span>
+                </router-link>
               </td>
             </tr>
             <tr>
               <td class="field">Reported Post Author</td>
               <td class="desc">
-                <router-link :to="{ path: '/profile/' + selectedReport.offender_author_username.toLowerCase() }" v-html="selectedReport.offender_author_username" />
+                <router-link :to="{ path: '/profile/' + selectedReport.offender_author_username.toLowerCase() }">
+                  <span v-html="selectedReport.offender_author_username"></span>
+                </router-link>
               </td>
             </tr>
             <tr>
@@ -219,7 +231,9 @@
           </div>
           <div class="note-details" v-if="!note.edit">
             <span class="note-author">
-              <router-link :to="{ path: '/profile/' + note.username.toLowerCase() }" v-html="note.username" />&nbsp;</span>
+              <router-link :to="{ path: '/profile/' + note.username.toLowerCase() }">
+                <span v-html="note.username"></span>
+              </router-link>&nbsp;</span>
             <span class="note-date" v-html="humanDate(note.created_at)"></span>
             <span class="note-date" v-if="note.created_at !== note.updated_at"> &mdash; Edited <span v-html="humanDate(note.updated_at)"></span></span>
             <span class="right" v-if="authedUser.id === note.user_id"><a href="#" @click.prevent="note.edit = true; note.noteCopy = note.note">Edit</a></span>
