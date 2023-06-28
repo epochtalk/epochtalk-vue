@@ -40,6 +40,7 @@ import UserPosts from '@/components/users/UserPosts.vue'
 import Login from '@/views/layout/Login.vue'
 import NProgress from 'nprogress'
 import { nextTick } from 'vue'
+import localStorageCache from '@/composables/utils/localStorageCache'
 import { localStorageAuth } from '@/composables/stores/auth'
 import BanStore from '@/composables/stores/ban'
 import PermissionUtils from '@/composables/utils/permissions'
@@ -386,7 +387,19 @@ router.afterEach(to => {
   else { document.body.className = '' }
 })
 
-$axios2.interceptors.response.use(res => res, err => {
+$axios2.interceptors.request.use(config => {
+  let storedViewToken = localStorageCache(0, 'app').get('epochViewerToken').data
+  if (storedViewToken) config.headers['epoch-viewer'] = storedViewToken
+  return config
+})
+
+
+$axios2.interceptors.response.use(res => {
+  let viewToken = res.headers['epoch-viewer']
+  if (viewToken) localStorageCache(0, 'app').set('epochViewerToken', viewToken)
+  return res
+},
+err => {
   console.log(err)
   if(err.response) { // Server still responding, just getting errors from api calls
     switch (err.response.status) {
