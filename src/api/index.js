@@ -126,12 +126,12 @@ export const threadsApi = {
   unsticky: threadId => $http(`/api/threads/${threadId}/sticky`, { data: { status: false }, method: 'POST'}),
   byBoard: params => $http2('/api/threads', { params }),
   postedIn: params => $http('/api/threads/posted', { params }),
-  slugToThreadId: slug => $http(`/api/threads/${slug}/id`),
+  slugToThreadId: slug => $http2(`/api/threads/${slug}/id`),
   notifications: () => $http('api/threadnotifications'),
   removeSubscriptions: () => $http('/api/threadnotifications', { method: 'DELETE' }),
   disableNotifications: () => $http('/api/threadnotifications', { data: { enabled: false }, method: 'PUT' }),
   enableNotifications: () => $http('/api/threadnotifications', { data: { enabled: true }, method: 'PUT' }),
-  viewed: threadId => $http(`/api/threads/${threadId}/viewed`, { method: 'POST' })
+  viewed: threadId => $http2(`/api/threads/${threadId}/viewed`, { method: 'POST' })
 }
 
 export const postsApi = {
@@ -142,7 +142,7 @@ export const postsApi = {
   purge: postId => $http(`/api/posts/${postId}/purge`, { method: 'DELETE' }),
   lock: postId => $http(`/api/posts/${postId}/lock`, { method: 'POST'}),
   unlock: postId => $http(`/api/posts/${postId}/unlock`, { method: 'POST'}),
-  byThread: params => $http('/api/posts', { params }),
+  byThread: params => $http2('/api/posts', { params }),
   find: id => $http(`/api/posts/${id}`),
   byUser: params => $http(`/api/posts/user/${params.username}`, { params }),
   startedByUser: params => $http(`/api/posts/user/${params.username}/started`, { params }),
