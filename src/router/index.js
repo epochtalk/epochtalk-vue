@@ -388,7 +388,8 @@ router.afterEach(to => {
 })
 
 $axios2.interceptors.request.use(config => {
-  let storedViewToken = localStorageCache(0, 'app').get('epochViewerToken').data
+  let storedViewToken = localStorageCache(0, 'app').get('epochViewerToken')
+  storedViewToken = storedViewToken ? storedViewToken.data : null
   if (storedViewToken) config.headers['epoch-viewer'] = storedViewToken
   return config
 })
