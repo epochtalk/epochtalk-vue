@@ -13,16 +13,9 @@ export default {
     const $route = useRoute()
     const $router = useRouter()
 
-    // TODO(akinsey): update hapi breadcrumb api routes to not use angular states, then remove this
-    const stateToRoute = {
-      '^.home': 'Boards',
-      '^.boards': 'Boards',
-      'threads.data': 'Threads'
-    }
-
     const pathLookup = {
       home: {
-        state: '^.home',
+        routeName: 'Boards',
         label: 'Home'
       },
       profiles: {
@@ -71,7 +64,8 @@ export default {
         let idKey = routeParamKeys.reverse()[0]
         let id = routeParams[idKey]
         let type = keyToType[idKey]
-        breadcrumbs.push(...await breadcrumbsApi.find(id, type))
+        let crumbs = await breadcrumbsApi.find(id, type)
+        breadcrumbs.push(...crumbs.breadcrumbs)
 
       }
       // routeParams is empty, route is static
@@ -94,7 +88,6 @@ export default {
       }
       if (breadcrumbs) {
         for (let i = 0; i < breadcrumbs.length; i++) {
-          breadcrumbs[i].routeName = stateToRoute[breadcrumbs[i].state]
           breadcrumbs[i].label = decodeURIComponent(breadcrumbs[i].label.replace(/%/g, '%25'))
           if (breadcrumbs[i].opts && breadcrumbs[i].opts['#']) {
             breadcrumbs[i].hash = '#' + breadcrumbs[i].opts['#']
