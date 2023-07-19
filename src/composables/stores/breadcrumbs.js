@@ -33,8 +33,6 @@ export default {
 
     /* Internal Methods */
     const update = async () => {
-      breadcrumbs.splice(0, breadcrumbs.length)
-      breadcrumbs.push(pathLookup.home)
       let path = $route.path
       let routeParams = cloneDeep($route.params)
       // Handle 403 breadcrumb
@@ -65,6 +63,8 @@ export default {
         let id = routeParams[idKey]
         let type = keyToType[idKey]
         let crumbs = await breadcrumbsApi.find(id, type)
+        breadcrumbs.splice(0, breadcrumbs.length)
+        breadcrumbs.push(pathLookup.home)
         breadcrumbs.push(...crumbs.breadcrumbs)
 
       }
@@ -85,6 +85,10 @@ export default {
         if (breadcrumbs[1].label === pathLookup.profiles.label && breadcrumbs.length > 3) {
           breadcrumbs[2].routePath =  '/profile/' + breadcrumbs[2].label.toLowerCase()
         }
+      }
+      else if (path == '/') {
+        breadcrumbs.splice(0, breadcrumbs.length)
+        breadcrumbs.push(pathLookup.home)
       }
       if (breadcrumbs) {
         for (let i = 0; i < breadcrumbs.length; i++) {
