@@ -45,7 +45,7 @@
             </div>
           </div>
           <div class="title">
-            <router-link :class="{bold: thread.latest}" class="thread-title" :title="decode(thread.title)" :to="{ name: 'Posts', params: { threadSlug: thread.slug, threadId: thread.id } }" onclick="event.stopPropagation()">{{decode(thread.title)}}</router-link>
+            <router-link :class="{bold: thread.latest}" class="thread-title" :title="decode(thread.title)" :to="{ name: 'Posts', params: { threadSlug: thread.slug } }" onclick="event.stopPropagation()">{{decode(thread.title)}}</router-link>
           </div>
           <div class="user">
             in

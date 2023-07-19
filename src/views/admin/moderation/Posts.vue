@@ -73,7 +73,7 @@
             <td>{{humanDate(report.created_at, true)}}</td>
             <td v-html="report.status"></td>
             <td>
-              <router-link :title="decode(report.offender_title)" :to="{ name: 'Posts', params: { threadSlug: report.offender_thread_slug, threadId: report.offender_thread_id }, query: { start: report.offender_post_position }, hash: `#${report.offender_post_id}` }" onclick="event.stopPropagation()">
+              <router-link :title="decode(report.offender_title)" :to="{ name: 'Posts', params: { threadSlug: report.offender_thread_slug }, query: { start: report.offender_post_position }, hash: `#${report.offender_post_id}` }" onclick="event.stopPropagation()">
                 <span v-html="decode(report.offender_title)"></span>
               </router-link>
             </td>
@@ -195,7 +195,7 @@
             <tr>
               <td class="field">Reported Post</td>
               <td class="desc">
-                <router-link :title="decode(selectedReport.offender_title)" :to="{ name: 'Posts', params: { threadSlug: selectedReport.offender_thread_slug, threadId: selectedReport.offender_thread_id }, query: { start: selectedReport.offender_post_position }, hash: `#${selectedReport.offender_post_id}` }" onclick="event.stopPropagation()">
+                <router-link :title="decode(selectedReport.offender_title)" :to="{ name: 'Posts', params: { threadSlug: selectedReport.offender_thread_slug }, query: { start: selectedReport.offender_post_position }, hash: `#${selectedReport.offender_post_id}` }" onclick="event.stopPropagation()">
                   <span v-html="decode(selectedReport.offender_title)"></span>
                 </router-link>
               </td>

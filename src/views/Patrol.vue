@@ -126,7 +126,7 @@
                 </router-link>
                 <strong v-if="index !== (post.breadcrumbs.length - 1)">&nbsp;/&nbsp;</strong>
                 <strong v-if="index === (post.breadcrumbs.length - 1)">
-                  <router-link :to="{ name: 'Posts', params: { threadSlug: post.slug, threadId: post.thread_id }, query: { start: post.position}, hash: `#${post.id}` }">
+                  <router-link :to="{ name: 'Posts', params: { threadSlug: post.slug }, query: { start: post.position}, hash: `#${post.id}` }">
                     <span v-html="post.thread_title"></span>
                   </router-link></strong>
               </span>

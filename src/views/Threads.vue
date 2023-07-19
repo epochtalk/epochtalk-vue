@@ -20,13 +20,13 @@
       <tbody>
         <tr v-for="childBoard in threadData.data.board.children" :key="childBoard.id">
           <td class="board-name">
-            <router-link class="board-name" :to="{ name: 'Threads', params: { boardSlug: childBoard.slug, boardId: childBoard.id } }">{{childBoard.name}}</router-link>
+            <router-link class="board-name" :to="{ name: 'Threads', params: { boardSlug: childBoard.slug} }">{{childBoard.name}}</router-link>
             <div class="description">{{childBoard.description}}</div>
 
             <div class="children" v-if="childBoard.children.length > 0">
               <span class="label">Child Boards: </span>
               <span v-for="(child, i) in childBoard.children" :key="child.id">
-                <router-link class="board-name" :to="{ name: 'Threads', params: { boardSlug: child.slug, boardId: child.id } }">{{child.name}}</router-link><span v-if="(i + 1) !== childBoard.children.length">, </span>
+                <router-link class="board-name" :to="{ name: 'Threads', params: { boardSlug: child.slug} }">{{child.name}}</router-link><span v-if="(i + 1) !== childBoard.children.length">, </span>
               </span>
             </div>
           </td>
@@ -48,7 +48,7 @@
               </router-link>
               <span v-if="childBoard.last_thread_id">
                 posted in
-                <router-link :title="decode(childBoard.last_thread_title)" :to="{ name: 'Posts', params: { threadSlug: childBoard.last_thread_slug, threadId: childBoard.last_thread_id }, query: { start: childBoard.last_post_position } }">{{truncate(decode(childBoard.last_thread_title), 25)}}</router-link> on
+                <router-link :title="decode(childBoard.last_thread_title)" :to="{ name: 'Posts', params: { threadSlug: childBoard.last_thread_slug }, query: { start: childBoard.last_post_position } }">{{truncate(decode(childBoard.last_thread_title), 25)}}</router-link> on
               </span>
               <span v-if="childBoard.last_thread_id">
                 {{humanDate(childBoard.last_post_created_at)}}
@@ -116,7 +116,7 @@
                   </svg>
                 </span>
               </div>
-              <router-link :class="{ 'bold': thread.has_new_post }" class="thread-title" :title="decode(thread.title)" :to="{ name: 'Posts', params: { threadSlug: thread.slug, threadId: thread.id } }">{{decode(thread.title)}}</router-link>
+              <router-link :class="{ 'bold': thread.has_new_post }" class="thread-title" :title="decode(thread.title)" :to="{ name: 'Posts', params: { threadSlug: thread.slug } }">{{decode(thread.title)}}</router-link>
               <div class="thread-state-secondary">
                 <span class="thread-state-locked" v-if="thread.locked" data-balloon="Locked">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -153,8 +153,8 @@
             <router-link v-if="!thread.last_deleted" :to="{ path: '/profile/' + thread.last_post_username.toLowerCase() }">
               <span v-html="thread.last_post_username"></span>
             </router-link> posted on
-            <router-link :to="{ name: 'Posts', params: { threadSlug: thread.slug, threadId: thread.id }, query: { start: thread.last_post_position }, hash: '#' + thread.last_post_id }"><span>{{humanDate(thread.last_post_created_at)}}</span>.</router-link>
-            <router-link v-if="thread.has_new_post" :to="{ name: 'Posts', params: { threadSlug: thread.slug, threadId: thread.id, start: thread.latest_unread_position}, hash: '#' + thread.latest_unread_post_id }">(Last unread post)</router-link>
+            <router-link :to="{ name: 'Posts', params: { threadSlug: thread.slug }, query: { start: thread.last_post_position }, hash: '#' + thread.last_post_id }"><span>{{humanDate(thread.last_post_created_at)}}</span>.</router-link>
+            <router-link v-if="thread.has_new_post" :to="{ name: 'Posts', params: { threadSlug: thread.slug, start: thread.latest_unread_position}, hash: '#' + thread.latest_unread_post_id }">(Last unread post)</router-link>
           </td>
         </tr>
 
@@ -169,7 +169,7 @@
                   </g>
                 </svg>
               </div>
-              <router-link :class="{ 'bold': thread.has_new_post }" class="thread-title" :title="decode(thread.title)" :to="{ name: 'Posts', params: { threadSlug: thread.slug, threadId: thread.id } }">{{decode(thread.title)}}</router-link>
+              <router-link :class="{ 'bold': thread.has_new_post }" class="thread-title" :title="decode(thread.title)" :to="{ name: 'Posts', params: { threadSlug: thread.slug } }">{{decode(thread.title)}}</router-link>
                 <div class="thread-state-secondary">
                 <span class="thread-state-locked" v-if="thread.locked" data-balloon="Locked">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" data-balloon="Locked">
@@ -203,8 +203,8 @@
           <td class="last-post" v-if="thread.user.username">
             <span v-if="thread.last_deleted">deleted</span>
             <router-link v-if="!thread.last_deleted" :to="{ path: '/profile/' + thread.last_post_username.toLowerCase() }"><img class="avatar-small" :class="defaultAvatar" :src="thread.last_post_avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" /></router-link>
-            <router-link v-if="!thread.last_deleted" :to="{ path: '/profile/' + thread.last_post_username.toLowerCase() }"><span v-html="thread.last_post_username"></span></router-link> posted on <router-link :to="{ name: 'Posts', params: { threadSlug: thread.slug, threadId: thread.id }, query: { start: thread.last_post_position }, hash: '#' + thread.last_post_id }"><span>{{humanDate(thread.last_post_created_at)}}</span>.</router-link>
-            <router-link v-if="thread.has_new_post" :to="{ name: 'Posts', params: { threadSlug: thread.slug, threadId: thread.id }, query: { start: thread.latest_unread_position }, hash: '#' + thread.latest_unread_post_id }">(Last unread post)</router-link>
+            <router-link v-if="!thread.last_deleted" :to="{ path: '/profile/' + thread.last_post_username.toLowerCase() }"><span v-html="thread.last_post_username"></span></router-link> posted on <router-link :to="{ name: 'Posts', params: { threadSlug: thread.slug }, query: { start: thread.last_post_position }, hash: '#' + thread.last_post_id }"><span>{{humanDate(thread.last_post_created_at)}}</span>.</router-link>
+            <router-link v-if="thread.has_new_post" :to="{ name: 'Posts', params: { threadSlug: thread.slug }, query: { start: thread.latest_unread_position }, hash: '#' + thread.latest_unread_post_id }">(Last unread post)</router-link>
           </td>
         </tr>
       </tbody>

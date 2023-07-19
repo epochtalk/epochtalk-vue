@@ -33,7 +33,7 @@
           <transition>
             <div class="board" v-if="collapsedCats.indexOf(cat.id) < 0 && ignoredBoards.indexOf(board.id) < 0">
               <div class="info">
-                <h2><router-link :to="{ name: 'Threads', params: { boardSlug: board.slug, boardId: board.id } }">{{board.name}}</router-link></h2>
+                <h2><router-link :to="{ name: 'Threads', params: { boardSlug: board.slug } }">{{board.name}}</router-link></h2>
                 <div class="description">{{board.description}}</div>
                 <div class="moderators" v-if="board.moderators && board.moderators.length">
                   <span>Moderators: </span>
@@ -44,7 +44,7 @@
                 <div class="childboards" v-if="board.children.length">
                   <span>Child Boards: </span>
                   <span v-for="(child, i) in board.children" :key="child.id">
-                    <router-link class="board-name" :to="{ name: 'Threads', params: { boardSlug: child.slug, boardId: child.id } }">{{child.name}}</router-link><span v-if="(i + 1) !== board.children.length">, </span>
+                    <router-link class="board-name" :to="{ name: 'Threads', params: { boardSlug: child.slug } }">{{child.name}}</router-link><span v-if="(i + 1) !== board.children.length">, </span>
                   </span>
                 </div>
               </div>
@@ -69,7 +69,7 @@
                     <img v-if="!board.user_deleted && !board.post_deleted" class="avatar-small" :class="defaultAvatarShape" :src="board.last_post_avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
                     <router-link v-if="!board.user_deleted && !board.post_deleted" :to="{ path: '/profile/' + board.last_post_username.toLowerCase() }">{{board.last_post_username}}</router-link> posted in
                     <span v-if="board.last_thread_title">
-                      <router-link :to="{ name: 'Posts', params: { threadSlug: board.last_thread_slug, threadId: board.last_thread_id }, query: { start: board.last_post_position} }">
+                      <router-link :to="{ name: 'Posts', params: { threadSlug: board.last_thread_slug }, query: { start: board.last_post_position} }">
                         <span v-html="board.last_thread_title"></span>
                       </router-link> on
                     </span>
