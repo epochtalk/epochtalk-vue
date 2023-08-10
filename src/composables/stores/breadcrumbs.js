@@ -13,16 +13,9 @@ export default {
     const $route = useRoute()
     const $router = useRouter()
 
-    // TODO(akinsey): update hapi breadcrumb api routes to not use angular states, then remove this
-    const stateToRoute = {
-      '^.home': 'Boards',
-      '^.boards': 'Boards',
-      'threads.data': 'Threads'
-    }
-
     const pathLookup = {
       home: {
-        state: '^.home',
+        routeName: 'Boards',
         label: 'Home'
       },
       profiles: {
@@ -40,8 +33,6 @@ export default {
 
     /* Internal Methods */
     const update = async () => {
-      breadcrumbs.splice(0, breadcrumbs.length)
-      breadcrumbs.push(pathLookup.home)
       let path = $route.path
       let routeParams = cloneDeep($route.params)
       // Handle 403 breadcrumb
@@ -71,7 +62,10 @@ export default {
         let idKey = routeParamKeys.reverse()[0]
         let id = routeParams[idKey]
         let type = keyToType[idKey]
-        breadcrumbs.push(...await breadcrumbsApi.find(id, type))
+        let crumbs = await breadcrumbsApi.find(id, type)
+        breadcrumbs.splice(0, breadcrumbs.length)
+        breadcrumbs.push(pathLookup.home)
+        breadcrumbs.push(...crumbs.breadcrumbs)
 
       }
       // routeParams is empty, route is static
@@ -92,9 +86,12 @@ export default {
           breadcrumbs[2].routePath =  '/profile/' + breadcrumbs[2].label.toLowerCase()
         }
       }
+      else if (path == '/') {
+        breadcrumbs.splice(0, breadcrumbs.length)
+        breadcrumbs.push(pathLookup.home)
+      }
       if (breadcrumbs) {
         for (let i = 0; i < breadcrumbs.length; i++) {
-          breadcrumbs[i].routeName = stateToRoute[breadcrumbs[i].state]
           breadcrumbs[i].label = decodeURIComponent(breadcrumbs[i].label.replace(/%/g, '%25'))
           if (breadcrumbs[i].opts && breadcrumbs[i].opts['#']) {
             breadcrumbs[i].hash = '#' + breadcrumbs[i].opts['#']

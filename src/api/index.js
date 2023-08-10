@@ -271,7 +271,7 @@ export const notificationsApi = {
 }
 
 export const breadcrumbsApi = {
-  find: (id, type) => $http('/api/breadcrumbs', { params: { id, type } })
+  find: (id, type) => $http2('/api/breadcrumbs', { params: { id, type } })
 }
 
 export const banApi = {
