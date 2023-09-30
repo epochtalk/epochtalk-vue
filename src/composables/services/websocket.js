@@ -5,12 +5,13 @@ import { Socket as PhoenixSocket } from 'phoenix'
 import { $axios2 } from '@/api'
 
 // Variable initializations
-let userChannel, roleChannel, publicChannel
+let userChannel, roleChannel, publicChannel, token = null
 let session = reactive({ user: {} })
 
 // Initiate the connection to the websocket server
 const socketUrl = process.env.VUE_APP_BACKEND_URL.replace('http://', 'ws://') + '/socket'
 const socket = new PhoenixSocket(socketUrl, {
+  params: () => token ? {token: token} : {},
   logger: (kind, msg, data) => {
    if (window.websocket_logs) console.log(`${kind}: ${msg}`, data)
   }
@@ -28,11 +29,14 @@ export const socketLogin = socketUser => {
   let reconnectWithToken = () => {
     if (socket.connectionState() === 'open') {
       socket.disconnect(() => {
-        socket.params.token = socketUser.token
+        token = socketUser.token
         socket.connect()
       }, 1000, 'Disconnected to attempt authorized socket connection.') // disconnect
     }
-    else setTimeout(() => reconnectWithToken(), 1000)
+    else {
+      token = socketUser.token
+      socket.connect()
+    }
   }
   reconnectWithToken()
   Object.assign(session.user, socketUser)
@@ -45,7 +49,7 @@ export const socketLogout = socketUser => {
     // Remove token from axios
     delete $axios2.defaults.headers.common['Authorization']
     Object.assign(session.user, socketUser)
-    delete socket.params.token
+    token = null
     if (socket.isConnected()) socket.disconnect() // disconnect
     socket.connect() // reconnect to retrigger onOpen event
   }
@@ -116,7 +120,7 @@ export default {
       publicChannel.join()
 
       // Authenticated Channels
-      if (socket.params.token) {
+      if (socket.params().token) {
         // Join Role Channel
         if (roleChannel) roleChannel.leave() // leave if already connected
         roleChannel = socket.channel('user:role')
