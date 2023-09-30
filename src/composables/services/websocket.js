@@ -51,7 +51,7 @@ export const socketLogout = socketUser => {
     Object.assign(session.user, socketUser)
     token = null
     if (socket.isConnected()) socket.disconnect() // disconnect
-    socket.connect() // reconnect to retrigger onOpen event
+    setTimeout(() => socket.connect(), 500) // reconnect to retrigger onOpen event
   }
 }
 
@@ -115,10 +115,10 @@ export default {
 
     socket.onOpen(() => {
       // Join Public Channel
-      if (publicChannel) publicChannel.leave() // leave if already connected
-      publicChannel = socket.channel('user:public')
-      publicChannel.join()
-
+      if (!publicChannel) {
+        publicChannel = socket.channel('user:public')
+        publicChannel.join()
+      }
       // Authenticated Channels
       if (socket.params().token) {
         // Join Role Channel
@@ -147,6 +147,11 @@ export default {
           // Logout all sessions sharing the same token (usually an entire device)
           if (payload.token === session.user.token) $auth.websocketLogout()
         })
+      }
+      else {
+        // leave authed channels if we reconnect without auth
+        if (roleChannel) roleChannel.leave()
+        if (userChannel) userChannel.leave()
       }
     })
 
