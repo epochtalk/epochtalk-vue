@@ -49,9 +49,12 @@ export const socketLogout = socketUser => {
     // Remove token from axios
     delete $axios2.defaults.headers.common['Authorization']
     Object.assign(session.user, socketUser)
-    token = null
-    if (socket.isConnected()) socket.disconnect() // disconnect
-    setTimeout(() => socket.connect(), 500) // reconnect to retrigger onOpen event
+    if (socket.isConnected()) {
+      socket.disconnect(() => {
+        token = null
+        socket.connect()
+      }, 1000, 'Disconnected to attempt unauthorized socket connection') // disconnect
+    }
   }
 }
 
