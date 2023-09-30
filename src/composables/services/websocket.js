@@ -33,7 +33,10 @@ export const socketLogin = socketUser => {
         socket.connect()
       }, 1000, 'Disconnected to attempt authorized socket connection.') // disconnect
     }
-    else setTimeout(() => reconnectWithToken(), 1000)
+    else {
+      token = socketUser.token
+      socket.connect()
+    }
   }
   reconnectWithToken()
   Object.assign(session.user, socketUser)
