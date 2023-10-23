@@ -401,11 +401,13 @@ $axios2.interceptors.response.use(res => {
   return res
 },
 err => {
-  console.log(err)
   if(err.response) { // Server still responding, just getting errors from api calls
     switch (err.response.status) {
       case 401:
+        delete $axios2.defaults.headers.common['Authorization'] // clear token from axios
+        delete $axios.defaults.headers.common['Authorization'] // clear token from axios
         if (router.currentRoute._value.meta.requiresAuth) router.push({ name: 'Login'})
+        else window.location.reload()
         break
       case 403:
         if (router.currentRoute._value.meta.ignoreAxiosInterceptor) break
@@ -428,7 +430,10 @@ $axios.interceptors.response.use(res => res, err => {
   if(err.response) { // Server still responding, just getting errors from api calls
     switch (err.response.status) {
       case 401:
+        delete $axios2.defaults.headers.common['Authorization'] // clear token from axios
+        delete $axios.defaults.headers.common['Authorization'] // clear token from axios
         if (router.currentRoute._value.meta.requiresAuth) router.push({ name: 'Login'})
+        else window.location.reload()
         break
       case 403:
         if (router.currentRoute._value.meta.ignoreAxiosInterceptor) break
