@@ -70,6 +70,7 @@ export default {
       }
       // routeParams is empty, route is static
       else if (path !== '/') {
+        breadcrumbs.splice(0, breadcrumbs.length)
         let pathArr = path.split('/')
         // Shifting array by one to eliminate empty index
         pathArr.shift()
