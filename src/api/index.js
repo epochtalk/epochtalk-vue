@@ -105,7 +105,7 @@ export const categoriesApi = {
 export const boardsApi = {
   slugToBoardId: slug => $http2(`/api/boards/${slug}/id`),
   getBoards: stripped => $http2(`/api/boards${stripped ? '?stripped=true' : ''}`),
-  movelist: () => $http('/api/boards/movelist'),
+  movelist: () => $http2('/api/boards/movelist'),
   unfiltered: () => $http('/api/boards/unfiltered'),
   uncategorized: () => $http('/api/boards/uncategorized'),
   find: id => $http(`/api/boards/${id}`),
