@@ -48,7 +48,7 @@
               </router-link>
               <span v-if="childBoard.last_thread_id">
                 posted in
-                <router-link :title="decode(childBoard.last_thread_title)" :to="{ name: 'Posts', params: { threadSlug: childBoard.last_thread_slug }, query: { start: childBoard.last_post_position } }">{{truncate(decode(childBoard.last_thread_title), 25)}}</router-link> on
+                <router-link :title="decode(childBoard.last_thread_title)" :to="{ name: 'Posts', params: { threadSlug: childBoard.last_thread_slug }, query: { start: childBoard.last_post_position } }"><span v-html="truncate(decode(childBoard.last_thread_title), 25)"></span></router-link> on
               </span>
               <span v-if="childBoard.last_thread_id">
                 {{humanDate(childBoard.last_post_created_at)}}
@@ -116,7 +116,7 @@
                   </svg>
                 </span>
               </div>
-              <router-link :class="{ 'bold': thread.has_new_post }" class="thread-title" :title="decode(thread.title)" :to="{ name: 'Posts', params: { threadSlug: thread.slug } }">{{decode(thread.title)}}</router-link>
+              <router-link :class="{ 'bold': thread.has_new_post }" class="thread-title" :title="decode(thread.title)" :to="{ name: 'Posts', params: { threadSlug: thread.slug } }"><span v-html="decode(thread.title)"></span></router-link>
               <div class="thread-state-secondary">
                 <span class="thread-state-locked" v-if="thread.locked" data-balloon="Locked">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -169,7 +169,7 @@
                   </g>
                 </svg>
               </div>
-              <router-link :class="{ 'bold': thread.has_new_post }" class="thread-title" :title="decode(thread.title)" :to="{ name: 'Posts', params: { threadSlug: thread.slug } }">{{decode(thread.title)}}</router-link>
+              <router-link :class="{ 'bold': thread.has_new_post }" class="thread-title" :title="decode(thread.title)" :to="{ name: 'Posts', params: { threadSlug: thread.slug } }"><span v-html="decode(thread.title)"></span></router-link>
                 <div class="thread-state-secondary">
                 <span class="thread-state-locked" v-if="thread.locked" data-balloon="Locked">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" data-balloon="Locked">
