@@ -1,7 +1,7 @@
 <template>
   <div class="board-controls" v-if="threadData && threadData.data && threadData.data.board">
     <div class="board-title">
-      <h1>{{threadData.data.board.name}}</h1>
+      <h1 v-html="threadData.data.board.name"></h1>
       <div class="moderators" v-if="threadData.data.board.moderators && threadData.data.board.moderators.length > 0">
         <span class="label">Moderators: </span>
         <span v-for="(mod, i) in threadData.data.board.moderators" :key="mod.username">
