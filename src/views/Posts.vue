@@ -11,7 +11,7 @@
     <div class="page-header-split">
       <!-- Show Title -->
       <div v-if="!editThread" class="thread-title">
-        <h1>{{postData.data.thread.title}}</h1>
+        <h1 v-html="postData.data.thread.title"></h1>
         <a href="#" data-balloon="Edit Thread Title" class="do-edit" v-if="canEditTitle()" @click.prevent="openEditThread()">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
             <title></title>
