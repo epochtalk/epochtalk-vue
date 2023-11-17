@@ -4,9 +4,9 @@
     <div id="breadcrumbs">
       <ul>
         <li v-for="(breadcrumb, i) in breadcrumbs" :key="i" :class="{ active: (i + 1) === breadcrumbs.length }">
-          <router-link v-if="(i + 1) !== breadcrumbs.length && breadcrumb.routeName && breadcrumb.label" :title="breadcrumb.label" :to="{ name: breadcrumb.routeName, params: breadcrumb.opts, hash: breadcrumb.hash }">{{truncate(breadcrumb.label, 30)}}</router-link>
-          <router-link v-if="(i + 1) !== breadcrumbs.length && breadcrumb.routePath && breadcrumb.label" :title="breadcrumb.label" :to="{ path: breadcrumb.routePath }">{{truncate(breadcrumb.label, 30)}}</router-link>
-          <span v-if="((i + 1) === breadcrumbs.length || (!breadcrumb.routeName && !breadcrumb.routePath)) && breadcrumb.label" :title="breadcrumb.label">{{truncate(breadcrumb.label, 30)}}</span>
+          <router-link v-if="(i + 1) !== breadcrumbs.length && breadcrumb.routeName && breadcrumb.label" :title="breadcrumb.label" :to="{ name: breadcrumb.routeName, params: breadcrumb.opts, hash: breadcrumb.hash }"><span v-html="truncate(breadcrumb.label, 30)"></span></router-link>
+          <router-link v-if="(i + 1) !== breadcrumbs.length && breadcrumb.routePath && breadcrumb.label" :title="breadcrumb.label" :to="{ path: breadcrumb.routePath }"><span v-html="truncate(breadcrumb.label, 30)"></span></router-link>
+          <span v-if="((i + 1) === breadcrumbs.length || (!breadcrumb.routeName && !breadcrumb.routePath)) && breadcrumb.label" :title="breadcrumb.label"><span v-html="truncate(breadcrumb.label, 30)"></span></span>
           <span v-if="((i + 1) === breadcrumbs.length || (!breadcrumb.routeName && !breadcrumb.routePath)) && breadcrumb.opts && breadcrumb.opts.locked" title="Locked" class="breadcrumbs-locked"><strong>(locked)</strong></span>
         </li>
       </ul>
