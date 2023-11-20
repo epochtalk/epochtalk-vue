@@ -169,7 +169,7 @@
                   </g>
                 </svg>
               </div>
-              <router-link :class="{ 'bold': thread.has_new_post }" class="thread-title" :title="decode(thread.title)" :to="{ name: 'Posts', params: { threadSlug: thread.slug } }"><span v-html="decode(thread.title)"></span></router-link>
+              <router-link :class="{ 'bold': thread.has_new_post }" class="thread-title" :title="decode(thread.title, true)" :to="{ name: 'Posts', params: { threadSlug: thread.slug } }"><span v-html="thread.title"></span></router-link>
                 <div class="thread-state-secondary">
                 <span class="thread-state-locked" v-if="thread.locked" data-balloon="Locked">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" data-balloon="Locked">
