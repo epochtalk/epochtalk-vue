@@ -1117,8 +1117,10 @@ $postWidth__mobile: calc(100vw - 2rem);
   overflow-wrap: break-word;
   .imageContainer.loaded { background: none; }
   .imageContainer { }
-  ul, ol { @include pad(0 0 0 1.15rem); }
-  ul { white-space: normal }
+  ul, ol {
+    @include pad(0 0 0 1.15rem);
+    white-space: normal
+  }
   img.loaded { opacity: 1; }
   img { @include transition(opacity 0.5s ease-in); opacity: 1; }
   & table {

@@ -245,7 +245,12 @@ export default {
   .post-body {
     white-space: pre-wrap;
     &.open { background-color: darken($base-background-color, 5%); }
-    ul { white-space: normal }
+    ul {
+      white-space: normal;
+    }
+    ol {
+      white-space: initial;
+    }
     &.closed {
       width: 100%;
       max-height: 18px;
