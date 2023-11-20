@@ -276,7 +276,7 @@
           </div>
           <!-- Post Body -->
           <!-- TODO(akinsey): post-processing="post.body_html" style-fix="true" -->
-          <div class="post-body" :class="{ 'rtl': post.right_to_left }" v-html="post.body_html"></div>
+          <div class="post-body" :class="{ 'rtl': post.right_to_left }" v-html="decode(post.body_html, true)"></div>
           <div v-if="post.user.signature && !disableSignature">
             <!-- TODO(akinsey): post-processing="post.user.signature" style-fix="true" -->
             <div class="post-signature" v-html="post.user.signature"></div>
@@ -1047,6 +1047,7 @@ export default {
 
     return {
       ...toRefs(v),
+      decode,
       createPost,
       updatePost,
       canEditTitle,
