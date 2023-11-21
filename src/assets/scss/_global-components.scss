@@ -185,10 +185,26 @@ h4 { font-size: 1.3125rem; } //Category Name, Board Name, Thread Name
 h5 { font-size: 1.125rem; } // Board Name (Front Page), Section Headers Board View
 h6 { font-size: 1rem; }
 
-div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, p, blockquote, th, td {
+div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, blockquote, th, td {
   margin: 0;
   padding: 0;
 }
+
+/*-- Post Formatting  --*/
+
+.post-body p {
+  padding: 0;
+  margin: 0;
+  display: inline-block;
+  height: auto;
+  line-height: initial;
+  &:first-child {
+    margin-top: -1rem;
+    white-space: pre-line;
+  }
+}
+
+/*-- UI components  --*/
 
 a.button, .button, button, button:focus, .button:focus {
   border-radius: 3px;
