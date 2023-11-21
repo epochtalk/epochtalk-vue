@@ -1142,11 +1142,6 @@ $postWidth__mobile: calc(100vw - 2rem);
     width: 100%;
     height: 100%;
   }
-
-  pre {
-    overflow-x: scroll;
-    word-wrap: normal;
-  }
 }
 .quoteHeader {
   border-left: $border-quote;
