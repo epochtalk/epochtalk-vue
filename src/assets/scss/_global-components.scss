@@ -224,6 +224,34 @@ blockquote p {
   margin-top: -2rem;
 }
 
+pre {
+  overflow-x: auto;
+  word-wrap: normal;
+}
+code {
+  font-family: Consolas, "Liberation Mono", Courier, monospace;
+  background-color: $code-block-bg-color;
+  margin-bottom: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 1rem;
+  display: block;
+  font-size: 0.85rem;
+  color: $code-block-text-color;
+  line-height: 0.65rem;
+  white-space: pre;
+  word-break: normal;
+  overflow-wrap: break-word;
+  overflow-x: auto;
+
+  &.preview {
+    padding: 0; display: inline-block;
+  }
+
+  @include break-mobile-tablet {
+    max-width: 50vw;
+  }
+}
+
 /*-- UI components  --*/
 
 a.button, .button, button, button:focus, .button:focus {
