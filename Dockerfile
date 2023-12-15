@@ -7,8 +7,6 @@ RUN chmod +x /usr/bin/jq
 RUN apk add --no-cache git
 WORKDIR /app
 COPY . .
-COPY src/docker-config.json src/config.json
-RUN jq 'to_entries | map_values({ (.key) : ("$" + .key) }) | reduce .[] as $item ({}; . + $item)' ./src/config.json > ./src/config.tmp.json && mv ./src/config.tmp.json ./src/config.json
 RUN yarn install && yarn run build
 
 # production stage
