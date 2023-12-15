@@ -1,5 +1,5 @@
 # build stage
-FROM node:12-alpine as build-stage
+FROM node:16-alpine as build-stage
 ENV JQ_VERSION=1.6
 RUN wget --no-check-certificate https://github.com/stedolan/jq/releases/download/jq-${JQ_VERSION}/jq-linux64 -O /tmp/jq-linux64
 RUN cp /tmp/jq-linux64 /usr/bin/jq
