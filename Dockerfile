@@ -4,6 +4,7 @@ ENV JQ_VERSION=1.6
 RUN wget --no-check-certificate https://github.com/stedolan/jq/releases/download/jq-${JQ_VERSION}/jq-linux64 -O /tmp/jq-linux64
 RUN cp /tmp/jq-linux64 /usr/bin/jq
 RUN chmod +x /usr/bin/jq
+RUN apk add --no-cache git
 WORKDIR /app
 COPY . .
 COPY src/docker-config.json src/config.json
