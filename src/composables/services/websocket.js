@@ -3,13 +3,15 @@ import { AuthStore } from '@/composables/stores/auth'
 import { provide, inject, reactive } from 'vue'
 import { Socket as PhoenixSocket } from 'phoenix'
 import { $axios2 } from '@/api'
+import config from '@/config.json'
 
 // Variable initializations
 let userChannel, roleChannel, publicChannel, token = null
 let session = reactive({ user: {} })
 
 // Initiate the connection to the websocket server
-const socketUrl = process.env.VUE_APP_BACKEND_URL.replace('http://', 'ws://') + '/socket'
+const backendUrl = process.env.VUE_APP_BACKEND_URL || config.VUE_APP_BACKEND_URL
+const socketUrl = backendUrl.replace('http://', 'ws://') + '/socket'
 const socket = new PhoenixSocket(socketUrl, {
   params: () => token ? {token: token} : {},
   logger: (kind, msg, data) => {

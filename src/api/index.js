@@ -2,14 +2,15 @@ import axios from 'axios'
 import { get } from 'lodash'
 import localStorageCache from '@/composables/utils/localStorageCache'
 import alertStore from '@/composables/stores/alert'
+import config from '@/config.json'
 
 export const $axios = axios.create({
-  baseURL: process.env.VUE_APP_OLD_BACKEND_URL,
+  baseURL: process.env.VUE_APP_OLD_BACKEND_URL || config.VUE_APP_OLD_BACKEND_URL,
   timeout: 3000,
   crossDomain: true
 })
 export const $axios2 = axios.create({
-  baseURL: process.env.VUE_APP_BACKEND_URL,
+  baseURL: process.env.VUE_APP_BACKEND_URL || config.VUE_APP_BACKEND_URL,
   timeout: 3000,
   crossDomain: true
 })
