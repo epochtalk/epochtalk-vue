@@ -4503,9 +4503,9 @@ neo-async@^2.6.2:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.2.tgz#b4aafb93e3aeb2d8174ca53cf163ab7d7308305f"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
 
-"nestable@git+https://github.com/slickage/Nestable.git":
+"nestable@https://github.com/epochtalk/Nestable.git":
   version "1.0.0"
-  resolved "git+ssh://git@github.com/slickage/Nestable.git#efb919259ea0ebfb26c672eda674570ed3a09375"
+  resolved "https://github.com/epochtalk/Nestable.git#efb919259ea0ebfb26c672eda674570ed3a09375"
 
 nice-try@^1.0.4:
   version "1.0.5"
