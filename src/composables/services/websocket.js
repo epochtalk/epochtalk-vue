@@ -11,7 +11,7 @@ let session = reactive({ user: {} })
 
 // Initiate the connection to the websocket server
 const backendUrl = process.env.VUE_APP_BACKEND_URL || config.VUE_APP_BACKEND_URL
-const socketUrl = backendUrl.replace('http://', 'ws://').replace('https://', 'wss://') + '/socket'
+const socketUrl = backendUrl.replace('http://', 'ws://').replace('https://', 'ws://') + '/socket'
 const socket = new PhoenixSocket(socketUrl, {
   params: () => token ? {token: token} : {},
   logger: (kind, msg, data) => {
