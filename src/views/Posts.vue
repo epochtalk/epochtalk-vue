@@ -512,17 +512,16 @@ export default {
       })
     }
     const postEditDisabled = (createdAt) => {
-      // get amount of time post edit has been disabled for in ms (if available)
-      const disablePostEdit = v.postData.data.board.disable_post_edit
-      if (disablePostEdit && Number(disablePostEdit) > -1) {
-        const disablePostEditDuration = dayjs.duration(disablePostEdit)
-        const currentTime = dayjs()
-        const createdAtTime = dayjs(createdAt)
-        // if elapsed time since creation has not passed disabled duration
-        // post edit is disabled
-        return currentTime.isBefore(createdAtTime.add(disablePostEditDuration))
+      // get amount of time post edit should be allowed for for in ms (if available)
+      const disablePostEditAfter = v.postData.data.board.disable_post_edit
+      let disabled = false
+      if (disablePostEditAfter && Number(disablePostEditAfter) > -1) {
+        let currentTime = new Date().getTime();
+        let minutes =  Number(disablePostEditAfter) * 60 * 1000;
+
+        disabled = currentTime - createdAt >= minutes;
       }
-      else return false
+      return disabled
     }
     /* View Methods */
     const canEditTitle = () => {
