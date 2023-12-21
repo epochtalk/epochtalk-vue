@@ -516,10 +516,16 @@ export default {
       const disablePostEditAfter = v.postData.data.board.disable_post_edit
       let disabled = false
       if (disablePostEditAfter && Number(disablePostEditAfter) > -1) {
-        let currentTime = new Date().getTime();
-        let minutes =  Number(disablePostEditAfter) * 60 * 1000;
-
-        disabled = currentTime - createdAt >= minutes;
+        createdAt = dayjs(createdAt).valueOf()
+        let currentTime = dayjs().valueOf()
+        let minutes =  Number(disablePostEditAfter) * 60 * 1000
+        console.log("currentTime:", currentTime)
+        console.log("createdAt:", createdAt)
+        console.log("minutes:", minutes)
+        console.log(`${currentTime} - ${createdAt} >= ${minutes}`)
+        console.log(`${currentTime - createdAt} >= ${minutes}`)
+        disabled = currentTime - createdAt >= minutes
+        console.log("disabled:", disabled)
       }
       return disabled
     }
