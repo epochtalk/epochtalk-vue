@@ -519,13 +519,7 @@ export default {
         createdAt = dayjs(createdAt).valueOf()
         let currentTime = dayjs().valueOf()
         let minutes =  Number(disablePostEditAfter) * 60 * 1000
-        console.log("currentTime:", currentTime)
-        console.log("createdAt:", createdAt)
-        console.log("minutes:", minutes)
-        console.log(`${currentTime} - ${createdAt} >= ${minutes}`)
-        console.log(`${currentTime - createdAt} >= ${minutes}`)
         disabled = currentTime - createdAt >= minutes
-        console.log("disabled:", disabled)
       }
       return disabled
     }
