@@ -60,17 +60,14 @@
     </table>
 
     <!-- Thread Sorting Controls -->
-    <div class="centered-text" v-if="!threadData?.data?.board?.thread_count">
-      <h4>There are currently no threads in this board, start a new thread to get the conversation going!</h4>
-    </div>
-    <div class="thread-sort" v-if="threadData && threadData.data && threadData.data.board.thread_count">Sort <a href="" @click.prevent="setSortField()">{{ threadData.data.desc === true ? 'descending' : 'ascending' }}</a> by
+    <div class="thread-sort">Sort <a href="" @click.prevent="setSortField()">{{ threadData.data.desc === true ? 'descending' : 'ascending' }}</a> by
       <select v-model="sortField" name="select-thread-sort" class="select-clean" @change="setSortField()">
         <option v-for="item in sortItems" :key="item.value" :value="item.value">{{item.label}}</option>
       </select>
     </div>
 
     <!-- Thread Listing -->
-    <table class="threads-list" v-if="threadData && threadData.data && threadData.data.board.thread_count">
+    <table class="threads-list">
       <caption>Threads</caption>
       <thead>
         <tr>
