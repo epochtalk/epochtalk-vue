@@ -140,7 +140,7 @@
           </td>
 
           <td class="views-replies">
-            <span class="replies">{{ thread.post_count - 1 || 0 }}</span>
+            <span class="replies">{{ thread.is_proxy ? thread.post_count : thread.post_count - 1 || 0 }}</span>
             <span class="views">{{ thread.view_count || 0 }}</span>
           </td>
 
@@ -193,7 +193,7 @@
           </td>
 
           <td class="views-replies" v-if="thread.user.username">
-            <span class="replies">{{ thread.post_count - 1 || 0 }}</span>
+            <span class="replies">{{ thread.is_proxy ? thread.post_count : thread.post_count - 1 || 0 }}</span>
             <span class="views">{{ thread.view_count || 0 }}</span>
           </td>
 
