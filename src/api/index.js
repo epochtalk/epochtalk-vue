@@ -155,7 +155,7 @@ export const postsApi = {
 }
 export const pollsApi = {
   create: (threadId, params) => $http(`/api/threads/${threadId}/polls`, { method: 'POST', data: params }),
-  vote: (threadId, pollId, answerIds) => $http(`/api/threads/${threadId}/polls/${pollId}/vote`, { method: 'POST', data: { answer_ids: answerIds }}),
+  vote: (threadId, pollId, answerIds) => $http2(`/api/threads/${threadId}/poll/vote`, { method: 'POST', data: { answer_ids: answerIds }}),
   removeVote: (threadId, pollId) => $http(`/api/threads/${threadId}/polls/${pollId}/vote`, { method: 'DELETE' }),
   editPoll: (threadId, pollId, options) => $http(`/api/threads/${threadId}/polls/${pollId}`, { method: 'PUT', data: options }),
   lock: (threadId, pollId) => $http(`/api/threads/${threadId}/polls/${pollId}/lock`, { method: 'POST', data: { locked: true }}),
