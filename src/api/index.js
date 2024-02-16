@@ -11,7 +11,7 @@ export const $axios = axios.create({
 })
 export const $axios2 = axios.create({
   baseURL: process.env.VUE_APP_BACKEND_URL || config.VUE_APP_BACKEND_URL,
-  timeout: 3000,
+  timeout: 10000,
   crossDomain: true
 })
 
