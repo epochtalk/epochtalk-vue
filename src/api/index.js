@@ -95,7 +95,9 @@ export const themeApi = {
 }
 
 export const imagesApi = {
-  imagePolicy: data => $http('/api/images/policy', { method: 'POST', data })
+  // TODO(boka): remove imagePolicy 
+  imagePolicy: data => $http('/api/images/policy', { method: 'POST', data }),
+  requestS3Upload: data => $http2('/api/images/s3/upload', { method: 'POST', data })
 }
 
 export const categoriesApi = {
