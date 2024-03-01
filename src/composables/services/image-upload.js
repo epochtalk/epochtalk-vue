@@ -3,6 +3,22 @@ const appCache = localStorageCache(0, 'app')
 const AUTH_KEY = 'auth'
 import { imagesApi } from '@/api'
 
+export const presignedPost = images => {
+  if (!images.length) return Promise.reject()
+  // get all the image filenames
+  images = images.map(image => {
+    console.log("image", image)
+    return {
+      length: image.file.size,
+      file_type: image.file.type
+    }
+  })
+  // images.forEach(image => names.push(image.name))
+
+  // request a presigned post for each name
+  return imagesApi.requestS3Upload(images[0])
+}
+
 export const policy = images => {
   if (!images.length) return Promise.reject()
   // get all the image filenames
