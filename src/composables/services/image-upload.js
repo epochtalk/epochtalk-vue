@@ -10,7 +10,7 @@ export const presignedPost = images => {
     console.log("image", image)
     return {
       length: image.file.size,
-      file_type: image.file.type
+      file_type: image.file.name.split('.').pop()
     }
   })
   // images.forEach(image => names.push(image.name))
