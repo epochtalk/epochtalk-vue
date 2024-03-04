@@ -19,6 +19,11 @@ export const presignedPost = images => {
   return imagesApi.requestS3Upload(images[0])
 }
 
+export const s3Upload = presignedPost => {
+  // upload to s3
+  return imagesApi.s3Upload(presignedPost)
+}
+
 export const policy = images => {
   if (!images.length) return Promise.reject()
   // get all the image filenames
