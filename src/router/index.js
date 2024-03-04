@@ -448,7 +448,7 @@ $axios.interceptors.response.use(res => res, err => {
         break
     }
   }
-  else router.push({ name: 'ServiceUnavailable'}) // API is down, 503
+  else console.log(err.config.url, "API is down, 503")
   return Promise.reject(err)
 })
 
