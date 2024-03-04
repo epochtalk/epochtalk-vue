@@ -97,7 +97,24 @@ export const themeApi = {
 export const imagesApi = {
   // TODO(boka): remove imagePolicy 
   imagePolicy: data => $http('/api/images/policy', { method: 'POST', data }),
-  requestS3Upload: data => $http2('/api/images/s3/upload', { method: 'POST', data })
+  requestS3Upload: data => $http2('/api/images/s3/upload', { method: 'POST', data }),
+  s3Upload: data => {
+    let presignedPost = data["presigned_post"]
+    // set request URL
+    let url = presignedPost["url"]
+    let file = data["file"]
+    // set request options/headers
+    let options = {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    }
+    // set request body and append file
+    let body = presignedPost["fields"]
+    body["file"] = file
+    return axios.post(url, body, options)
+    .then(res => res.status === 200 ? res.data : res)
+  }
 }
 
 export const categoriesApi = {
