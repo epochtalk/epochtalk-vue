@@ -64,7 +64,7 @@
 
 <script>
 import { reactive, toRefs, watch } from 'vue'
-import { policy, upload, presignedPost } from '@/composables/services/image-upload'
+import { policy, upload, presignedPost, s3Upload } from '@/composables/services/image-upload'
 import Modal from '@/components/layout/Modal.vue'
 
 Promise.each = async (arr, fn) => { for(const item of arr) await fn(item) }
@@ -135,7 +135,10 @@ export default {
         // the number of images that are still being uploaded
         v.uploadingImages = v.currentImages.length
         presignedPost(v.currentImages)
-           .then(result => console.log("result", result))
+        .then(presignedPost => {
+          presignedPost["file"] = images[0]
+          return s3Upload(presignedPost)
+        })
         return policy(v.currentImages)
         // upload each image
         .then(imagesToUpload => {
