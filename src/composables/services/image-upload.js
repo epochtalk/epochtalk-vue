@@ -5,7 +5,7 @@ import { imagesApi } from '@/api'
 
 export const presignedPost = images => {
   if (!images.length) return Promise.reject()
-  // get all the image filenames
+  // get details for all images
   images = images.map(image => {
     console.log("image", image)
     return {
@@ -13,10 +13,9 @@ export const presignedPost = images => {
       file_type: image.file.name.split('.').pop()
     }
   })
-  // images.forEach(image => names.push(image.name))
 
   // request a presigned post for each name
-  return imagesApi.requestS3Upload(images[0])
+  return imagesApi.requestS3Upload(images)
 }
 
 export const s3Upload = presignedPost => {
