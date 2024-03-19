@@ -63,7 +63,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, watch } from 'vue'
+import { reactive, toRefs, watch, inject } from 'vue'
 import { presignedPost, s3Upload } from '@/composables/services/image-upload'
 import Modal from '@/components/layout/Modal.vue'
 
@@ -149,9 +149,8 @@ export default {
         .then(promises => {
           return Promise.all(promises)
         })
-        .then(result => console.log("s3Upload", result))
-        .catch(err => console.log("err", err))
-
+        .then(result => $alertStore.success(`Successfully uploaded ${result}`))
+        .catch(err => $alertStore.error(`Error: ${err.response.data.message}`))
         /* return policy(v.currentImages) */
         /* // upload each image */
         /* .then(imagesToUpload => { */
@@ -201,6 +200,7 @@ export default {
       }
     }
 
+    const $alertStore = inject('$alertStore')
     const handleError = msg => {
       v.currentImages = []
       v.image = []
