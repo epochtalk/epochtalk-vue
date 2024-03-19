@@ -141,7 +141,7 @@ export default {
           return Object.keys(presignedPosts).map(index => {
             let data = {
               presigned_post: presignedPosts[index],
-              file: images[index]
+              file: v.currentImages[index].file
             }
             return s3Upload(data)
           })
