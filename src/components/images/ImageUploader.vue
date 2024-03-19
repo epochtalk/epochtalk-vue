@@ -135,6 +135,7 @@ export default {
         // the number of images that are still being uploaded
         v.uploadingImages = v.currentImages.length
         presignedPost(v.currentImages)
+        .then(result => result.presigned_posts)
         .then(presignedPosts => {
           let data = {
             presigned_post: presignedPosts.presigned_posts[0],
