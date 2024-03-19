@@ -64,7 +64,7 @@
 
 <script>
 import { reactive, toRefs, watch } from 'vue'
-import { policy, upload, presignedPost, s3Upload } from '@/composables/services/image-upload'
+import { presignedPost, s3Upload } from '@/composables/services/image-upload'
 import Modal from '@/components/layout/Modal.vue'
 
 Promise.each = async (arr, fn) => { for(const item of arr) await fn(item) }
@@ -145,52 +145,56 @@ export default {
         })
         .then(result => console.log("s3Upload", result))
 
-        return policy(v.currentImages)
-        // upload each image
-        .then(imagesToUpload => {
-          let index = 0
-          return Promise.each(imagesToUpload, image => {
-            v.currentImages[index].status = 'Starting'
-            return Promise.resolve(upload(image)
-            .progress(p => updateImagesUploading(index, p))
-            .error(err => {
-              updateImagesUploading(index)
-              let message = 'Image upload failed for: ' + image.name + '. '
-              if (err.status === 429) { message += 'Exceeded 10 images in batch upload.' }
-              else if (err.message) { console.log(err) }
-              else { message += 'Error: ' + err.message }
-              emit('upload-error', message)
-            })
-            .success(url => {
-              updateImagesUploading(index, 100, url)
-              if (props.purpose === 'avatar' || props.purpose === 'logo' || props.purpose === 'favicon') {
-                v.model = url
-
-                let imageRoot = image.policy.storageType === 'local' ? window.images_local_root : ''
-                emit('upload-success', imageRoot + url)
-              }
-              else {
-                v.images.push(image)
-                fireDone(image)
-              }
-            })
-            .catch(function(err) {
-              updateImagesUploading(index)
-              let message = 'Image upload failed for: ' + image.name + '. '
-              if (err.status === 429) { message += 'Exceeded 10 images in batch upload.' }
-              else { message += 'Error: ' + err.message }
-              handleError(message)
-            }))
-            .finally(() => index++)
           })
-          // log error images after all uploads finish
-          .then(() => { if (errImages.length) handleError(v.warningMsg) })
         })
-        .catch(() => handleError(v.warningMsg))
-        .finally(() => {
-          v.currentImages = []
-          if (props.purpose === 'editor') setTimeout(() => v.imagesProgress = 0, 500)
         })
+
+        /* return policy(v.currentImages) */
+        /* // upload each image */
+        /* .then(imagesToUpload => { */
+        /*   let index = 0 */
+        /*   return Promise.each(imagesToUpload, image => { */
+        /*     v.currentImages[index].status = 'Starting' */
+        /*     return Promise.resolve(upload(image) */
+        /*     .progress(p => updateImagesUploading(index, p)) */
+        /*     .error(err => { */
+        /*       updateImagesUploading(index) */
+        /*       let message = 'Image upload failed for: ' + image.name + '. ' */
+        /*       if (err.status === 429) { message += 'Exceeded 10 images in batch upload.' } */
+        /*       else if (err.message) { console.log(err) } */
+        /*       else { message += 'Error: ' + err.message } */
+        /*       emit('upload-error', message) */
+        /*     }) */
+        /*     .success(url => { */
+        /*       updateImagesUploading(index, 100, url) */
+        /*       if (props.purpose === 'avatar' || props.purpose === 'logo' || props.purpose === 'favicon') { */
+        /*         v.model = url */
+        /*  */
+        /*         let imageRoot = image.policy.storageType === 'local' ? window.images_local_root : '' */
+        /*         emit('upload-success', imageRoot + url) */
+        /*       } */
+        /*       else { */
+        /*         v.images.push(image) */
+        /*         fireDone(image) */
+        /*       } */
+        /*     }) */
+        /*     .catch(function(err) { */
+        /*       updateImagesUploading(index) */
+        /*       let message = 'Image upload failed for: ' + image.name + '. ' */
+        /*       if (err.status === 429) { message += 'Exceeded 10 images in batch upload.' } */
+        /*       else { message += 'Error: ' + err.message } */
+        /*       handleError(message) */
+        /*     })) */
+        /*     .finally(() => index++) */
+        /*   }) */
+        /*   // log error images after all uploads finish */
+        /*   .then(() => { if (errImages.length) handleError(v.warningMsg) }) */
+        /* }) */
+        /* .catch(() => handleError(v.warningMsg)) */
+        /* .finally(() => { */
+        /*   v.currentImages = [] */
+        /*   if (props.purpose === 'editor') setTimeout(() => v.imagesProgress = 0, 500) */
+        /* }) */
       }
     }
 
@@ -201,38 +205,38 @@ export default {
       emit('upload-error', msg)
     }
 
-    // update loading status
-    const updateImagesUploading = (index, percent, url) => {
-      // on successful update
-      if (percent) {
-        // update images' progress sum
-        // (subtract old value and add new value)
-        v.imagesProgressSum = v.imagesProgressSum - v.currentImages[index].progress + percent
-        // update the image's progress
-        v.currentImages[index].progress = percent
-        // update the image's properties
-        if (percent === 100 && url) {
-          // on complete, with url populated
-          // set the image URL
-          // and remove from currentlyUploadingImages
-          v.currentImages[index].status = 'Complete'
-          v.currentImages[index].url = url
-          v.uploadingImages--
-        }
-        else v.currentImages[index].status = 'Uploading'
-      }
-      // on upload error or failure
-      else {
-        v.imagesProgressSum = v.imagesProgressSum - v.currentImages[index].progress
-        v.currentImages[index].progress = '--'
-        v.currentImages[index].status = 'Failed'
-        v.uploadingImages--
-      }
-
-      v.imagesProgress = v.imagesProgressSum / v.currentImages.length
-
-      if (v.uploadingImages <= 0) v.imagesUploading = false
-    }
+    /* // update loading status */
+    /* const updateImagesUploading = (index, percent, url) => { */
+    /*   // on successful update */
+    /*   if (percent) { */
+    /*     // update images' progress sum */
+    /*     // (subtract old value and add new value) */
+    /*     v.imagesProgressSum = v.imagesProgressSum - v.currentImages[index].progress + percent */
+    /*     // update the image's progress */
+    /*     v.currentImages[index].progress = percent */
+    /*     // update the image's properties */
+    /*     if (percent === 100 && url) { */
+    /*       // on complete, with url populated */
+    /*       // set the image URL */
+    /*       // and remove from currentlyUploadingImages */
+    /*       v.currentImages[index].status = 'Complete' */
+    /*       v.currentImages[index].url = url */
+    /*       v.uploadingImages-- */
+    /*     } */
+    /*     else v.currentImages[index].status = 'Uploading' */
+    /*   } */
+    /*   // on upload error or failure */
+    /*   else { */
+    /*     v.imagesProgressSum = v.imagesProgressSum - v.currentImages[index].progress */
+    /*     v.currentImages[index].progress = '--' */
+    /*     v.currentImages[index].status = 'Failed' */
+    /*     v.uploadingImages-- */
+    /*   } */
+    /*  */
+    /*   v.imagesProgress = v.imagesProgressSum / v.currentImages.length */
+    /*  */
+    /*   if (v.uploadingImages <= 0) v.imagesUploading = false */
+    /* } */
 
     const fireDone = image => {
       image.added = true
