@@ -151,6 +151,10 @@ export default {
         })
         .then(result => $alertStore.success(`Successfully uploaded ${result}`))
         .catch(err => $alertStore.error(`Error: ${err.response.data.message}`))
+        .finally(() => {
+          v.currentImages = []
+          if (props.purpose === 'editor') setTimeout(() => v.imagesProgress = 0, 500)
+        })
         /* return policy(v.currentImages) */
         /* // upload each image */
         /* .then(imagesToUpload => { */
