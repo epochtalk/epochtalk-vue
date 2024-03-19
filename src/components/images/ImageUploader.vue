@@ -134,20 +134,23 @@ export default {
         }
         // the number of images that are still being uploaded
         v.uploadingImages = v.currentImages.length
+
         presignedPost(v.currentImages)
         .then(result => result.presigned_posts)
         .then(presignedPosts => {
-          let data = {
-            presigned_post: presignedPosts.presigned_posts[0],
-            file: images[0]
-          }
-          return s3Upload(data)
-        })
-        .then(result => console.log("s3Upload", result))
-
+          return Object.keys(presignedPosts).map(index => {
+            let data = {
+              presigned_post: presignedPosts[index],
+              file: images[index]
+            }
+            return s3Upload(data)
           })
         })
+        .then(promises => {
+          return Promise.all(promises)
         })
+        .then(result => console.log("s3Upload", result))
+        .catch(err => console.log("err", err))
 
         /* return policy(v.currentImages) */
         /* // upload each image */
