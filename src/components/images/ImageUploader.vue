@@ -150,7 +150,14 @@ export default {
           return Promise.all(promises)
         })
         .then(result => $alertStore.success(`Successfully uploaded ${result}`))
-        .catch(err => $alertStore.error(`Error: ${err.response.data.message}`))
+        .catch(err => {
+          if (err.response && err.response.data && err.response.data.message) {
+            $alertStore.error(`Error: ${err.response.data.message}`)
+          }
+          else {
+            $alertStore.error(`Error: ${err}`)
+          }
+        })
         .finally(() => {
           v.currentImages = []
           if (props.purpose === 'editor') setTimeout(() => v.imagesProgress = 0, 500)
