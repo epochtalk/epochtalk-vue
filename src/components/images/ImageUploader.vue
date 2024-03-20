@@ -135,8 +135,11 @@ export default {
         // the number of images that are still being uploaded
         v.uploadingImages = v.currentImages.length
 
+        // get presigned posts
+        //   on error, goes to catch
         presignedPost(v.currentImages)
         .then(result => result.presigned_posts)
+        // use presigned_posts to upload to s3
         .then(presignedPosts => {
           return Object.keys(presignedPosts).map(index => {
             let data = {
@@ -144,7 +147,11 @@ export default {
               file: v.currentImages[index].file
             }
             return s3Upload(data).catch(err => {
-              return {error: err}
+              // return individual errors with corresponding filename
+              return {
+                S3Error: err,
+                filename: v.currentImages[index].name
+              }
             })
           })
         })
@@ -152,22 +159,18 @@ export default {
           return Promise.all(promises)
         })
         .then(results => {
+          // process upload results
           results.forEach((result, index) => {
-            // check if result is an error
-            if (result.error) {
-              let err = result.error
-              // backend error, log message
-              if (err.response.data.message) {
-                $alertStore.error(`Error uploading ${v.currentImages[index].name}: ${err.response.data.message}`)
-              }
-              // aws error, parse xml
-              else {
-                let parser = new DOMParser();
-                let xmlDoc = parser.parseFromString(err.response.data,"text/xml");
+            // handle aws error
+            if (result.S3Error) {
+              let err = result.S3Error
+              let filename = result.filename
+              // parse aws xml error
+              let parser = new DOMParser();
+              let xmlDoc = parser.parseFromString(err.response.data,"text/xml");
 
-                let message = xmlDoc.getElementsByTagName("Message")[0].childNodes[0].nodeValue;
-                $alertStore.error(`Error uploading ${v.currentImages[index].name}: ${message}`)
-              }
+              let message = xmlDoc.getElementsByTagName("Message")[0].childNodes[0].nodeValue;
+              $alertStore.error(`Error uploading ${filename}: ${message}`)
             }
             // otherwise, upload succeeded
             else {
@@ -176,14 +179,17 @@ export default {
           })
         })
         .catch(err => {
+          // backend error, log message
           if (err.response && err.response.data && err.response.data.message) {
             $alertStore.error(`Error: ${err.response.data.message}`)
           }
+          // other error
           else {
             $alertStore.error(`Error: ${err}`)
           }
         })
         .finally(() => {
+          // reset images
           v.currentImages = []
           if (props.purpose === 'editor') setTimeout(() => v.imagesProgress = 0, 500)
         })
