@@ -143,13 +143,38 @@ export default {
               presigned_post: presignedPosts[index],
               file: v.currentImages[index].file
             }
-            return s3Upload(data)
+            return s3Upload(data).catch(err => {
+              return {error: err}
+            })
           })
         })
         .then(promises => {
           return Promise.all(promises)
         })
-        .then(result => $alertStore.success(`Successfully uploaded ${result}`))
+        .then(results => {
+          results.forEach((result, index) => {
+            // check if result is an error
+            if (result.error) {
+              let err = result.error
+              // backend error, log message
+              if (err.response.data.message) {
+                $alertStore.error(`Error uploading ${v.currentImages[index].name}: ${err.response.data.message}`)
+              }
+              // aws error, parse xml
+              else {
+                let parser = new DOMParser();
+                let xmlDoc = parser.parseFromString(err.response.data,"text/xml");
+
+                let message = xmlDoc.getElementsByTagName("Message")[0].childNodes[0].nodeValue;
+                $alertStore.error(`Error uploading ${v.currentImages[index].name}: ${message}`)
+              }
+            }
+            // otherwise, upload succeeded
+            else {
+              $alertStore.success(`Successfully uploaded ${v.currentImages[index].name}`)
+            }
+          })
+        })
         .catch(err => {
           if (err.response && err.response.data && err.response.data.message) {
             $alertStore.error(`Error: ${err.response.data.message}`)
