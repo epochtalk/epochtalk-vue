@@ -150,16 +150,16 @@ export const postsApi = {
   slugToPostId: slug => $http(`/api/posts/${slug}/id`),
   postSearch: params => $http('/api/search/posts', { params }),
   byNewbie: params => $http('/api/posts/patrol', { params }),
-  getPostDraft: () => $http('/api/posts/draft'),
-  updatePostDraft: draft => $http('/api/posts/draft', { method: 'PUT', data: { draft } })
+  getPostDraft: () => $http2('/api/posts/draft'),
+  updatePostDraft: draft => $http2('/api/posts/draft', { method: 'PUT', data: { draft } })
 }
 export const pollsApi = {
-  create: (threadId, params) => $http(`/api/threads/${threadId}/polls`, { method: 'POST', data: params }),
-  vote: (threadId, pollId, answerIds) => $http2(`/api/threads/${threadId}/poll/vote`, { method: 'POST', data: { answer_ids: answerIds }}),
-  removeVote: (threadId, pollId) => $http(`/api/threads/${threadId}/polls/${pollId}/vote`, { method: 'DELETE' }),
-  editPoll: (threadId, pollId, options) => $http(`/api/threads/${threadId}/polls/${pollId}`, { method: 'PUT', data: options }),
-  lock: (threadId, pollId) => $http(`/api/threads/${threadId}/polls/${pollId}/lock`, { method: 'POST', data: { locked: true }}),
-  unlock: (threadId, pollId) => $http(`/api/threads/${threadId}/polls/${pollId}/lock`, { method: 'POST', data: { locked: false }})
+  create: (threadId, params) => $http2(`/api/threads/${threadId}/polls`, { method: 'POST', data: params }),
+  vote: (threadId, answerIds) => $http2(`/api/threads/${threadId}/polls/vote`, { method: 'POST', data: { answer_ids: answerIds }}),
+  removeVote: (threadId) => $http2(`/api/threads/${threadId}/polls/vote`, { method: 'DELETE' }),
+  editPoll: (threadId, options) => $http2(`/api/threads/${threadId}/polls`, { method: 'PUT', data: options }),
+  lock: (threadId) => $http2(`/api/threads/${threadId}/polls/lock`, { method: 'POST', data: { locked: true }}),
+  unlock: (threadId) => $http2(`/api/threads/${threadId}/polls/lock`, { method: 'POST', data: { locked: false }})
 }
 
 export const watchlistApi = {

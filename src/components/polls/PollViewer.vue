@@ -213,7 +213,7 @@ export default {
       else { return true }
     }
     const saveOptions = () => {
-      pollsApi.editPoll(props.thread.id, props.poll.id, v.options)
+      pollsApi.editPoll(props.thread.id, v.options)
         .then(poll => {
           Object.assign(v.pollCopy, poll)
           if (v.pollCopy.expiration) {
@@ -237,10 +237,9 @@ export default {
     }
     const vote = () => {
       const threadId = props.thread.id
-      const pollId = props.thread.poll.id
       const answerIds = v.pollAnswers
 
-      pollsApi.vote(threadId, pollId, answerIds)
+      pollsApi.vote(threadId, answerIds)
         .then(poll => {
           v.pollCopy = poll
           v.pollAnswers = []
@@ -249,9 +248,8 @@ export default {
     }
     const removeVote = () => {
       const threadId = props.thread.id
-      const pollId = props.thread.poll.id
 
-      pollsApi.removeVote(threadId, pollId)
+      pollsApi.removeVote(threadId)
         .then(poll => {
           v.pollCopy = poll
           calculatePollPercentage()
@@ -259,10 +257,10 @@ export default {
     }
     const updateLockPoll = () => {
       if(v.pollCopy.locked) {
-        pollsApi.unlock(props.thread.id, props.poll.id)
+        pollsApi.unlock(props.thread.id)
       }
       else {
-        pollsApi.lock(props.thread.id, props.poll.id)
+        pollsApi.lock(props.thread.id)
       }
     }
     const calcExpiration = () => {
