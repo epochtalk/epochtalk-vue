@@ -152,7 +152,7 @@
           <!-- START EDITOR -->
           <div class="editor-header">
             <a class="first" :class="{'selected': !preview }" tabindex="-1" @click="preview = false">Compose</a>
-            <a :class="{'selected': preview }" tabindex="-1" @click="preview = true">Preview</a>
+            <a :class="{'selected': preview }" tabindex="-1" @click="preview = true; loadPreview()">Preview</a>
           </div>
 
           <div class="editor-body" @dragenter.prevent="showDropzone = true" @dragover.prevent="showDropzone = true">
@@ -168,7 +168,7 @@
             </div>
             <div class="editor-column-preview"  :class="{ 'hidden': !preview }">
               <!-- TODO(akinsey): post-processing="bodyHtml" style-fix="false" -->
-              <div class="editor-preview" :class="{ 'rtl': rightToLeft }" ></div>
+              <div class="editor-preview" v-html="editorTextPreview" :class="{ 'rtl': rightToLeft }" ></div>
             </div>
           </div>
 
@@ -309,6 +309,23 @@ export default {
       })
     }
 
+    const loadPreview = () => {
+      let body
+      if (props.threadEditorMode) {
+        body = v.threadCopy.body
+      }
+      else if (props.postEditorMode) {
+        body = v.posting.post.body
+      }
+      else if (props.editorConvoMode) {
+        body = v.newMessage.content.body
+      }
+      postsApi.preview(body)
+      .then(res => {
+        v.editorTextPreview = res.parsed_body
+      })
+    }
+
     const insertImageUrl = url => {
       if (!url) return
       let imageCode = '[img]' + url + '[/img]'
@@ -333,6 +350,7 @@ export default {
       draftStatus: null,
       draftTimeout: null,
       postMaxLength: window.post_max_length,
+      editorTextPreview: null,
       posting: { post: { title: '', body: '', thread_id: props?.thread?.id } },
       newMessage: { receiver_ids: [], conversation_id: null, content: { subject: '', body: '' } },
       rightToLeft: false,
@@ -411,7 +429,7 @@ export default {
       })
     })
 
-    return { ...toRefs(v), cancel, closeEditor, insertImageUrl, onPollValidation }
+    return { ...toRefs(v), cancel, closeEditor, insertImageUrl, onPollValidation, loadPreview }
   }
 }
 </script>

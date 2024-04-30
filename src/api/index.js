@@ -137,6 +137,7 @@ export const threadsApi = {
 
 export const postsApi = {
   create: data => $http2('/api/posts', { method: 'POST', data }, true),
+  preview: body => $http2('/api/preview', { method: 'POST', data: { body: body} }, true),
   update: post => $http2(`/api/posts/${post.id}`, { method: 'POST', data: { thread_id: post.thread_id, title: post.title, body: post.body }}, true),
   delete: (postId, lock) => $http(`/api/posts/${postId}`, { method: 'DELETE', params: { locked: lock }}),
   undelete: postId => $http(`/api/posts/${postId}/undelete`, { method: 'POST' }),
