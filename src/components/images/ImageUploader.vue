@@ -100,8 +100,7 @@ export default {
       else if (images.length > 0) {
         // (re)prime loading and progress variables
         v.imagesUploading = true
-        // let imagesProgress = 0
-        // let imagesProgressSum = 0
+        v.imagesProgressSum = 0
         let errImages = []
         /**
          * Image = {
@@ -146,7 +145,12 @@ export default {
               presigned_post: presignedPosts[index],
               file: v.currentImages[index].file
             }
-            return s3Upload(data).catch(err => {
+            let progressHandler = data => {
+              // data.progress is a fraction of 1
+              updateImagesUploading(index, data.progress * 100)
+            }
+            return s3Upload(data, progressHandler)
+            .catch(err => {
               // return individual errors with corresponding filename
               return {
                 S3Error: err,
@@ -250,38 +254,38 @@ export default {
       emit('upload-error', msg)
     }
 
-    /* // update loading status */
-    /* const updateImagesUploading = (index, percent, url) => { */
-    /*   // on successful update */
-    /*   if (percent) { */
-    /*     // update images' progress sum */
-    /*     // (subtract old value and add new value) */
-    /*     v.imagesProgressSum = v.imagesProgressSum - v.currentImages[index].progress + percent */
-    /*     // update the image's progress */
-    /*     v.currentImages[index].progress = percent */
-    /*     // update the image's properties */
-    /*     if (percent === 100 && url) { */
-    /*       // on complete, with url populated */
-    /*       // set the image URL */
-    /*       // and remove from currentlyUploadingImages */
-    /*       v.currentImages[index].status = 'Complete' */
-    /*       v.currentImages[index].url = url */
-    /*       v.uploadingImages-- */
-    /*     } */
-    /*     else v.currentImages[index].status = 'Uploading' */
-    /*   } */
-    /*   // on upload error or failure */
-    /*   else { */
-    /*     v.imagesProgressSum = v.imagesProgressSum - v.currentImages[index].progress */
-    /*     v.currentImages[index].progress = '--' */
-    /*     v.currentImages[index].status = 'Failed' */
-    /*     v.uploadingImages-- */
-    /*   } */
-    /*  */
-    /*   v.imagesProgress = v.imagesProgressSum / v.currentImages.length */
-    /*  */
-    /*   if (v.uploadingImages <= 0) v.imagesUploading = false */
-    /* } */
+    // update loading status
+    const updateImagesUploading = (index, percent, url) => {
+      // on successful update
+      if (percent) {
+        // update images' progress sum
+        // (subtract old value and add new value)
+        v.imagesProgressSum = v.imagesProgressSum - v.currentImages[index].progress + percent
+        // update the image's progress
+        v.currentImages[index].progress = percent
+        // update the image's properties
+        if (percent === 100 && url) {
+          // on complete, with url populated
+          // set the image URL
+          // and remove from currentlyUploadingImages
+          v.currentImages[index].status = 'Complete'
+          v.currentImages[index].url = url
+          v.uploadingImages--
+        }
+        else v.currentImages[index].status = 'Uploading'
+      }
+      // on upload error or failure
+      else {
+        v.imagesProgressSum = v.imagesProgressSum - v.currentImages[index].progress
+        v.currentImages[index].progress = '--'
+        v.currentImages[index].status = 'Failed'
+        v.uploadingImages--
+      }
+
+      v.imagesProgress = v.imagesProgressSum / v.currentImages.length
+
+      if (v.uploadingImages <= 0) v.imagesUploading = false
+    }
 
     const fireDone = image => {
       image.added = true

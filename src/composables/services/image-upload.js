@@ -18,9 +18,9 @@ export const presignedPost = images => {
   return imagesApi.requestS3Upload(images)
 }
 
-export const s3Upload = presignedPost => {
+export const s3Upload = (presignedPost, progressCallback) => {
   // upload to s3
-  return imagesApi.s3Upload(presignedPost)
+  return imagesApi.s3Upload(presignedPost, progressCallback)
 }
 
 export const policy = images => {

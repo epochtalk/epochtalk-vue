@@ -98,7 +98,7 @@ export const imagesApi = {
   // TODO(boka): remove imagePolicy 
   imagePolicy: data => $http('/api/images/policy', { method: 'POST', data }),
   requestS3Upload: data => $http2('/api/images/s3/upload', { method: 'POST', data }),
-  s3Upload: data => {
+  s3Upload: (data, progressHandler) => {
     let presignedPost = data["presigned_post"]
     // set request URL
     let url = presignedPost["url"]
@@ -107,7 +107,8 @@ export const imagesApi = {
     let options = {
       headers: {
         'Content-Type': 'multipart/form-data'
-      }
+      },
+      onUploadProgress: progressHandler
     }
     // set request body and append file
     let body = presignedPost["fields"]
