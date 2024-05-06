@@ -168,12 +168,12 @@
             </div>
             <div class="editor-column-preview"  :class="{ 'hidden': !preview }">
               <!-- TODO(akinsey): post-processing="bodyHtml" style-fix="false" -->
-              <div class="editor-preview" v-html="editorTextPreview" :class="{ 'rtl': rightToLeft }" ></div>
+              <div class="editor-preview post-body" v-html="editorTextPreview" :class="{ 'rtl': rightToLeft }" ></div>
             </div>
           </div>
 
           <div class="editor-footer">
-            <div class="editor-image-uploader">
+            <div class="editor-image-uploader" v-if="!preview">
               <image-uploader purpose="editor" @upload-success="() => {}" @upload-error="() => {}" :show-dropzone="showDropzone" @hover-stop="showDropzone = false" :on-done="insertImageUrl" />
             </div>
           </div>
@@ -181,7 +181,7 @@
         </form>
 
         <div class="editor-tools">
-          <div class="tools">
+          <div class="tools" v-if="!preview">
             <a href="#" data-balloon="Formatting Help" @click.prevent="showFormatting = !showFormatting"><i class="fa fa-code"></i></a>
             <a href="#" :data-balloon="fullscreen ? 'Minimize' : 'Fullscreen'" @click.prevent="fullscreen = !fullscreen"><i class="fa expand" :class="{ 'fa-expand': !fullscreen, 'fa-compress': fullscreen }"></i></a>
           </div>
@@ -612,10 +612,7 @@ export default {
       width: 100%;
       flex: 1 0 auto;
       display: flex;
-      .editor-column-input {
-        flex: 1 0 auto;
-        height: auto;
-      }
+
       input[type],
       .editor-input,
       .editor-preview {
@@ -626,8 +623,12 @@ export default {
         border-bottom: 1px solid $border-color;
         padding: 1rem;
         resize: none;
-        ul, ol { margin-left: 1.25rem; }
-        ul { white-space: normal; }
+        overflow-y: auto;
+        ul, ol {
+          @include pad(0 0 0 1.15rem);
+          white-space: normal;
+        }
+
       }
       .editor-drag-container {
         display: none;
@@ -662,10 +663,11 @@ export default {
 
     .editor-column-input,
     .editor-column-preview {
-      height: 100%;
+      flex: 1 0 auto;
+      height: auto;
       &.hidden { display: none; }
     }
-    .editor-input {
+    .editor-input, .editor-preview {
       white-space: pre-wrap;
       overflow: auto;
       height: 100%;
@@ -676,13 +678,7 @@ export default {
         line-height: 1.6;
       }
     }
-    .editor-preview {
-      white-space: pre-wrap;
-      overflow: auto;
-      height: 100%;
-      word-wrap: break-word;
-      p { margin: 0; }
-    }
+    .editor-preview { height: 80vh; }
     .editor-footer {
       color: $secondary-font-color-light;
       font-size: .875rem;

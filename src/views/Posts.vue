@@ -1118,7 +1118,7 @@ $postWidth__mobile: calc(100vw - 2rem);
   .imageContainer { }
   ul, ol {
     @include pad(0 0 0 1.15rem);
-    white-space: normal
+    white-space: normal;
   }
   img.loaded { opacity: 1; }
   img { @include transition(opacity 0.5s ease-in); opacity: 1; }
