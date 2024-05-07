@@ -320,10 +320,15 @@ export default {
       else if (props.editorConvoMode) {
         body = v.newMessage.content.body
       }
-      postsApi.preview(body)
-      .then(res => {
-        v.editorTextPreview = res.parsed_body
-      })
+      if (body.length) {
+          postsApi.preview(body)
+        .then(res => {
+          v.editorTextPreview = res.parsed_body
+        })
+      }
+      else {
+        v.editorTextPreview = null
+      }
     }
 
     const insertImageUrl = url => {
