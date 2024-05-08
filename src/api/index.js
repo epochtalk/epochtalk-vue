@@ -95,8 +95,6 @@ export const themeApi = {
 }
 
 export const imagesApi = {
-  // TODO(boka): remove imagePolicy 
-  imagePolicy: data => $http('/api/images/policy', { method: 'POST', data }),
   requestS3Upload: data => $http2('/api/images/s3/upload', { method: 'POST', data }),
   s3Upload: (data, progressHandler) => {
     let presignedPost = data["presigned_post"]

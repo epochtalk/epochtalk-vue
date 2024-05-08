@@ -23,20 +23,6 @@ export const s3Upload = (presignedPost, progressCallback) => {
   return imagesApi.s3Upload(presignedPost, progressCallback)
 }
 
-export const policy = images => {
-  if (!images.length) return Promise.reject()
-  // get all the image filenames
-  var names = []
-  images.forEach(image => names.push(image.name))
-
-  // get policy for each name
-  return imagesApi.imagePolicy(names)
-  .then(response => {
-    for (var i = 0; i < names.length; i++) images[i].policy = response[i]
-    return images
-  })
-}
-
 function Defer() {
     const self = this
     self.promise = new Promise((resolve, reject) => {
