@@ -625,7 +625,6 @@ export default {
         background-color: $base-background-color;
         border: 0;
         border-top: 1px solid $border-color;
-        border-bottom: 1px solid $border-color;
         padding: 1rem;
         resize: none;
         overflow-y: auto;
@@ -666,6 +665,7 @@ export default {
       }
     }
 
+    .editor-column-input { border-bottom: 1px solid $border-color; }
     .editor-column-input,
     .editor-column-preview {
       flex: 1 0 auto;
