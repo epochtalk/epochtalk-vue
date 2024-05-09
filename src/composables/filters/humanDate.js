@@ -1,12 +1,16 @@
 import * as dayjs from 'dayjs'
 import timezone from 'dayjs/plugin/timezone'
+import localStorageCache from '@/composables/utils/localStorageCache'
+const $prefs = localStorageCache(0, 'app').get('preferences')
 
 dayjs.extend(timezone)
 
 export default (dateStr, hideTime, customFormat) => {
   if (!dateStr) return dateStr
-  //let timezone = PreferencesSvc.preferences.timezone_offset || ''
-  let timezone
+
+  let storedTz = $prefs.data ? $prefs.data.timezone_offset : null
+  let timezone = storedTz ? storedTz.sign + storedTz.hours + storedTz.minutes : null
+
   let result
   let now = new Date()
   let maxDate = new Date(8640000000000000)
@@ -26,10 +30,11 @@ export default (dateStr, hideTime, customFormat) => {
   }
   else if (customFormat) result = convertedDate.format(customFormat)
   else {
+    // TODO(akinsey): properly apply timezone fetched from prefs
     if (timezone) {
-      if (isToday) { result = 'Today at ' +  convertedDate.format('h:mm A').tz(timezone) }
-      else if (isThisYear) { result = convertedDate.format('MMMM D [at] h:mm A').tz(timezone) }
-      else { result = convertedDate.format('MMM D, YYYY [at] h:mm A').tz(timezone) }
+      if (isToday) { result = 'Today at ' +  convertedDate.format('h:mm A') }
+      else if (isThisYear) { result = convertedDate.format('MMMM D [at] h:mm A') }
+      else { result = convertedDate.format('MMM D, YYYY [at] h:mm A') }
     }
     else {
       if (isToday) { result = 'Today at ' +  convertedDate.format('h:mm A') }
