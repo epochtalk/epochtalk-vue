@@ -9,7 +9,7 @@ export default (dateStr, hideTime, customFormat) => {
   if (!dateStr) return dateStr
 
   let storedTz = $prefs.data ? $prefs.data.timezone_offset : null
-  let timezone = storedTz ? storedTz.sign + storedTz.hours + storedTz.minutes : null
+  let timezoneOffset = storedTz ? storedTz.sign + (Number(storedTz.hours * 60) + Number(storedTz.minutes)) : null
 
   let result
   let now = new Date()
@@ -21,6 +21,11 @@ export default (dateStr, hideTime, customFormat) => {
 
   // TODO(akinsey): load users timezone setting from saved preferences
   // otherwise guess timzone.
+  console.log("tz offset:", timezoneOffset)
+  console.log("raw date str:", dateStr)
+  console.log("date:", date, date.getTime())
+  console.log("dayjs:", dayjs(date.getTime()))
+  console.log("dayjs:", dayjs(date.getTime()).utcOffset(timezoneOffset))
   let convertedDate = dayjs.utc(dateStr).tz(dayjs.tz.guess())
 
   if (hideTime) {
@@ -31,16 +36,9 @@ export default (dateStr, hideTime, customFormat) => {
   else if (customFormat) result = convertedDate.format(customFormat)
   else {
     // TODO(akinsey): properly apply timezone fetched from prefs
-    if (timezone) {
-      if (isToday) { result = 'Today at ' +  convertedDate.format('h:mm A') }
-      else if (isThisYear) { result = convertedDate.format('MMMM D [at] h:mm A') }
-      else { result = convertedDate.format('MMM D, YYYY [at] h:mm A') }
-    }
-    else {
-      if (isToday) { result = 'Today at ' +  convertedDate.format('h:mm A') }
-      else if (isThisYear) { result = convertedDate.format('MMMM D [at] h:mm A') }
-      else { result = convertedDate.format('MMM D, YYYY [at] h:mm A') }
-    }
+    if (isToday) { result = 'Today at ' +  convertedDate.format('h:mm A') }
+    else if (isThisYear) { result = convertedDate.format('MMMM D [at] h:mm A') }
+    else { result = convertedDate.format('MMM D, YYYY [at] h:mm A') }
   }
   return result
 }
