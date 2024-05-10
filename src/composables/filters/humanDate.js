@@ -1,10 +1,7 @@
 import * as dayjs from 'dayjs'
 import { get } from 'lodash'
-import timezone from 'dayjs/plugin/timezone'
 import localStorageCache from '@/composables/utils/localStorageCache'
 const $prefs = localStorageCache(0, 'app').get('preferences')
-
-dayjs.extend(timezone)
 
 export default (dateStr, hideTime, customFormat) => {
   if (!dateStr) return dateStr
