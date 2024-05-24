@@ -15,7 +15,7 @@ export const presignedPost = images => {
   })
 
   // request a presigned post for each name
-  return imagesApi.requestS3Upload(images)
+  return imagesApi.requestS3Upload({images: images})
 }
 
 export const s3Upload = (presignedPost, progressCallback) => {
