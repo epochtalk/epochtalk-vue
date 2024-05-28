@@ -461,6 +461,7 @@ export default {
         .then(data => next(vm => {
           vm.postData.data = data
           vm.checkUsersOnline()
+          vm.processBbcode()
           BanStore.updateBanNotice(vm.postData.data.banned_from_board)
           vm.bannedFromBoard = vm.postData.data.banned_from_board
           vm.highlightPost()
@@ -481,6 +482,7 @@ export default {
         return postsApi.byThread(params).then(data => {
           this.postData.data = data
           this.checkUsersOnline()
+          this.processBbcode()
           BanStore.updateBanNotice(this.postData.data.banned_from_board)
           this.bannedFromBoard = this.postData.data.banned_from_board
           this.highlightPost()
@@ -507,6 +509,7 @@ export default {
         return postsApi.byThread(params)
         .then(data => {
           checkUsersOnline()
+          processBbcode()
           return data
         })
       })
@@ -977,6 +980,21 @@ export default {
     .then(processPosts)
     .then(data => v.postData.data = data)
 
+    const processBbcode = () => {
+      v.postData.data.posts.map(post => {
+        return postsApi.parseBbcode(post.body_html)
+        .then(data => {
+          post.body_html = data.parsed_body
+          console.log(data.parsed_body)
+          return post
+        })
+        .catch(err => {
+          console.log(err)
+          return post
+        })
+      })
+    }
+
     const checkUsersOnline = () => {
       let uniqueUsers = {}
       v.postData.data.posts.forEach(post => uniqueUsers[post.user.id] = 'user')
@@ -1087,7 +1105,8 @@ export default {
       watchThread,
       toggleIgnoredPosts,
       openMoveThreadModal,
-      checkUsersOnline
+      checkUsersOnline,
+      processBbcode
     }
   }
 }
