@@ -982,10 +982,11 @@ export default {
 
     const processBbcode = () => {
       v.postData.data.posts.map(post => {
-        return postsApi.parseBbcode(post.body_html)
+        console.log("before parse:", post.body)
+        return postsApi.parseBbcode(post.body || post.body_html)
         .then(data => {
           post.body_html = data.parsed_body
-          console.log(data.parsed_body)
+          console.log("after parse:", data.parsed_body)
           return post
         })
         .catch(err => {
