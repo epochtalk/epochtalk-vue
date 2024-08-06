@@ -170,8 +170,8 @@ export const watchlistApi = {
   pageBoards: params => $http('/api/watchlist/boards', { params }),
   watchBoard: boardId => $http(`/api/watchlist/boards/${boardId}`, { method: 'POST' }),
   unwatchBoard: boardId => $http(`/api/watchlist/boards/${boardId}`, { method: 'DELETE' }),
-  watchThread: threadId => $http(`/api/watchlist/threads/${threadId}`, { method: 'POST' }),
-  unwatchThread: threadId => $http(`/api/watchlist/threads/${threadId}`, { method: 'DELETE' })
+  watchThread: threadId => $http2(`/api/watchlist/threads/${threadId}`, { method: 'POST' }),
+  unwatchThread: threadId => $http2(`/api/watchlist/threads/${threadId}`, { method: 'DELETE' })
 }
 
 export const authApi = {
