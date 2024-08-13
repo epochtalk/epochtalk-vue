@@ -118,7 +118,7 @@ export const boardsApi = {
 
 export const threadsApi = {
   create: data => $http2('/api/threads', { method: 'POST', data }, true),
-  move: (threadId, newBoardId) => $http(`/api/threads/${threadId}/move`, { data: { new_board_id: newBoardId }, method: 'POST'}),
+  move: (threadId, newBoardId) => $http2(`/api/threads/${threadId}/move`, { data: { new_board_id: newBoardId }, method: 'POST'}),
   title: (threadId, title) => $http(`/api/threads/${threadId}`, { data: { title: title }, method: 'POST'}),
   purge: threadId => $http2(`/api/threads/${threadId}`, { method: 'DELETE' }),
   lock: threadId => $http2(`/api/threads/${threadId}/lock`, { data: { locked: true }, method: 'POST'}),
