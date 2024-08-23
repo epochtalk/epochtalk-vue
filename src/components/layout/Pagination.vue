@@ -1,27 +1,39 @@
 <template>
   <div v-if="pageCount > 1" class="pagination-component">
-    <label class="page-label">Page 1</label>
+<!--     <label class="page-label">Page 1</label>
     <div class="range-wrap">
-      <input v-model="currentPage" ref="rangeInput" class="pagination" type="range" step="0.01" min="1" :max="pageCount" @change="smoothThumbDrag" @input="updatePageDisplay" />
+      <input v-model="currentPage" ref="rangeInput" class="pagination" type="range" step="0.01" min="1" :max="pageCount" @change="changePage" @input="updatePageDisplay" />
       <div class="range-value" ref="valueBubble">Page {{currentPageDisplay}} of {{pageCount}}</div>
     </div>
-    <label class="page-label">Page {{pageCount}}</label>
+    <label class="page-label">Page {{pageCount}}</label> -->
+    <ul class="pagination no-select">
+      <li class="jump">
+        <span @click="showJump = !showJump">GOTO</span>
+        <div class="jump-tooltip" v-if="showJump">
+          <!-- <jump-to-page page-count="pageCount" focus="showJump" click-action="closeJump"></jump-to-page> -->
+        </div>
+      </li>
+      <span  v-for="page in pageCount" :key="page">
+        <li>
+          <a href="#" @click.stop.prevent="changePage(page)" v-html="page"></a>
+        </li>
+      </span>
+    </ul>
   </div>
 </template>
 
 <script>
-import { computed, reactive, toRefs, nextTick, watch } from 'vue'
+import { computed, reactive, toRefs, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 export default {
   props: ['page', 'limit', 'count'],
   setup(props) {
     /* View Methods */
-    const smoothThumbDrag = e => {
-      v.currentPage = Math.round(e.target.value) // Round up since were using step = 0.01
+    const changePage = page => {
+      v.currentPage = page
 
-      updatePageDisplay(e, v.currentPage)
-      const params = { ...$route.params, saveScrollPos: true }
+      const params = { ...$route.params }
       let query = { ...$route.query, page: v.currentPage }
       if (query.page === 1 || !query.page) delete query.page
       if (query.start) delete query.start
@@ -30,14 +42,14 @@ export default {
       }
     }
 
-    const updatePageDisplay = (e, value) => {
-      if (v.pageCount < 2) return
-      const range = e.target || e // account for passing in ref in nextTick
-      value = value || range.value // account for passing in custom page
-      const newVal = Number((value - range.min) * 100 / (range.max - range.min))
-      const newPos = 10 - (newVal * 0.625)
-      v.valueBubble.style.top = `calc(${newVal}% + (${newPos}px))`
-    }
+    // const updatePageDisplay = (e, value) => {
+    //   if (v.pageCount < 2) return
+    //   const range = e.target || e // account for passing in ref in nextTick
+    //   value = value || range.value // account for passing in custom page
+    //   const newVal = Number((value - range.min) * 100 / (range.max - range.min))
+    //   const newPos = 10 - (newVal * 0.625)
+    //   v.valueBubble.style.top = `calc(${newVal}% + (${newPos}px))`
+    // }
 
     /* Internal Data */
     const $route = useRoute()
@@ -45,6 +57,7 @@ export default {
 
     /* View Data */
     const v = reactive({
+      showJump: false,
       rangeInput: null,
       valueBubble: null,
       currentPage: props.page,
@@ -53,16 +66,16 @@ export default {
     })
 
     /* Next Tick - waits for dom to load so refs are populated */
-    nextTick(() => updatePageDisplay(v.rangeInput, v.currentPage)) // set init pos of page disp
+    // nextTick(() => updatePageDisplay(v.rangeInput, v.currentPage)) // set init pos of page disp
     watch(() => props.page, () => v.currentPage = props.page )
 
     /* Watch - this handles when query data changes, (e.g. query string for search changes) */
     watch(() => props.count, () => {
       v.currentPage = props.page
-       nextTick(() => updatePageDisplay(v.rangeInput, v.currentPage))
+       // nextTick(() => updatePageDisplay(v.rangeInput, v.currentPage))
     })
 
-    return { ...toRefs(v), smoothThumbDrag, updatePageDisplay }
+    return { ...toRefs(v), changePage }
   }
 }
 </script>
