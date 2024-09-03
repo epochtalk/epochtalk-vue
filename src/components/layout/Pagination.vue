@@ -1,11 +1,21 @@
 <template>
   <div v-if="pageCount > 1" class="pagination-component">
-    <label class="page-label">Page 1</label>
-    <div class="range-wrap">
-      <input v-model="currentPage" ref="rangeInput" class="pagination" type="range" step="0.01" min="1" :max="pageCount" @change="smoothThumbDrag" @input="updatePageDisplay" />
-      <div class="range-value" ref="valueBubble">Page {{currentPageDisplay}} of {{pageCount}}</div>
-    </div>
-    <label class="page-label">Page {{pageCount}}</label>
+    <ul class="pagination no-select">
+      <li class="jump">
+        <span @click="toggleJump()">GOTO</span>
+        <div class="jump-tooltip" v-if="showJump">
+          <div class="jump-to-page">
+           <input v-model="currentPage" type="number" min="1" :max="pageCount" @keyup="$event.which === 13 && changePage(currentPage)" ref="pageInput" @focus="$event.target.select()" />
+           <button @click="changePage(currentPage)">Go</button>
+         </div>
+        </div>
+      </li>
+      <span v-for="pageKey in paginationKeys" :key="pageKey.val">
+        <li :class="pageKey.class">
+          <a href="#" @click.stop.prevent="changePage(pageKey.page)" v-html="pageKey.val"></a>
+        </li>
+      </span>
+    </ul>
   </div>
 </template>
 
@@ -17,11 +27,15 @@ export default {
   props: ['page', 'limit', 'count'],
   setup(props) {
     /* View Methods */
-    const smoothThumbDrag = e => {
-      v.currentPage = Math.round(e.target.value) // Round up since were using step = 0.01
+    const changePage = page => {
+      // do nothing if no page is specified, or if page is out of range
+      if (!page || page > v.pageCount || page < 1) return
 
-      updatePageDisplay(e, v.currentPage)
-      const params = { ...$route.params, saveScrollPos: true }
+      // update current page var
+      v.currentPage = page
+
+      // redirect while saving query params
+      const params = { ...$route.params }
       let query = { ...$route.query, page: v.currentPage }
       if (query.page === 1 || !query.page) delete query.page
       if (query.start) delete query.start
@@ -30,13 +44,103 @@ export default {
       }
     }
 
-    const updatePageDisplay = (e, value) => {
-      if (v.pageCount < 2) return
-      const range = e.target || e // account for passing in ref in nextTick
-      value = value || range.value // account for passing in custom page
-      const newVal = Number((value - range.min) * 100 / (range.max - range.min))
-      const newPos = 10 - (newVal * 0.625)
-      v.valueBubble.style.top = `calc(${newVal}% + (${newPos}px))`
+    const toggleJump = () => {
+      v.showJump = !v.showJump
+      if (v.showJump) nextTick(() => v.pageInput.focus())
+    }
+
+    const buildPages = () => {
+      // reset pagination keys
+      v.paginationKeys = []
+
+      // close jump to page widget
+      if (v.showJump) v.showJump = false
+
+      // truncate if more than 15 pages
+      let truncate = v.pageCount > 15
+
+      // variable to hold ellipsis positions
+      let ellipsis
+
+      // Case 1: No Truncation up to 15 pages
+      // [1] 2 3 4 5 6 7 8 9 10 11 13 14 15
+      if (!truncate)
+        ellipsis = undefined
+
+      // Case 2: Truncate Tail
+      // 1 2 3 4 5 [6] 7 8 ... 14 15 16
+      if (truncate && v.currentPage <= 6)
+        ellipsis = [{ index: 9, nextIndex: v.pageCount - 2 }]
+
+      // Case 3: Truncate Head
+      // 1 2 3 ... 9 10 [11] 12 13 14 15 16
+      else if (truncate && v.currentPage >= v.pageCount - 5)
+        ellipsis = [{ index: 4, nextIndex: v.pageCount - 8 }]
+
+      // Case 4: Truncate Head and Tail
+      // 1 2 3 ... 7 8 [9] 10 11 ... 14 15 16
+      else if (truncate && v.currentPage > 6 && v.currentPage < v.pageCount - 5)
+        ellipsis = [
+          { index: 4, nextIndex: v.currentPage - 2 },
+          { index: v.currentPage + 3, nextIndex: v.pageCount - 2 }
+        ]
+
+      generatePageKeys(ellipsis)
+    }
+
+    const generatePageKeys = (ellipsis) => {
+      // Add Previous Button
+      let prevBtnKey = { val: '&#10094;' }
+      if (v.currentPage > 1) {
+        prevBtnKey.class = 'arrow'
+        prevBtnKey.page = v.currentPage - 1
+        v.paginationKeys.push(prevBtnKey)
+      }
+      else {
+        prevBtnKey.class = 'arrow unavailable'
+        prevBtnKey.page = null
+        v.paginationKeys.push(prevBtnKey)
+      }
+
+      // Add Pagination Keys accounting for ellipsis
+      let ellipsisIndex = 0
+      let index = 1
+      while (index <= v.pageCount) {
+        let pageKey
+        // Insert ellipsis if index matches
+        if (ellipsis && ellipsis[ellipsisIndex] && ellipsis[ellipsisIndex].index === index) {
+          pageKey = {
+            val: '&hellip;',
+            page: null,
+            class: 'unavailable'
+          }
+          index = ellipsis[ellipsisIndex].nextIndex
+          ellipsisIndex++
+        }
+        // Otherwise generate page key
+        else {
+          pageKey = {
+            val: index,
+            page: index,
+            class: index === v.currentPage ? 'current' : null
+          }
+          index++
+        }
+        v.paginationKeys.push(pageKey)
+      }
+
+      // Add Next Button
+      let nextBtnKey = { val: '&#10095;' }
+      if (v.currentPage < v.pageCount) {
+        nextBtnKey.class = 'arrow'
+        nextBtnKey.page = v.currentPage + 1
+        v.paginationKeys.push(nextBtnKey)
+      }
+      else {
+        nextBtnKey.class = 'arrow unavailable'
+        nextBtnKey.page = null
+        v.paginationKeys.push(nextBtnKey)
+      }
     }
 
     /* Internal Data */
@@ -45,149 +149,156 @@ export default {
 
     /* View Data */
     const v = reactive({
-      rangeInput: null,
-      valueBubble: null,
+      showJump: false,
+      pageInput: null,
+      paginationKeys: [],
       currentPage: props.page,
-      pageCount: computed(() => Math.ceil(props.count / props.limit)),
-      currentPageDisplay: computed(() => Math.round(v.currentPage))
+      pageCount: computed(() => Math.ceil(props.count / props.limit))
     })
 
-    /* Next Tick - waits for dom to load so refs are populated */
-    nextTick(() => updatePageDisplay(v.rangeInput, v.currentPage)) // set init pos of page disp
-    watch(() => props.page, () => v.currentPage = props.page )
+    buildPages()
 
-    /* Watch - this handles when query data changes, (e.g. query string for search changes) */
-    watch(() => props.count, () => {
+    /* Watch - this handles when pagination data changes */
+    watch(() => props.page, () => reloadPagination())
+    watch(() => props.limit, () => reloadPagination())
+    watch(() => props.count, () => reloadPagination())
+
+    let reloadPagination = () => {
       v.currentPage = props.page
-       nextTick(() => updatePageDisplay(v.rangeInput, v.currentPage))
-    })
+      buildPages()
+    }
 
-    return { ...toRefs(v), smoothThumbDrag, updatePageDisplay }
+    return { ...toRefs(v), changePage, toggleJump }
   }
 }
 </script>
 
 <style lang="scss">
-.pagination-component {
-  display: flex;
-  flex-flow: row wrap;
-  height: 45vh;
+.actions-bottom ul.pagination li.jump .jump-tooltip,
+.mobile-pagination ul.pagination li.jump .jump-tooltip {
+  margin-left: -1.5rem;
+  margin-top: -.25rem;
+}
 
-  label.page-label {
-    display: flex;
+ul.pagination {
+  display: inline-block;
+  min-height: 1.3rem;
+  li {
+    line-height: 1.3rem;
+    font-size: 0.875rem;
+    margin-left: 0.125rem;
+    float: left;
+    display: block;
+    &.unavailable a:hover { background-color: transparent; }
+    &.current a, &.current a:hover { color: $button-text-color; }
+    &.arrow { font-family: 'Zapf Dingbats'; }
+    a {
+      @include transition(background-color 300ms ease-out);
+      display: block;
+      padding: 0.0325rem 0.325rem 0.0325rem;
+      color: $secondary-font-color;
+      background: none;
+      border-radius: 3px;
+      font-weight: normal;
+      font-size: 1rem;
+      line-height: inherit;
+      &:hover { color: $secondary-font-color-dark; background-color: $secondary-font-color-light; }
+    }
+  }
+  li.unavailable a { cursor: default; color: $secondary-font-color; }
+  li.current a {
+    background: $color-primary;
+    &:hover, &:focus { background: $color-primary-alt; }
+  }
+  li.jump {
+    @include transition(background-color 300ms ease-out);
+    display: block;
+    padding: 0.0325rem 0.325rem 0.0325rem 0;
     color: $secondary-font-color;
-    font-size: 0.8125rem;
-    flex: 1 100%;
-  }
-
-  div.range-wrap {
+    background: none;
+    border-radius: 3px;
+    font-weight: normal;
+    font-size: 0.8rem;
+    line-height: inherit;
+    cursor: pointer;
     position: relative;
-    height: 45vh;
-    padding-left: 0.625rem;
-    input.pagination {
-      transform: rotate(90deg);
-      transform-origin: left;
-      height: 1rem;
-      width: 43vh;
-    }
-    .range-value {
+    .jump-tooltip {
+      text-align: center;
+      color: $secondary-font-color;
+      background: $secondary-font-color-light;
+      background-clip: padding-box;
+      border-radius: 3px;
       position: absolute;
-      font-weight: bold;
-      font-size: 0.8125rem;
-      margin-top: 0.625rem;
-      margin-left: 0.75rem;
-      top: 0.625rem;
+      width: 10rem;
+      left: 50%;
+      margin-left: -5rem;
+      top: -4rem;
+      padding: 0.5rem;
+      z-index: 100;
+
+      &:before, &:after {
+        content: "";
+        position: absolute;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        top: 100%;
+        left: 50%;
+        margin-left: -10px;
+      }
+
+      &:after{
+        border-top: 10px solid $secondary-font-color-light;
+        z-index: 1;
+      }
+
+      .jump-to-page {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        input,
+        button {
+          margin-bottom: 0;
+        }
+
+        input {
+          flex: 1 1 auto;
+        }
+
+        button {
+          flex: 1 0 auto;
+          padding-bottom: .375rem;
+          padding-top: .375rem;
+        }
+      }
     }
   }
 
-  input[type=range] {
-    background-color: transparent;
-    -webkit-appearance: none;
-    color: red;
-  }
-  input[type=range]:focus {
-    outline: none;
-  }
-  input[type=range]::-webkit-slider-runnable-track {
-    background: $border-color;
-    border: 0 solid $border-color;
-    border-radius: 1.5625rem;
-    width: 100%;
-    height: 0.08125rem;
-    cursor: pointer;
-  }
-  input[type=range]::-webkit-slider-thumb {
-    margin-top: -0.115625rem;
-    width: 2.6875rem;
-    height: 0.3125rem;
-    background: $color-primary;
-    border: 0 solid $border-color;
-    border-radius: 3.125rem;
-    cursor: pointer;
-    -webkit-appearance: none;
-  }
-  input[type=range]:focus::-webkit-slider-runnable-track {
-    background: $border-color;
-  }
-  input[type=range]::-moz-range-track {
-    background: $border-color;
-    border: 0 solid $border-color;
-    border-radius: 1.5625rem;
-    width: 100%;
-    height: 0.08125rem;
-    cursor: pointer;
-  }
-  input[type=range]::-moz-range-thumb {
-    width: 2.6875rem;
-    height: 0.3125rem;
-    background: $color-primary;
-    border: 0 solid $border-color;
-    border-radius: 3.125rem;
-    cursor: pointer;
-  }
-  input[type=range]::-ms-track {
-    background: transparent;
-    border-color: transparent;
-    border-width: 0.115625rem 0;
-    color: transparent;
-    width: 100%;
-    height: 0.08125rem;
-    cursor: pointer;
-  }
-  input[type=range]::-ms-fill-lower {
-    background: $border-color;
-    border: 0 solid $border-color;
-    border: 0;
-    border-radius: 3.125rem;
-  }
-  input[type=range]::-ms-fill-upper {
-    background: $border-color;
-    border: 0 solid $border-color;
-    border-radius: 3.125rem;
-  }
-  input[type=range]::-ms-thumb {
-    width: 2.6875rem;
-    height: 0.3125rem;
-    background: $color-primary;
-    border-radius: 3.125rem;
-    cursor: pointer;
-    margin-top: 0;
-    /*Needed to keep the Edge thumb centred*/
-  }
-  input[type=range]:focus::-ms-fill-lower {
-    background: $border-color;
-  }
-  input[type=range]:focus::-ms-fill-upper {
-    background: $border-color;
-  }
+  .sidebar & {
+    @include break-mobile-tablet {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
 
-  /*TODO: Use one of the selectors from https://stackoverflow.com/a/20541859/7077589 and figure out
-  how to remove the virtical space around the range input in IE*/
-  @supports (-ms-ime-align:auto) {
-    /* Pre-Chromium Edge only styles, selector taken from hhttps://stackoverflow.com/a/32202953/7077589 */
-    input[type=range] {
-      margin: 0;
-      /*Edge starts the margin from the thumb, not the track as other browsers do*/
+      .arrow {
+        transform: rotate(90deg);
+      }
+
+      li {
+        line-height: 1.5;
+        margin: 0.3125rem 0;
+
+        &.jump {
+          .jump-tooltip {
+            left: 0;
+            top: inherit;
+            bottom: 140%;
+          }
+
+          input[type='number'] {
+            margin-right: 0.5rem;
+          }
+        }
+      }
     }
   }
 }

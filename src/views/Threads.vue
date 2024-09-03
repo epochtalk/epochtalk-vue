@@ -209,16 +209,13 @@
         </tr>
       </tbody>
     </table>
+
+    <pagination v-if="threadData.data?.board" class="hide-mobile" :page="threadData.data.page" :limit="threadData.data.limit" :count="threadData.data.board.thread_count"></pagination>
   </div>
 
   <div class="mobile-pagination" v-if="threadData.data?.board">
     <div class="pagination-wrap">
-      <simple-pagination
-        v-model="currentPage"
-        :pages="pages"
-        :range-size="1"
-        @update:modelValue="pageResults"
-      />
+     <pagination v-if="threadData.data?.board" :page="threadData.data.page" :limit="threadData.data.limit" :count="threadData.data.board.thread_count"></pagination>
     </div>
   </div>
 
@@ -235,7 +232,6 @@
         <i class="icon-epoch-watch"></i>Set Moderators
       </a>
     </div>
-    <pagination v-if="threadData.data?.board" :page="threadData.data.page" :limit="threadData.data.limit" :count="threadData.data.board.thread_count"></pagination>
   </div>
   <set-moderators-modal v-if="threadData.data?.board" :board="threadData.data.board" :show="showSetModerators" @close="showSetModerators = false"></set-moderators-modal>
   <editor v-if="threadData.data?.board" :showEditor="showEditor" @close="showEditor = false" :threadEditorMode="true" :thread="{ title: '', board_id: threadData?.data?.board.id }" :createAction="createThread" :canCreate="canCreate" :canLock="canLock" :canSticky="canSticky" :canModerate="canModerate" :canCreatePoll="canCreatePoll" />
@@ -256,15 +252,15 @@ import { processThreads } from '@/composables/utils/boardUtils'
 import BanStore from '@/composables/stores/ban'
 import Editor from '@/components/layout/Editor.vue'
 import slugify from 'slugify'
-import SimplePagination from '@/components/layout/SimplePagination.vue'
+// import SimplePagination from '@/components/layout/SimplePagination.vue'
 
 export default {
   name: 'Threads',
   props: ['boardSlug', 'boardId'],
-  components: { Pagination, SetModeratorsModal, Editor, SimplePagination },
+  components: { Pagination, SetModeratorsModal, Editor },
   beforeRouteEnter(to, from, next) {
     const params = {
-      limit: localStoragePrefs().data.threads_per_page,
+      limit: to.query.limit || localStoragePrefs().data.threads_per_page,
       page: to.query.page || 1,
       field: to.query.field,
       desc: to.query.desc
@@ -281,7 +277,7 @@ export default {
   },
   beforeRouteUpdate(to, from, next) {
     const params = {
-      limit: localStoragePrefs().data.threads_per_page,
+      limit: to.query.limit || localStoragePrefs().data.threads_per_page,
       page: to.query.page || 1,
       field: to.query.field,
       desc: to.query.desc
@@ -314,7 +310,7 @@ export default {
       .then(boardId => {
         const params = {
           board_id: boardId,
-          limit: v.prefs.threads_per_page,
+          limit: $route.query.limit || v.prefs.threads_per_page,
           page: $route.query.page || 1,
           field: $route.query.field,
           desc: $route.query.desc
@@ -483,6 +479,10 @@ export default {
 
 .mobile-pagination {
   display: none;
+  .pagination-wrap {
+    float: left;
+    padding-left: 0.325rem
+  }
   @include break-mobile-sm {
     border-top: 1px solid $border-color;
     position: fixed;
