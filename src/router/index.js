@@ -401,7 +401,7 @@ $axios2.interceptors.response.use(res => {
   return res
 },
 err => {
-  if(err.response) { // Server still responding, just getting errors from api calls
+  if (err.response) { // Server still responding, just getting errors from api calls
     switch (err.response.status) {
       case 401:
         delete $axios2.defaults.headers.common['Authorization'] // clear token from axios
@@ -427,7 +427,7 @@ err => {
 })
 
 $axios.interceptors.response.use(res => res, err => {
-  if(err.response) { // Server still responding, just getting errors from api calls
+  if (err.response) { // Server still responding, just getting errors from api calls
     switch (err.response.status) {
       case 401:
         delete $axios2.defaults.headers.common['Authorization'] // clear token from axios

@@ -118,13 +118,13 @@ export const boardsApi = {
 
 export const threadsApi = {
   create: data => $http2('/api/threads', { method: 'POST', data }, true),
-  move: (threadId, newBoardId) => $http(`/api/threads/${threadId}/move`, { data: { new_board_id: newBoardId }, method: 'POST'}),
+  move: (threadId, newBoardId) => $http2(`/api/threads/${threadId}/move`, { data: { new_board_id: newBoardId }, method: 'POST'}),
   title: (threadId, title) => $http(`/api/threads/${threadId}`, { data: { title: title }, method: 'POST'}),
-  purge: threadId => $http(`/api/threads/${threadId}`, { method: 'DELETE' }),
-  lock: threadId => $http(`/api/threads/${threadId}/lock`, { data: { status: true }, method: 'POST'}),
-  unlock: threadId => $http(`/api/threads/${threadId}/lock`, { data: { status: false }, method: 'POST'}),
-  sticky: threadId => $http(`/api/threads/${threadId}/sticky`, { data: { status: true}, method: 'POST'}),
-  unsticky: threadId => $http(`/api/threads/${threadId}/sticky`, { data: { status: false }, method: 'POST'}),
+  purge: threadId => $http2(`/api/threads/${threadId}`, { method: 'DELETE' }),
+  lock: threadId => $http2(`/api/threads/${threadId}/lock`, { data: { locked: true }, method: 'POST'}),
+  unlock: threadId => $http2(`/api/threads/${threadId}/lock`, { data: { locked: false }, method: 'POST'}),
+  sticky: threadId => $http2(`/api/threads/${threadId}/sticky`, { data: { sticky: true}, method: 'POST'}),
+  unsticky: threadId => $http2(`/api/threads/${threadId}/sticky`, { data: { sticky: false }, method: 'POST'}),
   byBoard: params => $http2('/api/threads', { params }),
   postedIn: params => $http('/api/threads/posted', { params }),
   slugToThreadId: slug => $http2(`/api/threads/${slug}/id`),
@@ -170,8 +170,8 @@ export const watchlistApi = {
   pageBoards: params => $http('/api/watchlist/boards', { params }),
   watchBoard: boardId => $http(`/api/watchlist/boards/${boardId}`, { method: 'POST' }),
   unwatchBoard: boardId => $http(`/api/watchlist/boards/${boardId}`, { method: 'DELETE' }),
-  watchThread: threadId => $http(`/api/watchlist/threads/${threadId}`, { method: 'POST' }),
-  unwatchThread: threadId => $http(`/api/watchlist/threads/${threadId}`, { method: 'DELETE' })
+  watchThread: threadId => $http2(`/api/watchlist/threads/${threadId}`, { method: 'POST' }),
+  unwatchThread: threadId => $http2(`/api/watchlist/threads/${threadId}`, { method: 'DELETE' })
 }
 
 export const authApi = {

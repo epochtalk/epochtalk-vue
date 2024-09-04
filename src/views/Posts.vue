@@ -372,8 +372,6 @@
 
       <!-- Poll Viewer -->
       <poll-viewer v-if="postData.data.thread?.poll" :poll="postData.data.thread.poll" :thread="postData.data.thread" :user-priority="postData.data.posts[0].user.priority" :reset="resetPoll" :banned-from-board="bannedFromBoard"></poll-viewer>
-
-      <pagination v-if="postData.data?.thread" :page="postData.data.page" :limit="postData.data.limit" :count="postData.data.thread.post_count"></pagination>
     </div>
 
   </div>
@@ -382,6 +380,7 @@
   <div class="actions-bottom">
     <div class="actions-bottom-grid">
       <div id="pagination-bottom" class="pagination-bottom">
+        <pagination v-if="postData.data?.thread" :page="postData.data.page" :limit="postData.data.limit" :count="postData.data.thread.post_count"></pagination>
       </div>
       <div v-if="canPost()" class="sidebar-actions">
         <a class="button small" @click.prevent="loadEditor()" v-if="canPost()">Post Reply</a>
@@ -448,7 +447,7 @@ export default {
   components: { Pagination, PostsDeleteModal, PostsUndeleteModal, PostsPurgePostModal, PostsMoveThreadModal, PostsPurgeThreadModal, PostsReportModal, PollViewer, PollCreator, RankDisplay, TrustDisplay, Editor },
   beforeRouteEnter(to, from, next) {
     const params = {
-      limit: localStoragePrefs().data.posts_per_page,
+      limit: to.query.limit || localStoragePrefs().data.posts_per_page,
       page: isNaN(to.query.start) ? to.query.page || 1 : undefined,
       start: isNaN(to.query.start) ? undefined : Number(to.query.start)
     }
@@ -469,7 +468,7 @@ export default {
   },
   beforeRouteUpdate(to, from, next) {
     const params = {
-      limit: localStoragePrefs().data.posts_per_page,
+      limit: to.query.limit || localStoragePrefs().data.posts_per_page,
       page: isNaN(to.query.start) ? to.query.page || 1 : undefined,
       start: isNaN(to.query.start) ? undefined : Number(to.query.start)
     }
@@ -499,7 +498,7 @@ export default {
       .then(threadId => {
         const params = {
           thread_id: threadId,
-          limit: v.prefs.posts_per_page,
+          limit: $route.query.limit || v.prefs.posts_per_page,
           page: isNaN($route.query.start) ? $route.query.page || 1 : undefined,
           start: isNaN($route.query.start) ? undefined : Number($route.query.start)
         }
@@ -1095,6 +1094,7 @@ export default {
 
 <style lang="scss">
 /*-------------- Posts (Thread View) Layout -------------- */
+
 .banner-container .banner.warning {
   border-radius: 2px;
   font-weight: normal;

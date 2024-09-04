@@ -16,6 +16,7 @@ a:hover { color: $color-primary-alt; }
 .inline-block { display: inline-block; }
 .small-text { font-size: 0.75rem; }
 .full-width { width: 100%; }
+.no-select { @include no-select; }
 .boxed-section {
   border-collapse: collapse;
   border: 1px solid $border-color;
@@ -841,7 +842,7 @@ input[disabled].toggle-switch:checked + label:after { background-color: lighten(
   }
 }
 .pagination-bottom {
-  justify-self: end;
+  justify-self: start;
   ul { &.pagination { li { a { font-size: $font-size-sm; } } } }
 }
 .pagination-wrap {
@@ -862,7 +863,7 @@ input[disabled].toggle-switch:checked + label:after { background-color: lighten(
         column-gap: 1rem;
       }
       .pagination-bottom {
-        justify-self: end;
+        justify-self: start;
       }
     }
   }

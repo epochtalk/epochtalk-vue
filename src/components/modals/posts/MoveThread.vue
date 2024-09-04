@@ -13,7 +13,7 @@
         </div>
         <!-- Save Button -->
         <div class="clear">
-          <button class="fill-row" @click="moveThread()">
+          <button class="fill-row" @click.prevent="moveThread()">
             Move Thread
           </button>
         </div>
@@ -26,6 +26,7 @@
 import Modal from '@/components/layout/Modal.vue'
 import decode from '@/composables/filters/decode'
 import { reactive, toRefs } from 'vue'
+import { useRouter } from 'vue-router'
 import { threadsApi, boardsApi } from '@/api'
 import { groupBy } from 'lodash'
 
@@ -45,8 +46,13 @@ export default {
       threadsApi.move(props.threadId, v.newBoard.id)
         .then(() => {
           close()
+
+          // soft reload page, after moving thread
+          $router.go()
         })
     }
+
+    const $router = useRouter()
 
     const v = reactive({
       threadId: props.threadId,
