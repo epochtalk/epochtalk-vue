@@ -215,7 +215,7 @@
 
   <div class="mobile-pagination" v-if="threadData.data?.board">
     <div class="pagination-wrap">
-     <pagination v-if="threadData.data?.board" :page="threadData.data.page" :limit="threadData.data.limit" :count="threadData.data.board.thread_count"></pagination>
+     <pagination v-if="threadData.data?.board" :page="threadData.data.page" :limit="threadData.data.limit" :count="threadData.data.board.thread_count - threadData.data.board.sticky_thread_count"></pagination>
     </div>
   </div>
 
