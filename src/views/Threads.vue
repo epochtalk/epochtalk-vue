@@ -345,7 +345,7 @@ export default {
       if (defaultField || newField === $route.query.field) desc = !desc
       else desc = true // Sort field changed, default to desc true
       // Update router to have new query params, watch on query params will update data
-      let query = { field: newField, page: $route.query.page }
+      let query = { field: newField, page: $route.query.page, limit: $route.query.limit }
       if (!query.page) delete query.page // don't include page if undefined
       if (newField === 'updated_at') delete query.field // do not display default field in qs
       if (!desc) query.desc = false  // only display desc in query string when false
