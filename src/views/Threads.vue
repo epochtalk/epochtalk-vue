@@ -210,12 +210,12 @@
       </tbody>
     </table>
 
-    <pagination v-if="threadData.data?.board" class="hide-mobile" :page="threadData.data.page" :limit="threadData.data.limit" :count="threadData.data.board.thread_count"></pagination>
+    <pagination v-if="threadData.data?.board" class="hide-mobile" :page="threadData.data.page" :limit="threadData.data.limit" :count="threadData.data.board.thread_count - threadData.data.board.sticky_thread_count"></pagination>
   </div>
 
   <div class="mobile-pagination" v-if="threadData.data?.board">
     <div class="pagination-wrap">
-     <pagination v-if="threadData.data?.board" :page="threadData.data.page" :limit="threadData.data.limit" :count="threadData.data.board.thread_count"></pagination>
+     <pagination v-if="threadData.data?.board" :page="threadData.data.page" :limit="threadData.data.limit" :count="threadData.data.board.thread_count - threadData.data.board.sticky_thread_count"></pagination>
     </div>
   </div>
 
@@ -244,7 +244,7 @@ import SetModeratorsModal from '@/components/modals/admin/management/SetModerato
 import humanDate from '@/composables/filters/humanDate'
 import decode from '@/composables/filters/decode'
 import truncate from '@/composables/filters/truncate'
-import { inject, reactive, watch, toRefs, computed } from 'vue'
+import { inject, reactive, watch, toRefs } from 'vue'
 import { boardsApi, threadsApi, watchlistApi } from '@/api'
 import { AuthStore } from '@/composables/stores/auth'
 import { PreferencesStore, localStoragePrefs } from '@/composables/stores/prefs'
@@ -345,7 +345,7 @@ export default {
       if (defaultField || newField === $route.query.field) desc = !desc
       else desc = true // Sort field changed, default to desc true
       // Update router to have new query params, watch on query params will update data
-      let query = { field: newField, page: $route.query.page }
+      let query = { field: newField, page: $route.query.page, limit: $route.query.limit }
       if (!query.page) delete query.page // don't include page if undefined
       if (newField === 'updated_at') delete query.field // do not display default field in qs
       if (!desc) query.desc = false  // only display desc in query string when false
@@ -415,7 +415,6 @@ export default {
     /* View Data */
     const v = reactive({
       currentPage: Number($route.query.page) || 1,
-      pages: computed(() => Math.ceil(v.threadData?.data?.board?.thread_count / v.threadData?.data?.limit)),
       threadData: { data: {} },
       showEditor: false,
       prefs: $prefs.data,

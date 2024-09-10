@@ -416,7 +416,12 @@ err => {
         }
         break
       case 404:
-        router.push({ name: 'NotFound'})
+        router.push({
+          name: 'NotFound',
+          params: { pathMatch: window.location.pathname.split('/').slice(1) },
+          query:  Object.fromEntries(new URLSearchParams(window.location.search)),
+          hash: window.location.hash
+        })
         break
       default:
         break

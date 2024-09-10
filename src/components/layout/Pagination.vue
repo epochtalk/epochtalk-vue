@@ -153,7 +153,7 @@ export default {
       pageInput: null,
       paginationKeys: [],
       currentPage: props.page,
-      pageCount: computed(() => Math.ceil(props.count / props.limit))
+      pageCount: computed(() => Math.ceil(props.count / props.limit) || 1)
     })
 
     buildPages()
