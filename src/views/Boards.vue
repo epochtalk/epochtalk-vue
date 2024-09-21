@@ -1,6 +1,6 @@
 <template>
   <div class="main">
-    <recent-threads></recent-threads>
+    <recent-threads v-if="boardData && boardData.data && boardData.data.threads" :threads="boardData.data.threads"></recent-threads>
 
     <div v-if="!loggedIn" class="dashboard-actions">
       <a href="" class="button" @click.prevent="showRegister = true">Create an Account</a>
