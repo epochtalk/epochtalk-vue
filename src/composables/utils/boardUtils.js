@@ -1,4 +1,5 @@
 import { localStoragePrefs } from '@/composables/stores/prefs'
+import { threadsApi } from '@/api'
 
 const buildLastPostData = data => {
   return {
@@ -70,7 +71,14 @@ export const processBoards = data => {
       return Object.assign(board, lastPost)
     })
   })
-  return data
+
+  // query recent threads and append to board data so no delay
+  // in recent thread component loading
+  return threadsApi.recent()
+  .then(recent => {
+    data.threads = recent
+    return data
+  }).catch(() => data)
 }
 
 export const processThreads = data => {
