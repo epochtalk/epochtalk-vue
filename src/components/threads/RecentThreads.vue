@@ -45,17 +45,17 @@
             </div>
           </div>
           <div class="title">
-            <router-link :class="{bold: thread.latest}" class="thread-title" :title="decode(thread.title)" :to="{ name: 'Posts', params: { threadSlug: thread.slug }, query: (thread.post.position && thread.post.position > 1 ? { start: thread.post.position } : undefined) }" onclick="event.stopPropagation()">{{decode(thread.title)}}</router-link>
+            <router-link :class="{bold: thread.latest}" class="thread-title" :title="decode(thread.title)" :to="{ name: 'Posts', params: { threadSlug: thread.slug }, query: (thread?.post?.position > 1 ? { start: thread.post.position } : undefined) }" onclick="event.stopPropagation()">{{decode(thread.title)}}</router-link>
           </div>
           <div class="user">
             in
-            <router-link class="thread-board" :title="decode(thread.board.name)" :to="{ name: 'Threads', params: { boardSlug: thread.board.slug } }" onclick="event.stopPropagation()">{{decode(thread.board.name)}}</router-link>
+            <router-link v-if="thread?.board" class="thread-board" :title="decode(thread.board.name)" :to="{ name: 'Threads', params: { boardSlug: thread.board.slug } }" onclick="event.stopPropagation()">{{decode(thread.board.name)}}</router-link>
             by
             <span v-if="thread.deleted">deleted</span>
-            <router-link onclick="event.stopPropagation()" v-if="!thread.deleted" :to="{ path: '/profile/' + thread.user.username.toLowerCase() }">{{thread.user.username}}</router-link>
+            <router-link onclick="event.stopPropagation()" v-if="!thread.deleted" :to="{ path: '/profile/' + thread?.user?.username.toLowerCase() }">{{thread?.user?.username}}</router-link>
           </div>
           <div class="last-reply">
-            <div>{{humanDate(thread.post.created_at)}}</div>
+            <div>{{humanDate(thread?.post?.created_at)}}</div>
           </div>
         </div>
       </div>
