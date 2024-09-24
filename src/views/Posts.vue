@@ -146,7 +146,7 @@
           </div>
 
           <div class="user-rank">
-            <rank-display :user="{ ...post.user, metadata: {...postData.data.metadata } }" />
+            <rank-display v-if="postData?.data?.metadata" :user="{ ...post.user, metadata: {...postData.data.metadata } }" />
           </div>
           <div v-if="loggedIn && post.user.id !== authedUser.id" class="ignore-directive">
             <a href="" @click.prevent="toggleIgnoredPosts(post)" v-html="post.user._ignored ? 'Unignore Posts' : 'Ignore Posts'"></a>
