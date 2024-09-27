@@ -125,6 +125,7 @@ export const threadsApi = {
   unlock: threadId => $http2(`/api/threads/${threadId}/lock`, { data: { locked: false }, method: 'POST'}),
   sticky: threadId => $http2(`/api/threads/${threadId}/sticky`, { data: { sticky: true}, method: 'POST'}),
   unsticky: threadId => $http2(`/api/threads/${threadId}/sticky`, { data: { sticky: false }, method: 'POST'}),
+  recent: () => $http2('/api/threads/recent'),
   byBoard: params => $http2('/api/threads', { params }),
   postedIn: params => $http('/api/threads/posted', { params }),
   slugToThreadId: slug => $http2(`/api/threads/${slug}/id`),

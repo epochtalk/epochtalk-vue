@@ -404,7 +404,7 @@ export default {
         width: 100%;
       }
       &.rect img {
-        object-fit: cover;
+        object-fit: contain;
         height: calc(#{$avatar-width} / 1.5);
       }
     }

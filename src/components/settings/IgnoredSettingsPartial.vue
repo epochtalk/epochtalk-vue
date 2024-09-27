@@ -140,7 +140,7 @@ table.striped.ignored-users {
      img {
        height: 1.5rem;
        width: 1.5rem;
-       object-fit: cover;
+       object-fit: contain;
      }
     }
   }
