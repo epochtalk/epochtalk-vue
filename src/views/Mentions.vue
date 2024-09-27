@@ -293,7 +293,7 @@ export default {
             height: 3.125rem;
             width: 3.125rem;
             border: 2px solid $border-color;
-            object-fit: cover;
+            object-fit: contain;
           }
         }
       }

@@ -93,7 +93,7 @@ export default {
     width: 100%; height: 100%;
     text-align: center;
     &.rect {
-      img { height: 80px; width: 120px; object-fit: cover;}
+      img { height: 80px; width: 120px; object-fit: contain;}
     }
     &.circle {
       img { height: 120px; width: 120px; border-radius: 100%; object-fit: cover; }

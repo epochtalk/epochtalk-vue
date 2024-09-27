@@ -879,7 +879,7 @@ header {
                         height: 2rem;
                         width: 2rem;
                         border: 2px solid $border-color;
-                        object-fit: cover;
+                        object-fit: contain;
                       }
                     }
                   }
