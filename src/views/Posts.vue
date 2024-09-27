@@ -132,7 +132,7 @@
                 </svg>
               </span>
               <router-link :to="{ path: '/profile/' + post.user.username.toLowerCase() }">
-                <img :src="'https://bitcointalk.org' + post.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
+                <img :src="post.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
               </router-link>
             </div>
             <router-link :to="{ path: '/profile/' + post.user.username.toLowerCase() }">
