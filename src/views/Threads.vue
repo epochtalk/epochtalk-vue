@@ -149,7 +149,7 @@
 
           <td class="last-post">
             <span v-if="thread.last_deleted">deleted</span>
-            <router-link v-if="!thread.last_deleted" :to="{ path: '/profile/' + thread.last_post_username.toLowerCase() }"><img class="avatar-small" :class="defaultAvatarShape" :src="thread.last_post_avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" /></router-link>
+            <router-link v-if="!thread.last_deleted" :to="{ path: '/profile/' + thread.last_post_username.toLowerCase() }"><img class="avatar-small" :class="defaultAvatarShape" :src="'https://bitcointalk.org/' + thread.last_post_avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" /></router-link>
             <router-link v-if="!thread.last_deleted" :to="{ path: '/profile/' + thread.last_post_username.toLowerCase() }">
               <span v-html="thread.last_post_username"></span>
             </router-link> posted on
@@ -202,20 +202,20 @@
 
           <td class="last-post" v-if="thread.user.username">
             <span v-if="thread.last_deleted">deleted</span>
-            <router-link v-if="!thread.last_deleted" :to="{ path: '/profile/' + thread.last_post_username.toLowerCase() }"><img class="avatar-small" :class="defaultAvatar" :src="thread.last_post_avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" /></router-link>
+            <router-link v-if="!thread.last_deleted" :to="{ path: '/profile/' + thread.last_post_username.toLowerCase() }"><img class="avatar-small" :class="defaultAvatar" :src="'https://bitcointalk.org/' + thread.last_post_avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" /></router-link>
             <router-link v-if="!thread.last_deleted" :to="{ path: '/profile/' + thread.last_post_username.toLowerCase() }"><span v-html="thread.last_post_username"></span></router-link> posted on <router-link :to="{ name: 'Posts', params: { threadSlug: thread.slug }, query: { start: thread.last_post_position }, hash: '#' + thread.last_post_id }"><span>{{humanDate(thread.last_post_created_at)}}</span>.</router-link>
             <router-link v-if="thread.has_new_post" :to="{ name: 'Posts', params: { threadSlug: thread.slug }, query: { start: thread.latest_unread_position }, hash: '#' + thread.latest_unread_post_id }">(Last unread post)</router-link>
           </td>
         </tr>
       </tbody>
     </table>
-
-    <pagination v-if="threadData.data?.board" class="hide-mobile" :page="threadData.data.page" :limit="threadData.data.limit" :count="threadData.data.board.thread_count - threadData.data.board.sticky_thread_count"></pagination>
   </div>
 
-  <div class="mobile-pagination" v-if="threadData.data?.board">
-    <div class="pagination-wrap">
-     <pagination v-if="threadData.data?.board" :page="threadData.data.page" :limit="threadData.data.limit" :count="threadData.data.board.thread_count - threadData.data.board.sticky_thread_count"></pagination>
+  <div class="actions-bottom">
+    <div class="actions-bottom-grid">
+      <div id="pagination-bottom" class="pagination-bottom">
+        <pagination v-if="threadData.data?.board" :page="threadData.data.page" :limit="threadData.data.limit" :count="threadData.data.board.thread_count - (threadData.data.board.sticky_thread_count ? threadData.data.board.sticky_thread_count : 0)"></pagination>
+      </div>
     </div>
   </div>
 
@@ -572,7 +572,7 @@ export default {
 .threads-posted-in {
   .actions-bottom {
     .pagination-bottom {
-      justify-self: end;
+      justify-self: start;
     }
 
     @media screen and (max-width: 1280px) {

@@ -70,20 +70,32 @@ export default {
       // Case 2: Truncate Tail
       // 1 2 3 4 5 [6] 7 8 ... 14 15 16
       if (truncate && v.currentPage <= 6)
-        ellipsis = [{ index: 9, nextIndex: v.pageCount - 2 }]
+        if (v.mobile) 
+          ellipsis = [{ index: 4, nextIndex: v.pageCount - 2 }]
+        else
+          ellipsis = [{ index: 9, nextIndex: v.pageCount - 2 }]
 
       // Case 3: Truncate Head
       // 1 2 3 ... 9 10 [11] 12 13 14 15 16
       else if (truncate && v.currentPage >= v.pageCount - 5)
-        ellipsis = [{ index: 4, nextIndex: v.pageCount - 8 }]
+        if (v.mobile) 
+          ellipsis = [{ index: 4, nextIndex: v.pageCount - 2 }]
+        else
+          ellipsis = [{ index: 4, nextIndex: v.pageCount - 8 }]
 
       // Case 4: Truncate Head and Tail
       // 1 2 3 ... 7 8 [9] 10 11 ... 14 15 16
-      else if (truncate && v.currentPage > 6 && v.currentPage < v.pageCount - 5)
-        ellipsis = [
-          { index: 4, nextIndex: v.currentPage - 2 },
-          { index: v.currentPage + 3, nextIndex: v.pageCount - 2 }
-        ]
+      else if (truncate && v.currentPage > 6 && v.currentPage < v.pageCount - 5) 
+        if (v.mobile) 
+          ellipsis = [
+            { index: 2, nextIndex: v.currentPage - 1 },
+            { index: v.currentPage + 2, nextIndex: v.pageCount }
+          ]
+        else
+          ellipsis = [
+            { index: 4, nextIndex: v.currentPage - 2 },
+            { index: v.currentPage + 3, nextIndex: v.pageCount - 2 }
+          ]
 
       generatePageKeys(ellipsis)
     }
@@ -153,7 +165,8 @@ export default {
       pageInput: null,
       paginationKeys: [],
       currentPage: props.page,
-      pageCount: computed(() => Math.ceil(props.count / props.limit) || 1)
+      pageCount: computed(() => Math.ceil(props.count / props.limit) || 1),
+      mobile: window.innerWidth <= window.mobile_break_width
     })
 
     buildPages()

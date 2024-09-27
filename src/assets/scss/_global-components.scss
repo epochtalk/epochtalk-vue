@@ -846,7 +846,7 @@ input[disabled].toggle-switch:checked + label:after { background-color: lighten(
   ul { &.pagination { li { a { font-size: $font-size-sm; } } } }
 }
 .pagination-wrap {
-  float: right;
+  float: left;
   @include break-mobile-sm {
     float: unset;
     text-align: center;
