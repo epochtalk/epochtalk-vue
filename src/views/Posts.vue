@@ -132,7 +132,7 @@
                 </svg>
               </span>
               <router-link :to="{ path: '/profile/' + post.user.username.toLowerCase() }">
-                <img :src="post.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
+                <img :src="'https://bitcointalk.org' + post.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
               </router-link>
             </div>
             <router-link :to="{ path: '/profile/' + post.user.username.toLowerCase() }">
@@ -1405,7 +1405,7 @@ ad-viewer {
         height: calc(#{$postUserWidth} / 1.5);
 
         img {
-          object-fit: cover;
+          object-fit: contain;
         }
 
         .online {
@@ -1738,8 +1738,13 @@ ad-viewer {
     margin-bottom: 3rem;
   }
 
-  .thread-data .post-block .post-user {
-    display: none;
+  .thread-data .post-block-grid  {
+    flex-direction: column;
+    .post-user.user-avatar {
+      width: calc(#{$postUserWidth}/2);
+      height: calc(#{$postUserWidth}/2);
+    }
+    
   }
   .thread-data .post-block .post-content {
     margin-left: 0;
