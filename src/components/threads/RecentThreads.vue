@@ -45,7 +45,7 @@
             </div>
           </div>
           <div class="title">
-            <router-link :class="{bold: thread.latest}" class="thread-title" :title="decode(thread.title)" :to="{ name: 'Posts', params: { threadSlug: thread.slug }, query: (thread?.post?.position > 1 ? { start: thread.post.position } : undefined) }" onclick="event.stopPropagation()">{{decode(thread.title)}}</router-link>
+            <router-link :class="{bold: thread.latest}" class="thread-title" :title="decode(thread.title)" :to="{ name: 'Posts', params: { threadSlug: thread.slug }, query: (thread?.post?.position > 1 ? { start: thread.post.position } : undefined) }" onclick="event.stopPropagation()"><span v-html="decode(thread.title)"></span></router-link>
           </div>
           <div class="user">
             in
