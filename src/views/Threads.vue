@@ -193,6 +193,10 @@
               </router-link>
               <span> on {{ humanDate(thread.created_at)}}</span>
             </div>
+
+            <div v-if="thread.post_count > posts_per_page" class="thread-pagination">
+              <thread-pagination :limit="posts_per_page" :count="thread.post_count" />
+            </div>
           </td>
 
           <td class="views-replies" v-if="thread.user.username">
@@ -239,6 +243,7 @@
 
 <script>
 import { useRoute, useRouter } from 'vue-router'
+import ThreadPagination from '@/components/layout/ThreadPagination.vue'
 import Pagination from '@/components/layout/Pagination.vue'
 import SetModeratorsModal from '@/components/modals/admin/management/SetModerators.vue'
 import humanDate from '@/composables/filters/humanDate'
@@ -257,7 +262,7 @@ import slugify from 'slugify'
 export default {
   name: 'Threads',
   props: ['boardSlug', 'boardId'],
-  components: { Pagination, SetModeratorsModal, Editor },
+  components: { ThreadPagination, Pagination, SetModeratorsModal, Editor },
   beforeRouteEnter(to, from, next) {
     const params = {
       limit: to.query.limit || localStoragePrefs().data.threads_per_page,
@@ -424,6 +429,7 @@ export default {
       showSetModerators: false,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
+      posts_per_page: localStoragePrefs().data.posts_per_page,
       sortField: $route.query.field ? $route.query.field : 'updated_at',
       sortItems: [
         {
