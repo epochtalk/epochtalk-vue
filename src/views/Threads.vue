@@ -195,7 +195,7 @@
             </div>
 
             <div v-if="thread.post_count > posts_per_page" class="thread-pagination">
-              <thread-pagination :limit="posts_per_page" :count="thread.post_count" />
+              <thread-pagination :slug="thread.slug" :limit="posts_per_page" :count="thread.post_count" />
             </div>
           </td>
 
