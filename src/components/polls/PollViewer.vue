@@ -103,7 +103,7 @@
             </span>
             <input v-if="pollCopy.max_answers === 1 && canVote()" @click="pollAnswers.pop(); toggleAnswer(answer.id);" name="pollanswer" type="radio">
             <input type="checkbox" @click="toggleAnswer(answer.id)" :disabled="pollAnswers.length >= pollCopy.max_answers && pollAnswers.indexOf(answer.id) === -1" :checked="pollAnswers.indexOf(answer.id) > -1" v-if="pollCopy.max_answers > 1 && canVote()"/>
-            <span>{{answer.answer}}</span>
+            <span v-html="answer.answer"></span>
           </label>
           <div v-if="showPollResults()" class="poll-results">
             <div class="poll-results-data">
