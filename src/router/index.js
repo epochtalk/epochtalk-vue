@@ -235,7 +235,7 @@ const routes = [
     name: 'Profile',
     component: Profile,
     props: true,
-    meta: { requiresAuth: true, bodyClass: 'profile' },
+    meta: { requiresAuth: false, bodyClass: 'profile' },
     children: [{
       path: '',
       name: 'Profile.UserPosts',
@@ -251,7 +251,7 @@ const routes = [
       user: usersApi.find(route.params.username).then(u => u),
       username: route.params.username
     }),
-    meta: { requiresAuth: true, bodyClass: 'user-posts' }
+    meta: { requiresAuth: false, bodyClass: 'user-posts' }
   },
   {
     path: '/profile/:username/trust',
