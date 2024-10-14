@@ -77,6 +77,7 @@
             <router-link id="logo-text" to="/"> <!-- ng-bind="{{decode(title)}}" -->
               Epochtalk Forums
             </router-link>
+            <span>&nbsp;{{decode(revision)}}</span>
           </h1>
           <admin-navigation v-if="adminMode && (permissionUtils.hasPermission('adminAccess') || permissionUtils.hasPermission('modAccess'))" />
 
@@ -361,6 +362,7 @@ export default {
       mentionsList: NotificationsStore.mentionsList,
       notificationMessages: NotificationsStore.messages,
       notificationMentions: NotificationsStore.mentions,
+      revision: window.revision,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
       breadcrumbs: [{label:'Home', state: '#', opts: {}}]
