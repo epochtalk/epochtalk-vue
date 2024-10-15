@@ -74,9 +74,10 @@
           <!-- Logo Section -->
           <h1 :class="{ 'hide-mobile': adminMode }">
             <router-link to="/" v-if="logo"><img :src="logo" id="logo" /></router-link>
-            <router-link id="logo-text" to="/"> <!-- ng-bind="{{decode(title)}}" -->
-              Epochtalk Forums
+            <router-link id="logo-text" to="/">
+              {{decode(title)}}
             </router-link>
+            <span>&nbsp;{{decode(revision)}}</span>
           </h1>
           <admin-navigation v-if="adminMode && (permissionUtils.hasPermission('adminAccess') || permissionUtils.hasPermission('modAccess'))" />
 
@@ -361,6 +362,8 @@ export default {
       mentionsList: NotificationsStore.mentionsList,
       notificationMessages: NotificationsStore.messages,
       notificationMentions: NotificationsStore.mentions,
+      title: window.title,
+      revision: window.revision,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
       breadcrumbs: [{label:'Home', state: '#', opts: {}}]
