@@ -133,7 +133,8 @@ export const threadsApi = {
   removeSubscriptions: () => $http('/api/threadnotifications', { method: 'DELETE' }),
   disableNotifications: () => $http('/api/threadnotifications', { data: { enabled: false }, method: 'PUT' }),
   enableNotifications: () => $http('/api/threadnotifications', { data: { enabled: true }, method: 'PUT' }),
-  viewed: threadId => $http2(`/api/threads/${threadId}/viewed`, { method: 'POST' })
+  viewed: threadId => $http2(`/api/threads/${threadId}/viewed`, { method: 'POST' }),
+  byUser: params => $http2(`/api/threads/user/${params.username}`, { params }),
 }
 
 export const postsApi = {
@@ -147,8 +148,7 @@ export const postsApi = {
   unlock: postId => $http(`/api/posts/${postId}/unlock`, { method: 'POST'}),
   byThread: params => $http2('/api/posts', { params }),
   find: id => $http(`/api/posts/${id}`),
-  byUser: params => $http(`/api/posts/user/${params.username}`, { params }),
-  startedByUser: params => $http(`/api/posts/user/${params.username}/started`, { params }),
+  byUser: params => $http2(`/api/posts/user/${params.username}`, { params }),
   slugToPostId: slug => $http(`/api/posts/${slug}/id`),
   postSearch: params => $http('/api/search/posts', { params }),
   byNewbie: params => $http('/api/posts/patrol', { params }),
