@@ -101,7 +101,7 @@
 <script>
 import humanDate from '@/composables/filters/humanDate'
 import { reactive, toRefs, computed, inject, watch } from 'vue'
-import { postsApi } from '@/api'
+import { postsApi, threadsApi } from '@/api'
 import { PreferencesStore, localStoragePrefs } from '@/composables/stores/prefs'
 import { useRoute, useRouter } from 'vue-router'
 import SimplePagination from '@/components/layout/SimplePagination.vue'
@@ -120,7 +120,7 @@ export default {
         field: to.query.field,
         desc: to.query.desc
       }
-      if (vm.threads) postsApi.startedByUser(params).then(d => vm.postData = d)
+      if (vm.threads) threadsApi.byUser(params).then(d => vm.postData = d)
       else postsApi.byUser(params)
         .then(d => {
           vm.postData = d
@@ -136,7 +136,7 @@ export default {
       field: to.query.field,
       desc: to.query.desc
     }
-    if (this.threads) postsApi.startedByUser(params).then(d => this.postData = d)
+    if (this.threads) threadsApi.byUser(params).then(d => this.postData = d)
     else postsApi.byUser(params)
       .then(d => {
         this.postData = d
@@ -163,7 +163,7 @@ export default {
         field: $route.query.field,
         desc: $route.query.desc
       }
-      if (v.threads) postsApi.startedByUser(params).then(d => v.postData = d)
+      if (v.threads) threadsApi.byUser(params).then(d => v.postData = d)
       else postsApi.byUser(params).then(d => v.postData = d)
     }
 
@@ -281,6 +281,8 @@ export default {
     }
   }
 }
+
+.pagination-wrap { margin-top: 1rem; }
 
 .table-actions {
   display: flex;
