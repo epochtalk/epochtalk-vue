@@ -200,13 +200,13 @@ export default {
   props: [ 'username', 'saveScrollPos' ],
   components: { TrustDisplay, RankDisplay, UpdateSignatureModal, UpdatePasswordModal, UpdateAvatarModal, UpdateEmailModal, DeleteAccountModal, DeactivateReactivateModal, UpdateProfileModal, QuickMessageModal, ManageBansModal, ModerationNotesModal },
   beforeRouteEnter(to, from, next) {
-    usersApi.find(to.params.username).then(u => next(vm => {
+    usersApi.find(to.query.id).then(u => next(vm => {
       vm.user = u
       isOnline(u.id, (e, d) => vm.userOnline = d.online)
     }))
   },
   beforeRouteUpdate(to, from, next) {
-    usersApi.find(to.params.username).then(u => {
+    usersApi.find(to.query.id).then(u => {
       this.user = u
       isOnline(u.id, (e, d) => this.userOnline = d.online)
     })
@@ -214,7 +214,7 @@ export default {
   },
   setup(props) {
     /* Template Methods */
-    const refreshUser = () => usersApi.find(v.user.username).then(u => v.user = u)
+    const refreshUser = () => usersApi.find(v.user.id).then(u => v.user = u)
     const redirectHome = () => $router.replace('/')
 
     const banExpiration = () => {

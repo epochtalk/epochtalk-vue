@@ -3,8 +3,10 @@
     <recent-threads v-if="boardData && boardData.data && boardData.data.threads" :threads="boardData.data.threads"></recent-threads>
 
     <div v-if="!loggedIn" class="dashboard-actions">
-      <a href="" class="button" @click.prevent="showRegister = true">Create an Account</a>
-      <a href="" class="button" @click.prevent="showLogin = true">Log In</a>
+      <!-- <a href="" class="button" @click.prevent="showRegister = true">Create an Account</a> -->
+      <a href="" class="button disabled" @click.stop.prevent="">Create an Account</a>
+      <!-- <a href="" class="button" @click.prevent="showLogin = true">Log In</a> -->
+      <a href="" class="button disabled" @click.stop.prevent="">Log In</a>
     </div>
     <div v-if="loggedIn" class="dashboard-actions">
       <router-link :to="{ name: 'Watchlist' }" class="button">Watchlist</router-link>
@@ -67,7 +69,7 @@
                   <div v-if="board.last_post_username">
                     <span v-if="board.user_deleted || board.post_deleted">deleted</span>
                     <img v-if="!board.user_deleted && !board.post_deleted" class="avatar-small" :class="defaultAvatarShape" :src="board.last_post_avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
-                    <router-link v-if="!board.user_deleted && !board.post_deleted" :to="{ path: '/profile/' + board.last_post_username.toLowerCase() }">{{board.last_post_username}}</router-link> posted in
+                    <router-link v-if="!board.user_deleted && !board.post_deleted" :to="{ path: '/profile/' + board.last_post_username.toLowerCase(), query: { id: board.last_post_user_id }}">{{board.last_post_username}}</router-link> posted in
                     <span v-if="board.last_thread_title">
                       <router-link :to="{ name: 'Posts', params: { threadSlug: board.last_thread_slug }, query: { start: board.last_post_position} }">
                         <span v-html="board.last_thread_title"></span>
@@ -349,6 +351,7 @@ img.avatar-small {
     margin: 0 1rem;
     min-width: 160px;
     &:last-child { margin-left: 0; }
+    &.disabled { cursor: not-allowed; }
   }
 
   @include break-mobile-sm {

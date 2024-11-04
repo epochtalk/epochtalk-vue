@@ -5,7 +5,7 @@
       <div class="moderators" v-if="threadData.data.board.moderators && threadData.data.board.moderators.length > 0">
         <span class="label">Moderators: </span>
         <span v-for="(mod, i) in threadData.data.board.moderators" :key="mod.username">
-          <router-link :to="{ path: '/profile/' + mod.username.toLowerCase() }">
+          <router-link :to="{ path: '/profile/' + mod.username.toLowerCase(), query: { id: mod.id } }">
             <span v-html="mod.username"></span>
           </router-link><span v-if="(i + 1) !== threadData.data.board.moderators.length">, </span>
         </span>
@@ -40,10 +40,10 @@
           <td class="last-post">
             <div v-if="childBoard.last_thread_id">
               <span v-if="!childBoard.last_post_username">deleted</span>
-              <router-link v-if="childBoard.last_post_username" :to="{ path: '/profile/' + childBoard.last_post_username.toLowerCase() }">
+              <router-link v-if="childBoard.last_post_username" :to="{ path: '/profile/' + childBoard.last_post_username.toLowerCase(), query: { id: childBoard.last_post_user_id } }">
                 <img class="avatar-small" :class="defaultAvatarShape" :src="childBoard.last_post_avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
               </router-link>
-              <router-link v-if="childBoard.last_post_username" :to="{ path: '/profile/' + childBoard.last_post_username.toLowerCase() }">
+              <router-link v-if="childBoard.last_post_username" :to="{ path: '/profile/' + childBoard.last_post_username.toLowerCase(), query: { id: childBoard.last_post_user_id } }">
                 <span v-html="childBoard.last_post_username"></span>
               </router-link>
               <span v-if="childBoard.last_thread_id">
@@ -132,7 +132,7 @@
             <div class="started-by">
               Started by
               <span v-if="thread.user.deleted">deleted</span>
-              <router-link v-if="!thread.user.deleted" :to="{ path: '/profile/' + thread?.user?.username.toLowerCase() }">
+              <router-link v-if="!thread.user.deleted" :to="{ path: '/profile/' + thread?.user?.username.toLowerCase(), query: { id: thread?.user?.id } }">
                 <span v-html="thread.user.username"></span>
               </router-link>
               <span> on {{humanDate(thread.created_at)}}</span>
@@ -146,8 +146,8 @@
 
           <td class="last-post">
             <span v-if="thread.last_deleted">deleted</span>
-            <router-link v-if="!thread.last_deleted" :to="{ path: '/profile/' + thread.last_post_username.toLowerCase() }"><img class="avatar-small" :class="defaultAvatarShape" :src="thread.last_post_avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" /></router-link>
-            <router-link v-if="!thread.last_deleted" :to="{ path: '/profile/' + thread.last_post_username.toLowerCase() }">
+            <router-link v-if="!thread.last_deleted" :to="{ path: '/profile/' + thread.last_post_username.toLowerCase(), query: { id: thread.last_post_user_id } }"><img class="avatar-small" :class="defaultAvatarShape" :src="thread.last_post_avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" /></router-link>
+            <router-link v-if="!thread.last_deleted" :to="{ path: '/profile/' + thread.last_post_username.toLowerCase(), query: { id: thread.last_post_user_id } }">
               <span v-html="thread.last_post_username"></span>
             </router-link> posted on
             <router-link :to="{ name: 'Posts', params: { threadSlug: thread.slug }, query: { start: thread.last_post_position }, hash: '#' + thread.last_post_id }"><span>{{humanDate(thread.last_post_created_at)}}</span>.</router-link>
@@ -185,7 +185,7 @@
             <div class="started-by">
               Started by
               <span v-if="thread.user.deleted">deleted</span>
-              <router-link v-if="!thread.user.deleted" :to="{ path: '/profile/' + thread.user.username.toLowerCase() }">
+              <router-link v-if="!thread.user.deleted" :to="{ path: '/profile/' + thread.user.username.toLowerCase(), query: { id: thread.user.id } }">
                 <span v-html="thread.user.username"></span>
               </router-link>
               <span> on {{ humanDate(thread.created_at)}}</span>
@@ -203,8 +203,8 @@
 
           <td class="last-post" v-if="thread.user.username">
             <span v-if="thread.last_deleted">deleted</span>
-            <router-link v-if="!thread.last_deleted" :to="{ path: '/profile/' + thread.last_post_username.toLowerCase() }"><img class="avatar-small" :class="defaultAvatar" :src="thread.last_post_avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" /></router-link>
-            <router-link v-if="!thread.last_deleted" :to="{ path: '/profile/' + thread.last_post_username.toLowerCase() }"><span v-html="thread.last_post_username"></span></router-link> posted on <router-link :to="{ name: 'Posts', params: { threadSlug: thread.slug }, query: { start: thread.last_post_position }, hash: '#' + thread.last_post_id }"><span>{{humanDate(thread.last_post_created_at)}}</span>.</router-link>
+            <router-link v-if="!thread.last_deleted" :to="{ path: '/profile/' + thread.last_post_username.toLowerCase(), query: { id: thread.last_post_user_id } }"><img class="avatar-small" :class="defaultAvatar" :src="thread.last_post_avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" /></router-link>
+            <router-link v-if="!thread.last_deleted" :to="{ path: '/profile/' + thread.last_post_username.toLowerCase(), query: { id: thread.last_post_user_id } }"><span v-html="thread.last_post_username"></span></router-link> posted on <router-link :to="{ name: 'Posts', params: { threadSlug: thread.slug }, query: { start: thread.last_post_position }, hash: '#' + thread.last_post_id }"><span>{{humanDate(thread.last_post_created_at)}}</span>.</router-link>
             <router-link v-if="thread.has_new_post" :to="{ name: 'Posts', params: { threadSlug: thread.slug }, query: { start: thread.latest_unread_position }, hash: '#' + thread.latest_unread_post_id }">(Last unread post)</router-link>
           </td>
         </tr>
