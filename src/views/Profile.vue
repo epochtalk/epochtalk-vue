@@ -39,7 +39,7 @@
           <span class="username-screen" v-html="user.name"></span>
           <span class="user-role" :style="{ 'background-color': user.role_highlight_color ? user.role_highlight_color : 'grey' }" v-html="user.role_name"></span>
           <span class="user-rank">
-            <rank-display :user="user" />
+            <rank-display v-if="user.metadata" :user="user" />
           </span>
         </div>
 
