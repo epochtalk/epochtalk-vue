@@ -307,6 +307,7 @@ img.avatar-small {
     .last-post {
       @include info-text;
       flex: 2;
+      word-break: break-word;
     }
 
     @include break-max-desktop {
