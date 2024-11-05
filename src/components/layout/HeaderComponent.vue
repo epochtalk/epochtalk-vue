@@ -88,8 +88,11 @@
               <span>REGISTER</span>
             </li>
             <li>
-              <!-- <a href="" id="login-link" @click.prevent="showLogin = true" isabled="true">LOGIN</a> -->
+              <!-- <a href="" id="login-link" @click.prevent="showLogin = true" disabled="true">LOGIN</a> -->
               <span>LOGIN</span>
+            </li>
+            <li>
+              <a href="https://forms.clickup.com/57751/f/1rcq-791/HNWSBPWCDSRMDMS9TF" target="_blank">REPORT A BUG</a>
             </li>
           </ul>
 
