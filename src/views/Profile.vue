@@ -72,7 +72,7 @@
             <span class="label">Posts</span>
           </div>
           <div class="stats">
-            <span class="label">Last Seen </span>
+            <span class="label">Last Post </span>
             <span class="stat-text-sm">{{ humanDate(user.last_active, true) }}</span>
           </div>
           <div class="stats">
