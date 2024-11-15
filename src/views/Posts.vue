@@ -1585,7 +1585,7 @@ ad-viewer {
       border-top: $border;
       border-color: lighten($border-color, 7%);
       font-size: 13px;
-      line-height: 1.2;;
+      line-height: 1.2;
       margin-top: 1rem;
       max-height: 3.5rem;
       padding-top: 0.5rem;
@@ -1596,6 +1596,33 @@ ad-viewer {
         &:hover {
           color: $color-primary;
         }
+      }
+      tbody {
+        line-height: 0;
+      }
+      td {
+        padding: 0.1rem;
+        div {
+          line-height: 0;
+        }
+      }
+      td > div > span > span:first-child {
+        line-height: 0 !important;
+      }
+      td > div > span > span > span:first-child {
+        line-height: 1 !important;
+      }
+      td > div > a > span:first-child {
+        display: block;
+      }
+      td > div > span:first-child {
+        display: block;
+      }
+      td > a > span:first-child {
+        display: block;
+      }
+      td > span:first-child {
+        display: block;
       }
     }
 
