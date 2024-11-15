@@ -37,20 +37,24 @@
         <div class="profile-user-name-role">
           <h1>{{user.username}}</h1>
           <span class="username-screen" v-html="user.name"></span>
-          <span class="user-role" :style="{ 'background-color': user.role_highlight_color ? user.role_highlight_color : 'grey' }" v-html="user.role_name"></span>
-          <span class="user-rank">
+          <span class="user-role" :style="{ 'background-color': user.position_color ? user.position_color : 'grey' }" v-html="user.position"></span>
+          <span v-if="user.title" class="user-rank">
+            {{user.title}}
             <rank-display v-if="user.metadata" :user="user" />
           </span>
         </div>
 
         <div class="profile-user-activity">
           <div class="user-activity-stat" v-if="user.activity > -1">Activity: <span class="value">{{user.activity}}</span>
+          </div><br />
+          <div class="user-activity-stat" v-if="user.merit">
+            Merit: <span class="value">{{user.merit}}</span>
           </div>
            <trust-display v-if="loggedIn" :username="user.username" />
         </div>
 
         <div class="user-profile-position">
-          <span v-html="user.position"></span>
+          <!-- <span v-html="user.position"></span> -->
           <span v-html="user.status"></span>
         </div>
 
@@ -71,8 +75,8 @@
             <span class="stat-text">{{ user.post_count || 0 }}</span>
             <span class="label">Posts</span>
           </div>
-          <div class="stats">
-            <span class="label">Last Post </span>
+          <div v-if="user.last_active" class="stats">
+            <span class="label">Last Active </span>
             <span class="stat-text-sm">{{ humanDate(user.last_active, true) }}</span>
           </div>
           <div class="stats">
