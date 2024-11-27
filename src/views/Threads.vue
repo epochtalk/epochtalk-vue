@@ -32,7 +32,7 @@
           </td>
           <td class="views">
               <span class="views-number">{{childBoard.total_post_count}}</span>
-              <span class="label"> posts,</span>
+              <span class="label"> posts, </span>
               <span class="views-number">{{childBoard.total_thread_count}}</span>
               <span class="label"> threads</span>
           </td>
@@ -194,7 +194,7 @@
               <span> on {{ humanDate(thread.created_at)}}</span>
             </div>
 
-            <div v-if="thread.post_count > posts_per_page" class="thread-pagination">
+            <div v-if="thread.post_count > posts_per_page" class="hide-mobile thread-pagination">
               <thread-pagination :slug="thread.slug" :limit="posts_per_page" :count="thread.post_count" />
             </div>
           </td>
@@ -209,6 +209,11 @@
             <router-link v-if="!thread.last_deleted" :to="{ path: '/profile/' + thread.last_post_username.toLowerCase() }"><img class="avatar-small" :class="defaultAvatar" :src="thread.last_post_avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" /></router-link>
             <router-link v-if="!thread.last_deleted" :to="{ path: '/profile/' + thread.last_post_username.toLowerCase() }"><span v-html="thread.last_post_username"></span></router-link> posted on <router-link :to="{ name: 'Posts', params: { threadSlug: thread.slug }, query: { start: thread.last_post_position }, hash: '#' + thread.last_post_id }"><span>{{humanDate(thread.last_post_created_at)}}</span>.</router-link>
             <router-link v-if="thread.has_new_post" :to="{ name: 'Posts', params: { threadSlug: thread.slug }, query: { start: thread.latest_unread_position }, hash: '#' + thread.latest_unread_post_id }">(Last unread post)</router-link>
+          </td>
+          <td class="show-mobile">
+            <div v-if="thread.post_count > posts_per_page" class="thread-pagination">
+              <thread-pagination :slug="thread.slug" :limit="posts_per_page" :count="thread.post_count" />
+            </div>
           </td>
         </tr>
       </tbody>
@@ -766,7 +771,7 @@ export default {
     margin-bottom: 2rem;
 
     td {
-      padding-bottom: 0;
+      padding-bottom: 0.1rem;
     }
 
     td:last-child {
@@ -981,7 +986,7 @@ export default {
           border-bottom: 0;
           line-height: 20px;
           margin-bottom: 0;
-          padding-bottom: 0;;
+          padding-bottom: 0.1rem;
         }
       }
     }
