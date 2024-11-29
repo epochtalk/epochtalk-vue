@@ -10,7 +10,7 @@
          </div>
         </div>
       </li>
-      <span v-for="pageKey in paginationKeys" :key="pageKey.val">
+      <span v-for="pageKey in paginationKeys" :key="pageKey.key">
         <li :class="pageKey.class">
           <a href="#" @click.stop.prevent="changePage(pageKey.page)" v-html="pageKey.val"></a>
         </li>
@@ -69,7 +69,7 @@ export default {
 
       // Case 2: Truncate Tail
       // 1 2 3 4 5 [6] 7 8 ... 14 15 16
-      if (truncate && v.currentPage <= 6)
+      if (truncate && (v.mobile ? v.currentPage <= 3 : v.currentPage <= 6))
         if (v.mobile) 
           ellipsis = [{ index: 4, nextIndex: v.pageCount - 2 }]
         else
@@ -77,7 +77,7 @@ export default {
 
       // Case 3: Truncate Head
       // 1 2 3 ... 9 10 [11] 12 13 14 15 16
-      else if (truncate && v.currentPage >= v.pageCount - 5)
+      else if (truncate && (v.mobile ? v.currentPage >= v.pageCount - 2 : v.currentPage >= v.pageCount - 5))
         if (v.mobile) 
           ellipsis = [{ index: 4, nextIndex: v.pageCount - 2 }]
         else
@@ -85,7 +85,7 @@ export default {
 
       // Case 4: Truncate Head and Tail
       // 1 2 3 ... 7 8 [9] 10 11 ... 14 15 16
-      else if (truncate && v.currentPage > 6 && v.currentPage < v.pageCount - 5) 
+      else if (truncate && (v.mobile ? v.currentPage > 3 : v.currentPage > 6) && (v.mobile ? v.currentPage < v.pageCount - 2 : v.currentPage < v.pageCount - 5)) 
         if (v.mobile) 
           ellipsis = [
             { index: 2, nextIndex: v.currentPage - 1 },
@@ -102,7 +102,7 @@ export default {
 
     const generatePageKeys = (ellipsis) => {
       // Add Previous Button
-      let prevBtnKey = { val: '&#10094;' }
+      let prevBtnKey = { key: 'prev', val: '&#10094;' }
       if (v.currentPage > 1) {
         prevBtnKey.class = 'arrow'
         prevBtnKey.page = v.currentPage - 1
@@ -122,6 +122,7 @@ export default {
         // Insert ellipsis if index matches
         if (ellipsis && ellipsis[ellipsisIndex] && ellipsis[ellipsisIndex].index === index) {
           pageKey = {
+            key: index,
             val: '&hellip;',
             page: null,
             class: 'unavailable'
@@ -132,6 +133,7 @@ export default {
         // Otherwise generate page key
         else {
           pageKey = {
+            key: index,
             val: index,
             page: index,
             class: index === v.currentPage ? 'current' : null
@@ -142,7 +144,7 @@ export default {
       }
 
       // Add Next Button
-      let nextBtnKey = { val: '&#10095;' }
+      let nextBtnKey = { key: 'next', val: '&#10095;' }
       if (v.currentPage < v.pageCount) {
         nextBtnKey.class = 'arrow'
         nextBtnKey.page = v.currentPage + 1

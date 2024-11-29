@@ -135,7 +135,7 @@
                 <img :src="post.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
               </router-link>
             </div>
-            <router-link :to="{ path: '/profile/' + post.user.username.toLowerCase() }">
+            <router-link class="hide-mobile" :to="{ path: '/profile/' + post.user.username.toLowerCase() }">
               <div class="original-poster" v-if="post.user.original_poster">OP</div>
               <div v-if="post.user.title" :title="('Title: ' + post.user.title)" class="user-activity"><span class="user-activity-value">{{post.user.title}}</span></div>
               <div v-if="post.user.merit > -1" :title="('Merit: ' + post.user.merit)" class="user-activity">Merit: <span class="user-activity-value">{{post.user.merit}}</span></div>
@@ -147,18 +147,46 @@
             <trust-display :user="post.user" />
           </div>
 
-          <div class="user-rank">
-            <rank-display v-if="postData?.data?.metadata" :user="{ ...post.user, metadata: {...postData.data.metadata } }" />
+          <div v-if="postData?.data?.metadata" class="user-rank">
+            <rank-display :user="{ ...post.user, metadata: {...postData.data.metadata } }" />
           </div>
           <div v-if="loggedIn && post.user.id !== authedUser.id" class="ignore-directive">
             <a href="" @click.prevent="toggleIgnoredPosts(post)" v-html="post.user._ignored ? 'Unignore Posts' : 'Ignore Posts'"></a>
+          </div>
+
+          <div class="show-mobile">
+            <div class="post-title-mobile">
+              <div class="post-title-user">
+                <span class="username" :data-balloon="post.user.role_name || 'User'"><router-link :to="{ path: '/profile/' + post.user.username.toLowerCase() }">
+                  <span v-html="post.user.username"></span>
+                </router-link></span>
+                <div :title="post.user.name" v-if="post.user.name" class="display-name">
+                  <span>{{truncate(post.user.name, 33)}}</span>
+                  <span class="hide-mobile">&nbsp;&mdash;&nbsp;</span>
+                </div>
+                <div :title="post.user.role_name || 'user'" class="user-role" :style="userRoleHighlight(post.user.highlight_color)">{{post.user.role_name || 'user'}}</div>
+              </div>
+              <router-link :to="{ path: '/profile/' + post.user.username.toLowerCase() }" class="user-activity-mobile">
+                <div class="original-poster" v-if="post.user.original_poster">OP</div>
+                <div v-if="post.user.title" :title="('Title: ' + post.user.title)" class="user-activity"><span class="user-activity-value">{{post.user.title}}</span></div>
+                <div v-if="post.user.merit > -1" :title="('Merit: ' + post.user.merit)" class="user-activity">Merit: <span class="user-activity-value">{{post.user.merit}}</span></div>
+                <div v-if="post.user.activity > -1" :title="('Activity: ' + post.user.activity)" class="user-activity">Act: <span class="user-activity-value">{{post.user.activity}}</span></div>
+              </router-link>
+              <div class="timestamp">
+                <span>{{humanDate(post.created_at)}}</span>
+                <span v-if="showEditDate(post) && post.metadata?.edited_by_username">{{'&nbsp;&mdash;&nbsp;Edited ' + humanDate(post.updated_at) + ' by '}}</span><a v-if="showEditDate(post) && post.metadata?.edited_by_username" href="#">{{post.metadata.edited_by_username}}</a>
+                <span v-if="showEditDate(post) && !post.metadata?.edited_by_username">{{'&nbsp;&mdash;&nbsp;Edited ' + humanDate(post.updated_at)}}</span>
+                <span v-if="post.metadata?.locked_by_username">{{'&nbsp;&mdash;&nbsp;Locked ' + humanDate(post.metadata.locked_at) + ' by '}}</span>
+                <a v-if="post.metadata?.locked_by_username" href="#">{{post.metadata.locked_by_username}}</a>
+              </div>
+            </div>
           </div>
         </div>
 
         <!-- Post Body Section -->
         <div :id="(i + 1) === postData.data.posts.length ? 'last' : ''" class="post-content">
           <!-- Post Title -->
-          <div class="post-title">
+          <div class="hide-mobile post-title">
             <div class="post-title-user">
               <span class="username" :data-balloon="post.user.role_name || 'User'"><router-link :to="{ path: '/profile/' + post.user.username.toLowerCase() }">
                 <span v-html="post.user.username"></span>
@@ -1113,6 +1141,9 @@ export default {
 
 $postWidth__mobile: calc(100vw - 2rem);
 .post-body {
+  @include break-mobile-sm {
+    padding-top: 0.5rem;
+  }
   white-space: pre-wrap;
   word-wrap: break-word;
   overflow-wrap: break-word;
@@ -1362,6 +1393,10 @@ ad-viewer {
   .post-user {
     // width: $postUserWidth;
     flex: 0 0 $postUserWidth;
+    @include break-mobile-sm {
+      display: flex;
+      flex: 0 0 calc(#{$postUserWidth}/1.25);
+    }
     margin-right: $postUserMargin;
     font-size: $font-size-tiny;
     text-align: center;
@@ -1375,6 +1410,10 @@ ad-viewer {
       background: no-repeat center center;
       position: relative;
       margin-bottom: 1rem;
+      @include break-mobile-sm {
+        margin-bottom: 0;
+        margin-right: 0.5rem;
+      }
       width: $postUserWidth;
       height: $postUserWidth;
 
@@ -1427,6 +1466,11 @@ ad-viewer {
       text-align: center;
       text-transform: uppercase;
       width: 100%;
+      @include break-mobile-sm {
+        text-align: left;
+        margin-bottom: 0;
+        width: auto;
+      }
 
       &-value {
         font-weight: 600;
@@ -1443,6 +1487,66 @@ ad-viewer {
         img {
           border-radius: 0;
         }
+      }
+    }
+
+    .post-title-mobile {
+      color: $secondary-font-color;
+      display: flex;
+      flex-direction: column;
+      align-items: left;
+      margin-bottom: 0.25rem;
+      width: 100%;
+      text-transform: none;
+
+      .post-title-user {
+        display: flex;
+        align-items: center;
+        flex: 2 1 auto;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+        padding-bottom: 0.1rem;
+      }
+
+      span.username {
+        margin-right: 0.25rem;
+        color: $base-font-color;
+        font-size: $font-size-sm;
+        font-weight: 600;
+        &:hover {
+          color: $color-primary;
+        }
+      }
+
+      .user-role {
+        @include truncate-ellipsis;
+        background-color: transparent;
+        border: 1px solid $secondary-font-color;
+        border-radius: 2px;
+        color: $secondary-font-color-dark;
+        display: inline-block;
+        font-size: $font-size-xs;
+        font-weight: 400;
+        line-height: 1.1;
+        margin-right: 0.5rem;
+        max-width: 140px;
+        padding: 0px 6px;
+        text-align: center;
+      }
+
+      .user-activity-mobile {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .timestamp, .display-name {
+        display: flex;
+        color: $secondary-font-color;
+        font-size: $font-size-xs;
+        font-weight: 400;
+      }
+      .display-name {
+        color: $secondary-font-color-dark;
       }
     }
   }
