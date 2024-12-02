@@ -68,16 +68,16 @@
 
         <div class="profile-user-stats">
           <div class="stats">
+            <span class="label">Posts </span>
             <span class="stat-text">{{ user.post_count || 0 }}</span>
-            <span class="label">Posts</span>
           </div>
-          <div class="stats">
-            <span class="label">Last Seen </span>
-            <span class="stat-text-sm">{{ humanDate(user.last_active, true) }}</span>
+          <div v-if="user.last_active" class="stats">
+            <span class="label">Last Active </span>
+            <span class="stat-text">{{ humanDate(user.last_active, true) }}</span>
           </div>
           <div class="stats">
             <span class="label">Created </span>
-            <span class="stat-text-sm">{{ humanDate(user.created_at, true) }}</span>
+            <span class="stat-text">{{ humanDate(user.created_at, true) }}</span>
           </div>
         </div>
       </div>
@@ -492,7 +492,7 @@ export default {
         a { color: $text-gray-med; text-decoration: underline; }
       }
     }
-    .signature-block { display: flex; margin-bottom: 1rem; }
+    .signature-block { display: grid; margin-bottom: 1rem; }
     .signature {
       @include truncate-ellipsis;
       font-size: $font-size-xs;
@@ -507,7 +507,11 @@ export default {
   }
   .profile-user-stats {
     display: flex;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
+    column-gap: 0.5rem;
+    @include break-mobile-med {
+      justify-content: center;
+    }
     .stats {
       border: $border;
       border-radius: 6px;
@@ -516,17 +520,23 @@ export default {
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      margin-right: 1rem;
       padding: 0.5rem;
       text-align: center;
-      width: 100px;
-      max-width: 120px;
-      .label { font-size: $font-size-xs; }
+      width: auto;
+      white-space: nowrap;
+      @include break-mobile-med {
+        width: 100px;
+        max-width: 120px;
+        white-space: normal;
+      }
+      .label { 
+        margin-bottom: 0.25rem;
+        font-size: $font-size-xs;
+       }
       .stat-text {
-        font-size: 2rem;
+        font-size: $font-size-lg;
         font-weight: 600;
         margin-bottom: 0.25rem;
-        &-sm { font-size: 21px; font-weight: 600; }
       }
     }
   }
@@ -534,13 +544,12 @@ export default {
     align-items: center;
     flex-direction: column;
     .profile-avatar {
-      margin-bottom: 3rem;
       margin-right: 0;
     }
     .profile-user-details {
       .profile-user-name-role {
         flex-direction: column;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1rem;
         h1, .username-screen, .user-role {
           margin-bottom: 0.25rem;
         }
@@ -550,12 +559,16 @@ export default {
     .trust-profile { .trust-link { white-space: nowrap; } }
   }
 }
-.profile-threads-posts { grid-area: main; }
+.profile-threads-posts { 
+  grid-area: main;
+  @include break-mobile-med {
+    border-top: $border;
+  }
+}
 .profile-sidebar {
   color: $text-gray-dark;
   grid-area: sidebar;
   .actions-panel {
-    border-bottom: $border;
     line-height: 1.5;
     margin-bottom: 1rem;
     padding-bottom: 1rem;
