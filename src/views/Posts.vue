@@ -123,7 +123,7 @@
       <div v-if="!post._deleted && !post.user.ignored" class="post-block-grid">
         <!-- Post Profile Section -->
         <div class="post-user">
-          <router-link :to="{ path: '/profile/' + post.user.username.toLowerCase(), query: { id: post.user.id }}">
+          <router-link :to="{ path: '/profile/' + post.user.username.toLowerCase() }">
             <div class="user-avatar" :class="defaultAvatarShape">
               <span v-if="post.user.online" class="online green" :data-balloon="post.user.username + ' is online'">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -131,11 +131,11 @@
                   <circle cx="24" cy="24" r="16" />
                 </svg>
               </span>
-              <router-link :to="{ path: '/profile/' + post.user.username.toLowerCase(), query: { id: post.user.id } }">
+              <router-link :to="{ path: '/profile/' + post.user.username.toLowerCase() }">
                 <img :src="post.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
               </router-link>
             </div>
-            <router-link :to="{ path: '/profile/' + post.user.username.toLowerCase(), query: { id: post.user.id } }" class="hide-mobile">
+            <router-link class="hide-mobile" :to="{ path: '/profile/' + post.user.username.toLowerCase() }">
               <div class="original-poster" v-if="post.user.original_poster">OP</div>
               <div v-if="post.user.title" :title="('Title: ' + post.user.title)" class="user-activity"><span class="user-activity-value">{{post.user.title}}</span></div>
               <div v-if="post.user.merit > -1" :title="('Merit: ' + post.user.merit)" class="user-activity">Merit: <span class="user-activity-value">{{post.user.merit}}</span></div>
@@ -166,7 +166,7 @@
                 </div>
                 <div :title="post.user.role_name || 'user'" class="user-role" :style="userRoleHighlight(post.user.highlight_color)">{{post.user.role_name || 'user'}}</div>
               </div>
-              <router-link :to="{ path: '/profile/' + post.user.username.toLowerCase(), query: { id: post.user.id } }" class="user-activity-mobile">
+              <router-link :to="{ path: '/profile/' + post.user.username.toLowerCase() }" class="user-activity-mobile">
                 <div class="original-poster" v-if="post.user.original_poster">OP</div>
                 <div v-if="post.user.title" :title="('Title: ' + post.user.title)" class="user-activity"><span class="user-activity-value">{{post.user.title}}</span></div>
                 <div v-if="post.user.merit > -1" :title="('Merit: ' + post.user.merit)" class="user-activity">Merit: <span class="user-activity-value">{{post.user.merit}}</span></div>
@@ -188,7 +188,7 @@
           <!-- Post Title -->
           <div class="hide-mobile post-title">
             <div class="post-title-user">
-              <span class="username" :data-balloon="post.user.role_name || 'User'"><router-link :to="{ path: '/profile/' + post.user.username.toLowerCase(), query: { id: post.user.id } }">
+              <span class="username" :data-balloon="post.user.role_name || 'User'"><router-link :to="{ path: '/profile/' + post.user.username.toLowerCase() }">
                 <span v-html="post.user.username"></span>
               </router-link></span>
               <div :title="post.user.name" v-if="post.user.name" class="display-name">

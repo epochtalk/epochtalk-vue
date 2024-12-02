@@ -84,15 +84,10 @@
           <!-- Login Section -->
           <ul class="signed-out" v-if="!loggedIn">
             <li>
-              <!-- <a href="" @click.prevent="showRegister = true" disabled="true">REGISTER</a> -->
-              <span>REGISTER</span>
+              <a href="" @click.prevent="showRegister = true">REGISTER</a>
             </li>
             <li>
-              <!-- <a href="" id="login-link" @click.prevent="showLogin = true" disabled="true">LOGIN</a> -->
-              <span>LOGIN</span>
-            </li>
-            <li>
-              <a href="https://forms.clickup.com/57751/f/1rcq-791/HNWSBPWCDSRMDMS9TF" target="_blank">REPORT A BUG</a>
+              <a href="" id="login-link" @click.prevent="showLogin = true">LOGIN</a>
             </li>
           </ul>
 
@@ -664,15 +659,10 @@ header {
           cursor: pointer;
         }
         &.signed-out li { padding-left: 1.25rem; }
-        &.signed-out li a, &.signed-out li span {
+        &.signed-out li a {
           display: table-cell;
           height: inherit;
           vertical-align: middle;
-        }
-        li span {
-          cursor: not-allowed;
-          color: $secondary-font-color;
-          font-size: $header-login-font-size;
         }
         li a {
           color: $header-login-font-color;

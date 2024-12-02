@@ -16,8 +16,7 @@ export default {
     const init = u => {
       const rankMap = u.metadata.ranks
       const metricToRankMaps = u.metadata.rank_metric_maps
-      if (metricToRankMaps) {
-        let ranks = Object.keys(metricToRankMaps).reduce((mappedRanks, metricName) => {
+      let ranks = Object.keys(metricToRankMaps).reduce((mappedRanks, metricName) => {
         let rank = -1
         for (let i = 0; i < metricToRankMaps[metricName].length; i++) {
           if (u[metricName] >= metricToRankMaps[metricName][i]) rank = i
@@ -32,7 +31,6 @@ export default {
 
       if (lowestRankNumber >= 0) v.userRank = rankMap[lowestRankNumber].name
       else v.userRank = ''
-      } else v.userRank = ''
     }
 
     init(v.user)
