@@ -138,8 +138,8 @@
             <router-link class="hide-mobile" :to="{ path: '/profile/' + post.user.username.toLowerCase() }">
               <div class="original-poster" v-if="post.user.original_poster">OP</div>
               <div v-if="post.user.title" :title="('Title: ' + post.user.title)" class="user-activity"><span class="user-activity-value">{{post.user.title}}</span></div>
+              <div v-if="post.user.activity > -1" :title="('Activity: ' + post.user.activity)" class="user-activity">Activity: <span class="user-activity-value">{{post.user.activity}}</span></div>
               <div v-if="post.user.merit > -1" :title="('Merit: ' + post.user.merit)" class="user-activity">Merit: <span class="user-activity-value">{{post.user.merit}}</span></div>
-              <div v-if="post.user.activity > -1" :title="('Activity: ' + post.user.activity)" class="user-activity">Act: <span class="user-activity-value">{{post.user.activity}}</span></div>
             </router-link>
           </router-link>
 
@@ -169,8 +169,8 @@
               <router-link :to="{ path: '/profile/' + post.user.username.toLowerCase() }" class="user-activity-mobile">
                 <div class="original-poster" v-if="post.user.original_poster">OP</div>
                 <div v-if="post.user.title" :title="('Title: ' + post.user.title)" class="user-activity"><span class="user-activity-value">{{post.user.title}}</span></div>
+                <div v-if="post.user.activity > -1" :title="('Activity: ' + post.user.activity)" class="user-activity">Activity: <span class="user-activity-value">{{post.user.activity}}</span></div>
                 <div v-if="post.user.merit > -1" :title="('Merit: ' + post.user.merit)" class="user-activity">Merit: <span class="user-activity-value">{{post.user.merit}}</span></div>
-                <div v-if="post.user.activity > -1" :title="('Activity: ' + post.user.activity)" class="user-activity">Act: <span class="user-activity-value">{{post.user.activity}}</span></div>
               </router-link>
               <div class="timestamp">
                 <span>{{humanDate(post.created_at)}}</span>
@@ -1706,10 +1706,6 @@ ad-viewer {
     @include break-mobile-sm {
       width: $postWidth__mobile;
     }
-  }
-
-  @include break-mobile-sm {
-    padding-bottom: 3rem;
   }
 }
 
