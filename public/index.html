@@ -16,7 +16,7 @@
     <!-- built files will be auto injected -->
     <script id="config-remote" async>
       window.configScript = document.createElement('script')
-      window.configScript.src = '<%= process.env.VUE_APP_BACKEND_URL%>/config.js'
+      window.configScript.src = '<%= process.env.VUE_APP_BACKEND_URL || "$VUE_APP_BACKEND_URL"%>/config.js'
       window.configScript.type = 'text/javascript'
 
       // Try to append config from backend

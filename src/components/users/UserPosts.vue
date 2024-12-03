@@ -115,6 +115,7 @@ export default {
     next(vm => {
       const params = {
         username: to.params.username,
+        id: to.query.id,
         limit: localStoragePrefs().data.posts_per_page,
         page: to.query.page || 1,
         field: to.query.field,
@@ -131,6 +132,7 @@ export default {
   beforeRouteUpdate(to, from, next) {
     const params = {
       username: to.params.username,
+      id: to.query.id,
       limit: localStoragePrefs().data.posts_per_page,
       page: to.query.page || 1,
       field: to.query.field,
@@ -158,6 +160,7 @@ export default {
     const refresh = () => {
       const params = {
         username: $route.params.username,
+        id: $route.query.id,
         limit: v.prefs.posts_per_page,
         page: $route.query.page || 1,
         field: $route.query.field,
@@ -169,8 +172,8 @@ export default {
 
     const toggleThreads = threads => {
       const params = { ...$route.params, saveScrollPos: true }
-      if (threads) $router.replace({ name: $route.name, params: params, query: { threads }})
-      else $router.replace({ name: $route.name, params: params })
+      if (threads) $router.replace({ name: $route.name, params: params, query: { threads: threads, id: $route.query.id }})
+      else $router.replace({ name: $route.name, params: params, query: { id: $route.query.id }})
       v.threads = threads
     }
 

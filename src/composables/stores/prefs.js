@@ -8,8 +8,8 @@ const AUTH_KEY = 'auth'
 
 const appCache = localStorageCache(0, 'app')
 const emtpyPrefs = {
-  posts_per_page: 25,
-  threads_per_page: 25,
+  posts_per_page: 10,
+  threads_per_page: 10,
   timezone_offset: {
     sign: '',
     hours: '',
