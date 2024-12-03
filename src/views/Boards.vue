@@ -56,7 +56,7 @@
                 <div class="view-count">
                   <p class="view-count-posts">
                     <span class="view-count-number">{{board.total_post_count}}</span>
-                     <span class="label"> posts,</span>
+                     <span class="label"> posts, </span>
                   </p>
                   <p class="view-count-threads">
                     <span class="view-count-number">{{board.total_thread_count}}</span>
@@ -172,7 +172,7 @@ img.avatar-small {
   border-radius: 100px;
   border: 1px solid #444;
   opacity: 1;
-  margin: 0 0.1rem;
+  margin: 0 0.2rem 0 0;
   height: 1rem;
   width: 1rem;
   object-fit: cover;
