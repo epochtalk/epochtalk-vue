@@ -563,6 +563,7 @@ export default {
   grid-area: main;
   @include break-mobile-med {
     border-top: $border;
+    margin-bottom: 3rem;
   }
 }
 .profile-sidebar {
