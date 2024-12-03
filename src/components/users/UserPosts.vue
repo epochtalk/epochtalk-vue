@@ -250,7 +250,7 @@ export default {
     }
     &.closed {
       width: 100%;
-      max-height: 2.25rem;
+      max-height: 2.5rem;
       white-space: pre-wrap;
       overflow: hidden;
       text-overflow: ellipsis;
