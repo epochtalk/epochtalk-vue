@@ -1053,7 +1053,7 @@ export default {
       bannedFromBoard: false,
       defaultAvatar: window.default_avatar,
       defaultAvatarShape: window.default_avatar_shape,
-      disableSignature: false,
+      disableSignature: true,
       showEditor: false,
       showPostsPurgePostModal: false,
       showPostsPurgeThreadModal: false,

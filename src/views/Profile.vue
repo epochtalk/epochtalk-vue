@@ -58,7 +58,7 @@
           <span v-html="user.status"></span>
         </div>
 
-        <div class="signature-block">
+        <!-- <div class="signature-block">
           <div class="signature" v-html="user.signature || user.raw_signature">
           </div>
           <a href="#" @click.prevent="showEditSignature = true" data-balloon="Edit your signature" v-if="canUpdate()" class="signature-edit">
@@ -68,7 +68,7 @@
               <path d="M45.48,6.89,41.11,2.52a1.78,1.78,0,0,0-2.5,0L36.11,5,43,11.89l2.5-2.5A1.76,1.76,0,0,0,45.48,6.89Z"/>
             </svg>
           </a>
-        </div>
+        </div> -->
 
         <div class="profile-user-stats">
           <div class="stats">
