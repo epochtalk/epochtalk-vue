@@ -75,7 +75,7 @@
           <h1 :class="{ 'hide-mobile': adminMode }">
             <router-link to="/" v-if="logo"><img :src="logo" id="logo" /></router-link>
             <router-link id="logo-text" to="/">
-              {{decode(title)}}
+              Bitcoin Forum
             </router-link>
             <span>&nbsp;{{decode(revision)}}</span>
           </h1>
