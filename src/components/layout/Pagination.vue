@@ -40,7 +40,7 @@ export default {
       if (query.page === 1 || !query.page) delete query.page
       if (query.start) delete query.start
       if (props.page !== v.currentPage) {
-        $router.replace({ name: $route.name, params: params, query: query })
+        $router.push({ name: $route.name, params: params, query: query })
       }
     }
 
