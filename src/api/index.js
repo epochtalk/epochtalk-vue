@@ -19,8 +19,6 @@ const $auth = localStorageCache(0, 'app').get('auth')
 const initUser = $auth ? $auth.data : undefined
 if (initUser) { $axios2.defaults.headers.common['Authorization'] = `BEARER ${initUser.token}` }
 
-$axios2.defaults.headers.common['api-key'] = process.env.VUE_APP_API_KEY || config.VUE_APP_API_KEY
-
 /* provided methods */
 const $http = (path, opts, handleErrors) => {
   opts = opts || {}
@@ -56,6 +54,11 @@ const $http2 = (path, opts, handleErrors) => {
   delete opts.method
   const data = opts.data
   delete opts.data
+
+  $axios2.defaults.headers.common['api-key'] = process.env.VUE_APP_API_KEY || config.VUE_APP_API_KEY
+  $axios2.defaults.headers.common['x-api-key'] = process.env.VUE_APP_API_KEY || config.VUE_APP_API_KEY
+  console.log(process.env.VUE_APP_API_KEY || config.VUE_APP_API_KEY)
+  $axios2.defaults.withCredentials = true;
 
   let req = (m => {
     switch(m) {
