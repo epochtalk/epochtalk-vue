@@ -51,7 +51,8 @@ export default {
       let keyToType = {
         boardSlug: 'board',
         slug: 'thread',
-        threadSlug: 'thread'
+        threadSlug: 'thread',
+        username: 'profile'
       }
       // remove anchor hash from params
       let routeParamKeys = without(Object.keys(routeParams), '#')
@@ -60,11 +61,13 @@ export default {
       // matches, route is dynamic
       if (!isEmpty(matches)) {
         let idKey = routeParamKeys.reverse()[0]
-        let id = routeParams[idKey]
+        // for proxy, use query parameter to get user id
+        let id = idKey !== 'username' ? routeParams[idKey] : $route.query.id 
         let type = keyToType[idKey]
         let crumbs = await breadcrumbsApi.find(id, type)
         breadcrumbs.splice(0, breadcrumbs.length)
-        breadcrumbs.push(pathLookup.home)
+        // for proxy, do not push 'Home' to breadcrumbs for profile page
+        if (idKey !== 'username') breadcrumbs.push(pathLookup.home) 
         breadcrumbs.push(...crumbs.breadcrumbs)
 
       }
