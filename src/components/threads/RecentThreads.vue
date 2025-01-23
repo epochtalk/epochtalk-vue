@@ -1,7 +1,7 @@
 <template>
   <!-- Recent Threads -->
-  <div class="dashboard-hero">
-    <div class="recent-threads collapse-section">
+  <div class="dashboard-hero" :class="{ 'is-open': collapsedCats.indexOf('recent-threads-00') < 0, 'is-closed': collapsedCats.indexOf('recent-threads-00') > -1 }">
+    <div class="recent-threads">
       <div @click="toggle" class="collapse-section">
         <a :class="{ 'is-open': collapsedCats.indexOf('recent-threads-00') < 0, 'is-closed': collapsedCats.indexOf('recent-threads-00') > -1 }">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 39.84 22.63" class="icon__caretDown">
@@ -10,9 +10,10 @@
               <polyline class="icon" points="37.92 1.92 19.92 19.92 1.92 1.92" />
             </g>
           </svg>
+          <h1 class="title">Recent Threads</h1>
         </a>
-        <h1 class="title">Recent Threads</h1>
       </div>
+
       <transition>
         <div>
           <div v-if="!threads && collapsedCats.indexOf('recent-threads-00') < 0" class="centered-text">
@@ -104,6 +105,8 @@ export default {
   margin-left: -50vw;
   margin-right: -50vw;
 
+  &.is-closed { padding-bottom: 1rem; }
+
   .recent-threads {
     max-width: $view-maxWidth;
     margin: 0 auto;
@@ -192,6 +195,8 @@ export default {
      @include no-select;
      cursor: pointer;
 
+    a { margin-left: -1rem; }
+
     .title { display: inline-block; margin-left: .5rem; }
 
     .is-open {
@@ -209,7 +214,7 @@ export default {
     }
 
      .icon__caretDown {
-       margin-bottom: 4px;
+       margin-bottom: 3px;
        width: 8px;
 
        polyline {
