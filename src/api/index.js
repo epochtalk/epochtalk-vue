@@ -18,7 +18,7 @@ export const $axios2 = axios.create({
 const $auth = localStorageCache(0, 'app').get('auth')
 const initUser = $auth ? $auth.data : undefined
 if (initUser) { $axios2.defaults.headers.common['Authorization'] = `BEARER ${initUser.token}` }
-$axios2.defaults.headers.common['api-key'] = 'NB/zpr4xwTT0icF84pp8E0Tu5T+bc+gGkZ6twZT+XGEU3TkX+S7cTJ6GckLJEztx'
+$axios2.defaults.headers.common['api-key'] = process.env.VUE_APP_API_KEY || config.VUE_APP_API_KEY
 
 /* provided methods */
 const $http = (path, opts, handleErrors) => {
