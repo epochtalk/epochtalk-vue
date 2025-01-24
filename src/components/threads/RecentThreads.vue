@@ -1,9 +1,9 @@
 <template>
   <!-- Recent Threads -->
-  <div class="dashboard-hero" :class="{ 'is-open': collapsedCats.indexOf('recent-threads-00') < 0, 'is-closed': collapsedCats.indexOf('recent-threads-00') > -1 }">
+  <div class="dashboard-hero" :class="{ 'is-open': collapsedCats.indexOf(recentThreadsId) < 0, 'is-closed': collapsedCats.indexOf(recentThreadsId) > -1 }">
     <div class="recent-threads">
       <div @click="toggle" class="collapse-section">
-        <a :class="{ 'is-open': collapsedCats.indexOf('recent-threads-00') < 0, 'is-closed': collapsedCats.indexOf('recent-threads-00') > -1 }">
+        <a :class="{ 'is-open': collapsedCats.indexOf(recentThreadsId) < 0, 'is-closed': collapsedCats.indexOf(recentThreadsId) > -1 }">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 39.84 22.63" class="icon__caretDown">
             <title></title>
             <g id="Layer_2" data-name="Layer 2">
@@ -16,11 +16,11 @@
 
       <transition>
         <div>
-          <div v-if="!threads && collapsedCats.indexOf('recent-threads-00') < 0" class="centered-text">
+          <div v-if="!threads && collapsedCats.indexOf(recentThreadsId) < 0" class="centered-text">
             <h5>No recently updated threads available</h5>
           </div>
 
-          <div v-if="threads && collapsedCats.indexOf('recent-threads-00') < 0" class="threads-container">
+          <div v-if="threads && collapsedCats.indexOf(recentThreadsId) < 0" class="threads-container">
             <!-- Thread listing -->
             <div class="threads-data threads-recent" v-for="thread in threads" :key="thread.id">
               <div class="states">
@@ -81,13 +81,20 @@
 <script>
 import humanDate from '@/composables/filters/humanDate'
 import decode from '@/composables/filters/decode'
+import { reactive, toRefs } from 'vue'
 
 export default {
   props: ['threads', 'collapsedCats'],
   emits: ['toggle'],
   setup(props, { emit }) {
-    const toggle = () => emit('toggle', {id: 'recent-threads-00'})
-    return { toggle, humanDate, decode }
+    const toggle = () => emit('toggle', { id: v.recentThreadsId })
+
+    /* View Data */
+    const v = reactive({
+      recentThreadsId: 'recent-threads-00'
+    })
+
+    return { ...toRefs(v), toggle, humanDate, decode }
   }
 }
 </script>
@@ -227,6 +234,12 @@ export default {
       }
     }
 
-  @include break-mobile-sm { padding: 1.5rem 1rem 0; }
+  @include break-mobile-sm {
+    padding: 1.5rem 2.5rem 0;
+    margin-top: -2.5rem;
+
+    &.is-closed { padding-bottom: 0; }
+    &.is-open { padding-bottom: 1rem; }
+  }
 }
 </style>
