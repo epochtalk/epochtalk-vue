@@ -11,13 +11,15 @@ export const $axios = axios.create({
 })
 export const $axios2 = axios.create({
   baseURL: process.env.VUE_APP_BACKEND_URL || config.VUE_APP_BACKEND_URL,
-  timeout: 3000,
+  timeout: 15000,
   crossDomain: true
 })
 
 const $auth = localStorageCache(0, 'app').get('auth')
 const initUser = $auth ? $auth.data : undefined
 if (initUser) { $axios2.defaults.headers.common['Authorization'] = `BEARER ${initUser.token}` }
+$axios2.defaults.headers.common['api-key'] = process.env.VUE_APP_API_KEY || config.VUE_APP_API_KEY
+
 /* provided methods */
 const $http = (path, opts, handleErrors) => {
   opts = opts || {}
@@ -208,7 +210,7 @@ export const usersApi = {
   memberSearch: params => $http('/api/search/users', { params }),
   lookup: (username, params) => $http(`/api/users/lookup/${username}`, { params }),
   update: (userId, data) => $http(`/api/users/${userId}`, { method: 'PUT', data }),
-  find: username => $http2(`/api/users/${username}`),
+  find: id => $http2(`/api/users/byid?id=${id}`),
   delete: userId => $http(`/api/users/${userId}`, { method: 'DELETE' }),
   deactivate: userId => $http(`/api/users/${userId}/deactivate`, { method: 'POST' }),
   reactivate: userId => $http(`/api/users/${userId}/reactivate`, { method: 'POST' }),

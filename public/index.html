@@ -5,18 +5,18 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <link rel="icon" href="/favicon.ico">
-    <title><%= htmlWebpackPlugin.options.title %></title>
+    <title>Bitcoin Forum</title>
   </head>
   <body>
     <noscript>
-      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+      <strong>We're sorry but Bitcoin Forum doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
     <div id="app"></div>
     <div id="modals"></div>
     <!-- built files will be auto injected -->
     <script id="config-remote" async>
       window.configScript = document.createElement('script')
-      window.configScript.src = '<%= process.env.VUE_APP_BACKEND_URL%>/config.js'
+      window.configScript.src = '<%= process.env.VUE_APP_BACKEND_URL || "$VUE_APP_BACKEND_URL"%>/config.js'
       window.configScript.type = 'text/javascript'
 
       // Try to append config from backend

@@ -37,24 +37,28 @@
         <div class="profile-user-name-role">
           <h1>{{user.username}}</h1>
           <span class="username-screen" v-html="user.name"></span>
-          <span class="user-role" :style="{ 'background-color': user.role_highlight_color ? user.role_highlight_color : 'grey' }" v-html="user.role_name"></span>
-          <span class="user-rank">
+          <span class="user-role" :style="{ 'background-color': user.position_color ? user.position_color : 'grey' }" v-html="user.position"></span>
+          <span v-if="user.title" class="user-rank">
+            {{user.title}}
             <rank-display v-if="user.metadata" :user="user" />
           </span>
         </div>
 
         <div class="profile-user-activity">
           <div class="user-activity-stat" v-if="user.activity > -1">Activity: <span class="value">{{user.activity}}</span>
+          </div><br />
+          <div class="user-activity-stat" v-if="user.merit">
+            Merit: <span class="value">{{user.merit}}</span>
           </div>
            <trust-display v-if="loggedIn" :username="user.username" />
         </div>
 
         <div class="user-profile-position">
-          <span v-html="user.position"></span>
+          <!-- <span v-html="user.position"></span> -->
           <span v-html="user.status"></span>
         </div>
 
-        <div class="signature-block">
+        <!-- <div class="signature-block">
           <div class="signature" v-html="user.signature || user.raw_signature">
           </div>
           <a href="#" @click.prevent="showEditSignature = true" data-balloon="Edit your signature" v-if="canUpdate()" class="signature-edit">
@@ -64,7 +68,7 @@
               <path d="M45.48,6.89,41.11,2.52a1.78,1.78,0,0,0-2.5,0L36.11,5,43,11.89l2.5-2.5A1.76,1.76,0,0,0,45.48,6.89Z"/>
             </svg>
           </a>
-        </div>
+        </div> -->
 
         <div class="profile-user-stats">
           <div class="stats">
@@ -200,13 +204,13 @@ export default {
   props: [ 'username', 'saveScrollPos' ],
   components: { TrustDisplay, RankDisplay, UpdateSignatureModal, UpdatePasswordModal, UpdateAvatarModal, UpdateEmailModal, DeleteAccountModal, DeactivateReactivateModal, UpdateProfileModal, QuickMessageModal, ManageBansModal, ModerationNotesModal },
   beforeRouteEnter(to, from, next) {
-    usersApi.find(to.params.username).then(u => next(vm => {
+    usersApi.find(to.query.id).then(u => next(vm => {
       vm.user = u
       isOnline(u.id, (e, d) => vm.userOnline = d.online)
     }))
   },
   beforeRouteUpdate(to, from, next) {
-    usersApi.find(to.params.username).then(u => {
+    usersApi.find(to.query.id).then(u => {
       this.user = u
       isOnline(u.id, (e, d) => this.userOnline = d.online)
     })
@@ -214,7 +218,7 @@ export default {
   },
   setup(props) {
     /* Template Methods */
-    const refreshUser = () => usersApi.find(v.user.username).then(u => v.user = u)
+    const refreshUser = () => usersApi.find(v.user.id).then(u => v.user = u)
     const redirectHome = () => $router.replace('/')
 
     const banExpiration = () => {
