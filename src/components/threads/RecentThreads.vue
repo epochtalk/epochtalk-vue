@@ -224,7 +224,7 @@ export default {
     }
   @include break-mobile-sm {
     padding: 1.5rem 2.5rem 0;
-    margin-top: -4.5rem;
+    margin-top: -1.25rem;
     &.is-closed { padding-bottom: 0; }
     &.is-open { padding-bottom: 1rem; }
   }
