@@ -1184,7 +1184,7 @@ $postWidth__mobile: calc(100vw - 2rem);
 }
 .quote {
   color: $secondary-font-color;
-  margin: 0 0 0rem 1rem;
+  margin: 0 0 1rem 1rem;
   padding: 0 0.625rem 0;
   border-left: $border-quote;
   ul, ol { margin-left: 1.625rem }
