@@ -1202,7 +1202,16 @@ $postWidth__mobile: calc(100vw - 2rem);
   border-left: 0;
   border-right: 4px solid RGB(221, 221, 221);
 }
-
+.codeheader {
+  font-weight: bold;
+}
+.code {
+  overflow-x: auto;
+  white-space: nowrap;
+  background-color: $sub-header-color;
+  font-size: $font-size-sm;
+  padding: 1rem;
+}
 #public-content {
   .posts & {
     grid-template-columns: minmax(0, 3fr) minmax($sidebarWidth, 1fr);
