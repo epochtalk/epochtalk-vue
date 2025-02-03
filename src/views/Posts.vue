@@ -1157,7 +1157,9 @@ $postWidth__mobile: calc(100vw - 2rem);
   img { @include transition(opacity 0.5s ease-in); opacity: 1; }
   & table {
     display: block;
-    overflow-x: scroll;
+    overflow-x: auto;
+    white-space: nowrap;
+    font-size: 0.875rem !important;
   }
   .video-wrap {
     position: relative;
