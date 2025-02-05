@@ -35,8 +35,8 @@ export default {
     const update = async () => {
       let path = $route.path
       let routeParams = cloneDeep($route.params)
-      // Handle 403 breadcrumb
-      if ($route.name === '403' || $route.name ===  '503') return
+      // Handle api error breadcrumb
+      if ($route.name === 'NotFound' || $route.name ===  'Forbidden' || $route.name === 'ServiceUnavailable') return
       // Strip query str params since stateParams includes query and route params together
       delete routeParams.limit
       delete routeParams.page
