@@ -937,11 +937,11 @@ input[disabled].toggle-switch:checked + label:after { background-color: lighten(
 #http-error {
   text-align: center;
   line-height: normal;
-  .code { font-size: 12.5rem; font-weight: 100; }
+  .error-code { font-size: 12.5rem; font-weight: 100; }
   .message { font-size: 1.875rem; color: $color-primary; }
   a { width: fit-content; margin: 0 auto; }
   @include break-mobile-sm {
-    .code { font-size: 8rem; }
+    .error-code { font-size: 8rem; }
     .message { font-size: 1.5rem; }
   }
 }

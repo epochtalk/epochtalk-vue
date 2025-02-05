@@ -412,7 +412,7 @@ err => {
       case 403:
         if (router.currentRoute._value.meta.ignoreAxiosInterceptor) break
         if (err.response.statusText === 'Forbidden' || err.response.data.error === 'Forbidden') {
-          router.push({ name: 'Forbidden'})
+          router.push({ name: 'Forbidden', params: { pathMatch: window.location.pathname.split('/').slice(1) }})
         }
         break
       case 404:
@@ -427,7 +427,7 @@ err => {
         break
     }
   }
-  else router.push({ name: 'ServiceUnavailable'}) // API is down, 503
+  else router.push({ name: 'ServiceUnavailable', params: { pathMatch: window.location.pathname.split('/').slice(1) }}) // API is down, 503
   return Promise.reject(err)
 })
 
