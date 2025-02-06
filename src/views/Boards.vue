@@ -40,7 +40,7 @@
                 <div class="moderators" v-if="board.moderators && board.moderators.length">
                   <span>Moderators: </span>
                   <span v-for="(mod, i) in board.moderators" :key="mod.username">
-                    <router-link :to="{ path: '/profile/' + mod.username.toLowerCase() }">{{mod.username}}</router-link><span v-if="(i + 1) !== board.moderators.length">, </span>
+                    <router-link :to="{ path: '/profile/' + mod.username.toLowerCase(), query: { id: mod.id } }">{{mod.username}}</router-link><span v-if="(i + 1) !== board.moderators.length">, </span>
                   </span>
                 </div>
                 <div class="childboards" v-if="board.children.length">
