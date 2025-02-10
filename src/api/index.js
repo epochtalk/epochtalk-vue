@@ -155,6 +155,7 @@ export const postsApi = {
   postSearch: params => $http('/api/search/posts', { params }),
   byNewbie: params => $http('/api/posts/patrol', { params }),
   getPostDraft: () => $http2('/api/posts/draft'),
+  postPage: topic => $http2(`/api/posts/page?topic=${topic}`),
   updatePostDraft: draft => $http2('/api/posts/draft', { method: 'PUT', data: { draft } })
 }
 export const pollsApi = {

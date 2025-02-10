@@ -1,5 +1,5 @@
 import { createWebHistory, createRouter } from 'vue-router'
-import { usersApi, boardsApi, threadsApi, $axios, $axios2 } from '@/api'
+import { usersApi, postsApi, boardsApi, threadsApi, $axios, $axios2 } from '@/api'
 import Boards from '@/views/Boards.vue'
 import Threads from '@/views/Threads.vue'
 import ThreadsPostedIn from '@/views/ThreadsPostedIn.vue'
@@ -42,6 +42,7 @@ import NProgress from 'nprogress'
 import { nextTick } from 'vue'
 import localStorageCache from '@/composables/utils/localStorageCache'
 import { localStorageAuth } from '@/composables/stores/auth'
+import { localStoragePrefs } from '@/composables/stores/prefs'
 import BanStore from '@/composables/stores/ban'
 import PermissionUtils from '@/composables/utils/permissions'
 
@@ -220,7 +221,7 @@ const routes = [
     component: Posts,
     props: route => ({
       threadSlug: route.params.threadSlug,
-      threadId: threadsApi.slugToThreadId(route.params.threadSlug).then(t => t.id)
+      threadId: threadsApi.slugToThreadId(route.params.threadSlug).then(t => t.id),
     }),
     meta: { requiresAuth: false, bodyClass: 'posts' }
   },
@@ -353,7 +354,7 @@ const router = createRouter({
   }
 })
 
-router.beforeEach(to => {
+router.beforeEach((to, from, next) => {
   // Start progress bar
   NProgress.start()
 
@@ -375,6 +376,20 @@ router.beforeEach(to => {
     to.meta.authedUser = localStorageAuth().data
     to.meta.permUtils = new PermissionUtils(to.meta.authedUser)
   }
+
+  if (to.name == 'Posts' && to.query.topic) {
+    let limit = to.query.limit || localStoragePrefs().data.posts_per_page
+    postsApi.postPage(to.query.topic, limit)
+    .then(p => {
+      next({
+        name: 'Posts',
+        params: { threadSlug: to.params.threadSlug },
+        query: { page: p.page > 1 ? p.page : undefined },
+        hash: '#' + p.post_id
+      })
+    })
+  }
+  else next()
 })
 
 router.afterEach(to => {
