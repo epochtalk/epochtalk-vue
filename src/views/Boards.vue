@@ -378,7 +378,7 @@ img.avatar-small {
     margin-bottom: 1rem;
 
     .title {
-      font-size: $font-size-base;;
+      font-size: $font-size-base;
     }
 
     .user {
