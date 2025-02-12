@@ -113,7 +113,7 @@
                   </svg>
                 </span>
               </div>
-              <router-link :class="{ 'bold': thread.has_new_post }" class="thread-title" :title="decode(thread.title, true)" :to="{ name: 'Posts', params: { threadSlug: thread.slug } }"><span v-html="thread.title"></span></router-link>
+              <router-link :class="{ 'bold': thread.has_new_post }" :dir="textDirection(threadData.data.board?.right_to_left)" class="thread-title" :title="decode(thread.title, true)" :to="{ name: 'Posts', params: { threadSlug: thread.slug } }"><span v-html="thread.title"></span></router-link>
               <div class="thread-state-secondary">
                 <span class="thread-state-locked" v-if="thread.locked" data-balloon="Locked">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -166,7 +166,7 @@
                   </g>
                 </svg>
               </div>
-              <router-link :class="{ 'bold': thread.has_new_post }" class="thread-title" :title="decode(thread.title, true)" :to="{ name: 'Posts', params: { threadSlug: thread.slug } }"><span v-html="thread.title"></span></router-link>
+              <router-link :class="{ 'bold': thread.has_new_post }" :dir="textDirection(threadData.data.board?.right_to_left)" class="thread-title" :title="decode(thread.title, true)" :to="{ name: 'Posts', params: { threadSlug: thread.slug } }"><span v-html="thread.title"></span></router-link>
                 <div class="thread-state-secondary">
                 <span class="thread-state-locked" v-if="thread.locked" data-balloon="Locked">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" data-balloon="Locked">
@@ -328,6 +328,8 @@ export default {
     }
 
     /* View Methods */
+    const textDirection = rtl => rtl ? "rtl" : ""
+
     const watchBoard = () => {
       if (v.threadData.data.board.watched) {
         watchlistApi.unwatchBoard(v.threadData.data.board.id)
@@ -459,7 +461,7 @@ export default {
       v.banned = BanStore.updateBanNotice(v.threadData.data.banned_from_board)
     })) // Update threads on login
 
-    return { ...toRefs(v), pageResults, createThread, canCreate, canSetModerator, canLock, canSticky, canModerate, canCreatePoll, watchBoard, setSortField, getSortClass, humanDate, decode, truncate }
+    return { ...toRefs(v), pageResults, createThread, canCreate, canSetModerator, canLock, canSticky, canModerate, canCreatePoll, watchBoard, setSortField, getSortClass, humanDate, decode, truncate, textDirection }
   }
 }
 </script>
