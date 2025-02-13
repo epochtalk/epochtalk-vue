@@ -1113,6 +1113,7 @@ header {
 }
 
 @include break-mobile-sm {
-  #header-spacer { margin-bottom: 0.5rem; }
+  .boards #header-spacer, .posts #header-spacer { margin-bottom: 0.5rem; }
+  .threads #header-spacer { margin-bottom: 1.5rem; }
 }
 </style>
