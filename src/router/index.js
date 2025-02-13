@@ -381,12 +381,14 @@ router.beforeEach((to, from, next) => {
     let limit = to.query.limit || localStoragePrefs().data.posts_per_page
     postsApi.postPage(to.query.topic, limit)
     .then(p => {
-      next({
+      let nextRoute = {
         name: 'Posts',
         params: { threadSlug: to.params.threadSlug },
         query: { page: p.page > 1 ? p.page : undefined },
         hash: '#' + p.post_id
-      })
+      }
+      if (p.page === to.query.page || (p.page === 1 && !to.query.page)) delete nextRoute.query
+      next(nextRoute)
     })
   }
   else next()
