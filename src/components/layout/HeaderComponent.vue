@@ -1113,6 +1113,6 @@ header {
 }
 
 @include break-mobile-sm {
-  #header-spacer { margin-bottom: 3.5rem; }
+  #header-spacer { margin-bottom: 0.5rem; }
 }
 </style>
