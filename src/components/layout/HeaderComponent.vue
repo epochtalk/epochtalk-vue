@@ -84,14 +84,6 @@
           <!-- Login Section -->
           <ul class="signed-out" v-if="!loggedIn">
             <li>
-              <!-- <a href="" @click.prevent="showRegister = true" disabled="true">REGISTER</a> -->
-              <span>REGISTER</span>
-            </li>
-            <li>
-              <!-- <a href="" id="login-link" @click.prevent="showLogin = true" disabled="true">LOGIN</a> -->
-              <span>LOGIN</span>
-            </li>
-            <li>
               <a href="https://forms.clickup.com/57751/f/1rcq-791/HNWSBPWCDSRMDMS9TF" target="_blank">REPORT A BUG</a>
             </li>
           </ul>

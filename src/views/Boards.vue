@@ -1,17 +1,17 @@
 <template>
   <div class="main">
-    <recent-threads v-if="boardData && boardData.data && boardData.data.threads" :threads="boardData.data.threads" :collapsed-cats="collapsedCats" @toggle="toggleCategory"></recent-threads>
+    <recent-threads v-if="boardData && boardData.data" :threads="boardData.data.threads" :collapsed-cats="collapsedCats" @toggle="toggleCategory"></recent-threads>
 
-    <div v-if="!loggedIn" class="dashboard-actions">
-      <!-- <a href="" class="button" @click.prevent="showRegister = true">Create an Account</a> -->
+<!--     <div v-if="!loggedIn" class="dashboard-actions">
+      <a href="" class="button" @click.prevent="showRegister = true">Create an Account</a>
       <a href="" class="button disabled" @click.stop.prevent="">Create an Account</a>
-      <!-- <a href="" class="button" @click.prevent="showLogin = true">Log In</a> -->
+      <a href="" class="button" @click.prevent="showLogin = true">Log In</a>
       <a href="" class="button disabled" @click.stop.prevent="">Log In</a>
     </div>
     <div v-if="loggedIn" class="dashboard-actions">
       <router-link :to="{ name: 'Watchlist' }" class="button">Watchlist</router-link>
       <router-link :to="{ name: 'ThreadsPostedIn' }" class="button">Threads Posted In</router-link>
-    </div>
+    </div> -->
     <div v-if="!boardData?.data?.boards?.length">
       <h4 class="centered-text">There are currently no boards, an administrator must add boards before threads can be created</h4>
     </div>
