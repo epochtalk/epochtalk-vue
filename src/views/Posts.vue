@@ -10,7 +10,7 @@
     <!-- Page Title -->
     <div class="page-header-split">
       <!-- Show Title -->
-      <div v-if="!editThread" class="thread-title">
+      <div v-if="!editThread" :dir="textDirection(postData.data.board?.right_to_left)" class="thread-title">
         <h1 v-html="postData.data.thread.title"></h1>
         <a href="#" data-balloon="Edit Thread Title" class="do-edit" v-if="canEditTitle()" @click.prevent="openEditThread()">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -306,7 +306,7 @@
           </div>
           <!-- Post Body -->
           <!-- TODO(akinsey): post-processing="post.body_html" style-fix="true" -->
-          <div class="post-body" :class="{ 'rtl': post.right_to_left }" v-html="post.body_html"></div>
+          <div class="post-body" :dir="textDirection(postData.data.board?.right_to_left)" :class="{ 'rtl': postData.data.board?.right_to_left }" v-html="post.body_html"></div>
           <div v-if="post.user.signature && !disableSignature">
             <!-- TODO(akinsey): post-processing="post.user.signature" style-fix="true" -->
             <div class="post-signature" v-html="post.user.signature"></div>
@@ -976,6 +976,7 @@ export default {
     }
 
     const openMoveThreadModal = () => v.showPostsMoveThreadModal = true
+    const textDirection = rtl => rtl ? "rtl" : ""
     const toggleIgnoredPosts = post => {
       const toggleIgnore = post.user._ignored ? usersApi.unignore : usersApi.ignore
       toggleIgnore(post.user)
@@ -1097,6 +1098,7 @@ export default {
       closeEditThread,
       onPollValidation,
       createPoll,
+      textDirection,
       truncate,
       humanDate,
       userRoleHighlight,
