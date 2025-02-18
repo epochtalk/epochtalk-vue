@@ -306,7 +306,7 @@
           </div>
           <!-- Post Body -->
           <!-- TODO(akinsey): post-processing="post.body_html" style-fix="true" -->
-          <div class="post-body" :dir="textDirection(postData.data.board?.right_to_left)" :class="{ 'rtl': postData.data.board?.right_to_left }" v-html="post.body_html"></div>
+          <div class="post-body" :dir="textDirection(postData.data.board?.right_to_left)" :class="{ 'rtl': postData.data.board?.right_to_left }" v-html="formatDateStrings(post.body_html)"></div>
           <div v-if="post.user.signature && !disableSignature">
             <!-- TODO(akinsey): post-processing="post.user.signature" style-fix="true" -->
             <div class="post-signature" v-html="post.user.signature"></div>
@@ -990,6 +990,17 @@ export default {
       })
     }
 
+    const formatDateStrings = (body_html) => {
+      const regex = /\b\d{10}\b/
+      let searchIndex = body_html.search(regex)
+      while (searchIndex >= 0) { // while loop to handle nested quote timestamps
+        const date = humanDate(body_html.match(regex) * 1000)
+        body_html = body_html.replace(regex, date)
+        searchIndex = body_html.search(regex)
+      }
+      return body_html
+    }
+
     const createPost = post => postsApi.create(post)
     .then(p => {
       const limit = localStoragePrefs().data.posts_per_page
@@ -1118,7 +1129,8 @@ export default {
       watchThread,
       toggleIgnoredPosts,
       openMoveThreadModal,
-      checkUsersOnline
+      checkUsersOnline,
+      formatDateStrings
     }
   }
 }
