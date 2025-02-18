@@ -991,10 +991,11 @@ export default {
     }
 
     const formatDateStrings = (body_html) => {
-      const regex = /\b\d{10}\b/
+      const regex = /\bunix_timestamp=\d{10}\b/
       let searchIndex = body_html.search(regex)
       while (searchIndex >= 0) { // while loop to handle nested quote timestamps
-        const date = humanDate(body_html.match(regex) * 1000)
+        const dateUnix = body_html.match(regex)
+        const date = humanDate(dateUnix[0].slice(15) * 1000)
         body_html = body_html.replace(regex, date)
         searchIndex = body_html.search(regex)
       }
