@@ -489,6 +489,7 @@ export default {
         return postsApi.byThread(params)
         .then(data => next(vm => {
           vm.postData.data = data
+          document.title = `${vm.postData.data.thread.title.replaceAll(/&#\d+;/g, '').trim()} - Posts`
           vm.checkUsersOnline()
           BanStore.updateBanNotice(vm.postData.data.banned_from_board)
           vm.bannedFromBoard = vm.postData.data.banned_from_board
@@ -509,6 +510,7 @@ export default {
         threadsApi.viewed(threadId)
         return postsApi.byThread(params).then(data => {
           this.postData.data = data
+          document.title = `${this.postData.data.thread.title.replaceAll(/&#\d+;/g, '').trim()} - Posts`
           this.checkUsersOnline()
           BanStore.updateBanNotice(this.postData.data.banned_from_board)
           this.bannedFromBoard = this.postData.data.banned_from_board

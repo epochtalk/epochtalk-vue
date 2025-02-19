@@ -206,6 +206,7 @@ export default {
   beforeRouteEnter(to, from, next) {
     usersApi.find(to.query.id).then(u => next(vm => {
       vm.user = u
+      document.title = `${vm.user.username} - Profile`
       isOnline(u.id, (e, d) => vm.userOnline = d.online)
     }))
   },

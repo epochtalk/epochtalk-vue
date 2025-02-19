@@ -279,6 +279,7 @@ export default {
       return threadsApi.byBoard(params)
       .then(d => next(vm => {
         vm.threadData.data = processThreads(d)
+        document.title = `${vm.threadData.data.board.name} - Threads`
         vm.banned = BanStore.updateBanNotice(vm.threadData.data.banned_from_board)
       }))
     })
@@ -295,6 +296,7 @@ export default {
       params.board_id = boardId
       return threadsApi.byBoard(params).then(d => {
         this.threadData.data = processThreads(d)
+        document.title = `${this.threadData.data.board.name} - Threads`
         this.banned = BanStore.updateBanNotice(this.threadData.data.banned_from_board)
         next()
       })
