@@ -55,12 +55,12 @@
                 <!-- Board Posts and Threads -->
                 <div class="view-count">
                   <p class="view-count-posts">
-                    <span class="view-count-number">{{board.total_post_count}}</span>
-                     <span class="label"> posts, </span>
+                    <span class="view-count-number">{{board.total_post_count.toLocaleString()}}</span>
+                     <span class="label"> Posts </span>
                   </p>
                   <p class="view-count-threads">
-                    <span class="view-count-number">{{board.total_thread_count}}</span>
-                     <span class="label"> threads</span>
+                    <span class="view-count-number">{{board.total_thread_count.toLocaleString()}}</span>
+                     <span class="label"> Threads</span>
                   </p>
                 </div>
 
