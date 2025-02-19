@@ -1229,7 +1229,6 @@ $postWidth__mobile: calc(100vw - 2rem);
 }
 #public-content {
   .posts & {
-    grid-template-columns: minmax(0, 3fr) minmax($sidebarWidth, 1fr);
     grid-template-areas:
       "top sidebar"
       "ads sidebar"

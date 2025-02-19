@@ -106,7 +106,6 @@ main {
   #public-content {
     @include base-layout-width;
     @include grid-base-layout;
-    @include grid-columns-base;
     // margin-top: $header-bottom-margin;
     grid-template-areas:
       "header header"

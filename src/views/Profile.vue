@@ -373,7 +373,6 @@ export default {
 .profile-wrap {
   grid-column: span 2;
   display: grid;
-  @include grid-columns-base;
   grid-template-areas:
     "header sidebar"
     "main sidebar";
