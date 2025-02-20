@@ -99,6 +99,9 @@
     </div>
 
     <!-- <pagination page-count="PostsParentCtrl.pageCount" page="PostsParentCtrl.page"></pagination> -->
+     
+    <!-- Poll Viewer -->
+    <poll-viewer v-if="postData.data.thread?.poll" :poll="postData.data.thread.poll" :thread="postData.data.thread" :user-priority="postData.data.posts[0].user.priority" :reset="resetPoll" :banned-from-board="bannedFromBoard"></poll-viewer>
 
   </div>
 
@@ -399,9 +402,6 @@
 
         </div>
       </div>
-
-      <!-- Poll Viewer -->
-      <poll-viewer v-if="postData.data.thread?.poll" :poll="postData.data.thread.poll" :thread="postData.data.thread" :user-priority="postData.data.posts[0].user.priority" :reset="resetPoll" :banned-from-board="bannedFromBoard"></poll-viewer>
     </div>
 
   </div>
