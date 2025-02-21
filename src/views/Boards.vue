@@ -307,10 +307,9 @@ img.avatar-small {
       padding-top: 0.5rem;
       @include info-text;
       word-break: break-word;
+      flex: 0.5 1 120px;
       @include break-min-desktop {
         text-align: right;
-        flex: 0.5 1 150px;
-        // flex: 1 1;
       }
     }
 
