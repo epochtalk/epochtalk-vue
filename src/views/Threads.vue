@@ -162,7 +162,7 @@
         </tr>
 
         <tr class="threads-data" v-for="thread in threadData.data.normal" :key="thread.id">
-          <td class="subject" v-if="thread.user.username">
+          <td class="subject">
             <div class="title">
               <div class="thread-state">
                 <svg class="is-unread" v-if="thread.has_new_post" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" data-balloon="Unread">
@@ -203,13 +203,12 @@
             </div>
           </td>
 
-          <td class="views-replies" v-if="thread.user.username">
+          <td class="views-replies">
             <span class="replies">{{ thread.is_proxy ? thread.post_count.toLocaleString() : (thread.post_count - 1).toLocaleString() || 0 }}</span>
             <span class="views">{{ thread.view_count.toLocaleString() || 0 }}</span>
-
           </td>
 
-          <td class="last-post" v-if="thread.user.username">
+          <td class="last-post">
             <span v-if="thread.last_deleted">deleted</span>
             <router-link v-if="!thread.last_deleted && thread.last_post_username" :to="{ path: '/profile/' + thread.last_post_username.toLowerCase(), query: { id: thread.last_post_user_id } }">
               <img class="avatar-small" :class="defaultAvatar" :src="thread.last_post_avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
