@@ -1440,7 +1440,7 @@ ad-viewer {
         margin-bottom: 0;
         margin-right: 0.5rem;
       }
-      width: $postUserWidth;
+      width: $avatar-width;
       height: $postUserWidth;
 
       .online {
@@ -1469,8 +1469,6 @@ ad-viewer {
         }
       }
       &.rect {
-        height: calc(#{$postUserWidth} / 1.5);
-
         img {
           object-fit: contain;
         }
