@@ -126,7 +126,7 @@
       <div v-if="!post._deleted && !post.user.ignored" class="post-block-grid">
         <!-- Post Profile Section -->
         <div class="post-user">
-          <router-link :to="{ path: '/profile/' + post.user.username.toLowerCase(), query: { id: post.user.id }}">
+          <router-link v-if="post.user.username" :to="{ path: '/profile/' + post.user.username.toLowerCase(), query: { id: post.user.id }}">
             <div class="user-avatar" :class="defaultAvatarShape">
               <span v-if="post.user.online" class="online green" :data-balloon="post.user.username + ' is online'">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -141,10 +141,15 @@
             <router-link class="hide-mobile" :to="{ path: '/profile/' + post.user.username.toLowerCase(), query: { id: post.user.id } }">
               <div class="original-poster" v-if="post.user.original_poster">OP</div>
               <div v-if="post.user.title" :title="('Title: ' + post.user.title)" class="user-activity"><span class="user-activity-value">{{post.user.title}}</span></div>
-              <div v-if="post.user.activity > -1" :title="('Activity: ' + post.user.activity)" class="user-activity">Activity: <span class="user-activity-value">{{post.user.activity}}</span></div>
-              <div v-if="post.user.merit > -1" :title="('Merit: ' + post.user.merit)" class="user-activity">Merit: <span class="user-activity-value">{{post.user.merit}}</span></div>
+              <div v-if="post.user.activity > -1" :title="('Activity: ' + post.user.activity)" class="user-activity">Activity: <span class="user-activity-value">{{post.user.activity || 0}}</span></div>
+              <div v-if="post.user.merit > -1" :title="('Merit: ' + post.user.merit)" class="user-activity">Merit: <span class="user-activity-value">{{post.user.merit || 0}}</span></div>
             </router-link>
           </router-link>
+          <div v-if="!post.user.username">
+            <div class="user-avatar" :class="defaultAvatarShape">
+              <img :src="post.avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
+            </div>
+          </div>
 
           <div class="user-trust" v-if="loggedIn && postData.data.thread.trust_visible">
             <trust-display :user="post.user" />
@@ -160,20 +165,23 @@
           <div class="show-mobile">
             <div class="post-title-mobile">
               <div class="post-title-user">
-                <span class="username" :data-balloon="post.user.role_name || 'User'"><router-link :to="{ path: '/profile/' + post.user.username.toLowerCase() }">
-                  <span v-html="post.user.username"></span>
-                </router-link></span>
+                <span class="username" :data-balloon="post.user.role_name || 'User'">
+                  <router-link v-if="post.user.username" :to="{ path: '/profile/' + post.user.username.toLowerCase() }">
+                    <span v-html="post.user.username"></span>
+                  </router-link>
+                  <span v-if="!post.user.username">Anonymous</span>
+                </span>
                 <div :title="post.user.name" v-if="post.user.name" class="display-name">
                   <span>{{truncate(post.user.name, 33)}}</span>
                   <span class="hide-mobile">&nbsp;&mdash;&nbsp;</span>
                 </div>
-                <div :title="post.user.role_name || 'user'" class="user-role" :style="userRoleHighlight(post.user.highlight_color)">{{post.user.role_name || 'user'}}</div>
+                <div v-if="post.user.id != 0" :title="post.user.role_name || 'user'" class="user-role" :style="userRoleHighlight(post.user.highlight_color)">{{post.user.role_name || 'user'}}</div>
               </div>
-              <router-link :to="{ path: '/profile/' + post.user.username.toLowerCase() }" class="user-activity-mobile">
+              <router-link v-if="post.user.username" :to="{ path: '/profile/' + post.user.username.toLowerCase() }" class="user-activity-mobile">
                 <div class="original-poster" v-if="post.user.original_poster">OP</div>
                 <div v-if="post.user.title" :title="('Title: ' + post.user.title)" class="user-activity"><span class="user-activity-value">{{post.user.title}}</span></div>
-                <div v-if="post.user.activity > -1" :title="('Activity: ' + post.user.activity)" class="user-activity">Activity: <span class="user-activity-value">{{post.user.activity}}</span></div>
-                <div v-if="post.user.merit > -1" :title="('Merit: ' + post.user.merit)" class="user-activity">Merit: <span class="user-activity-value">{{post.user.merit}}</span></div>
+                <div v-if="post.user.activity > -1" :title="('Activity: ' + post.user.activity)" class="user-activity">Activity: <span class="user-activity-value">{{post.user.activity || 0}}</span></div>
+                <div v-if="post.user.merit > -1" :title="('Merit: ' + post.user.merit)" class="user-activity">Merit: <span class="user-activity-value">{{post.user.merit || 0}}</span></div>
               </router-link>
               <div class="timestamp">
                 <span>{{humanDate(post.created_at)}}</span>
@@ -191,14 +199,17 @@
           <!-- Post Title -->
           <div class="hide-mobile post-title">
             <div class="post-title-user">
-              <span class="username" :data-balloon="post.user.role_name || 'User'"><router-link :to="{ path: '/profile/' + post.user.username.toLowerCase(), query: { id: post.user.id } }">
-                <span v-html="post.user.username"></span>
-              </router-link></span>
+              <span class="username" :data-balloon="post.user.role_name || 'User'">
+                <router-link v-if="post.user.username" :to="{ path: '/profile/' + post.user.username.toLowerCase(), query: { id: post.user.id } }">
+                  <span v-html="post.user.username"></span>
+                </router-link>
+                <span v-if="!post.user.username">Anonymous</span>
+              </span>
               <div :title="post.user.name" v-if="post.user.name" class="display-name">
                 <span>{{truncate(post.user.name, 33)}}</span>
                 <span class="hide-mobile">&nbsp;&mdash;&nbsp;</span>
               </div>
-              <div :title="post.user.role_name || 'user'" class="user-role" :style="userRoleHighlight(post.user.highlight_color)">{{post.user.role_name || 'user'}}</div>
+              <div v-if="post.user.id != 0" :title="post.user.role_name || 'user'" class="user-role" :style="userRoleHighlight(post.user.highlight_color)">{{post.user.role_name || 'user'}}</div>
               <div class="timestamp">
                 <span>{{humanDate(post.created_at)}}</span>
                 <span v-if="showEditDate(post) && post.metadata?.edited_by_username">{{'&nbsp;&mdash;&nbsp;Edited ' + humanDate(post.updated_at) + ' by '}}</span><a v-if="showEditDate(post) && post.metadata?.edited_by_username" href="#">{{post.metadata.edited_by_username}}</a>
@@ -1538,9 +1549,6 @@ ad-viewer {
         color: $base-font-color;
         font-size: $font-size-sm;
         font-weight: 600;
-        &:hover {
-          color: $color-primary;
-        }
       }
 
       .user-role {
@@ -1605,9 +1613,6 @@ ad-viewer {
         margin-right: 0.25rem;
         color: $base-font-color;
         font-weight: 600;
-        &:hover {
-          color: $color-primary;
-        }
       }
 
       .user-role {
