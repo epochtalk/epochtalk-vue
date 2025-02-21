@@ -51,34 +51,32 @@
                 </div>
               </div>
 
-              <div class="board-secondary">
-                <!-- Board Posts and Threads -->
-                <div class="view-count">
-                  <p class="view-count-posts">
-                    <span class="view-count-number">{{board.total_post_count}}</span>
-                     <span class="label"> posts, </span>
-                  </p>
-                  <p class="view-count-threads">
-                    <span class="view-count-number">{{board.total_thread_count}}</span>
-                     <span class="label"> threads</span>
-                  </p>
-                </div>
+              <!-- Board Posts and Threads -->
+              <div class="view-count">
+                <p class="view-count-posts">
+                  <span class="view-count-number">{{board.total_post_count.toLocaleString()}}</span>
+                    <span class="label"> Posts </span>
+                </p>
+                <p class="view-count-threads">
+                  <span class="view-count-number">{{board.total_thread_count.toLocaleString()}}</span>
+                    <span class="label"> Threads</span>
+                </p>
+              </div>
 
-                <!-- Board Last Post By -->
-                <div class="last-post">
-                  <div v-if="board.last_post_username">
-                    <span v-if="board.user_deleted || board.post_deleted">deleted</span>
-                    <img v-if="!board.user_deleted && !board.post_deleted" class="avatar-small" :class="defaultAvatarShape" :src="board.last_post_avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
-                    <router-link v-if="!board.user_deleted && !board.post_deleted" :to="{ path: '/profile/' + board.last_post_username.toLowerCase(), query: { id: board.last_post_user_id }}">{{board.last_post_username}}</router-link> posted in
-                    <span v-if="board.last_thread_title">
-                      <router-link :to="{ name: 'Posts', params: { threadSlug: board.last_thread_slug }, query: { start: board.last_post_position} }">
-                        <span v-html="board.last_thread_title"></span>
-                      </router-link> on
-                    </span>
-                    <span vi-if="board.last_post_created_at">
-                      <span>{{humanDate(board.last_post_created_at)}}</span>
-                    </span>
-                  </div>
+              <!-- Board Last Post By -->
+              <div class="last-post">
+                <div v-if="board.last_post_username">
+                  <span v-if="board.user_deleted || board.post_deleted">deleted</span>
+                  <img v-if="!board.user_deleted && !board.post_deleted" class="avatar-small" :class="defaultAvatarShape" :src="board.last_post_avatar || defaultAvatar" @error="$event.target.src=defaultAvatar" />
+                  <router-link v-if="!board.user_deleted && !board.post_deleted" :to="{ path: '/profile/' + board.last_post_username.toLowerCase(), query: { id: board.last_post_user_id }}">{{board.last_post_username}}</router-link> posted in
+                  <span v-if="board.last_thread_title">
+                    <router-link :to="{ name: 'Posts', params: { threadSlug: board.last_thread_slug }, query: { start: board.last_post_position} }">
+                      <span v-html="truncate(decode(board.last_thread_title), 25)"></span>
+                    </router-link>
+                  </span>
+                  <span vi-if="board.last_post_created_at">
+                    <br />on <span>{{humanDate(board.last_post_created_at)}}</span>
+                  </span>
                 </div>
               </div>
             </div>
@@ -96,6 +94,8 @@
 import useSWRV from 'swrv'
 import { mutate } from 'swrv'
 import humanDate from '@/composables/filters/humanDate'
+import decode from '@/composables/filters/decode'
+import truncate from '@/composables/filters/truncate'
 import RecentThreads from '@/components/threads/RecentThreads.vue'
 import LoginModal from '@/components/modals/auth/Login.vue'
 import RegisterModal from '@/components/modals/auth/Register.vue'
@@ -160,7 +160,7 @@ export default {
     watch(() => v.loggedIn, () => v.boardData.mutate(getBoards)) // Update boards on login
     watch(() => v.boardData.error, err => err ? $alertStore.error(err) : null) // Handle errors
 
-    return { ...toRefs(v), generateCatId, toggleCategory, humanDate }
+    return { ...toRefs(v), generateCatId, toggleCategory, humanDate, decode, truncate }
   }
 }
 </script>
@@ -236,7 +236,8 @@ img.avatar-small {
   .board {
     display: flex;
     flex-direction: row;
-    padding: 0 0 1rem 0;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(215, 215, 215, 0.35);
     @include break-mobile-sm { flex-direction: column; }
     .info {
       flex: 2 0 0;
@@ -277,15 +278,11 @@ img.avatar-small {
       }
     }
 
-    .board-secondary {
-      display: flex;
-      flex: 1;
-      flex-direction: column;
-    }
-
     .view-count {
+      padding-top: 0.5rem;
+      flex: 0 1 10%;
+      margin-right: 1rem;
       @include info-text;
-      flex: 0 0 50%;
 
       &-posts,
       &-threads {
@@ -307,15 +304,16 @@ img.avatar-small {
     }
 
     .last-post {
+      padding-top: 0.5rem;
       @include info-text;
-      flex: 2;
       word-break: break-word;
+      flex: 0.5 1 120px;
+      @include break-min-desktop {
+        text-align: right;
+      }
     }
 
-    @include break-max-desktop {
-      .view-count {
-        flex: 0 0 auto;
-      }
+    @include break-mobile-sm {
       .view-count-posts,
       .view-count-threads {
         display: inline;
@@ -325,18 +323,6 @@ img.avatar-small {
         text-align: left;
       }
     }
-
-    @include break-min-desktop {
-      .info {
-        flex: 2;
-      }
-      .board-secondary {
-        flex-direction: row;
-          .view-count {
-            padding-right: 2rem;
-          }
-        }
-      }
   }
 
   @include break-mobile-sm {

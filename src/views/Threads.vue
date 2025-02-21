@@ -31,10 +31,10 @@
             </div>
           </td>
           <td class="views">
-              <span class="views-number">{{childBoard.total_post_count}}</span>
-              <span class="label"> posts, </span>
-              <span class="views-number">{{childBoard.total_thread_count}}</span>
-              <span class="label"> threads</span>
+            <span class="views-number">{{childBoard.total_post_count.toLocaleString()}}</span>
+            <span class="label"> Posts</span>
+            <span class="views-number">{{childBoard.total_thread_count.toLocaleString()}}</span>
+            <span class="label"> Threads</span>
           </td>
 
           <td class="last-post">
@@ -48,10 +48,10 @@
               </router-link>
               <span v-if="childBoard.last_thread_id">
                 posted in
-                <router-link :title="decode(childBoard.last_thread_title)" :to="{ name: 'Posts', params: { threadSlug: childBoard.last_thread_slug }, query: { start: childBoard.last_post_position } }"><span v-html="truncate(decode(childBoard.last_thread_title), 25)"></span></router-link> on
+                <router-link :title="decode(childBoard.last_thread_title)" :to="{ name: 'Posts', params: { threadSlug: childBoard.last_thread_slug }, query: { start: childBoard.last_post_position } }"><span v-html="truncate(decode(childBoard.last_thread_title), 25)"></span></router-link>
               </span>
               <span v-if="childBoard.last_thread_id">
-                {{humanDate(childBoard.last_post_created_at)}}
+                <br />on {{humanDate(childBoard.last_post_created_at)}}
               </span>
             </div>
           </td>
@@ -204,8 +204,9 @@
           </td>
 
           <td class="views-replies" v-if="thread.user.username">
-            <span class="replies">{{ thread.is_proxy ? thread.post_count : thread.post_count - 1 || 0 }}</span>
-            <span class="views">{{ thread.view_count || 0 }}</span>
+            <span class="replies">{{ thread.is_proxy ? thread.post_count.toLocaleString() : (thread.post_count - 1).toLocaleString() || 0 }}</span>
+            <span class="views">{{ thread.view_count.toLocaleString() || 0 }}</span>
+
           </td>
 
           <td class="last-post" v-if="thread.user.username">
@@ -295,6 +296,7 @@ export default {
       return threadsApi.byBoard(params)
       .then(d => next(vm => {
         vm.threadData.data = processThreads(d)
+        document.title = `${vm.threadData.data.board.name} - Threads`
         vm.banned = BanStore.updateBanNotice(vm.threadData.data.banned_from_board)
       }))
     })
@@ -311,6 +313,7 @@ export default {
       params.board_id = boardId
       return threadsApi.byBoard(params).then(d => {
         this.threadData.data = processThreads(d)
+        document.title = `${this.threadData.data.board.name} - Threads`
         this.banned = BanStore.updateBanNotice(this.threadData.data.banned_from_board)
         next()
       })
@@ -744,6 +747,9 @@ export default {
   }
 
   .last-post {
+    @include break-min-desktop {
+      text-align: right;
+    }
     color: $secondary-font-color;
     font-size: $font-size-sm;
   }

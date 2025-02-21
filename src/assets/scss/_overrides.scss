@@ -24,3 +24,99 @@ body { overflow: hidden auto; }
     box-sizing: inherit;
   }
 }
+
+// $sub-header-color #1a1a1a;
+// $sub-header-secondary-font-color #f9f9f9;
+// $secondary-font-color #f0f0f0;
+// $base-background-color #0f0f0f;
+// $base-font-color #fff;
+// $header-bg-color rgb(17, 17, 17);
+// $breadcrumbs-border-color #2f2f2f;
+// $breadcrumbs-link-color rgb(153, 153, 153);
+// $recent-thread-background-color #262626;
+html.dark, html.dark body {
+  background-color: #0f0f0f; // $base-background-color;
+  color: #fff; // $base-font-color;
+  .board-controls {
+    background-color: #0f0f0f; //$base-background-color;
+    h1 { color: #fff; } // $base-font-color;
+  }
+  .child-boards .description, .threads-list .description {
+    color: #fff; // $base-font-color;
+  }
+  .category .board h2 a {
+    color: #f0f0f0; // $secondary-font-color;
+  }
+  .category .board .info .description {
+    color: #f0f0f0; // $secondary-font-color;
+  }
+  header #menu-wrap {
+    background-color: rgb(17, 17, 17); // $header-bg-color;
+  }
+  header #breadcrumbs-wrap {
+    background-color: #1a1a1a; // $sub-header-color;
+    border-bottom: 1px solid #2f2f2f; // $breadcrumbs-border-color;
+    #breadcrumbs ul li span {
+      color: rgb(153, 153, 153); // $breadcrumbs-link-color;
+    }
+  }
+  .dashboard-hero {
+    background-color: #1a1a1a; // $sub-header-color;
+    .threads-data {
+      background-color: #262626; // $recent-thread-background-color
+    }
+  }
+  .actions-bottom {
+    border-top: 1px solid #2f2f2f; // $breadcrumbs-border-color;
+    background-color: #0f0f0f; // $base-background-color;
+  }
+  .page-header-split h1 {
+    color: #fff; // $base-font-color
+  }
+  .poll-title, .actionsBar {
+    background-color: #0f0f0f; // $base-background-color;
+    color: #f0f0f0; // $secondary-font-color;
+  }
+  .polls {
+    .poll-header .poll-question {
+      color: #fff; // $base-font-color
+    }
+    .poll-answer .poll-select {
+      color: #f0f0f0; // $sub-header-secondary-font-color;
+    }
+  }
+  .profile-header .profile-user-details .profile-user-name-role h1 {
+    color: #fff; // $base-font-color
+  }
+  .table-actions button {
+    color: #f0f0f0; // $secondary-font-color;
+    &.active {
+      color: rgb(255, 100, 0); // $color-primary
+    }
+  }
+  .pagination-wrap .pagination {
+    .control {
+      fill: rgb(153, 153, 153); // $breadcrumbs-link-color;
+    }
+    .control-active {
+      fill: #fff; // $base-font-color
+      &:hover {
+        fill: rgb(255, 100, 0); // $color-primary
+      }
+    }
+    .page {
+      color: #fff; // $base-font-color
+    }
+  }
+  .pagination-simple button {
+    background: #0f0f0f; // $base-background-color;
+  }
+  .profile-posts-table {
+    .post {
+      color: #fff; // $base-font-color
+      &:hover {
+        background-color: lighten(#0f0f0f, 5%); // $base-background-color;
+      }
+    }
+  }
+}

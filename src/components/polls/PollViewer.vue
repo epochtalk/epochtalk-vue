@@ -1,12 +1,20 @@
 <template>
   <div class="polls" id="poll-view" v-if="poll">
     <!-- Poll Header -->
-    <div class="poll-title">
+    <div class="poll-title collapse-section" @click="togglePollsCollapsed()">
       <span class="poll-title-text">
+        <a :class="{ 'is-open': !options.polls_collapsed, 'is-closed': options.polls_collapsed }">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 39.84 22.63" class="icon__caretDown">
+            <title></title>
+            <g id="Layer_2" data-name="Layer 2">
+              <polyline class="icon" points="37.92 1.92 19.92 19.92 1.92 1.92" />
+            </g>
+          </svg>
+        </a>
         Poll
         <span class="is_locked" v-if="pollCopy.locked">(Locked)</span>
       </span>
-      <div class="poll-controls">
+      <div v-if="!options.polls_collapsed" class="poll-controls">
         <!-- Poll Controls -->
         <div class="poll-control" v-if="canLock()">
           <input id="lockPoll" class="icon" type="checkbox" v-model="pollCopy.locked">
@@ -32,7 +40,7 @@
     </div>
 
     <!-- Poll Edit -->
-    <div class="poll-edit" v-if="canEdit()" :class="{'showing': editPoll, 'hidden': !editPoll}">
+    <div class="poll-edit" v-if="canEdit() && !options.polls_collapsed" :class="{'showing': editPoll, 'hidden': !editPoll}">
       <div class="slide-wrapper">
         <div class="poll-edit-container">
           <h5 class="panelTitle">Edit Poll Options:</h5>
@@ -71,7 +79,7 @@
       </div>
     </div>
 
-    <div class="poll-body">
+    <div v-if="!options.polls_collapsed" class="poll-body">
       <div class="poll-header">
         <!-- Poll Details -->
         <div class="poll-header-main">
@@ -117,7 +125,7 @@
         </div>
       </div>
     </div>
-    <div class="actionsBar">
+    <div v-if="!options.polls_collapsed" class="actionsBar">
       <button @click="vote()" :disabled="pollAnswers.length === 0" v-if="canVote()">Vote</button>
       <button v-if="canRemoveVote()" @click="removeVote()" class="secondary">Remove Vote</button>
     </div>
@@ -288,6 +296,11 @@ export default {
       console.log('scrollPollView')
       // $('#poll-view').animate({  scrollTop: 0 }, 250)
     }
+
+    const togglePollsCollapsed = () => {
+      v.options.polls_collapsed = !v.options.polls_collapsed
+    }
+
     /* Internal Data */
     const $auth = inject(AuthStore)
     const $alertStore = inject('$alertStore')
@@ -303,7 +316,8 @@ export default {
         display_mode: props.poll.display_mode,
         // used in view to track date and time from input field
         expiration_date: props.poll.expiration ? dayjs(props.poll.expiration).format('YYYY-MM-DD') : undefined,
-        expiration_time: props.poll.expiration ? dayjs(props.poll.expiration).format('HH:mm') : undefined
+        expiration_time: props.poll.expiration ? dayjs(props.poll.expiration).format('HH:mm') : undefined,
+        polls_collapsed: false
       },
       editPoll: false,
       pollAnswers: [],
@@ -334,7 +348,8 @@ export default {
       updateLockPoll,
       calcExpiration,
       scrollPollView,
-      humanDate
+      humanDate,
+      togglePollsCollapsed
     }
   }
 }
@@ -349,6 +364,36 @@ export default {
   }
   &.hidden {
     max-height: 0rem;
+  }
+}
+
+.collapse-section {
+  @include no-select;
+  cursor: pointer;
+  a { margin-left: -0.5rem; }
+  .title { display: inline-block; margin-left: .5rem; }
+  .is-open {
+    .icon__caretDown {
+      transform: rotateZ(0deg);
+      transition: all ease-in-out 150ms;
+    }
+  }
+  .is-closed {
+    .icon__caretDown {
+      transform: rotateZ(-90deg);
+      transition: all ease-in-out 150ms;
+    }
+  }
+  .icon__caretDown {
+    margin-bottom: 3px;
+    width: 8px;
+    polyline {
+      fill: none;
+      stroke: $secondary-font-color;
+      stroke-linecap: round;
+      stroke-miterlimit: 10;
+      stroke-width: 7px;
+    }
   }
 }
 </style>

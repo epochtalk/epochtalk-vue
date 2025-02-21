@@ -84,7 +84,10 @@
           <!-- Login Section -->
           <ul class="signed-out" v-if="!loggedIn">
             <li>
-              <a href="https://forms.clickup.com/57751/f/1rcq-791/HNWSBPWCDSRMDMS9TF" target="_blank">REPORT A BUG</a>
+              <a href="" @click.prevent="toggleDarkMode()">
+                <i v-if="!darkMode" class="fa-solid fa-moon"></i>
+                <i v-if="darkMode" class="fa-solid fa-sun"></i>
+              </a>
             </li>
           </ul>
 
@@ -265,7 +268,7 @@ import AdminNavigation from '@/components/layout/AdminNavigation.vue'
 import AdminSubNavigation from '@/components/layout/AdminSubNavigation.vue'
 import decode from '@/composables/filters/decode'
 import { AuthStore } from '@/composables/stores/auth'
-import { PreferencesStore } from '@/composables/stores/prefs'
+import { PreferencesStore, localStoragePrefs} from '@/composables/stores/prefs'
 import { reactive, toRefs, watch, onMounted, onUnmounted, onBeforeMount, inject } from 'vue'
 import { debounce } from 'lodash'
 import { useRouter, useRoute } from 'vue-router'
@@ -282,6 +285,10 @@ export default {
       let fetchMotd = () => motdApi.get().then(d => v.motdData = d).catch(() => {})
       fetchMotd()
       addAnnouncementListener(fetchMotd)
+
+      // set dark mode if in user prefs
+      if (localStoragePrefs().data.dark_mode)
+        document.documentElement.classList.add('dark')
     })
     /* Internal Methods */
     const scrollHeader = () => {
@@ -320,6 +327,12 @@ export default {
       if (v.searchExpanded) { v.search.focus() }
     }
 
+    const toggleDarkMode = () => {
+      v.darkMode = !v.darkMode
+      document.documentElement.classList.toggle('dark')
+      $prefs.update()
+    }
+
     const unseenMentionsText = () => {
       let unseenInList = 0;
       v.mentionsList.forEach(mention => { if (!mention.viewed) { unseenInList++ } })
@@ -337,6 +350,7 @@ export default {
 
     /* Template Data */
     const v = reactive({
+      darkMode: $prefs.data.dark_mode,
       showMobileMenu: false,
       focusSearch: false,
       searchExpanded: false,
@@ -389,7 +403,7 @@ export default {
       window.removeEventListener('scroll', debounce(scrollHeader, 10))
     })
 
-    return { ...toRefs(v), BanStore, logout, isPatroller, searchForum, dismissNotifications, deleteMention, unseenMentionsText, toggleFocusSearch, decode, humanDate }
+    return { ...toRefs(v), BanStore, logout, isPatroller, searchForum, dismissNotifications, deleteMention, unseenMentionsText, toggleFocusSearch, toggleDarkMode, decode, humanDate }
   }
 }
 </script>
