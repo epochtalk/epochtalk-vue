@@ -83,7 +83,12 @@
 
           <!-- Login Section -->
           <ul class="signed-out" v-if="!loggedIn">
-            <li><a href="" @click.prevent="toggleDarkMode()"><i class="fa-solid fa-moon"></i></a></li>
+            <li>
+              <a href="" @click.prevent="toggleDarkMode()">
+                <i v-if="!darkMode" class="fa-solid fa-moon"></i>
+                <i v-if="darkMode" class="fa-solid fa-sun"></i>
+              </a>
+            </li>
           </ul>
 
           <!-- User Dropdown Mobile -->
