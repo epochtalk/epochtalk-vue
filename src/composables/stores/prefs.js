@@ -17,7 +17,8 @@ const emtpyPrefs = {
   },
   patroller_view: false,
   collapsed_categories: [],
-  ignored_boards: []
+  ignored_boards: [],
+  dark_mode: false
 }
 
 export const PreferencesStore = Symbol(PREFS_KEY)
@@ -68,6 +69,7 @@ export default {
         patroller_view: prefs.patroller_view,
         collapsed_categories: [...prefs.collapsed_categories],
         ignored_boards: [...prefs.ignored_boards],
+        dark_mode: prefs.dark_mode,
         ...specificPrefs
       }
       if (user && user.token) { // user is logged in update cache and server
