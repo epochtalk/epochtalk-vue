@@ -253,6 +253,9 @@ export default {
     }
     &.closed {
       width: 100%;
+      @include break-mobile-sm {
+        max-height: 3rem;
+      }
       max-height: 2.5rem;
       white-space: pre-wrap;
       overflow: hidden;

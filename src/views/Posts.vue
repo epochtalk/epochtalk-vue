@@ -99,6 +99,9 @@
     </div>
 
     <!-- <pagination page-count="PostsParentCtrl.pageCount" page="PostsParentCtrl.page"></pagination> -->
+     
+    <!-- Poll Viewer -->
+    <poll-viewer v-if="postData.data.thread?.poll" :poll="postData.data.thread.poll" :thread="postData.data.thread" :user-priority="postData.data.posts[0].user.priority" :reset="resetPoll" :banned-from-board="bannedFromBoard"></poll-viewer>
 
   </div>
 
@@ -399,9 +402,6 @@
 
         </div>
       </div>
-
-      <!-- Poll Viewer -->
-      <poll-viewer v-if="postData.data.thread?.poll" :poll="postData.data.thread.poll" :thread="postData.data.thread" :user-priority="postData.data.posts[0].user.priority" :reset="resetPoll" :banned-from-board="bannedFromBoard"></poll-viewer>
     </div>
 
   </div>
@@ -489,6 +489,7 @@ export default {
         return postsApi.byThread(params)
         .then(data => next(vm => {
           vm.postData.data = data
+          document.title = `${vm.postData.data.thread.title.replaceAll(/&#\d+;/g, '').trim()} - Posts`
           vm.checkUsersOnline()
           BanStore.updateBanNotice(vm.postData.data.banned_from_board)
           vm.bannedFromBoard = vm.postData.data.banned_from_board
@@ -509,6 +510,7 @@ export default {
         threadsApi.viewed(threadId)
         return postsApi.byThread(params).then(data => {
           this.postData.data = data
+          document.title = `${this.postData.data.thread.title.replaceAll(/&#\d+;/g, '').trim()} - Posts`
           this.checkUsersOnline()
           BanStore.updateBanNotice(this.postData.data.banned_from_board)
           this.bannedFromBoard = this.postData.data.banned_from_board
@@ -1229,7 +1231,6 @@ $postWidth__mobile: calc(100vw - 2rem);
 }
 #public-content {
   .posts & {
-    grid-template-columns: minmax(0, 3fr) minmax($sidebarWidth, 1fr);
     grid-template-areas:
       "top sidebar"
       "ads sidebar"

@@ -979,7 +979,6 @@ input[disabled].toggle-switch:checked + label:after { background-color: lighten(
   color: $sub-header-font-color;
   margin: 1.5rem 0;
   max-height: calc(100vh - 16rem);
-  min-height: 200px;
   overflow-x: hidden;
   overflow-y: auto;
   button { margin: 0.5rem 0 0; width: 100%; }
