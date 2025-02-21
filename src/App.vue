@@ -112,6 +112,7 @@ main {
       "main main"
       "sidebar sidebar";
     grid-gap: 2rem;
+    column-gap: 0;
     row-gap: 0;
     margin-bottom: 2rem;
 
