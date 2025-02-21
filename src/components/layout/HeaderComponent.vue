@@ -83,9 +83,6 @@
 
           <!-- Login Section -->
           <ul class="signed-out" v-if="!loggedIn">
-            <li>
-              <a href="https://forms.clickup.com/57751/f/1rcq-791/HNWSBPWCDSRMDMS9TF" target="_blank">REPORT A BUG</a>
-            </li>
             <li><a href="" @click.prevent="toggleDarkMode()"><i class="fa-solid fa-moon"></i></a></li>
           </ul>
 
