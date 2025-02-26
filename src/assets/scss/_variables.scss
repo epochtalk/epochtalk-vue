@@ -44,7 +44,7 @@ $font-size-tiny:  0.6375rem;
     $color-brightness: brightness($color);
     $light-text-brightness: brightness($light);
     $dark-text-brightness: brightness($dark);
-    @return if(abs($color-brightness - $light-text-brightness) > abs($color-brightness - $dark-text-brightness), $light, $dark);
+    @return if(math.abs($color-brightness - $light-text-brightness) > math.abs($color-brightness - $dark-text-brightness), $light, $dark);
   }
 }
 @import '~@/assets/scss/_default-variables.scss';
