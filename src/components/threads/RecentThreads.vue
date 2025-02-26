@@ -14,11 +14,11 @@
         </a>
       </div>
       <transition>
-        <div>
-          <div v-if="!threads && collapsedCats.indexOf(recentThreadsId) < 0" class="centered-text">
+        <div v-if="collapsedCats.indexOf(recentThreadsId) < 0">
+          <div v-if="!threads" class="centered-text">
             <h5>No recently updated threads available</h5>
           </div>
-          <div class="threads-container" v-if="threads && collapsedCats.indexOf(recentThreadsId) < 0">
+          <div class="threads-container" v-if="threads">
             <!-- Thread listing -->
             <div class="threads-data threads-recent" v-for="thread in threads" :key="thread.id">
               <div class="states">
