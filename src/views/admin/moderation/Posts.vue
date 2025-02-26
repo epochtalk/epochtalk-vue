@@ -50,15 +50,17 @@
       </div>
       <table class="underlined" width="100%">
         <thead>
-          <th class="left-icon-col"></th>
-          <th class="pointer hide-mobile" @click="setSortField('reporter_username')"><span :class="getSortClass('reporter_username')"></span>&nbsp;Reported By</th>
-          <th class="pointer" @click="setSortField('created_at')"><span :class="getSortClass('created_at')"></span>&nbsp;Reported Date</th>
-          <th class="pointer" @click="setSortField('status')"><span :class="getSortClass('status')"></span>&nbsp;Status</th>
-          <th class="pointer" @click="setSortField('offender_title')"><span :class="getSortClass('offender_title')"></span>&nbsp;Title</th>
-          <th class="pointer hide-mobile" @click="setSortField('offender_created_at')"><span :class="getSortClass('offender_created_at')"></span>&nbsp;Posted Date</th>
-          <th class="pointer" @click="setSortField('offender_author_username')"><span :class="getSortClass('offender_author_username')"></span>&nbsp;Author</th>
-          <th class="reason">Reason</th>
-          <th class="user-actions">Actions</th>
+          <tr>
+            <th class="left-icon-col"></th>
+            <th class="pointer hide-mobile" @click="setSortField('reporter_username')"><span :class="getSortClass('reporter_username')"></span>&nbsp;Reported By</th>
+            <th class="pointer" @click="setSortField('created_at')"><span :class="getSortClass('created_at')"></span>&nbsp;Reported Date</th>
+            <th class="pointer" @click="setSortField('status')"><span :class="getSortClass('status')"></span>&nbsp;Status</th>
+            <th class="pointer" @click="setSortField('offender_title')"><span :class="getSortClass('offender_title')"></span>&nbsp;Title</th>
+            <th class="pointer hide-mobile" @click="setSortField('offender_created_at')"><span :class="getSortClass('offender_created_at')"></span>&nbsp;Posted Date</th>
+            <th class="pointer" @click="setSortField('offender_author_username')"><span :class="getSortClass('offender_author_username')"></span>&nbsp;Author</th>
+            <th class="reason">Reason</th>
+            <th class="user-actions">Actions</th>
+          </tr>
         </thead>
         <tbody>
           <tr v-for="report in reportData.data" :key="report.id" class="selectable-row" :class="{ 'active-row' : selectedReport?.id === report.id }" @click="selectReport(report)">
