@@ -12,9 +12,11 @@
     <div class="invitations-content fill-row" v-if="inviteData?.invitations?.length">
       <table class="underlined" width="100%">
         <thead>
-          <th>Email</th>
-          <th>Sent</th>
-          <th class="user-actions">Actions</th>
+          <tr>
+            <th>Email</th>
+            <th>Sent</th>
+            <th class="user-actions">Actions</th>
+          </tr>
         </thead>
         <tbody>
           <tr v-for="invite in inviteData?.invitations" :key="invite">

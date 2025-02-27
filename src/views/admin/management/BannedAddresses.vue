@@ -18,14 +18,16 @@
     <div class="banned-address-content fill-row" v-if="banData?.data?.length > 0 || query?.search">
       <table class="underlined" width="100%">
         <thead>
-          <th>Address</th>
-          <th class="pointer" @click="setSortField('weight')"><span :class="getSortClass('weight')"></span>&nbsp;Weight</th>
-          <th class="pointer" @click="setSortField('created_at')"><span :class="getSortClass('created_at')"></span>&nbsp;Date Banned</th>
-          <th class="pointer" @click="setSortField('decay')"><span :class="getSortClass('decay')"></span>&nbsp;Decays</th>
-          <th class="pointer" @click="setSortField('updates')"><span :class="getSortClass('updates')"></span>Last Updated</th>
-          <th class="pointer" @click="setSortField('update_count')"><span :class="getSortClass('update_count')"></span>&nbsp;Update Count</th>
-          <th class="pointer" @click="setSortField('imported_at')"><span :class="getSortClass('imported_at')"></span>&nbsp;Date Imported</th>
-          <th class="user-actions">Actions</th>
+          <tr>
+            <th>Address</th>
+            <th class="pointer" @click="setSortField('weight')"><span :class="getSortClass('weight')"></span>&nbsp;Weight</th>
+            <th class="pointer" @click="setSortField('created_at')"><span :class="getSortClass('created_at')"></span>&nbsp;Date Banned</th>
+            <th class="pointer" @click="setSortField('decay')"><span :class="getSortClass('decay')"></span>&nbsp;Decays</th>
+            <th class="pointer" @click="setSortField('updates')"><span :class="getSortClass('updates')"></span>Last Updated</th>
+            <th class="pointer" @click="setSortField('update_count')"><span :class="getSortClass('update_count')"></span>&nbsp;Update Count</th>
+            <th class="pointer" @click="setSortField('imported_at')"><span :class="getSortClass('imported_at')"></span>&nbsp;Date Imported</th>
+            <th class="user-actions">Actions</th>
+          </tr>
         </thead>
         <tbody>
           <tr v-for="address in banData?.data" :key="address">

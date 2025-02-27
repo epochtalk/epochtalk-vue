@@ -42,14 +42,16 @@
       </div>
       <table class="underlined" width="100%">
         <thead>
-          <th class="pointer hide-mobile" @click="setSortField('reporter_username')"><span :class="getSortClass('reporter_username')"></span>&nbsp;Reported By</th>
-          <th class="pointer" @click="setSortField('created_at')"><span :class="getSortClass('created_at')"></span>&nbsp;Reported Date</th>
-          <th class="pointer" @click="setSortField('status')"><span :class="getSortClass('status')"></span>&nbsp;Status</th>
-          <th class="pointer" @click="setSortField('offender_username')"><span :class="getSortClass('offender_username')"></span>&nbsp;Reported User</th>
-          <th class="pointer hide-mobile" @click="setSortField('offender_email')"><span :class="getSortClass('offender_email')"></span>&nbsp;Email</th>
-          <th class="pointer hide-mobile" @click="setSortField('offender_created_at')"><span :class="getSortClass('offender_created_at')"></span>&nbsp;Register Date</th>
-          <th class="reason">Reason</th>
-          <th class="user-actions">Actions</th>
+          <tr>
+            <th class="pointer hide-mobile" @click="setSortField('reporter_username')"><span :class="getSortClass('reporter_username')"></span>&nbsp;Reported By</th>
+            <th class="pointer" @click="setSortField('created_at')"><span :class="getSortClass('created_at')"></span>&nbsp;Reported Date</th>
+            <th class="pointer" @click="setSortField('status')"><span :class="getSortClass('status')"></span>&nbsp;Status</th>
+            <th class="pointer" @click="setSortField('offender_username')"><span :class="getSortClass('offender_username')"></span>&nbsp;Reported User</th>
+            <th class="pointer hide-mobile" @click="setSortField('offender_email')"><span :class="getSortClass('offender_email')"></span>&nbsp;Email</th>
+            <th class="pointer hide-mobile" @click="setSortField('offender_created_at')"><span :class="getSortClass('offender_created_at')"></span>&nbsp;Register Date</th>
+            <th class="reason">Reason</th>
+            <th class="user-actions">Actions</th>
+          </tr>
         </thead>
         <tbody>
           <tr v-for="report in reportData.data" :key="report.id" class="selectable-row" :class="{ 'active-row' : selectedReport?.id === report.id }" @click="selectReport(report, $event)">
