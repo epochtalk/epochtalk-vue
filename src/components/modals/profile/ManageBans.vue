@@ -7,30 +7,32 @@
         <!-- Manage Bans -->
         <label class="bold">User Information</label>
         <table v-if="userCopy.username" class="striped" width="100%">
-          <tr>
-            <td>Username</td>
-            <td>{{ userCopy.username }}</td>
-          </tr>
-          <tr>
-            <td>Email</td>
-            <td>{{ userCopy.email }}</td>
-          </tr>
-          <tr>
-            <td>Register Date</td>
-            <td>{{ humanDate(userCopy.created_at) }}</td>
-          </tr>
-          <tr v-if="userCopy.ban_expiration">
-            <td>Global Ban Expiration (UTC)</td>
-            <td>{{ humanDate(dayjs.utc(userCopy.ban_expiration), true) }}</td>
-          </tr>
-          <tr v-if="userCopy?.banned_board_names?.length">
-            <td>Banned From Boards</td>
-            <td>
-              <span v-for="(boardName, i) in userCopy.banned_board_names" :key="i">
-                {{ boardName }}<span v-if="(i + 1) !== userCopy.banned_board_names.length">, </span>
-              </span>
-            </td>
-          </tr>
+          <tbody>
+            <tr>
+              <td>Username</td>
+              <td>{{ userCopy.username }}</td>
+            </tr>
+            <tr>
+              <td>Email</td>
+              <td>{{ userCopy.email }}</td>
+            </tr>
+            <tr>
+              <td>Register Date</td>
+              <td>{{ humanDate(userCopy.created_at) }}</td>
+            </tr>
+            <tr v-if="userCopy.ban_expiration">
+              <td>Global Ban Expiration (UTC)</td>
+              <td>{{ humanDate(dayjs.utc(userCopy.ban_expiration), true) }}</td>
+            </tr>
+            <tr v-if="userCopy?.banned_board_names?.length">
+              <td>Banned From Boards</td>
+              <td>
+                <span v-for="(boardName, i) in userCopy.banned_board_names" :key="i">
+                  {{ boardName }}<span v-if="(i + 1) !== userCopy.banned_board_names.length">, </span>
+                </span>
+              </td>
+            </tr>
+          </tbody>
         </table>
         <div v-if="!userCopy.username">
           <Multiselect ref="focusInput" v-model="userToBan.value" v-bind="userToBan" />

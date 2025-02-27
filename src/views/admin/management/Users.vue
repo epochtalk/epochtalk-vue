@@ -45,13 +45,15 @@
       </div>
       <table class="underlined" width="100%">
         <thead>
-          <th class="pointer" @click="setSortField('username')"><span :class="getSortClass('username')"></span>&nbsp;Username</th>
-          <th class="pointer" :class="{'hide-mobile': query?.filter === 'banned' }" @click="setSortField('email')"><span :class="getSortClass('email')"></span>&nbsp;Email</th>
-          <th class="pointer" v-if="query?.filter === 'banned'" @click="setSortField('ban_expiration')"><span :class="getSortClass('ban_expiration')"></span>&nbsp;Ban Expiration</th>
-          <th class="pointer hide-mobile" @click="setSortField('created_at')"><span :class="getSortClass('created_at')"></span>&nbsp;Registered Date</th>
-          <th class="hide-mobile">Last Active Date</th>
-          <th class="hide-mobile">IP Addresses</th>
-          <th class="user-actions">Actions</th>
+          <tr>
+            <th class="pointer" @click="setSortField('username')"><span :class="getSortClass('username')"></span>&nbsp;Username</th>
+            <th class="pointer" :class="{'hide-mobile': query?.filter === 'banned' }" @click="setSortField('email')"><span :class="getSortClass('email')"></span>&nbsp;Email</th>
+            <th class="pointer" v-if="query?.filter === 'banned'" @click="setSortField('ban_expiration')"><span :class="getSortClass('ban_expiration')"></span>&nbsp;Ban Expiration</th>
+            <th class="pointer hide-mobile" @click="setSortField('created_at')"><span :class="getSortClass('created_at')"></span>&nbsp;Registered Date</th>
+            <th class="hide-mobile">Last Active Date</th>
+            <th class="hide-mobile">IP Addresses</th>
+            <th class="user-actions">Actions</th>
+          </tr>
         </thead>
         <tbody>
           <tr v-for="user in users" :key="user.username">

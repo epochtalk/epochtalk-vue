@@ -95,9 +95,11 @@
         <section class="ads-container">
           <table class="striped ads-table full-width">
             <thead>
-              <th>Number</th>
-              <th>Display</th>
-              <th>Actions</th>
+              <tr>
+                <th>Number</th>
+                <th>Display</th>
+                <th>Actions</th>
+              </tr>
             </thead>
             <tbody>
               <tr v-for="(ad, index) in ads" :key="ad.id">
@@ -181,10 +183,12 @@
       <section class="factoids-container full-width">
         <table class="striped ads-table full-width">
           <thead>
-            <th>Number</th>
-            <th>Display</th>
-            <th>Enabled</th>
-            <th>Actions</th>
+            <tr>
+              <th>Number</th>
+              <th>Display</th>
+              <th>Enabled</th>
+              <th>Actions</th>
+            </tr>
           </thead>
           <tbody>
             <tr v-for="(factoid, index) in factoids" :key="factoid.id">

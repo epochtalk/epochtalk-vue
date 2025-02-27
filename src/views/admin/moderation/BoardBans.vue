@@ -40,11 +40,13 @@
     <div class="board-ban-content">
       <table class="underlined" width="100%">
         <thead>
-          <th class="left-icon-col"></th>
-          <th>User</th>
-          <th>Email</th>
-          <th class="banned-boards">Banned Boards</th>
-          <th>Action</th>
+          <tr>
+            <th class="left-icon-col"></th>
+            <th>User</th>
+            <th>Email</th>
+            <th class="banned-boards">Banned Boards</th>
+            <th>Action</th>
+          </tr>
         </thead>
         <tbody v-if="boardBanData?.data?.length">
           <tr v-for="boardBan in boardBanData?.data" :key="boardBan">
