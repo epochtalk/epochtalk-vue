@@ -9,9 +9,11 @@
 
       <table class="striped rulesTable" width="100%">
         <thead>
-          <th>Rule Name</th>
-          <th>Rule</th>
-          <th>Actions</th>
+          <tr>
+            <th>Rule Name</th>
+            <th>Rule</th>
+            <th>Actions</th>
+          </tr>
         </thead>
         <tbody v-if="!blacklist.length">
           <tr>
@@ -40,9 +42,11 @@
 
       <table class="striped rulesTable" width="100%">
         <thead>
-          <th>Rank Name</th>
-          <th>Minimum Post Count</th>
-          <th>Actions</th>
+          <tr>
+            <th>Rank Name</th>
+            <th>Minimum Post Count</th>
+            <th>Actions</th>
+          </tr>
         </thead>
         <tbody v-if="!ranks.length">
           <tr>
@@ -78,9 +82,11 @@
 
       <table class="striped rulesTable" width="100%">
         <thead>
-          <th>Rule Name</th>
-          <th>Rule Description</th>
-          <th>Actions</th>
+          <tr>
+            <th>Rule Name</th>
+            <th>Rule Description</th>
+            <th>Actions</th>
+          </tr>
         </thead>
         <tbody v-if="!rules.length">
           <tr>

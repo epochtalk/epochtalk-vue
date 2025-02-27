@@ -69,9 +69,11 @@
     <div v-if="userData.count > 0">
       <table class="underlined" width="100%">
         <thead>
-          <th>Username</th>
-          <th>Email</th>
-          <th>Actions</th>
+          <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Actions</th>
+          </tr>
         </thead>
         <tbody v-for="user in userData.users" :key="user.id">
           <tr>

@@ -29,8 +29,10 @@
       <div v-if="postData && postData?.posts?.length">
         <table class="profile-posts-table" width="100%">
           <thead>
-            <th class="thread">Thread</th>
-            <th class="timestamp pointer" @click="setDesc()"><span :class="getSortClass()"></span>&nbsp;Post Date</th>
+            <tr>
+              <th class="thread">Thread</th>
+              <th class="timestamp pointer" @click="setDesc()"><span :class="getSortClass()"></span>&nbsp;Post Date</th>
+            </tr>
           </thead>
 
           <tbody>
@@ -71,8 +73,10 @@
       <div v-if="postData?.posts.length">
         <table class="profile-posts-table" width="100%">
           <thead>
-            <th class="thread">Thread</th>
-            <th class="timestamp pointer" @click="setDesc()"><span :class="getSortClass()"></span>&nbsp;Post Date</th>
+            <tr>
+              <th class="thread">Thread</th>
+              <th class="timestamp pointer" @click="setDesc()"><span :class="getSortClass()"></span>&nbsp;Post Date</th>
+            </tr>
           </thead>
 
           <tbody>
