@@ -33,5 +33,6 @@ The main project was initially written in Node/Angular an is in the process of b
     * There should be no modifications made to this project, it is just running to stop the frontend from breaking when hitting api routes which have not been ported to the new `epochtalk-server` yet.
   * `epochtalk/epochtalk-vue` (main)
     * Frontend changes should be made here. When new routes are ported to the new elixir server, the front end api/views must be updated as well.
+    * See `PortRoadMap.md` within this project to view a list of remaining views to be ported.
   * `epochtalk/epochtalk-server` (main)
-    * See `PortRoadmap.md` within the `epochtalk-server` project for a list of unported api routes/features.
+    * See `PortRoadmap.md` within the `epochtalk-server` project for a list of which models and features have been ported.
