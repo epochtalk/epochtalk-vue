@@ -54,11 +54,13 @@
     <div class="logs-content fill-row" >
       <table class="underlined" width="100%">
         <thead>
-          <th>Date</th>
-          <th>Mod Username</th>
-          <th>Mod Action</th>
-          <th>Link</th>
-          <th>Raw</th>
+          <tr>
+            <th>Date</th>
+            <th>Mod Username</th>
+            <th>Mod Action</th>
+            <th>Link</th>
+            <th>Raw</th>
+          </tr>
         </thead>
         <tbody v-if="logData?.data?.length">
           <tr v-for="log in logData?.data" :key="log">
