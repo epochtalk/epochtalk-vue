@@ -31,7 +31,7 @@ The main project was initially written in Node/Angular an is in the process of b
 * Checkout each of the three projects and switch to the branch in parentheses
   * `epochtalk/epochtalk` (ui-refactor-2020)
     * There should be no modifications made to this project, it is just running to stop the frontend from breaking when hitting api routes which have not been ported to the new `epochtalk-server` yet.
-  * `epochtalk/epochtalk-vue` (main)
+  * `epochtalk/epochtalk-vue` (server-migration)
     * Frontend changes should be made here. When new routes are ported to the new elixir server, the front end api/views must be updated as well.
     * See `PortRoadMap.md` within this project to view a list of remaining views to be ported.
   * `epochtalk/epochtalk-server` (main)
